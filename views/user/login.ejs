@@ -1,0 +1,55 @@
+<%- include('../layouts/userLayouts/user-header.ejs') %>
+
+<%- include('../layouts/userLayouts/user-preloader.ejs') %>
+
+<%- include('../layouts/userLayouts/user-navbar.ejs') %>
+
+
+<main class="page-content">
+    <div class="tm-section tm-login-register-area bg-white tm-padding-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <form action="#" class="tm-form tm-login-form">
+                        <h4>Login</h4>
+                        <p>Become a part of our community!</p>
+                        <div class="tm-form-inner">
+                            <div class="tm-form-field">
+                                <label for="login-email">Username or email address*</label>
+                                <input type="email" name="email" id="login-email" required="required">
+                            </div>
+                            <div class="tm-form-field">
+                                <label for="login-password">Password*</label>
+                                <input type="password" name="password" id="login-password" required="required">
+                            </div>
+                            <div class="tm-form-field">
+                                <input type="checkbox" name="login-remember" id="login-remember">
+                                <label for="login-remember">Remember Me</label>
+                                <p class="mb-0"><a href="#">Forgot your password?</a></p>
+                            </div>
+                            <div class="tm-form-field">
+                                <button type="submit" class="tm-button">Login</button>
+                            </div>
+                            <div class="tm-form-field">
+                                <div class="tm-form-sociallogin">
+                                    <h6>Or, Login with :</h6>
+                                    <ul>
+                                        <li><a href="#" class="facebook-btn"><i
+                                                    class="ion-social-facebook"></i></a></li>
+                                        <li><a href="#" class="google-btn"><i class="ion-social-google"></i></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+<%- include('../layouts/userLayouts/brands.ejs') %>
+
+<%- include('../layouts/userLayouts/user-footer.ejs') %>

@@ -1,0 +1,360 @@
+<%- include('../layouts/userLayouts/user-header.ejs') %>
+
+<%- include('../layouts/userLayouts/user-preloader.ejs') %>
+
+<%- include('../layouts/userLayouts/user-navbar.ejs') %>
+
+
+<main class="page-content">
+    <div class="tm-section tm-login-register-area bg-white tm-padding-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <form action="/register" method="post" class="tm-form tm-register-form">
+
+                        <% if (typeof message !== 'undefined') { %>
+                            <h4 style="color: yellowgreen"> <%= message %></h4>
+                        <% } %>
+
+                        <h4>Create an account</h4>
+                        <p>Welcome! Register for an account</p>
+                        <div class="tm-form-inner">
+                            <div class="tm-form-field">
+                                <label for="register-first-name">First Name</label>
+                                <input type="text" name="firstname" id="register-first-name" required>
+                                <span id="first-name-error" style="color: red; display: none;">Enter your first name.</span>
+                            </div>
+                            <div class="tm-form-field">
+                                <label for="register-last-name">Last Name</label>
+                                <input type="text" name="lastname" id="register-last-name" required>
+                                <span id="last-name-error" style="color: red; display: none;">Enter your last name.</span>
+                            </div>
+                            <div class="tm-form-field">
+                                <label for="register-email">Email Address</label>
+                                <input type="email" name="email" id="register-email" required>
+                                <span id="email-error" style="color: red; display: none;">Enter email.</span>
+                            </div>
+                            <div class="tm-form-field">
+                                <label for="register-mobile">Mobile Number</label>
+                                <input type="text" name="mobile" id="register-mobile" required>
+                                <span id="mobile-error" style="color: red; display: none;">Please enter a 10-digit mobile number (digits 0-9) only.</span>
+                            </div>
+                            <div class="tm-form-field">
+                                <label for="register-password">Password</label>
+                                <input type="password" name="registerpassword" id="register-password" required>  <!-- name="register-pass" -->
+                                <span id="password-error" style="color: red; display: none;">Password should be at least 8 characters long and include a combination of uppercase and lowercase letters, numbers, and symbols.</span>
+                                <div>
+                                    <input type="checkbox" name="register-pass-show" id="register-pass-show">
+                                    <label for="register-pass-show">Show Password</label>
+                                </div>
+                            </div>
+                            <div class="tm-form-field">
+                                <label for="confirm-password">Confirm Password</label>
+                                <input type="password" name="confirmpassword" id="confirm-password" required>
+                                <span id="confirm-password-error" style="color: red; display: none;">Password mismatch.!</span>
+                            </div>
+                            <div class="tm-form-field">
+                                <div>
+                                    <input type="checkbox" id="register-terms" name="register-terms">
+                                    <label for="register-terms">I have read and agree to the website <a href="#">terms and conditions</a></label>
+                                </div>
+                                <span id="terms-error" style="color: red; display: none;">Please agree to the terms and conditions.</span>
+                            </div>
+                            <div class="tm-form-field">
+                                <button type="submit" class="tm-button" id="register-button"> Register</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function (){
+
+        var isValid = true;
+
+        // Function to check all fields for errors
+        function checkAllFields() {
+            var firstName = document.getElementById("register-first-name");
+            var lastName = document.getElementById("register-last-name");
+            var email = document.getElementById("register-email");
+            var mobileInput = document.getElementById("register-mobile");
+            var password = document.getElementById("register-password");
+            var confirmPassword = document.getElementById("confirm-password");
+            var terms = document.getElementById("register-terms");
+
+            var firstNameError = document.getElementById("first-name-error");
+            var lastNameError = document.getElementById("last-name-error");
+            var emailError = document.getElementById("email-error");
+            var mobileError = document.getElementById("mobile-error");
+            var passwordError = document.getElementById("password-error");
+            var confirmPasswordError = document.getElementById("confirm-password-error");
+            var termsError = document.getElementById("terms-error");
+
+            // Check first name
+            if (!firstName.value) {
+                firstNameError.style.display = "block";
+                isValid = false;
+            } else {
+                firstNameError.style.display = "none";
+            }
+
+            // Check last name
+            if (!lastName.value) {
+                lastNameError.style.display = "block";
+                isValid = false;
+            } else {
+                lastNameError.style.display = "none";
+            }
+
+            // Check email
+            if (!email.value) {
+                emailError.style.display = "block";
+                isValid = false;
+            } else {
+                emailError.style.display = "none";
+            }
+
+            // Check mobile
+            var mobilePattern = /^[0-9]{10}$/;
+            if (!mobilePattern.test(mobileInput.value)) {
+                mobileError.style.display = 'block';
+                isValid = false;
+            } else {
+                mobileError.style.display = 'none';
+            }
+
+            // Check password
+            if (password.value === "" || password.value.length < 8 || !validateExpressions(password.value)) {
+                passwordError.textContent = "Password should be at least 8 characters long and include a combination of uppercase and lowercase letters, numbers, and symbols.";
+                passwordError.style.display = 'block';
+                isValid = false;
+            } else if (!validateExpressions(password.value)) {
+                passwordError.textContent = "Password should contain at least one uppercase letter, one lowercase letter, one number, and one symbol.";
+                passwordError.style.display = 'block';
+                isValid = false;
+            } else {
+                passwordError.style.display = 'none';
+            }
+
+            // Check confirm password
+            if (confirmPassword.value != password.value) {
+                confirmPasswordError.style.display = "block";
+                isValid = false;
+            } else {
+                confirmPasswordError.style.display = "none";
+            }
+
+            // Check terms
+            if (!terms.checked) {
+                termsError.style.display = "block";
+                isValid = false;
+            } else {
+                termsError.style.display = "none";
+            }
+        }
+
+
+
+        var submitButton = document.getElementById("register-button");
+        submitButton.addEventListener('click', function(){
+            checkAllFields();
+        })
+
+
+
+
+
+
+        // ================================================================================
+
+
+
+
+        // CHECKS INDIVIDUAL VALIDATIONS
+
+        // First Name validation
+        var firstName = document.getElementById("register-first-name");
+        var firstNameError = document.getElementById("first-name-error");
+        firstName.addEventListener('input', function(){
+            if (!firstName.value) {
+            firstNameError.style.display = "block";
+            isValid = false;
+        }
+        else{
+            firstNameError.style.display = "none";
+        }
+        });
+
+
+        
+        
+        // Last Name validation
+        var lastName = document.getElementById("register-last-name");
+        var lastNameError = document.getElementById("last-name-error");
+        lastName.addEventListener('input', function(){
+            if (!lastName.value) {
+            lastNameError.style.display = "block";
+            isValid = false;
+        }
+        else{
+            lastNameError.style.display = "none";
+        }
+        });
+
+
+
+
+        // Email validation
+        var email = document.getElementById("register-email");
+        var emailError = document.getElementById("email-error");
+        email.addEventListener('input', function(){
+            if (!email.value) {
+            emailError.style.display = "block";
+            isValid = false;
+        }
+        else{
+            emailError.style.display = "none";
+        }
+        });
+
+
+
+
+        // Mobile validation
+        var mobileInput = document.getElementById("register-mobile");
+        var mobileError = document.getElementById("mobile-error");
+        mobileInput.addEventListener('input', function () {
+            var mobilePattern = /^[0-9]{10}$/;
+            if (!mobilePattern.test(mobileInput.value)) {
+                mobileError.style.display = 'block';
+                isValid = false;
+            } else {
+                mobileError.style.display = 'none';
+            }
+        });
+
+
+
+
+
+        // Password validation
+        function validateExpressions(password) {
+            var uppercaseRegex = /[A-Z]/;
+            var lowercaseRegex = /[a-z]/;
+            var numberRegex = /[0-9]/;
+            var symbolRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
+            return (
+                uppercaseRegex.test(password) &&
+                lowercaseRegex.test(password) &&
+                numberRegex.test(password) &&
+                symbolRegex.test(password)
+            );
+        }
+
+        var password = document.getElementById("register-password");
+        var passwordError = document.getElementById("password-error");
+        password.addEventListener('input', function(){            
+            if (password.value === "" || password.value.length <8 && !validateExpressions(password.value)) {
+                passwordError.textContent = "Password should be at least 8 characters long and include a combination of uppercase and lowercase letters, numbers, and symbols.";
+                passwordError.style.display = 'block';
+                isValid = false;
+            }else if (!validateExpressions(password.value)){
+                passwordError.textContent = "Password should contain at least one uppercase letter, one lowercase letter, one number, and one symbol.";
+                passwordError.style.display = 'block';
+                isValid = false;
+            } else {
+                passwordError.style.display = 'none';
+            }
+        });        
+
+
+
+
+
+        // Confirm-Password validation
+        var confirmPassword = document.getElementById("confirm-password");
+        var confirmPasswordError = document.getElementById("confirm-password-error");
+        confirmPassword.addEventListener('input', function(){
+            if (confirmPassword.value != password.value) {
+                confirmPasswordError.style.display = "block";
+                isValid = false;
+            } else {
+                confirmPasswordError.style.display = "none";
+            }
+        })
+
+
+
+
+
+        // Terms validation
+        var terms = document.getElementById("register-terms");
+        var termsError = document.getElementById("terms-error");
+        terms.addEventListener('change', function(){
+            if (!terms.checked) {
+                termsError.style.display = "block";
+                isValid = false;
+            } else {
+                termsError.style.display = "none";
+                isValid = true;
+            }
+        });
+
+
+        
+
+        // Form submission validation
+        var registerForm = document.querySelector('.tm-register-form');
+        registerForm.addEventListener('submit', function(event) {
+            if (!isValid) {
+                event.preventDefault(); // Prevent form submission
+            }
+        });
+
+
+
+        
+
+
+
+    });
+</script>
+
+
+
+<!-- <script>
+// Mobile number validation ----------
+    document.addEventListener('DOMContentLoaded', function () {
+        var mobileInput = document.getElementById('register-mobile');
+        var mobileError = document.getElementById('mobile-error');
+
+        mobileInput.addEventListener('input', function () {
+            var mobilePattern = /^[0-9]{10}$/;
+            if (!mobilePattern.test(mobileInput.value)) {
+                mobileError.style.display = 'block';
+            } else {
+                mobileError.style.display = 'none';
+            }
+        });
+    });
+
+</script> -->
+
+ 
+
+
+
+
+
+
+<%- include('../layouts/userLayouts/brands.ejs') %>
+
+<%- include('../layouts/userLayouts/user-footer.ejs') %>
