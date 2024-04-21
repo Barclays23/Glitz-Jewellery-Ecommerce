@@ -1,35 +1,39 @@
 const express = require ('express');
-const user_route = express();
+const userRoute = express();
 const session = require ('express-session');
 
-user_route.use(session({
+userRoute.use(session({
     secret: process.env.sessionSecret,
     saveUninitialized: true,
     resave: false
 }));
 
-user_route.set('view engine', 'ejs');
-user_route.set('views', './views/user');
+userRoute.set('view engine', 'ejs');
+userRoute.set('views', './views/user');
 
 
-user_route.use(express.json());
-user_route.use(express.urlencoded({extended:true}));
+userRoute.use(express.json());
+userRoute.use(express.urlencoded({extended:true}));
 
 
-user_route.use(express.static('public'));
+userRoute.use(express.static('public'));
 
 
 const userAuth = require('../middlewares/userAuth');
 const userController = require ('../controllers/userController');
 
-user_route.get('/', userController.loadHome);
-user_route.get('/login', userController.loadLogin);
-user_route.get('/register', userController.loadRegister);
-user_route.post('/register', userController.insertUser);
-user_route.get('/verify-account', userController.loadVerifyAccount);
+userRoute.get('/', userController.loadHome);
+
+userRoute.get('/login', userController.loadLogin);
+userRoute.post('/login', userController.verifyLogin);
+
+userRoute.get('/register', userController.loadRegister);
+userRoute.post('/register', userController.insertUser);
+
+userRoute.get('/verify-account', userController.loadVerifyAccount);
+userRoute.post('/verify-account', userController.verifyAccount);
 
 
 
 
-
-module.exports = user_route
+module.exports = userRoute

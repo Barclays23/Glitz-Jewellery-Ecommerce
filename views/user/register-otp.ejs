@@ -4,39 +4,39 @@
 
 <%- include('../layouts/userLayouts/user-navbar.ejs') %>
 
-
-
-
 <main class="page-content">
     <div class="tm-section bg-white tm-padding-section">
         <div class="container">
-            <form action="#" class="tm-regular-form otpform">
+            <form class="tm-regular-form otpform">
                 <div>
                     <h4 class="form-title">VERIFY YOUR ACCOUNT</h4>
                 </div>
                 <div>
-                    <p class="form-title-info"> We've just sent you an email containing a verification code. Please check your inbox and enter the code here to complete the registration process. </p>
+                    <p class="form-title-info">We've just sent you an email containing a verification code. Please check your inbox and enter the code here to complete the registration process.</p>
                 </div>
+                <span id="error-message" style="color: red;"></span>
                 <div class="tm-otpform-inner">
                     <div class="tm-form-field otp-area">
-                        <input type="text" class="otp-field" maxlength="1" oninput="moveToNext(this)" onkeypress="return isNumberKey(event)" pattern="[0-9]*" inputmode="numeric"/>
-                        <input type="text" class="otp-field" maxlength="1" oninput="moveToNext(this)" onkeypress="return isNumberKey(event)" pattern="[0-9]*" inputmode="numeric"/>
-                        <input type="text" class="otp-field" maxlength="1" oninput="moveToNext(this)" onkeypress="return isNumberKey(event)" pattern="[0-9]*" inputmode="numeric"/>
-                        <input type="text" class="otp-field" maxlength="1" oninput="moveToNext(this)" onkeypress="return isNumberKey(event)" pattern="[0-9]*" inputmode="numeric"/>
-                        <input type="text" class="otp-field" maxlength="1" oninput="moveToNext(this)" onkeypress="return isNumberKey(event)" pattern="[0-9]*" inputmode="numeric"/>
-                        <input type="text" class="otp-field" maxlength="1" oninput="moveToNext(this)" onkeypress="return isNumberKey(event)" pattern="[0-9]*" inputmode="numeric"/>
+                        <input type="text" name="digit1" id="digit1" class="otp-field" maxlength="1" oninput="moveToNext(this)" onkeypress="return isNumberKey(event)" pattern="[0-9]*" inputmode="numeric"/>
+                        <input type="text" name="digit2" id="digit2" class="otp-field" maxlength="1" oninput="moveToNext(this)" onkeypress="return isNumberKey(event)" pattern="[0-9]*" inputmode="numeric"/>
+                        <input type="text" name="digit3" id="digit3" class="otp-field" maxlength="1" oninput="moveToNext(this)" onkeypress="return isNumberKey(event)" pattern="[0-9]*" inputmode="numeric"/>
+                        <input type="text" name="digit4" id="digit4" class="otp-field" maxlength="1" oninput="moveToNext(this)" onkeypress="return isNumberKey(event)" pattern="[0-9]*" inputmode="numeric"/>
+                        <input type="text" name="digit5" id="digit5" class="otp-field" maxlength="1" oninput="moveToNext(this)" onkeypress="return isNumberKey(event)" pattern="[0-9]*" inputmode="numeric"/>
+                        <input type="text" name="digit6" id="digit6" class="otp-field" maxlength="1" oninput="moveToNext(this)" onkeypress="return isNumberKey(event)" pattern="[0-9]*" inputmode="numeric"/>
                     </div>
                 </div>
                 <div>
-                    <p class="form-bottom-msg"> Didn't receive the verification code yet? <a href=""><b> Resend Code </b></a></p>
+                    <p class="form-bottom-msg">Didn't receive the verification code yet? <a href=""><b>Resend Code</b></a></p>
                 </div>
                 <div class="tm-checkout-submit">
                     <div class="tm-form-inner">
                         <div class="tm-form-field">
-                            <button type="submit" class="tm-button ml-auto">Verify Account</button>
+                            <button type="button" onclick="formSubmit()" id="verifyButton" class="tm-button ml-auto">Verify Account</button>
                         </div>
                     </div>
                 </div>
+                <!-- Hidden input field for the id parameter -->
+                <input type="hidden" name="id" id="userId" value="<%= userId %>">
             </form>
         </div>
     </div>
@@ -44,25 +44,89 @@
 
 
 
+<!-- ------------------------------------------------------------------------------- -->
 
 <script>
-    function moveToNext(input) {
-        if (input.value.length >= input.maxLength) {
-            var nextInput = input.nextElementSibling;
-            if (nextInput !== null) {
-                nextInput.focus();
-            }
-        }
+
+function formSubmit() {
+    const num1 = document.getElementById('digit1').value;
+    const num2 = document.getElementById('digit2').value;
+    const num3 = document.getElementById('digit3').value;
+    const num4 = document.getElementById('digit4').value;
+    const num5 = document.getElementById('digit5').value;
+    const num6 = document.getElementById('digit6').value;
+
+    const OTP = num1 + num2 + num3 + num4 + num5 + num6;
+
+    const errorMessage = document.getElementById('error-message');
+
+    const userID = document.getElementById('userId').value;
+    console.log(OTP, userID);
+
+    if(OTP.length < 6){
+        errorMessage.textContent = "Enter Valid OTP";
+        return;
     }
 
-    function isNumberKey(evt) {
-        var charCode = (evt.which) ? evt.which : event.keyCode;
-        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-            return false;
+    const url = '/verify-account';
+
+    // Create fetch request
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ OTP, userID })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = '/login';
+        } else if(data.notFound){
+            errorMessage.textContent = data.message;
+        } else if(data.incorrect){
+            errorMessage.textContent = data.message;
+        } else if(data.otpExpire){
+            errorMessage.textContent = data.message;
         }
-        return true;
+         else {
+            console.error('Verification failed');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+
+};
+
+
+
+
+
+
+// to move the curser to next field automatically
+function moveToNext(input) {
+    if (input.value.length >= input.maxLength) {
+        var nextInput = input.nextElementSibling;
+        if (nextInput !== null) {
+            nextInput.focus();
+        }
     }
+}
+
+function isNumberKey(evt) {
+    var charCode = (evt.which) ? evt.which : event.keyCode;
+    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+        return false;
+    }
+    return true;
+}
 </script>
+
+
+
+
+<!-- ----------------------------------------------------------------------- -->
 
 
 <%- include('../layouts/userLayouts/user-footer.ejs') %>

@@ -10,17 +10,33 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-6">
-                    <form action="#" class="tm-form tm-login-form">
+                    <form class="tm-form tm-login-form">
+                    <!-- <div class="tm-form tm-login-form"> -->
                         <h4>Login</h4>
-                        <p>Become a part of our community!</p>
+                        <span id="error-message" style="color: red; display: none;"></span>
                         <div class="tm-form-inner">
+
+                            <% if (verificationSuccess) { %>
+                                <div class="alert alert-success" role="alert">
+                                    Your account has been successfully verified!
+                                </div>
+                            <% } %>
+
+                            <% if (passwordResetSuccess) { %>
+                                <div class="alert alert-success" role="alert">
+                                    Your password has been successfully reset!
+                                </div>
+                            <% } %>
+
                             <div class="tm-form-field">
                                 <label for="login-email">Username or email address*</label>
-                                <input type="email" name="email" id="login-email" required="required">
+                                <input type="email" name="email" id="login-email">
+                                <span id="email-error" style="color: red; display: none;"></span>
                             </div>
                             <div class="tm-form-field">
                                 <label for="login-password">Password*</label>
-                                <input type="password" name="password" id="login-password" required="required">
+                                <input type="password" name="password" id="login-password">
+                                <span id="password-error" style="color: red; display: none;"></span>
                             </div>
                             <div class="tm-form-field">
                                 <input type="checkbox" name="login-remember" id="login-remember">
@@ -28,7 +44,7 @@
                                 <p class="mb-0"><a href="#">Forgot your password?</a></p>
                             </div>
                             <div class="tm-form-field">
-                                <button type="submit" class="tm-button">Login</button>
+                                <button type="button" onclick="formSubmit()" class="tm-button" id="login-button">Login</button>
                             </div>
                             <div class="tm-form-field">
                                 <div class="tm-form-sociallogin">
@@ -42,6 +58,7 @@
                                 </div>
                             </div>
                         </div>
+                    <!-- </div> -->
                     </form>
                 </div>
             </div>
@@ -50,6 +67,250 @@
 </main>
 
 
+
+<!-- ----------------------------------------------------------------------- -->
+
+
+<!-- CHECK WITH DISPLAY: NONE (removed display: none;) -->
+
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function () {
+    const emailInput = document.getElementById('login-email');
+    const passwordInput = document.getElementById('login-password');
+    const loginButton = document.getElementById('login-button');
+
+
+    // const loginEmail = document.getElementById('login-email').value;
+    // const loginPassword = document.getElementById('login-password').value;
+
+    const emailError = document.getElementById('email-error');
+    const passwordError = document.getElementById('password-error');
+    const errorMessage = document.getElementById('error-message');
+    
+
+    loginButton.addEventListener('click', function (event) {
+        event.preventDefault();
+
+        // Reset error messages
+        emailError.textContent = '';
+        passwordError.textContent = '';
+
+        const loginEmail = emailInput.value.trim();
+        const loginPassword = passwordInput.value.trim();
+
+        let isValid = true;
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const isValidEmail = emailRegex.test(loginEmail);
+
+        if (!loginEmail || loginEmail === "") {
+            emailError.textContent = "Email is required";
+            emailError.style.display = 'block';
+            isValid = false;
+        } else if (!isValidEmail) {
+            emailError.textContent = "Invalid Email Format";
+            emailError.style.display = 'block';
+            isValid = false;
+        } else {
+            emailError.style.display = 'none';
+        }
+
+
+
+        if (!loginPassword) {
+            passwordError.textContent = "Password is required";
+            passwordError.style.display = 'block';
+            isValid = false;
+        } else {
+            passwordError.style.display = 'none';
+        }
+
+
+        if (!isValid) {
+            return; // Prevent form submission
+        } else{
+            formSubmit(loginEmail, loginPassword);
+        }
+
+
+
+        function formSubmit(loginEmail, loginPassword) {
+            const url = '/login';
+
+            // Create fetch request
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ loginEmail, loginPassword })
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    console.error('Network response was not ok:', response.status);
+                    return response.json();
+                    // throw new Error('Network response was not ok.');
+                }
+            })
+            // .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/';
+                } else if (data.notFound) {
+                    emailError.textContent = data.message;
+                    emailError.style.display = 'block';
+                } else if (data.emailRequired) {
+                    emailError.textContent = data.message;
+                    emailError.style.display = 'block';
+                } else if (data.incorrect) {
+                    passwordError.textContent = data.message;
+                    passwordError.style.display = 'block';
+                } else {
+                    console.error('Login failed');
+                }
+            })
+
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+
+            window.formSubmit = formSubmit;
+        }
+
+
+    });
+
+
+    
+
+});
+
+</script>
+
+
 <%- include('../layouts/userLayouts/brands.ejs') %>
 
 <%- include('../layouts/userLayouts/user-footer.ejs') %>
+    
+
+
+
+    <!-- // // Form submission validation
+    // var loginForm = document.querySelector('.tm-login-form');
+    // loginForm.addEventListener('submit', function(event) {
+    //     if (!isValid) {
+    //         event.preventDefault(); // Prevent form submission
+    //     }
+    // });
+
+
+
+
+
+
+    // emailInput.addEventListener('input', function(){
+    //         if (!isValidEmail) {
+    //         emailError.style.display = "block";
+    //         isValid = false;
+    //     }
+    //     else{
+    //         emailError.style.display = "none";
+    //     }
+    // }); -->
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const loginEmail = document.getElementById('login-email').value;
+        const loginPassword = document.getElementById('login-password').value;
+    
+        const errorMessage = document.getElementById('error-message');
+        const emailError = document.getElementById('email-error');
+        const passwordError = document.getElementById('password-error');
+    
+    
+    // ADD EVENT LISTENER TO EMAIL AND PASSWORD VALIDATION INSIDE THE EVENT LISTENER
+        // Email validation
+        
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!loginEmail) {
+            emailError.textContent = 'Email is required';
+            emailError.style.display = "block";
+            isValid = false;
+        } else if (!emailRegex.test(loginEmail)) {
+            emailError.textContent = 'Enter a valid email';
+            emailError.style.display = "block";
+            isValid = false;
+        } else {
+            emailError.style.display = "none";
+        }
+    
+    
+        // Password validation
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!loginPassword) {
+            passwordError.textContent = 'Password is required';
+            passwordError.style.display = "block";
+        } else if (!passwordRegex.test(loginPassword)) {
+            passwordError.textContent = 'Enter a valid password';
+            passwordError.style.display = "block";
+        } else {
+            passwordError.style.display = "none";
+        }
+    
+    
+    function formSubmit() {
+        console.log('entered email', loginEmail);
+        console.log('entered password', loginPassword);
+    
+        const url = '/login';
+    
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ loginEmail, loginPassword })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = '/';
+            } else if(data.notFound){
+                errorMessage.textContent = data.message;
+            } else if(data.incorrect){
+                errorMessage.textContent = data.message;
+            } else {
+                console.error('Verification failed');
+            }
+        })
+        .catch(error => {
+            console.error('Catch Error:', error);
+        });
+    
+    }
+    });
+    </script> -->
