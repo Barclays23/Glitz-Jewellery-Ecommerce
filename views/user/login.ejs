@@ -29,7 +29,7 @@
                             <% } %>
 
                             <div class="tm-form-field">
-                                <label for="login-email">Username or email address*</label>
+                                <label for="login-email">Username or Email Address*</label>
                                 <input type="email" name="email" id="login-email">
                                 <span id="email-error" style="color: red; display: none;"></span>
                             </div>
@@ -71,8 +71,6 @@
 <!-- ----------------------------------------------------------------------- -->
 
 
-<!-- CHECK WITH DISPLAY: NONE (removed display: none;) -->
-
 
 <script>
 
@@ -104,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const isValidEmail = emailRegex.test(loginEmail);
-
+        
         if (!loginEmail || loginEmail === "") {
             emailError.textContent = "Email is required";
             emailError.style.display = 'block';
@@ -159,13 +157,26 @@ document.addEventListener('DOMContentLoaded', function () {
             // .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    window.location.href = '/';
+                    // Show Sweet Alert for successful login
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'You have successfully logged in.',
+                        icon: 'success',
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        window.location.href = '/'; // Redirect to homepage after 1.5 seconds
+                    });
                 } else if (data.notFound) {
                     emailError.textContent = data.message;
                     emailError.style.display = 'block';
                 } else if (data.emailRequired) {
                     emailError.textContent = data.message;
                     emailError.style.display = 'block';
+                } else if (data.notVerified) {
+                    emailError.textContent = data.message;
+                    emailError.style.display = 'block';
+                    window.location.href = '/verify-account'; // Redirect to verify-account
                 } else if (data.incorrect) {
                     passwordError.textContent = data.message;
                     passwordError.style.display = 'block';
@@ -173,11 +184,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     console.error('Login failed');
                 }
             })
-
             .catch(error => {
                 console.error('Error:', error);
             });
-
 
             window.formSubmit = formSubmit;
         }
@@ -192,6 +201,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 </script>
 
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <%- include('../layouts/userLayouts/brands.ejs') %>
 
@@ -211,8 +222,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-
-
     // emailInput.addEventListener('input', function(){
     //         if (!isValidEmail) {
     //         emailError.style.display = "block";
@@ -223,94 +232,3 @@ document.addEventListener('DOMContentLoaded', function () {
     //     }
     // }); -->
 
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const loginEmail = document.getElementById('login-email').value;
-        const loginPassword = document.getElementById('login-password').value;
-    
-        const errorMessage = document.getElementById('error-message');
-        const emailError = document.getElementById('email-error');
-        const passwordError = document.getElementById('password-error');
-    
-    
-    // ADD EVENT LISTENER TO EMAIL AND PASSWORD VALIDATION INSIDE THE EVENT LISTENER
-        // Email validation
-        
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!loginEmail) {
-            emailError.textContent = 'Email is required';
-            emailError.style.display = "block";
-            isValid = false;
-        } else if (!emailRegex.test(loginEmail)) {
-            emailError.textContent = 'Enter a valid email';
-            emailError.style.display = "block";
-            isValid = false;
-        } else {
-            emailError.style.display = "none";
-        }
-    
-    
-        // Password validation
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-        if (!loginPassword) {
-            passwordError.textContent = 'Password is required';
-            passwordError.style.display = "block";
-        } else if (!passwordRegex.test(loginPassword)) {
-            passwordError.textContent = 'Enter a valid password';
-            passwordError.style.display = "block";
-        } else {
-            passwordError.style.display = "none";
-        }
-    
-    
-    function formSubmit() {
-        console.log('entered email', loginEmail);
-        console.log('entered password', loginPassword);
-    
-        const url = '/login';
-    
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ loginEmail, loginPassword })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                window.location.href = '/';
-            } else if(data.notFound){
-                errorMessage.textContent = data.message;
-            } else if(data.incorrect){
-                errorMessage.textContent = data.message;
-            } else {
-                console.error('Verification failed');
-            }
-        })
-        .catch(error => {
-            console.error('Catch Error:', error);
-        });
-    
-    }
-    });
-    </script> -->

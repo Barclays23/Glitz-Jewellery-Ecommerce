@@ -46,25 +46,38 @@ const verifyLogin = async (req, res) => {
         const userData = await User.findOne({ email: loginEmail });
         console.log('userData is : ', userData);
 
-        if (!userData) {
-            return res.status(404).json({ notFound: true, message: "The email is not registered with us. Please sign up." });
-        } else {
+        if (userData) {
             const passwordMatch = await bcrypt.compare(loginPassword, userData.password);
-            if (!passwordMatch) {
-                console.log("Incorrect password");
+
+            if (passwordMatch) {
+                console.log('password is matching');
+                if(userData.isVerified === 1){
+                    console.log('user account is verified, login successful');
+                    req.session.userId = userData._id;
+                    console.log('req session', req.session);
+                    return res.status(200).json({success: true});
+                } else{
+                    console.log('user account is not verified');
+                    // return res.status(401).json({ notVerified: true, message: "Email verification is pending.. Please check your mail & verify.!" });
+                    return res.status(401).json({ notVerified: true, message: "Email verification is pending. Please verify.!" });
+                    // res.redirect('/verify-account');
+                }
+            }
+            else{
+                console.log('password incorrect');
                 return res.status(401).json({ incorrect: true, message: "Incorrect Password!" });
-            } else {
-                console.log('Sign in successful');
-                return res.status(200).json({ success: true });
             }
         }
+        else{
+            return res.status(404).json({ notFound: true, message: "The email is not registered with us. Please sign up." });
+        }
+        
+        
     } catch (error) {
         console.error("Error in login verification:", error);
         return res.status(500).json({ message: "Internal server error" });
     }
 }
-
-
 
 
 
@@ -101,32 +114,42 @@ const securePassword = async(password)=>{
 // create/insert new user data --------------------------------
 const insertUser = async(req, res)=>{
     try {
-        const existEmail = await User.findOne({email: req.body.email});
-        // const existMobile = await User.findOne({mobile: req.body.mobile});
-        if (existEmail) {
-            res.render('registration', {message: 'Email Already Exists.!'});
-            console.log('Email already und...');
-        // } else if (existMobile){
-        //     res.render('registration', {message: 'Mobile Number Already Exists.!'});
+        console.log('req.body is: ', req.body);
+        const existEmail = await User.findOne({email: req.body.userEmail});
+        const existMobile = await User.findOne({mobile: req.body.userMobile});
+        if(existEmail && existMobile){
+            return res.status(409).json({emailExists: true, mobileExists: true})
+        }else if (existEmail) {
+            console.log('Email is exist...');
+            return res.status(409).json({emailExists: true})
+            // return res.render('registration', {message: 'Email Already Exists.!'});
+        } else if (existMobile){
+            console.log('Mobile is exist...');
+           return res.status(409).json({mobileExists: true})
+            // res.render('registration', {message: 'Mobile Number Already Exists.!'});
         } else {
-            const securedPass = await securePassword(req.body.registerpassword);
+            const securedPass = await securePassword(req.body.userPassword);
             const user = new User ({
-                firstname : req.body.firstname,
-                lastname : req.body.lastname,
-                email : req.body.email,
-                mobile : req.body.mobile,
+                firstname : req.body.userFirstName,
+                lastname : req.body.userLastName,
+                email : req.body.userEmail,
+                mobile : req.body.userMobile,
                 password : securedPass,
                 isAdmin : 0
             });
 
             const userData = await user.save();
+            // const redirectPath = `/verify-account?id=${userData._id}`;
 
             if (userData) {
                 sendOtpVerificationMail(userData, res);
-                // res.render('registration', {message: "Registration Successful, Please verify your Email."});
-                res.redirect(`/verify-account?id=${userData._id}`);
+                // res.redirect(`/verify-account?id=${userData._id}`);
+                console.log('User ID:', userData._id);
+                return res.status(200).json({success: true, userId: userData._id });
+                // res.status(200).json({success: true, userId : userData._id});
             } else {
-                res.render('registration', {message: "Registration Failed !"});
+                return   res.status(400).json({failed: true, message: "Registration Failed !"})
+                // res.render('registration', {message: "Registration Failed !"});
             }
         }
     } catch (error) {
@@ -136,17 +159,39 @@ const insertUser = async(req, res)=>{
 
 
 
+// resend otp function -----------------------------------------
+const resendOtp = async(req, res)=>{
+    try {
+        console.log("resend Otp: ");
+        console.log("resend Otp Id  : ",req.query.id);
+
+        const userData = await User.findOne({_id: req.query.id});
+        console.log("user : ",userData);
+        // const existMobile = await User.findOne({mobile: req.body.mobile});
+        if (userData) {
+            sendOtpVerificationMail(userData, res);
+            console.log('resend otp mail sent');
+            res.redirect(`/verify-account?id=${userData._id}`);
+            console.log('redirected to otp page after resend otp');
+        }
+    } catch (error) {
+        console.log(error.message);
+        console.log('resend otp failed.');
+    }
+}
+
+
 
 // for sending mail for verification --------------------------
 const sendOtpVerificationMail = async({firstname, lastname, email, _id}, res)=>{
     try {
         const otp = Math.floor(Math.random()*900000+100000);
         console.log('generated otp is: ' + otp);
-        const expirationDuration = 2 * 60 * 1000; // 2 minutes in milliseconds
+        const expirationDuration = 5 * 60 * 1000; // 2 minutes in milliseconds
         const expirationTime = new Date(Date.now() + expirationDuration);
         const hashedOtp = await bcrypt.hash(otp.toString(), 10);
 
-
+        // res.render('register-otp', { expirationTime: expirationTime });
 
         const transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -254,6 +299,9 @@ const sendOtpVerificationMail = async({firstname, lastname, email, _id}, res)=>{
                     <strong>OTP:</strong> ${otp}
                 </div>
                 <p>This OTP is valid for a single use and will expire shortly. Please do not share this OTP with anyone for security reasons.</p>
+
+                <p>In case you missed or closed the verification page, you can access it again by clicking <a href=http://localhost:3000/verify-account?id=${_id}> <b> here.<a></b></p>
+
                 <p>If you did not request this registration or if you have any questions, please contact our support team immediately.</p>
                 <p>Thank you,</p><br>
                 <div class="contact">
@@ -318,6 +366,9 @@ const sendOtpVerificationMail = async({firstname, lastname, email, _id}, res)=>{
 const loadVerifyAccount = async(req, res)=>{
     try {
         const userId = req.query.id;
+        console.log("load verify account : ",userId);;
+    //    res.write("hello");
+    //    return res.end();
         res.render('register-otp', {userId});
     } catch (error) {
         console.log('Register otp page loading failed');
@@ -353,6 +404,8 @@ const verifyAccount = async (req, res)=>{
         }
 
         console.log('OTP verification successful');
+        const updateInfo = await User.updateOne({_id: req.body.userID}, {isVerified: 1});
+        console.log('updated user info after account verify : ', updateInfo);
         return res.json({ success: true});
 
 
@@ -379,5 +432,6 @@ module.exports = {
     sendOtpVerificationMail,
     loadVerifyAccount,
     verifyAccount,
+    resendOtp,
 
 }

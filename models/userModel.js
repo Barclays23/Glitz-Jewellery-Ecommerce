@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
         unique : true
     },
     mobile : {
-        type : Number,
+        type : String,
         required : true,
         unique : true,
     },
@@ -37,6 +37,10 @@ const userSchema = new mongoose.Schema({
         type : Number,
         default : 0,
         required : true
+    },
+    token: {
+        type: String,
+        default: ''
     }
 });
 

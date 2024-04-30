@@ -1,0 +1,343 @@
+<%- include('../layouts/adminLayouts/admin-header.ejs') %>
+
+<body>
+  <div class="container-scroller">
+    <div class="container-fluid page-body-wrapper full-page-wrapper">
+      <div class="row w-100">
+        <div
+          class="content-wrapper full-page-wrapper d-flex align-items-center auth login-bg">
+          <div class="card col-lg-4 mx-auto">
+            <div class="card-body px-5 py-5">
+              <span id="error-message" style="color: orange; display: none"></span>
+              <h3 class="card-title text-start mb-3">Login</h3>
+              <form class="admin-login-form">
+                <div class="form-group">
+                  <label for="login-email">Username or Email Address*</label>
+                  <input type="email" name="email" id="login-email" class="form-control p_input"/>
+                  <span id="email-error" style="color: orangered; display: none"></span>
+                </div>
+                <div class="form-group">
+                  <label for="login-password">Password*</label>
+                  <input type="password" name="password" id="login-password" class="form-control p_input" />
+                  <span id="password-error" style="color: orangered; display: none"></span>
+                </div>
+                <div class="form-group d-flex align-items-center justify-content-between">
+                  <div class="form-check">
+                    <label class="form-check-label">
+                      <input type="checkbox" class="form-check-input" /> Remember me
+                    </label>
+                  </div>
+                  <a href="#" class="forgot-pass">Forgot password</a>
+                </div>
+                <div class="text-center d-grid gap-2">
+                  <button type="submit" id="login-button" class="btn btn-primary btn-block enter-btn"> Login </button>
+                </div>
+                <div class="d-flex">
+                  <button class="btn btn-facebook me-2 col">
+                    <i class="mdi mdi-facebook"></i> Facebook
+                  </button>
+                  <button class="btn btn-google col">
+                    <i class="mdi mdi-google-plus"></i> Google
+                  </button>
+                </div>
+                <p class="sign-up">
+                  Don't have an Account?<a href="#"> Sign Up</a>
+                </p>
+              </form>
+            </div>
+          </div>
+        </div>
+        <!-- content-wrapper ends -->
+      </div>
+      <!-- row ends -->
+    </div>
+    <!-- page-body-wrapper ends -->
+  </div>
+  <!-- container-scroller -->
+
+
+<!-- --------------------------------------------------------------- -->
+
+
+  <!-- Modal for forget password -->
+  <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" id="forgotPasswordModalLabel">Forgot Password ?</h4>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="forgotPasswordForm">
+            <div class="mb-3">
+              <label for="forgotPasswordEmail" class="form-label">Enter your email address to reset password:</label>
+              <input type="email" class="form-control" id="forgotPasswordEmail" required>
+              <span id="forgetPasswordEmailError" style="color: orangered; display: none"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+<!-- --------------------------------------------------------------- -->
+
+
+
+  <!-- plugins:js -->
+  <script src="/assets/vendors/adminVendors/js/vendor.bundle.base.js"></script>
+  <!-- endinject -->
+  <!-- Plugin js for this page -->
+  <!-- End plugin js for this page -->
+  <!-- inject:js -->
+  <script src="/assets/js/adminjs/off-canvas.js"></script>
+  <script src="/assets/js/adminjs/hoverable-collapse.js"></script>
+  <script src="/assets/js/adminjs/misc.js"></script>
+  <script src="/assets/js/adminjs/settings.js"></script>
+  <script src="/assets/js/adminjs/todolist.js"></script>
+  <!-- endinject -->
+
+   <!-- Modal script -->
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- ----------------------------------------------------------------------- -->
+  
+<!-- Login form script -->
+  <script>
+   document.addEventListener("DOMContentLoaded", function () {
+      const emailInput = document.getElementById("login-email");
+      const passwordInput = document.getElementById("login-password");
+      const loginButton = document.getElementById("login-button");
+
+      // const loginEmail = document.getElementById('login-email').value;
+      // const loginPassword = document.getElementById('login-password').value;
+
+      const emailError = document.getElementById("email-error");
+      const passwordError = document.getElementById("password-error");
+      const errorMessage = document.getElementById("error-message");
+
+
+      
+      loginButton.addEventListener("click", function (event) {
+         event.preventDefault();
+
+         // Reset error messages
+         emailError.textContent = "";
+         passwordError.textContent = "";
+
+         const loginEmail = emailInput.value.trim();
+         const loginPassword = passwordInput.value.trim();
+
+         let isValid = true;
+
+         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+         const isValidEmail = emailRegex.test(loginEmail);
+
+         if (!loginEmail || loginEmail === "") {
+            emailError.textContent = "Email is required";
+            emailError.style.display = "block";
+            isValid = false;
+         } else if (!isValidEmail) {
+            emailError.textContent = "Invalid Email Format";
+            emailError.style.display = "block";
+            isValid = false;
+         } else {
+            emailError.style.display = "none";
+         }
+
+         if (!loginPassword) {
+            passwordError.textContent = "Password is required";
+            passwordError.style.display = "block";
+            isValid = false;
+         } else {
+            passwordError.style.display = "none";
+         }
+
+         if (!isValid) {
+            return; // Prevent form submission
+         } else {
+            formSubmit(loginEmail, loginPassword);
+         }
+
+         function formSubmit(loginEmail, loginPassword) {
+            const url = "/admin/login";
+
+            // Create fetch request
+            fetch(url, {
+               method: "POST",
+               headers: {
+                  "Content-Type": "application/json",
+               },
+               body: JSON.stringify({ loginEmail, loginPassword }),
+            })
+            .then((response) => {
+               if (response.ok) {
+                  return response.json();
+               } else {
+                  console.error("Network response was not ok:", response.status);
+                  return response.json();
+                  // throw new Error('Network response was not ok.');
+               }
+            })
+            // .then(response => response.json())
+            .then((data) => {
+                  
+               if (data.success) {
+                  // Show Sweet Alert for successful login
+                  Swal.fire({
+                     title: "Success!",
+                     text: "You have successfully logged in.",
+                     icon: "success",
+                     showConfirmButton: false,
+                     timer: 1500,
+                  }).then(() => {
+                     window.location.href = "dashboard"; // Redirect to homepage after 1.5 seconds
+                  });
+               } else if (data.notFound) {
+                  emailError.textContent = data.message;
+                  emailError.style.display = "block";
+               } else if (data.emailRequired) {
+                  emailError.textContent = data.message;
+                  emailError.style.display = "block";
+               } else if (data.incorrect) {
+                  passwordError.textContent = data.message;
+                  passwordError.style.display = "block";
+               } else if (data.notAdmin) {
+                  errorMessage.textContent = data.message;
+                  errorMessage.style.display = "block";
+               } else {
+                  console.error("Login failed");
+               }
+            })
+            .catch((error) => {
+               console.error("Catch Error:", error);
+            });
+
+            window.formSubmit = formSubmit;
+         }
+      });
+   });
+   </script>
+<!-- login form script ends -->
+
+
+
+<!-- Modal script -->
+   <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const forgotPasswordLink = document.querySelector(".forgot-pass");
+      const forgotPasswordModal = new bootstrap.Modal(document.getElementById("forgotPasswordModal"));
+
+
+      forgotPasswordLink.addEventListener("click", function (event) {
+        event.preventDefault();
+        forgotPasswordModal.show();
+      });
+
+
+      const forgotPasswordForm = document.getElementById("forgotPasswordForm");
+      const forgetPasswordEmailError = document.getElementById("forgetPasswordEmailError");
+
+      forgotPasswordForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        forgetPasswordEmailError.textContent = "";
+
+        const forgotPasswordEmail = document.getElementById("forgotPasswordEmail").value.trim();
+        console.log("Reset password requested for email:", forgotPasswordEmail);
+
+        let isValid = true;
+
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const isValidEmail = emailRegex.test(forgotPasswordEmail);
+
+        if (!forgetPasswordEmailError || forgetPasswordEmailError === "") {
+            forgetPasswordEmailError.textContent = "Email is required";
+            forgetPasswordEmailError.style.display = "block";
+            isValid = false;
+         } else if (!isValidEmail) {
+            forgetPasswordEmailError.textContent = "Invalid Email Format";
+            forgetPasswordEmailError.style.display = "block";
+            isValid = false;
+         } else {
+            forgetPasswordEmailError.style.display = "none";
+         }
+
+
+         if (!isValid) {
+            return; // Prevent form submission
+         } else {
+            forgetPasswordEmailSubmit(forgotPasswordEmail);
+         }
+
+         function forgetPasswordEmailSubmit(forgotPasswordEmail) {
+            const url = "/admin/forget-password";
+            // Create fetch request
+            fetch(url, {
+               method: "POST",
+               headers: {
+                  "Content-Type": "application/json",
+               },
+               body: JSON.stringify({ forgotPasswordEmail }),
+            })
+            .then((response) => {
+               if (response.ok) {
+                  return response.json();
+               } else {
+                  console.error("Network response was not ok:", response.status);
+                  return response.json();
+               }
+            })
+            // .then(response => response.json())
+            .then((data) => {
+                  
+               if (data.success) {
+                  // Show Sweet Alert for successful login
+                  Swal.fire({
+                     title: "Reset Link Sent!",
+                     text: "The reset password link has been sent to your registered email. Please check.",
+                     icon: "info",
+                     showConfirmButton: true,
+                     // timer: 1500,
+                  }).then(() => {
+                     window.location.href = "dashboard"; // Redirect to homepage after 1.5 seconds
+                  });
+               } else if (data.notFound) {
+                  forgetPasswordEmailError.textContent = data.message;
+                  forgetPasswordEmailError.style.display = "block";
+               } else if (data.notAdmin) {
+                  forgetPasswordEmailError.textContent = data.message;
+                  forgetPasswordEmailError.style.display = "block";
+               } else if (data.notVerified) {
+                  forgetPasswordEmailError.textContent = data.message;
+                  forgetPasswordEmailError.style.display = "block";
+               } else {
+                  console.error("Reset password link sending failed");
+               }
+            })
+            .catch((error) => {
+               console.error("Catch Error in reset password", error);
+            });
+
+            window.forgetPasswordEmailSubmit = forgetPasswordEmailSubmit;
+         }
+
+        forgotPasswordModal.hide();
+      });
+    });
+
+   </script>
+
+
+
+   <%- include('../layouts/adminLayouts/admin-footer.ejs') %>
+
+   <!-- Mirrored from demo.bootstrapdash.com/corona-new/themes/modern-vertical/pages/samples/login.html by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 22 Apr 2024 10:43:02 GMT -->
+
+
+</body>

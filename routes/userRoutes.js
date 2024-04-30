@@ -1,5 +1,6 @@
 const express = require ('express');
 const userRoute = express();
+
 const session = require ('express-session');
 
 userRoute.use(session({
@@ -7,6 +8,7 @@ userRoute.use(session({
     saveUninitialized: true,
     resave: false
 }));
+
 
 userRoute.set('view engine', 'ejs');
 userRoute.set('views', './views/user');
@@ -33,7 +35,10 @@ userRoute.post('/register', userController.insertUser);
 userRoute.get('/verify-account', userController.loadVerifyAccount);
 userRoute.post('/verify-account', userController.verifyAccount);
 
+userRoute.get('/resend-otp', userController.resendOtp);
 
 
 
-module.exports = userRoute
+
+
+module.exports = userRoute;

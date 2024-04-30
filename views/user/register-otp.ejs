@@ -25,8 +25,11 @@
                         <input type="text" name="digit6" id="digit6" class="otp-field" maxlength="1" oninput="moveToNext(this)" onkeypress="return isNumberKey(event)" pattern="[0-9]*" inputmode="numeric"/>
                     </div>
                 </div>
+                <div id="otp-timer"></div>
                 <div>
-                    <p class="form-bottom-msg">Didn't receive the verification code yet? <a href=""><b>Resend Code</b></a></p>
+                    <p class="form-bottom-msg">Didn't receive the verification code yet? 
+                        <button type="button" onclick="resendCode()"><b>Resend Code</b></a>
+                    </p>
                 </div>
                 <div class="tm-checkout-submit">
                     <div class="tm-form-inner">
@@ -36,7 +39,6 @@
                     </div>
                 </div>
                 <!-- Hidden input field for the id parameter -->
-                <input type="hidden" name="id" id="userId" value="<%= userId %>">
             </form>
         </div>
     </div>
@@ -46,7 +48,22 @@
 
 <!-- ------------------------------------------------------------------------------- -->
 
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+
 <script>
+
+
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+let userID = urlParams.get('id');
+console.log("UserId in register-otp is :", userID);
+
+function resendCode(){
+    window.location.href=`/resend-otp?id=${userID}`
+}
 
 function formSubmit() {
     const num1 = document.getElementById('digit1').value;
@@ -60,11 +77,14 @@ function formSubmit() {
 
     const errorMessage = document.getElementById('error-message');
 
-    const userID = document.getElementById('userId').value;
-    console.log(OTP, userID);
+    // const userID = document.getElementById('userId').value;
+    console.log('user entered OTP: ', OTP);
+    console.log('OTP users id is: ', userID);
+
 
     if(OTP.length < 6){
         errorMessage.textContent = "Enter Valid OTP";
+        errorMessage.style.display = 'block';
         return;
     }
 
@@ -80,8 +100,19 @@ function formSubmit() {
     })
     .then(response => response.json())
     .then(data => {
+        console.log('response data in otp page', data);
+
         if (data.success) {
+            Swal.fire({
+                title: 'Verified !',
+                text: 'Your account verification is success.',
+                icon: 'success',
+                showConfirmButton: false,
+                timer: 2000 // Close alert after 2 seconds
+        }).then(() => {
+            // Redirect to homepage or login page after 2 seconds
             window.location.href = '/login';
+        });
         } else if(data.notFound){
             errorMessage.textContent = data.message;
         } else if(data.incorrect){
@@ -121,7 +152,12 @@ function isNumberKey(evt) {
     }
     return true;
 }
+
+
+
+
 </script>
+
 
 
 

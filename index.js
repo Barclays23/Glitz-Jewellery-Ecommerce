@@ -25,8 +25,8 @@ app.use('/', userRoute);
 
 
 // for admin routes
-// const adminRoute = require('./routes/adminRoutes');
-// app.use('/admin', adminRoute);
+const adminRoute = require('./routes/adminRoutes');
+app.use('/admin', adminRoute);
 
 
 const port = process.env.port;

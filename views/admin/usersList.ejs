@@ -1,0 +1,235 @@
+<%- include('../layouts/adminLayouts/adminDashboardHeader.ejs') %>
+<%- include('../layouts/adminLayouts/adminSidebarAndNavbar.ejs') %>
+
+
+<!-- copied from 6th week user table -->
+<!-- <div class="rightdiv">
+    <div>
+        <h1> Users List </h1>
+    </div>
+
+    <div class="mynavbar">
+        <div class="navlinks">
+            <a href="/admin/add-user" > Add New User </a> |
+            <a href="/admin/export-userdata-excel" > Export Data (Excel) </a> |
+            <a href="/admin/export-userdata-pdf" > Export Data (PDF) </a>
+        </div>
+
+        <div class="navsearch">
+            <form class="search-form" action="" method="">
+                <input type="text" class="search-inputs" placeholder="search user" name="search">
+                <input type="submit" class="search-inputs search-btn" value="Search">
+            </form>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="userdata">
+        <table class="users-list" border="1px">
+            <th colspan="6"> <h2> USERS LIST </h2></th>
+            <tr>
+                <th> First Name </th>
+                <th> Last Name </th>
+                <th> Email </th>
+                <th> Mobile No </th>
+                <th> Image </th>
+                <th> Verified </th>
+                <th> Actions </th>
+            </tr>
+        
+            <% if(users.length> 0 ){
+                for(let i=0; i<locals.users.length; i++) { %>
+                    <tr>
+                        <td>
+                            <%= users[i].firstname %>
+                        </td>
+                        <td>
+                            <%= users[i].lastname %>
+                        </td>
+                        <td>
+                            <%= users[i].email %>
+                        </td>
+                        <td>
+                            <%= users[i].mobile %>
+                        </td>
+                        <td> <img src="/userImages/<%=users[i].image %>" alt="<%=users[i].image %>" width="100px"
+                                height="100px"> </td>
+        
+                        <% if(users[i].isVerified==0){ %>
+                            <td> Not Verified </td>
+                            <% } else{ %>
+                                <td> Verified </td>
+                                <% } %>
+                        <td>
+                            <button class="action-btn"> <a href="/admin/edit-user?id=<%= users[i]._id %>"> Edit </button></a>
+                            <button class="action-btn"> <a href="/admin/delete-user?id=<%= users[i]._id %>"> Delete </button> </a>
+                        </td>
+                    </tr>
+            <% } } else{ %>
+                <tr>
+                    <td colspan="5"> No Users Found </td>
+                </tr>
+                <% } %>
+        </table>
+        <br>
+
+        <div class="pageno">
+            <p> Pages : </p>
+            <% for(let j=1; j<= totalPages; j++){ %>
+                <p> <a href="?page=<%= j %>"> <%= j %> </a> </p>
+            <% } %>
+        </div>
+        <div class="pageno">
+            <h6> <a href="#" > Go to Top </a> </h6>
+        </div>
+        <br>
+    </div>
+</div> -->
+<!-- copied from 6th week user table -->
+
+
+
+<div class="row ">
+    <div class="col-12 grid-margin">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Users List</h4>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <div class="form-check form-check-muted m-0">
+                                        <label class="form-check-label">
+                                            <input type="checkbox" class="form-check-input" id="check-all">
+                                        </label>
+                                    </div>
+                                </th>
+                                <th> First Name </th>
+                                <th> Last Name </th>
+                                <th> Email </th>
+                                <th> Mobile No </th>
+                                <th> Photo </th>
+                                <th> isVerified </th>
+                                <th> Start Date </th>
+                                <th> Payment Status </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="form-check form-check-muted m-0">
+                                        <label class="form-check-label">
+                                            <input type="checkbox" class="form-check-input">
+                                        </label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <img src="../assets/images/faces/face1.jpg" alt="image" />
+                                    <span class="ps-2">Henry Klein</span>
+                                </td>
+                                <td> 02312 </td>
+                                <td> $14,500 </td>
+                                <td> Dashboard </td>
+                                <td> Credit card </td>
+                                <td> 04 Dec 2019 </td>
+                                <td>
+                                    <div class="badge badge-outline-success">Approved</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="form-check form-check-muted m-0">
+                                        <label class="form-check-label">
+                                            <input type="checkbox" class="form-check-input">
+                                        </label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <img src="../assets/images/faces/face2.jpg" alt="image" />
+                                    <span class="ps-2">Estella Bryan</span>
+                                </td>
+                                <td> 02312 </td>
+                                <td> $14,500 </td>
+                                <td> Website </td>
+                                <td> Cash on delivered </td>
+                                <td> 04 Dec 2019 </td>
+                                <td>
+                                    <div class="badge badge-outline-warning">Pending</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="form-check form-check-muted m-0">
+                                        <label class="form-check-label">
+                                            <input type="checkbox" class="form-check-input">
+                                        </label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <img src="../assets/images/faces/face5.jpg" alt="image" />
+                                    <span class="ps-2">Lucy Abbott</span>
+                                </td>
+                                <td> 02312 </td>
+                                <td> $14,500 </td>
+                                <td> App design </td>
+                                <td> Credit card </td>
+                                <td> 04 Dec 2019 </td>
+                                <td>
+                                    <div class="badge badge-outline-danger">Rejected</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="form-check form-check-muted m-0">
+                                        <label class="form-check-label">
+                                            <input type="checkbox" class="form-check-input">
+                                        </label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <img src="../assets/images/faces/face3.jpg" alt="image" />
+                                    <span class="ps-2">Peter Gill</span>
+                                </td>
+                                <td> 02312 </td>
+                                <td> $14,500 </td>
+                                <td> Development </td>
+                                <td> Online Payment </td>
+                                <td> 04 Dec 2019 </td>
+                                <td>
+                                    <div class="badge badge-outline-success">Approved</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="form-check form-check-muted m-0">
+                                        <label class="form-check-label">
+                                            <input type="checkbox" class="form-check-input">
+                                        </label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <img src="../assets/images/faces/face4.jpg" alt="image" />
+                                    <span class="ps-2">Sallie Reyes</span>
+                                </td>
+                                <td> 02312 </td>
+                                <td> $14,500 </td>
+                                <td> Website </td>
+                                <td> Credit card </td>
+                                <td> 04 Dec 2019 </td>
+                                <td>
+                                    <div class="badge badge-outline-success">Approved</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<%- include('../layouts/adminLayouts/adminDashboardFooter.ejs') %>
