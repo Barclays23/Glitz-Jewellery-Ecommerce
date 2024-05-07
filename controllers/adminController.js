@@ -30,7 +30,12 @@ const verifyLogin = async(req, res)=>{
             if (passwordMatch){
                 console.log("userData : ",userData);
                 if(userData.isAdmin === 1){
-                    console.log('Admin Sign in successful');
+                    console.log('this user is an Admin');
+                    
+
+                    req.session.adminId = userData._id;
+                    console.log('req session of admin : ', req.session);
+                    
                     return res.status(200).json({ success: true });
                 } else {
                     console.log("User is not an admin");
@@ -76,13 +81,16 @@ const verifyForgetMail = async(req, res)=>{
             if (userData.isAdmin === 1) {
                 console.log('user is an admin');
                 if (userData.isVerified === 1) {
+
                     console.log('user is verified');
                     const randomString = randomstring.generate();
                     console.log('random string for forget password', randomString);
                     const updatedData = await User.updateOne({email: userData.email}, {token: randomString});
                     console.log('updated data with token', updatedData);
                     sendforgetPasswordMail(userData, randomString, res);
+
                     return res.status(200).json({ success: true });
+
                 } else {
                     console.log('not a verified user');
                 return res.status(401).json({ notVerified: true, message: "Your account is not verified yet. Please check your email and complete the verification process." });
@@ -332,7 +340,10 @@ const resetPassword = async(req, res)=>{
 // load admin dashboard -----------------------------------------------
 const loadAdminDashboard = async(req, res)=>{
     try {
-        res.render('adminDashboard');
+        const adminData = await User.findById({_id: req.session.adminId});
+        console.log('admin name from session : ' , adminData.firstname);
+        res.render('adminDashboard', {adminData: adminData});
+
     } catch (error) {
         console.log('failed to load admin dashboard', error.message);
     }
@@ -344,6 +355,11 @@ const loadAdminDashboard = async(req, res)=>{
 // load users list -----------------------------------------------
 const loadUsersList = async(req, res)=>{
     try {
+
+        // to display the admin name in navbar and menu in front end
+        const adminData = await User.findById({_id: req.session.adminId});
+
+
         let search = '';
         if(req.query.search){
             search = req.query.search;
@@ -355,6 +371,7 @@ const loadUsersList = async(req, res)=>{
         }
 
         const limit = 5;
+
         const userData = await User.find({
             isAdmin: 0,
             $or: [
@@ -378,11 +395,16 @@ const loadUsersList = async(req, res)=>{
                 {mobile: {$regex:'.*'+search+'.*', $options: 'i'}},
             ]
         })
-        .countDocuments()
+        .countDocuments();
+
+        console.log('count of users : ', count);
+        console.log('users : ', userData);
+        console.log('logged admin : ', adminData);
 
 
         res.render('usersList', {
-            users: userData,
+            adminData: adminData,
+            userData: userData,
             totalPages: Math.ceil(count /limit),
             currentPage: pageNo});
 

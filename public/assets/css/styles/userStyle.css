@@ -4968,7 +4968,7 @@ button.tm-videobutton img {
     -webkit-transition: all .4s ease-in-out;
     -o-transition: all .4s ease-in-out;
     transition: all .4s ease-in-out;
-    border: 1px solid #ebebeb
+    border: 1px solid #9A0056; /* favourite color */
 }
 
 .tm-shop-header {

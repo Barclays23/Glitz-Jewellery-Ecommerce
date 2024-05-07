@@ -192,10 +192,10 @@
                      title: "Success!",
                      text: "You have successfully logged in.",
                      icon: "success",
-                     showConfirmButton: false,
-                     timer: 1500,
+                     showConfirmButton: true,
+                     // timer: 1500,
                   }).then(() => {
-                     window.location.href = "dashboard"; // Redirect to homepage after 1.5 seconds
+                     window.location.href = "/admin"; // Redirect to homepage after 1.5 seconds
                   });
                } else if (data.notFound) {
                   emailError.textContent = data.message;
@@ -223,6 +223,9 @@
    });
    </script>
 <!-- login form script ends -->
+
+
+
 
 
 
@@ -275,9 +278,12 @@
             forgetPasswordEmailSubmit(forgotPasswordEmail);
          }
 
+
+
          function forgetPasswordEmailSubmit(forgotPasswordEmail) {
+
             const url = "/admin/forget-password";
-            // Create fetch request
+            // Create fetch request for forget password
             fetch(url, {
                method: "POST",
                headers: {
@@ -297,7 +303,7 @@
             .then((data) => {
                   
                if (data.success) {
-                  // Show Sweet Alert for successful login
+                  // Show Sweet Alert after sending verification otp to the email.
                   Swal.fire({
                      title: "Reset Link Sent!",
                      text: "The reset password link has been sent to your registered email. Please check.",
@@ -305,7 +311,7 @@
                      showConfirmButton: true,
                      // timer: 1500,
                   }).then(() => {
-                     window.location.href = "dashboard"; // Redirect to homepage after 1.5 seconds
+                     window.location.href = "/admin/login"; // Redirect to reset new password page
                   });
                } else if (data.notFound) {
                   forgetPasswordEmailError.textContent = data.message;

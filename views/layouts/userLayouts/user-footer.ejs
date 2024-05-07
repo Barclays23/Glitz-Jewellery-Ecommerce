@@ -34,11 +34,13 @@
                     <div class="single-widget widget-quicklinks">
                         <h6 class="widget-title">My Account</h6>
                         <ul>
+                            <% if(sessionData){ %>
                             <li><a href="my-account.html">My account</a></li>
                             <li><a href="cart.html">Cart</a></li>
                             <li><a href="wishlist.html">Wishlist</a></li>
-                            <li><a href="#">Newsletter</a></li>
                             <li><a href="#">Check out</a></li>
+                            <% } %>
+                            <li><a href="#">Newsletter</a></li>
                             <li><a href="#">Frequently Questions</a></li>
                         </ul>
                     </div>

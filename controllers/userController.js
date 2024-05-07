@@ -8,12 +8,16 @@ const nodemailer = require ('nodemailer');
 // load user home page----------------------------------------------
 const loadHome = async(req, res)=>{
     try {
-        const userData = User.findById({_id : req.session.user_id});
-        if(!userData){
-            req.session.destroy();
-            res.redirect ('/');
-        }
-        res.render('home', {user: userData});
+        const sessionData = await User.findOne({_id : req.session.userId});
+        // console.log('sessiondata in user home page :', sessionData);
+        // console.log('username in session data :', sessionData.firstname);
+
+        // if(!userData){
+        //     req.session.destroy();
+        //     res.redirect ('/login');
+        // }
+
+        res.render('home', {sessionData: sessionData});
 
     } catch (error) {
         console.log(error.message);
@@ -26,11 +30,17 @@ const loadHome = async(req, res)=>{
 const loadLogin = async (req, res)=>{
     try {
         const verificationSuccess = req.query.verification === 'success';
-        const passwordResetSuccess = req.query.passwordReset === 'success';
+        const passwordResetSuccess = req.query.passworReset === 'success';
 
-        res.render('login', { verificationSuccess, passwordResetSuccess });
+        const sessionData = await User.findById(req.session.userId);
+        console.log('session data in login page is : ' , sessionData);
+
+        res.render('login', { sessionData, verificationSuccess, passwordResetSuccess });
+        // res.render('login', {userData: userData});
+        // res.render('login');
+
     } catch (error) {
-        console.log(error.message);
+        console.log('error in loading the login page', error.message);
     }
 }
 
@@ -41,40 +51,44 @@ const loadLogin = async (req, res)=>{
 const verifyLogin = async (req, res) => {
     try {
         const { loginEmail, loginPassword } = req.body;
-        console.log('req.body is : ', req.body);
-
+        console.log('user details received after login is : ', req.body);
+        console.count("verifyLogin");
         const userData = await User.findOne({ email: loginEmail });
         console.log('userData is : ', userData);
 
-        if (userData) {
+        if (!userData) {
+            console.log('no userdata');
+            return res.status(404).json({ notFound: true, message: "The email is not registered with us. Please sign up." });
+        }
+        else{
             const passwordMatch = await bcrypt.compare(loginPassword, userData.password);
 
-            if (passwordMatch) {
+            if (!passwordMatch) {
+                console.log('password incorrect');
+                return res.status(401).json({ incorrect: true, message: "Incorrect Password!" });
+            }
+            else{ 
                 console.log('password is matching');
-                if(userData.isVerified === 1){
-                    console.log('user account is verified, login successful');
-                    req.session.userId = userData._id;
-                    console.log('req session', req.session);
-                    return res.status(200).json({success: true});
-                } else{
+
+                if(!userData.isVerified === 1){
                     console.log('user account is not verified');
                     // return res.status(401).json({ notVerified: true, message: "Email verification is pending.. Please check your mail & verify.!" });
                     return res.status(401).json({ notVerified: true, message: "Email verification is pending. Please verify.!" });
                     // res.redirect('/verify-account');
+                } else{
+                    console.log('user account is verified');
+
+                    req.session.userId = userData._id;
+                    console.log('session id after verify account : ', req.session.userId);
+
+                    return res.status(200).json({success: true});
                 }
             }
-            else{
-                console.log('password incorrect');
-                return res.status(401).json({ incorrect: true, message: "Incorrect Password!" });
-            }
-        }
-        else{
-            return res.status(404).json({ notFound: true, message: "The email is not registered with us. Please sign up." });
         }
         
         
     } catch (error) {
-        console.error("Error in login verification:", error);
+        console.error("Error in login verification :", error);
         return res.status(500).json({ message: "Internal server error" });
     }
 }
@@ -145,7 +159,7 @@ const insertUser = async(req, res)=>{
                 sendOtpVerificationMail(userData, res);
                 // res.redirect(`/verify-account?id=${userData._id}`);
                 console.log('User ID:', userData._id);
-                return res.status(200).json({success: true, userId: userData._id });
+                // return res.status(200).json({success: true, userId: userData._id, expirationTime: expirationTime.getTime()});
                 // res.status(200).json({success: true, userId : userData._id});
             } else {
                 return   res.status(400).json({failed: true, message: "Registration Failed !"})
@@ -159,39 +173,25 @@ const insertUser = async(req, res)=>{
 
 
 
-// resend otp function -----------------------------------------
-const resendOtp = async(req, res)=>{
-    try {
-        console.log("resend Otp: ");
-        console.log("resend Otp Id  : ",req.query.id);
-
-        const userData = await User.findOne({_id: req.query.id});
-        console.log("user : ",userData);
-        // const existMobile = await User.findOne({mobile: req.body.mobile});
-        if (userData) {
-            sendOtpVerificationMail(userData, res);
-            console.log('resend otp mail sent');
-            res.redirect(`/verify-account?id=${userData._id}`);
-            console.log('redirected to otp page after resend otp');
-        }
-    } catch (error) {
-        console.log(error.message);
-        console.log('resend otp failed.');
-    }
-}
-
-
-
 // for sending mail for verification --------------------------
 const sendOtpVerificationMail = async({firstname, lastname, email, _id}, res)=>{
     try {
         const otp = Math.floor(Math.random()*900000+100000);
-        console.log('generated otp is: ' + otp);
-        const expirationDuration = 5 * 60 * 1000; // 2 minutes in milliseconds
+        console.log('generated otp is : ' + otp);
+        const expirationDuration = 3 * 60 * 1000; // 3 minutes in milliseconds
         const expirationTime = new Date(Date.now() + expirationDuration);
+        console.log('OTP expirationTime : ', expirationTime);
         const hashedOtp = await bcrypt.hash(otp.toString(), 10);
 
-        // res.render('register-otp', { expirationTime: expirationTime });
+
+        // const generatedTime = new Date(); // Current time when generated
+        // console.log('generatedTime : ', generatedTime);
+        // const duration = 2 * 60 * 1000; // 2 minutes in milliseconds
+        // console.log('duration :', duration);
+        // const expireTime = new Date(generatedTime.getTime() + duration);
+        // console.log('expireTime : ', expireTime);
+
+
 
         const transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -343,12 +343,13 @@ const sendOtpVerificationMail = async({firstname, lastname, email, _id}, res)=>{
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
                 console.log('Error in Sending OTP Verification Mail', error);
-                // console.error('Error in Sending OTP Verification Mail', error);
                 res.status(500).send('Error sending email');
                 // res.status(500).json({ error: 'Internal Server Error' });
             } else {
-                console.log('Email sent: ' + info.response);
-                res.send('Verification email sent successfully');
+                console.log('Email sent : ' + info.response);
+                console.log('print this after info.response line');
+                console.log('data after sent mail (_id and expirationTime): ', _id, expirationTime);  //expireTime can also log if defined.
+                return res.status(200).json({success: true, userId: _id, expirationTime: expirationTime}); // {expireTime: expireTime} can also give as response if defined and used
             }
         });
         
@@ -362,14 +363,44 @@ const sendOtpVerificationMail = async({firstname, lastname, email, _id}, res)=>{
 
 
 
+// resend otp function -----------------------------------------
+const resendOtp = async(req, res)=>{
+    try {
+        console.log("resend Otp page loaded");
+        console.log("resend Otp Id  : ", req.query.id);
+
+        const userData = await User.findOne({_id: req.query.id});
+        console.log("userData : ",userData);
+        // const existMobile = await User.findOne({mobile: req.body.mobile}); if otp is providing to mobile number instead of email
+
+        if (userData) {
+            sendOtpVerificationMail(userData, res);
+            console.log('sendOtpVerificationMail called for resending');
+            // res.redirect(`/verify-account?id=${userData._id}`);
+            // redirect function is in sendMail function
+            console.log('redirected to otp page after resend otp');
+        }
+    } catch (error) {
+        console.log(error.message);
+        console.log('resend otp failed.');
+    }
+}
+
+
+
+
 // load otp verification / account verification page ----------
 const loadVerifyAccount = async(req, res)=>{
     try {
         const userId = req.query.id;
-        console.log("load verify account : ",userId);;
-    //    res.write("hello");
-    //    return res.end();
-        res.render('register-otp', {userId});
+        const exp = req.query.expire;
+        console.log("query received in register-otp page :", userId, exp);
+
+        res.render('register-otp', {userId, exp});
+        console.log("loaded verify account page");
+
+        console.log("query after loading register-otp page :", userId, exp);
+
     } catch (error) {
         console.log('Register otp page loading failed');
     }
@@ -420,6 +451,28 @@ const verifyAccount = async (req, res)=>{
 
 
 
+// load shopping page / products page ---------------------------
+const loadShopping = async (req, res)=>{
+    try {
+        const sessionData = await User.findById({_id: req.session.userId});
+        console.log('session user name in shopping page :', sessionData.email);
+
+        // if(!sessionData){
+        //     req.session.destroy();
+        //     res.redirect('/login');
+        // }
+
+        res.render('shopping', {sessionData: sessionData});
+
+    } catch (error) {
+        console.log('error in loading shopping page :', error.message);
+    }
+}
+
+
+
+
+
 
 
 module.exports = {
@@ -433,5 +486,6 @@ module.exports = {
     loadVerifyAccount,
     verifyAccount,
     resendOtp,
+    loadShopping
 
 }

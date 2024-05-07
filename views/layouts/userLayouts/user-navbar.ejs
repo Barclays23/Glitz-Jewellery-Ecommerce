@@ -1,20 +1,79 @@
-<!-- navbar section starts -->
-<div class="tm-header tm-header-sticky">
-    <div class="tm-header-toparea">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-8 col-12">
-                    <ul class="tm-header-info">
-                        <li><a href="tel:919633699766"><i class="ion-ios-telephone"></i> +919 633 699 766</a>
-                        </li>
-                        <li><a href="mailto:itsmesajeer@gmail.com"><i class="ion-android-mail"></i>Mail Us</a>
-                        </li>
-                    </ul>
+<!-- <% try { %> -->
+
+
+    <!-- navbar section starts -->
+    <div class="tm-header tm-header-sticky">
+        <div class="tm-header-toparea">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-8 col-12">
+                        <ul class="tm-header-info">
+                            <li><a href="tel:919633699766"><i class="ion-ios-telephone"></i> +919 633 699 766</a></li>
+                            <li><a href="mailto:itsmesajeer@gmail.com"><i class="ion-android-mail"></i>Mail Us</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-4 col-12">
+                        <div class="tm-header-options">
+                            <div class="tm-dropdown tm-header-links">
+                                <button>
+                                    <% if(sessionData){ %>
+                                        <a href=""><%= sessionData.firstname %> <%= sessionData.lastname %></a>
+                                    <% } else { %>
+                                        <a href="/login">Login</a>
+                                    <% } %>
+                                </button>
+
+                                <ul>
+                                    <% if(sessionData){ %>
+                                    <li><a href="my-account.html">My Profile</a></li>
+                                    <li><a href="login-register.html">Address</a></li>
+                                    <li><a href="cart.html">Cart</a></li>
+                                    <li><a href="cart.html">Wishlist</a></li>
+                                    <li><a href="wishlist.html">Orders</a></li>
+                                    <li><a href="wishlist.html">Wallet</a></li>
+                                    <li><a href="checkout.html">Logout</a></li>
+
+                                    <% } else { %>
+                                        <li><a href="/login">Login</a></li>
+                                        <li><a href="/register">Register</a></li>
+                                    <% } %>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-lg-4 col-12">
-                    <div class="tm-header-options">
-                        <div class="tm-dropdown tm-header-links">
-                            <button> Raihan Arsh </button>
+            </div>
+        </div>
+        <div class="tm-header-middlearea bg-white">
+            <div class="container">
+                <div class="tm-mobilenav"></div>
+                <div class="row align-items-center">
+                    <div class="col-lg-3 col-6 order-1 order-lg-1">
+                        <a href="index.html" class="tm-header-logo">
+                            <img src="assets/images/logos/Glitz Logo Small 2.jpg" alt="surose">
+                        </a>
+                    </div>
+                    <div class="col-lg-9 col-6 order-4 order-lg-4">
+                        <ul class="tm-header-icons">
+                            <% if(sessionData){ %>
+                                <li><a href="#"><img src="assets/images/icons/user2.png" width="22px" height="22px" alt="user"></a></li>
+                                <!-- <li><a href="profile.html"><i class="ion-person"></i></a></li> -->
+                                <li><a href="wishlist.html"><i class="ion-android-favorite-outline"></i><span>0</span></a></li>
+                                <li><a href="cart.html"><i class="ion-bag"></i><span>0</span></a></li>
+                            <% } else { %>
+                                <li><a href="/login"><img src="assets/images/icons/enter.png" width="23px" height="23px" alt="login"></a></li>
+                            <% } %>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tm-header-bottomarea">
+            <div class="container">
+                <nav class="tm-header-nav">
+                    <ul>
+                        <% if(sessionData){ %>
+                        <li class="tm-header-nav-dropdown"><a href="index.html">My Account</a>
                             <ul>
                                 <li><a href="my-account.html">My Profile</a></li>
                                 <li><a href="login-register.html">Address</a></li>
@@ -24,58 +83,29 @@
                                 <li><a href="wishlist.html">Wallet</a></li>
                                 <li><a href="checkout.html">Logout</a></li>
                             </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="tm-header-middlearea bg-white">
-        <div class="container">
-            <div class="tm-mobilenav"></div>
-            <div class="row align-items-center">
-                <div class="col-lg-3 col-6 order-1 order-lg-1">
-                    <a href="index.html" class="tm-header-logo">
-                        <img src="assets/images/logos/Glitz Logo Small 2.jpg" alt="surose">
-                    </a>
-                </div>
-                <div class="col-lg-9 col-6 order-4 order-lg-4">
-                    <ul class="tm-header-icons">
-                        <li><a href="profile.html"><i class="ion-person fa-light fa-user"></i></a></li>
-                        <li><a href="wishlist.html"><i class="ion-android-favorite-outline"></i><span>0</span></a></li>
-                        <li><a href="cart.html"><i class="ion-bag"></i><span>0</span></a></li>
+                        </li>
+                        <% } %>
+
+                        <li><a href="/">Home</a></li>
+                        <li class="tm-header-nav-dropdown"><a href="/shopping">Shop</a>
+                            <ul>
+                                <li><a href="/shopping">Products</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="contact.html">Blogs</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="contact.html">Contact</a></li>
                     </ul>
-                </div>
+                </nav>
             </div>
         </div>
     </div>
-    <div class="tm-header-bottomarea">
-        <div class="container">
-            <nav class="tm-header-nav">
-                <ul>
-                    <li class="tm-header-nav-dropdown"><a href="index.html">My Account</a>
-                        <ul>
-                            <li><a href="my-account.html">My Profile</a></li>
-                            <li><a href="login-register.html">Address</a></li>
-                            <li><a href="cart.html">Cart</a></li>
-                            <li><a href="cart.html">Wishlist</a></li>
-                            <li><a href="wishlist.html">Orders</a></li>
-                            <li><a href="wishlist.html">Wallet</a></li>
-                            <li><a href="checkout.html">Logout</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="index.html">Home</a></li>
-                    <li class="tm-header-nav-dropdown"><a href="products.html">Shop</a>
-                        <ul>
-                            <li><a href="products.html">Products</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="contact.html">Blogs</a></li>
-                    <li><a href="about.html">About</a></li>
-                    <li><a href="contact.html">Contact</a></li>
-                </ul>
-            </nav>
-        </div>
-    </div>
-</div>
-<!-- navbar section ends -->
+    <!-- navbar section ends -->
+
+
+
+<!-- <% } catch (error) { %> -->
+    <!-- Handle the error here -->
+    <!-- <p>An error occurred while rendering the navbar.</p> -->
+    <!-- <p>Error details: <%= error.message %></p> -->
+<!-- <% } %> -->

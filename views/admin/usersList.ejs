@@ -38,32 +38,32 @@
                 <th> Actions </th>
             </tr>
         
-            <% if(users.length> 0 ){
-                for(let i=0; i<locals.users.length; i++) { %>
+            <% if(userData.length > 0 ){
+                for(let i=0; i<locals.userData.length; i++) { %>
                     <tr>
                         <td>
-                            <%= users[i].firstname %>
+                            <%= userData[i].firstname %>
                         </td>
                         <td>
-                            <%= users[i].lastname %>
+                            <%= userData[i].lastname %>
                         </td>
                         <td>
-                            <%= users[i].email %>
+                            <%= userData[i].email %>
                         </td>
                         <td>
-                            <%= users[i].mobile %>
+                            <%= userData[i].mobile %>
                         </td>
-                        <td> <img src="/userImages/<%=users[i].image %>" alt="<%=users[i].image %>" width="100px"
+                        <td> <img src="/userImages/<%=userData[i].image %>" alt="<%=userData[i].image %>" width="100px"
                                 height="100px"> </td>
         
-                        <% if(users[i].isVerified==0){ %>
+                        <% if(userData[i].isVerified==0){ %>
                             <td> Not Verified </td>
                             <% } else{ %>
                                 <td> Verified </td>
                                 <% } %>
                         <td>
-                            <button class="action-btn"> <a href="/admin/edit-user?id=<%= users[i]._id %>"> Edit </button></a>
-                            <button class="action-btn"> <a href="/admin/delete-user?id=<%= users[i]._id %>"> Delete </button> </a>
+                            <button class="action-btn"> <a href="/admin/edit-user?id=<%= userData[i]._id %>"> Edit </button></a>
+                            <button class="action-btn"> <a href="/admin/delete-user?id=<%= userData[i]._id %>"> Delete </button> </a>
                         </td>
                     </tr>
             <% } } else{ %>
@@ -106,17 +106,79 @@
                                         </label>
                                     </div>
                                 </th>
-                                <th> First Name </th>
-                                <th> Last Name </th>
-                                <th> Email </th>
+                                <th> User Name </th>
+                                <!-- <th> Photo </th> -->
+                                <!-- <th> First Name </th> -->
+                                <!-- <th> Last Name </th> -->
+                                <th> Email Address </th>
                                 <th> Mobile No </th>
-                                <th> Photo </th>
                                 <th> isVerified </th>
                                 <th> Start Date </th>
                                 <th> Payment Status </th>
+                                <th> Actions </th>
                             </tr>
                         </thead>
                         <tbody>
+
+                            <!-- ------------------------------------- -->
+                            <% if (userData.length > 0){
+                                for(let i=0; i<userData.length; i++){ %>
+                                    <tr>
+
+                                        <td>
+                                            <div class="form-check form-check-muted m-0">
+                                                <label class="form-check-label">
+                                                    <input type="checkbox" class="form-check-input">
+                                                </label>
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <img src="../assets/images/userImages/faces/face1.jpg" alt="image" />
+                                            <span class="ps-2"> <%= userData[i].firstname %> <%= userData[i].lastname %></span>
+                                        </td>
+
+                                        <!-- <td> <%= userData[i].photo %> </td> -->
+
+                                        <!-- <td> <%= userData[i].firstname %> </td> -->
+
+                                        <!-- <td> <%= userData[i].lastname %> </td> -->
+
+                                        <td> <%= userData[i].email %> </td>
+
+                                        <td> <%= userData[i].mobile %> </td>
+
+                                        <% if(userData[i].isVerified === 1){ %>
+                                            <td>
+                                                <div class="badge badge-outline-success">Verified</div>
+                                            </td>
+                                        <% } else{ %>
+                                            <td>
+                                                <div class="badge badge-outline-danger">Not Verified</div>
+                                            </td>
+                                        <% } %>
+
+                                        <td> <%= userData[i].registeredDate %> NILL </td>
+
+                                        <td> <%= userData[i].actions %> NILL2 </td>
+
+                                        <td>
+                                            <div class="badge badge-outline-success">Blocked/Active</div>
+                                        </td>
+
+                                    </tr>
+                                <% }
+                            }
+                            else{ %>
+                                <tr>
+                                    <td colspan="5"> No Users Found </td>
+                                </tr>
+                            <% } %>
+
+                            
+
+                            <!-- ------------------------------------- -->
+
                             <tr>
                                 <td>
                                     <div class="form-check form-check-muted m-0">
@@ -138,6 +200,7 @@
                                     <div class="badge badge-outline-success">Approved</div>
                                 </td>
                             </tr>
+
                             <tr>
                                 <td>
                                     <div class="form-check form-check-muted m-0">

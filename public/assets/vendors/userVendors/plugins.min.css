@@ -258,7 +258,7 @@ optgroup,
 select,
 textarea {
   margin: 0;
-  font-family: inherit;
+  /* font-family: inherit; */ /*font for user profile name in navbar*/
   font-size: inherit;
   line-height: inherit
 }
@@ -16327,7 +16327,7 @@ a.meanmenu-reveal {
 }
 
 .slick-loading .slick-track {
-  visibility: hidden
+  visibility: hidden9
 }
 
 .slick-slide {

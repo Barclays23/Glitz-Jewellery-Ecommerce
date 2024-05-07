@@ -1,7 +1,7 @@
-const express = require ('express');
+const express = require('express');
 const userRoute = express();
 
-const session = require ('express-session');
+const session = require('express-session');
 
 userRoute.use(session({
     secret: process.env.sessionSecret,
@@ -26,16 +26,20 @@ const userController = require ('../controllers/userController');
 
 userRoute.get('/', userController.loadHome);
 
-userRoute.get('/login', userController.loadLogin);
+userRoute.get('/login', userAuth.isLogout, userController.loadLogin);
 userRoute.post('/login', userController.verifyLogin);
 
-userRoute.get('/register', userController.loadRegister);
+userRoute.get('/register', userAuth.isLogout, userController.loadRegister);
 userRoute.post('/register', userController.insertUser);
 
-userRoute.get('/verify-account', userController.loadVerifyAccount);
+userRoute.get('/verify-account', userAuth.isLogout, userController.loadVerifyAccount);
 userRoute.post('/verify-account', userController.verifyAccount);
 
 userRoute.get('/resend-otp', userController.resendOtp);
+
+userRoute.get('/shopping', userAuth.isLogin, userController.loadShopping);
+
+
 
 
 
