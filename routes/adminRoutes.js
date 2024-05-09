@@ -17,21 +17,14 @@ adminRoute.use(express.json());
 adminRoute.use(express.urlencoded({extended: true}));
 
 adminRoute.use(express.static('public'));
-// adminRoute.use(express.static('public', {
-//     setHeaders: (res, path, stat) => {
-//       if (path.endsWith('.css')) {
-//         res.set('Content-Type', 'text/css');
-//       }
-//     }
-// }));
 
-// adminRoute.use((req, res, next) => {
-//     res.setHeader('Access-Control-Allow-Origin', '*');
-//     next();
-// });
+
+
 
 const adminAuth = require('../middlewares/adminAuth');
 const adminController = require('../controllers/adminController');
+const categoryController = require('../controllers/categoryController');
+
 
 // adminRoute.get('/dashboard', adminAuth.isLogin, adminController.loadAdminDashboard);
 adminRoute.get('/', adminAuth.isLogin, adminController.loadAdminDashboard);
@@ -46,8 +39,16 @@ adminRoute.post('/forget-password', adminController.verifyForgetMail);
 adminRoute.get('/reset-password', adminAuth.isLogout, adminController.loadResetPassword);
 adminRoute.post('/reset-password', adminController.resetPassword);
 
-
 adminRoute.get('/users', adminAuth.isLogin, adminController.loadUsersList);
+adminRoute.post('/user-action', adminAuth.isLogin, adminController.manageUser);
+
+
+adminRoute.get('/categories', adminAuth.isLogin, categoryController.loadCategory);
+adminRoute.post('/add-category', adminAuth.isLogin, categoryController.addCategory);
+// adminRoute.get('/edit-category', adminAuth.isLogin, categoryController.loadEditCategory);
+adminRoute.put('/edit-category', adminAuth.isLogin, categoryController.updateCategory);
+
+
 
 
 

@@ -398,7 +398,7 @@ const loadUsersList = async(req, res)=>{
         .countDocuments();
 
         console.log('count of users : ', count);
-        console.log('users : ', userData);
+        // console.log('all users : ', userData);
         console.log('logged admin : ', adminData);
 
 
@@ -417,6 +417,34 @@ const loadUsersList = async(req, res)=>{
 
 
 
+//manage user (block and unblock) -------------------------------
+const manageUser = async(req, res)=>{
+    try {
+
+        console.log('body of manageUSER",' , req.body);
+        const userData = await User.findOne({_id: req.body.id});
+        console.log('managing user is : ', userData._id);
+
+        if(userData.isBlocked === true){
+            await User.updateOne({_id: req.body.id}, {isBlocked: false});
+            console.log('changed: blocked to active');
+        }
+        else{
+            await User.updateOne({_id: req.body.id}, {isBlocked: true});
+            console.log('changed: active to blocked');
+        }
+
+
+        return  res.json({status: true})
+
+
+
+    } catch (error) {
+        console.log('failed to manage user', error.message);
+    }
+}
+
+
 
 
 
@@ -428,5 +456,6 @@ module.exports = {
     verifyForgetMail,
     loadResetPassword,
     resetPassword,
-    loadUsersList
+    loadUsersList,
+    manageUser
 }

@@ -1,0 +1,325 @@
+<%- include('../layouts/adminLayouts/adminDashboardHeader.ejs') %>
+<%- include('../layouts/adminLayouts/adminSidebarAndNavbar.ejs') %>
+
+
+
+<!-- Category list area starts -->
+<div class="row ">
+    <div class="col-12 grid-margin">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title" style="text-align: center">CATEGORY LIST</h3>
+
+                <div class="table-responsive">
+                    <div style="text-align: right;">
+                        <button type="button" class="btn btn-success add-category" data-toggle="modal" data-target="#addCategoryModal">Add Category</button>
+                        <!-- <button type="button" class="btn btn-success add-category" data-toggle="modal" data-target="#addCategoryModal">
+                            <img src="/assets/images/icons/add.png" alt="add" width="30px" height="30px">
+                        </button> -->
+                    </div>
+                    
+
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <div class="form-check form-check-muted m-0">
+                                        <label class="form-check-label">
+                                            <input type="checkbox" class="form-check-input" id="check-all">
+                                        </label>
+                                    </div>
+                                </th>
+                                <th> Category Name </th>
+                                <th> Description </th>
+                                <th> Status </th>
+                                <th> Actions </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <!-- ------------------------------------- -->
+                            <% if (categoryData.length > 0){
+                                for(let i=0; i<categoryData.length; i++){ %>
+                                    <tr>
+
+                                        <td>
+                                            <div class="form-check form-check-muted m-0">
+                                                <label class="form-check-label">
+                                                    <input type="checkbox" class="form-check-input">
+                                                </label>
+                                            </div>
+                                        </td>
+
+                                        <td> <%= categoryData[i].name %> </td>
+
+                                        <td> <%= categoryData[i].description %> </td>
+
+                                        <% if(categoryData[i].isBlocked === true){ %>
+                                            <td>
+                                                <div class="badge badge-outline-danger">Blocked</div>
+                                            </td>
+                                        <% } else{ %>
+                                            <td>
+                                                <div class="badge badge-outline-success">Active</div>
+                                            </td>
+                                        <% } %>
+
+
+                                        <td>
+                                            <a href="<%= `/admin/edit-category?id=${categoryData[i]._id}` %>" class="badge badge-secondary" style="color: black; text-decoration: none;" data-toggle="modal" data-target="#editCategoryModal"
+                                            data-id="<%= categoryData[i]._id %>" data-name="<%= categoryData[i].name %>" data-description="<%= categoryData[i].description %>" data-isBlocked="<%= categoryData[i].isBlocked %>">Edit</a>
+                                            <!-- <a href="#" class="badge badge-secondary" style="color: black; text-decoration: none;" id="edit-user" onclick="manageCategory('<%= categoryData[i]._id %>')">Edit</a> -->
+
+
+                                            <% if(categoryData[i].isBlocked === true){ %>
+                                                <a href="#" class="badge badge-danger" id="blocked-user">Unblock</a>
+                                            <% }
+                                            else{ %>
+                                                <a href="#" class="badge badge-danger" id="blocked-user">Block</a>
+                                            <% } %>
+                                        </td>
+
+                                    </tr>
+                                <% }
+                            }
+                            else{ %>
+                                <tr>
+                                    <td colspan="5" style="text-align: center"><h4> No Categories Found </h4></td>
+                                </tr>
+                            <% } %>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Category list area ends -->
+
+
+
+
+<!-- Add New Category Modal Starts-->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCategoryModalLabel">Add New Category</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Form for adding new category -->
+                <form id="add-category-form">
+                    <div class="form-group">
+                        <label for="category-name">Category Name:</label>
+                        <input type="text" class="form-control" id="category-name" name="category-name" required>
+                        <span id="category-error" style="color: orangered; display: none"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="category-description">Description:</label>
+                        <textarea class="form-control" id="category-description" name="category-description" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="category-status">Status:</label>
+                        <select class="form-control" id="category-status" name="category-status" required>
+                            <option value="block">Block</option>
+                            <option value="unblock">Unblock</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveCategoryBtn">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Add New Category Modal Ends-->
+
+
+
+
+
+<!-- Edit Category Modal Starts-->
+<div class="modal fade" id="editCategoryModal" tabindex="-1" role="dialog" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCategoryModalLabel">Edit Category</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-category-form">
+                    <input type="hidden" id="edit-category-id" name="edit-category-id">
+                    <div class="form-group">
+                        <label for="edit-category-name">Category Name:</label>
+                        <input type="text" class="form-control" id="edit-category-name" name="edit-category-name" required>
+                        <span id="category-error" style="color: orangered; display: none"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-category-description">Description:</label>
+                        <textarea class="form-control" id="edit-category-description" name="edit-category-description" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-category-status">Status:</label>
+                        <select class="form-control" id="edit-category-status" name="edit-category-status" required>
+                            <option value="block">Block</option>
+                            <option value="unblock">Unblock</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="updateCategoryBtn">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Edit Category Modal Ends-->
+
+
+<!-- --------------------------------------------------------------------------------- -->
+
+
+<!-- for sweet alert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- for modal -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+
+<!-- script for form submission to add new category -->
+<script>
+    $(document).ready(function() {
+        // Event listener for form submission
+        $('#saveCategoryBtn').click(function() {
+            const categoryName = $('#category-name').val();
+            const categoryDescription = $('#category-description').val();
+            const categoryStatus = $('#category-status').val();
+
+            const categoryError = document.getElementById('category-error');
+
+            console.log(categoryName);
+            console.log(categoryDescription);
+            console.log(categoryStatus);
+
+            // Form validation logic here (if needed)
+
+
+            $.ajax({
+                url: '/admin/add-category',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    categoryName,
+                    categoryDescription,
+                    categoryStatus
+                }),
+                success: function(response) {
+                    console.log('Adding Category Form submitted');
+                    if(response.success){
+                        Swal.fire({
+                            icon: "success",
+                            title: "Success",
+                            text : "New Category Created Successfully!",
+                        })
+                        .then(location.reload())
+                        
+                    } else if(response.exists){
+                        categoryError.textContent = response.message;
+                        categoryError.style.display = "block";
+                    }
+
+                    $('#addCategoryModal').modal('hide');
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error submitting form:', error);
+                }
+            });
+        });
+    });
+</script>
+
+
+
+
+
+<!-- script for form submission to edit category -->
+<script>
+    // for loading the values in the fields of modal from backend.
+    $(document).ready(function() {
+        // Event listener for clicking the "Edit" link
+        $('a[data-target="#editCategoryModal"]').click(function() {
+            // Retrieve data attributes
+            var categoryId = $(this).data('id');
+            var categoryName = $(this).data('name');
+            var categoryDescription = $(this).data('description');
+            var categoryStatus = $(this).data('isblocked');
+
+            // Set values in the edit category modal fields
+            $('#edit-category-id').val(categoryId);
+            $('#edit-category-name').val(categoryName);
+            $('#edit-category-description').val(categoryDescription);
+            $('#edit-category-status').val(categoryStatus ? 'block' : 'unblock');
+        });
+    });
+
+
+    // for updating the values of modal
+    $(document).ready(function() {
+        // Event listener for clicking the "Update" button in the edit category modal
+        $('#updateCategoryBtn').click(function() {
+            // Retrieve updated values from modal fields
+            var categoryId = $('#edit-category-id').val();
+            var categoryName = $('#edit-category-name').val();
+            var categoryDescription = $('#edit-category-description').val();
+            var categoryStatus = $('#edit-category-status').val();
+
+            // Send updated data to server
+            $.ajax({
+                url: '/admin/edit-category',
+                method: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    categoryId,
+                    categoryName,
+                    categoryDescription,
+                    categoryStatus
+                }),
+                success: function(response) {
+                    console.log('Update Category Form submitted');
+                    if(response.success){
+                        Swal.fire({
+                            icon: "success",
+                            title: "Success",
+                            text : "Category Updated Successfully!",
+                        })
+                        .then(location.reload())
+                    } else {
+                        console.error('Update Category Failed:', response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error submitting form:', error);
+                }
+            });
+        });
+    });
+
+    
+</script>
+
+
+
+
+<%- include('../layouts/adminLayouts/adminDashboardFooter.ejs') %>

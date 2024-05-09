@@ -30,7 +30,7 @@ const loadHome = async(req, res)=>{
 const loadLogin = async (req, res)=>{
     try {
         const verificationSuccess = req.query.verification === 'success';
-        const passwordResetSuccess = req.query.passworReset === 'success';
+        const passwordResetSuccess = req.query.passwordReset === 'success';
 
         const sessionData = await User.findById(req.session.userId);
         console.log('session data in login page is : ' , sessionData);
@@ -99,7 +99,11 @@ const verifyLogin = async (req, res) => {
 // load user-registration page---------------------------------
 const loadRegister = async (req, res)=>{
     try {
-        res.render('registration');
+
+        const sessionData = await User.findById(req.session.userId);
+        console.log('session data in register page is : ' , sessionData);
+
+        res.render('registration', {sessionData});
 
     } catch (error) {
         console.log(error.message);
@@ -149,7 +153,8 @@ const insertUser = async(req, res)=>{
                 email : req.body.userEmail,
                 mobile : req.body.userMobile,
                 password : securedPass,
-                isAdmin : 0
+                isAdmin : 0,
+                isBlocked : false
             });
 
             const userData = await user.save();
@@ -162,7 +167,7 @@ const insertUser = async(req, res)=>{
                 // return res.status(200).json({success: true, userId: userData._id, expirationTime: expirationTime.getTime()});
                 // res.status(200).json({success: true, userId : userData._id});
             } else {
-                return   res.status(400).json({failed: true, message: "Registration Failed !"})
+                return res.status(400).json({failed: true, message: "Registration Failed !"})
                 // res.render('registration', {message: "Registration Failed !"});
             }
         }
@@ -396,7 +401,9 @@ const loadVerifyAccount = async(req, res)=>{
         const exp = req.query.expire;
         console.log("query received in register-otp page :", userId, exp);
 
-        res.render('register-otp', {userId, exp});
+        const sessionData = await User.findOne({_id: userId});
+
+        res.render('register-otp', {userId, exp, sessionData});
         console.log("loaded verify account page");
 
         console.log("query after loading register-otp page :", userId, exp);
@@ -426,17 +433,20 @@ const verifyAccount = async (req, res)=>{
         const isMatch = await bcrypt.compare(submittedOtp, otpData.otp);
         console.log('isMatch OTP: ', isMatch);
         
+        if(submittedAt > otpData.expireAt){
+            return res.status(400).json({otpExpire: true, message :'OTP Already Expired! Please Resend Code.'});
+        }
+
         if(!isMatch){
             return res.status(400).json({incorrect: true, message : 'Incorrect OTP !'});
-        }
-        
-        if(submittedAt > otpData.expireAt){
-            return res.status(400).json({otpExpire: true, message :'OTP Expired !'});
         }
 
         console.log('OTP verification successful');
         const updateInfo = await User.updateOne({_id: req.body.userID}, {isVerified: 1});
         console.log('updated user info after account verify : ', updateInfo);
+
+        req.session.userId = req.body.userID;
+
         return res.json({ success: true});
 
 
@@ -474,7 +484,6 @@ const loadShopping = async (req, res)=>{
 
 
 
-
 module.exports = {
     loadHome,
     loadLogin,
@@ -486,6 +495,6 @@ module.exports = {
     loadVerifyAccount,
     verifyAccount,
     resendOtp,
-    loadShopping
+    loadShopping,
 
 }
