@@ -2734,13 +2734,17 @@ fieldset:disabled a.btn {
 .btn-primary {
   color: #fff;
   background-color: #007bff;
-  border-color: #007bff
+  background-color: grey;
+
+  /* border-color: #007bff */
 }
 
 .btn-primary:hover {
   color: #fff;
-  background-color: #0069d9;
-  border-color: #0062cc
+  /* background-color: #0069d9; */
+  /* border-color: #0062cc; */
+  background-color: #aa0056;
+  border-color: #aa0056;
 }
 
 .btn-primary.focus,
@@ -6353,7 +6357,7 @@ a.close.disabled {
 
 .modal-title {
   margin-bottom: 0;
-  line-height: 1.5
+  line-height: 1.5;
 }
 
 .modal-body {

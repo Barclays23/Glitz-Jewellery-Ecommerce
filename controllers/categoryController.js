@@ -32,13 +32,13 @@ const addCategory = async(req, res)=>{
         if (existCategory) {
             res.json({exists: true, message: "This category already exists. Please create a different one."})
         } else {
-            const isBlocked = req.body.categoryStatus === "block";
+            // const isBlocked = req.body.categoryStatus === "block";
 
             const category = new Category({
                 name : req.body.categoryName,
                 description : req.body.categoryDescription,
-                isBlocked : isBlocked
-            })
+                isListed : true
+            });
 
             const categoryData = await category.save();
 
@@ -76,16 +76,21 @@ const addCategory = async(req, res)=>{
 const updateCategory = async(req, res)=>{
     try {
         const {categoryId, categoryName, categoryDescription, categoryStatus} = req.body;
-        console.log('requested category to edit is :', categoryId, categoryName);
+        console.log('requested category to edit is :', categoryId);
 
-        const existCategory = await Category.findOne({_id: {$ne: categoryId}, name: categoryName});
-        
+        const existCategory = await Category.findOne({ _id: { $ne: categoryId }, name: categoryName });
+        console.log('existCategory : ', existCategory);
+
         if (existCategory) {
-            res.json({exists: true, message: "Cannot modify category. This category name already exists. Choose a different name."})
+            console.log('category name is existing.');
+            return res.json({exists: true, message: "Cannot modify category. This category name already exists. Choose a different name."})
         } else {
-            const isBlocked = categoryStatus === "block";
+            // const isBlocked = categoryStatus === "block";
+            const isListed = categoryStatus === "list";
+            console.log('isListed is: ', isListed);
+            // const false = categoryStatus === "list";
 
-            const updatedData = await Category.findOneAndUpdate({_id: categoryId}, {name: categoryName, description: categoryDescription, isBlocked: isBlocked});
+            const updatedData = await Category.findOneAndUpdate({_id: categoryId}, {name: categoryName, description: categoryDescription, isListed: isListed});
             console.log('updated category details :', updatedData);
     
             return res.status(200).json({success: true});

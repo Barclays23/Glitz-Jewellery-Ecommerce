@@ -22,13 +22,14 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>
+                                <!-- <th>
                                     <div class="form-check form-check-muted m-0">
                                         <label class="form-check-label">
                                             <input type="checkbox" class="form-check-input" id="check-all">
                                         </label>
                                     </div>
-                                </th>
+                                </th> -->
+                                <th> No </th>
                                 <th> Category Name </th>
                                 <th> Description </th>
                                 <th> Status </th>
@@ -42,41 +43,34 @@
                                 for(let i=0; i<categoryData.length; i++){ %>
                                     <tr>
 
-                                        <td>
+                                        <!-- <td>
                                             <div class="form-check form-check-muted m-0">
                                                 <label class="form-check-label">
                                                     <input type="checkbox" class="form-check-input">
                                                 </label>
                                             </div>
-                                        </td>
+                                        </td> -->
+
+                                        <td> <%= i+1 %> </td>
 
                                         <td> <%= categoryData[i].name %> </td>
 
                                         <td> <%= categoryData[i].description %> </td>
 
-                                        <% if(categoryData[i].isBlocked === true){ %>
+                                        <% if(categoryData[i].isListed=== false){ %>
                                             <td>
-                                                <div class="badge badge-outline-danger">Blocked</div>
+                                                <div class="badge badge-outline-danger">Unlisted</div>
                                             </td>
                                         <% } else{ %>
                                             <td>
-                                                <div class="badge badge-outline-success">Active</div>
+                                                <div class="badge badge-outline-success">Listed</div>
                                             </td>
                                         <% } %>
 
 
                                         <td>
                                             <a href="<%= `/admin/edit-category?id=${categoryData[i]._id}` %>" class="badge badge-secondary" style="color: black; text-decoration: none;" data-toggle="modal" data-target="#editCategoryModal"
-                                            data-id="<%= categoryData[i]._id %>" data-name="<%= categoryData[i].name %>" data-description="<%= categoryData[i].description %>" data-isBlocked="<%= categoryData[i].isBlocked %>">Edit</a>
-                                            <!-- <a href="#" class="badge badge-secondary" style="color: black; text-decoration: none;" id="edit-user" onclick="manageCategory('<%= categoryData[i]._id %>')">Edit</a> -->
-
-
-                                            <% if(categoryData[i].isBlocked === true){ %>
-                                                <a href="#" class="badge badge-danger" id="blocked-user">Unblock</a>
-                                            <% }
-                                            else{ %>
-                                                <a href="#" class="badge badge-danger" id="blocked-user">Block</a>
-                                            <% } %>
+                                            data-id="<%= categoryData[i]._id %>" data-name="<%= categoryData[i].name %>" data-description="<%= categoryData[i].description %>" data-isListed="<%= categoryData[i].isListed %>">Edit</a>
                                         </td>
 
                                     </tr>
@@ -116,7 +110,7 @@
                     <div class="form-group">
                         <label for="category-name">Category Name:</label>
                         <input type="text" class="form-control" id="category-name" name="category-name" required>
-                        <span id="category-error" style="color: orangered; display: none"></span>
+                        <span id="add-category-error" style="color: orangered; display: none"></span>
                     </div>
                     <div class="form-group">
                         <label for="category-description">Description:</label>
@@ -125,8 +119,8 @@
                     <div class="form-group">
                         <label for="category-status">Status:</label>
                         <select class="form-control" id="category-status" name="category-status" required>
-                            <option value="block">Block</option>
-                            <option value="unblock">Unblock</option>
+                            <option value="list">List</option>
+                            <option value="unlist">Unlist</option>
                         </select>
                     </div>
                 </form>
@@ -160,7 +154,7 @@
                     <div class="form-group">
                         <label for="edit-category-name">Category Name:</label>
                         <input type="text" class="form-control" id="edit-category-name" name="edit-category-name" required>
-                        <span id="category-error" style="color: orangered; display: none"></span>
+                        <span id="edit-category-error" style="color: orangered; display: none"></span>
                     </div>
                     <div class="form-group">
                         <label for="edit-category-description">Description:</label>
@@ -169,8 +163,8 @@
                     <div class="form-group">
                         <label for="edit-category-status">Status:</label>
                         <select class="form-control" id="edit-category-status" name="edit-category-status" required>
-                            <option value="block">Block</option>
-                            <option value="unblock">Unblock</option>
+                            <option value="unlist">Unlist</option>
+                            <option value="list">List</option>
                         </select>
                     </div>
                 </form>
@@ -207,7 +201,7 @@
             const categoryDescription = $('#category-description').val();
             const categoryStatus = $('#category-status').val();
 
-            const categoryError = document.getElementById('category-error');
+            const categoryError = document.getElementById('add-category-error');
 
             console.log(categoryName);
             console.log(categoryDescription);
@@ -264,13 +258,14 @@
             var categoryId = $(this).data('id');
             var categoryName = $(this).data('name');
             var categoryDescription = $(this).data('description');
-            var categoryStatus = $(this).data('isblocked');
+            var categoryStatus = $(this).data('isListed');
+            
 
-            // Set values in the edit category modal fields
+            // Set values in the edit category modal fields (default values)
             $('#edit-category-id').val(categoryId);
             $('#edit-category-name').val(categoryName);
             $('#edit-category-description').val(categoryDescription);
-            $('#edit-category-status').val(categoryStatus ? 'block' : 'unblock');
+            $('#edit-category-status').val(categoryStatus ? 'unlist' : 'list');
         });
     });
 
@@ -284,6 +279,8 @@
             var categoryName = $('#edit-category-name').val();
             var categoryDescription = $('#edit-category-description').val();
             var categoryStatus = $('#edit-category-status').val();
+
+            const categoryError = document.getElementById('edit-category-error');
 
             // Send updated data to server
             $.ajax({
@@ -305,6 +302,9 @@
                             text : "Category Updated Successfully!",
                         })
                         .then(location.reload())
+                    } else if(response.exists){
+                        categoryError.textContent = response.message;
+                        categoryError.style.display = "block";
                     } else {
                         console.error('Update Category Failed:', response.message);
                     }

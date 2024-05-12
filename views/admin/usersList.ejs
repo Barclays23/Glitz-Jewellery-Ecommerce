@@ -13,13 +13,14 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>
+                                <!-- <th>
                                     <div class="form-check form-check-muted m-0">
                                         <label class="form-check-label">
                                             <input type="checkbox" class="form-check-input" id="check-all">
                                         </label>
                                     </div>
-                                </th>
+                                </th> -->
+                                <th> No </th>
                                 <th> User Name </th>
                                 <!-- <th> Photo </th> -->
                                 <!-- <th> First Name </th> -->
@@ -39,13 +40,15 @@
                                 for(let i=0; i<userData.length; i++){ %>
                                     <tr>
 
-                                        <td>
+                                        <!-- <td>
                                             <div class="form-check form-check-muted m-0">
                                                 <label class="form-check-label">
                                                     <input type="checkbox" class="form-check-input">
                                                 </label>
                                             </div>
-                                        </td>
+                                        </td> -->
+
+                                        <td> <%= i+1 %></td>
 
                                         <td>
                                             <img src="../assets/images/userImages/faces/face1.jpg" alt="image" />
@@ -63,21 +66,24 @@
                                         <td> <%= userData[i].mobile %> </td>
 
                                         <% if(userData[i].isVerified === 1){ %>
-                                            <td>
-                                                <div class="badge badge-outline-success">Verified</div>
+                                            <td class="text-success">
+                                                <!-- <div class="badge badge-outline-success">Verified</div> -->
+                                                <!-- <div class="mdi badge-check-circle text-success">Verified</div> -->
+                                                Verified <i class="mdi mdi-check-circle text-success"></i>
                                             </td>
                                         <% } else{ %>
-                                            <td>
-                                                <div class="badge badge-outline-danger">Not Verified</div>
+                                            <td class="text-danger">
+                                                <!-- <div class="badge badge-outline-danger">Not Verified</div> -->
+                                                Not Verified <i class="mdi mdi-do-not-disturb text-danger"></i>
                                             </td>
                                         <% } %>
 
                                         <td>
                                             <% if (userData[i].isBlocked == true){ %>
-                                                <a href="#" class="badge badge-danger" id="blocked-user" style="text-decoration: none" onclick="manageUser('<%= userData[i]._id %>')">Blocked</a>
+                                                <a href="#" class="badge badge-secondary" id="blocked-user" style="text-decoration: none; color: black;" onclick="manageUser('<%= userData[i]._id %>')">Unblock</a>
                                             <% }
                                             else{ %>
-                                                <a href="#" class="badge badge-success" id="active-user" style="text-decoration: none" onclick="manageUser('<%= userData[i]._id %>')">Active</a>
+                                                <a href="#" class="badge badge-danger" id="active-user" style="text-decoration: none" onclick="manageUser('<%= userData[i]._id %>')">Block</a>
                                             <% } %>
                                         </td>
 
@@ -86,7 +92,7 @@
                             }
                             else{ %>
                                 <tr>
-                                    <td colspan="6" style="text-align: center"></td>> No Users Found </td>
+                                    <td colspan="6" class="text-danger" style="text-align: center"> No Users Found </td>
                                 </tr>
                             <% } %>
 
@@ -117,11 +123,26 @@
 
                         </tbody>
                     </table>
+
+                    <br>
+
+                    <div class="list-pagination text-center">
+                        <% if (totalPages > 1){ %>
+                            <p> Pages : 
+                                <% for(let j=1; j<= totalPages; j++){ %>
+                                    <a href="?page=<%= j %>"> <%= j %> </a>
+                                <% } %>
+                            </p>
+                        <% } %>
+
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<a href="#" class="text-center"><img src="assets/images/icons/up-arrow.png" width="30px" height="30px" alt="up-arrow"> </a>
 
 
 <!-- ------------------------------------------------ -->

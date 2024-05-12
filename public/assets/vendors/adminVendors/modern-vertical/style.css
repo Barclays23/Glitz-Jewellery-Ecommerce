@@ -13488,6 +13488,18 @@ textarea.is-invalid.tt-hint, .select2-container--default .select2-selection--sin
   color: var(--bs-breadcrumb-item-active-color);
 }
 
+.list-pagination p{
+  font-size: large;
+  color: #6c7293;
+}
+
+.list-pagination a {
+  text-decoration: none;
+  font-size: large;
+  color: #00ec66; /*green color */
+  margin-left: 10px;
+}
+
 .pagination, .jsgrid .jsgrid-pager {
   --bs-pagination-padding-x: 0.75rem;
   --bs-pagination-padding-y: 0.375rem;
@@ -29681,12 +29693,15 @@ div.tagsinput span.tag a {
 .sidebar .nav .nav-item.active > .nav-link {
   background: #0f1015;
   position: relative;
+  border-color: #00ec66; /* green line */
+  border-style: solid;
+  border-width: 1px;
 }
 .sidebar .nav .nav-item.active > .nav-link:before {
   content: "";
   width: 3px;
   height: 100%;
-  background: #0090e7;
+  background: #00ec66; /* green background */
   display: inline-block;
   position: absolute;
   left: 0;

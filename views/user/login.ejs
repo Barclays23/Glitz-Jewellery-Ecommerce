@@ -41,7 +41,7 @@
                             <div class="tm-form-field">
                                 <input type="checkbox" name="login-remember" id="login-remember">
                                 <label for="login-remember">Remember Me</label>
-                                <p class="mb-0"><a href="#">Forgot your password?</a></p>
+                                <p class="mb-0 forgot-password"> <a href="#">Forgot your password?</a></p>
                             </div>
                             <div class="tm-form-field">
                                 <button type="button"  class="tm-button" id="login-button">Login</button>
@@ -57,6 +57,9 @@
                                     </ul>
                                 </div>
                             </div>
+                            <div class="tm-form-field">
+                                <h6 class="mb-0">Dont have an account? <a href="/register" style="color: #AA0056;">Signup</a></h6>
+                            </div>
                         </div>
                     <!-- </div> -->
                     </form>
@@ -64,6 +67,42 @@
             </div>
         </div>
     </div>
+
+
+
+    <!-- Forgot Password Modal Starts-->
+    <div class="modal fade" id="forgotPasswordModal" tabindex="-1" role="dialog" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="forgotPasswordModalLabel">Forgot Password ?</h5>
+                    <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button> -->
+                </div>
+                <div class="modal-body">
+                    <form id="forgot-password-form">
+                        <div class="form-group">
+                            <label for="forgot-email"> Email Address</label>
+                            <input type="email" class="form-control" id="forgot-email" required>
+                            <span id="forgot-email-error" style="color: red; display: none;"></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <style>
+        .modal-header {
+            background-color: #AA0056;
+        }
+        .modal-title {
+            color: white;
+        }
+    </style>
+    
+    <!-- Forgot Password Modal Ends-->
 </main>
 
 
@@ -71,9 +110,19 @@
 <!-- ----------------------------------------------------------------------- -->
 
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+<!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+
+<!-- script for login form validation and submition starts -->
 <script>
-
 document.addEventListener('DOMContentLoaded', function () {
     const emailInput = document.getElementById('login-email');
     const passwordInput = document.getElementById('login-password');
@@ -170,9 +219,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else if (data.notFound) {
                     emailError.textContent = data.message;
                     emailError.style.display = 'block';
-                } else if (data.emailRequired) {
+                } else if (data.blocked) {
                     emailError.textContent = data.message;
                     emailError.style.display = 'block';
+                    Swal.fire({
+                        title: 'Account Blocked!',
+                        text: 'We are sorry, your account is blocked by admin!',
+                        icon: 'error',
+                        showConfirmButton: false,
+                    })
                 } else if (data.notVerified) {
                     emailError.textContent = data.message;
                     emailError.style.display = 'block';
@@ -192,17 +247,111 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
 
-    });
-
-
-    
+    }); 
 
 });
-
 </script>
+<!-- script for login form validation and submition ends -->
 
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- script for forget password modal starts-->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const forgotPasswordLink = document.querySelector('.forgot-password a');
+        forgotPasswordLink.addEventListener('click', function (event) {
+            event.preventDefault();
+            $('#forgotPasswordModal').modal('show');
+
+
+
+    });
+
+    // Handle form submission for forgot password
+    const forgotPasswordForm = document.getElementById('forgot-password-form');
+    const forgotEmailError = document.getElementById('forgot-email-error');
+
+    forgotPasswordForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        const forgotEmail = document.getElementById('forgot-email').value.trim();
+
+        let isValid = true;
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const isValidEmail = emailRegex.test(forgotEmail);
+
+        if(forgotEmail === ''){
+            forgotEmailError.textContent = "Enter your email";
+            forgotEmailError.style.display = "block";
+            let isValid = false;
+        } else if(!isValidEmail){
+            forgotEmailError.textContent = "Enter a valid email ID";
+            forgotEmailError.style.display = "block";
+            let isValid = false;
+        } else{
+            forgotEmailError.style.display = "none";
+        }
+
+        if (!isValid) {
+            return;
+        } else {
+            forgetPasswordEmailSubmit(forgotEmail);
+        }
+
+        function forgetPasswordEmailSubmit(forgotEmail) {
+            const url = "/forget-password";
+
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ forgotEmail }),
+            })
+            .then((response) => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    console.error("Network response was not ok:", response.status);
+                    return response.json();
+                }
+            })
+            .then((data) => {
+                if (data.success) {
+                    Swal.fire({
+                        title: "Reset Link Sent!",
+                        text: "The reset password link has been sent to your registered email. Please check.",
+                        icon: "success",
+                        showConfirmButton: true,
+                        // timer: 1500,
+                    }).then(() => {
+                        window.location.href = "/login";
+                    });
+                } else if (data.notFound) {
+                    forgotEmailError.textContent = data.message;
+                    forgotEmailError.style.display = "block";
+                } else if (data.notVerified) {
+                    forgotEmailError.textContent = data.message;
+                    forgotEmailError.style.display = "block";
+                } else {
+                    console.error("Reset password link sending failed");
+                }
+            })
+            .catch((error) => {
+                console.error("Catch Error in reset password", error);
+            });
+
+            // window.forgetPasswordEmailSubmit = forgetPasswordEmailSubmit;
+        }
+
+        $('#forgotPasswordModal').modal('hide');
+    });
+});
+</script>
+<!-- script for forget password modal ends-->
+
+
+
 
 <%- include('../layouts/userLayouts/brands.ejs') %>
 

@@ -2,6 +2,7 @@ const User = require ('../models/userModel');
 const UserOtp = require ('../models/otpModel');
 const bcrypt =  require ('bcrypt');
 const nodemailer = require ('nodemailer');
+const randomString = require('randomstring');
 
 
 
@@ -59,8 +60,9 @@ const verifyLogin = async (req, res) => {
         if (!userData) {
             console.log('no userdata');
             return res.status(404).json({ notFound: true, message: "The email is not registered with us. Please sign up." });
-        }
-        else{
+        } else if(userData.isBlocked === true){
+            return res.status(401).json({ blocked: true, message: "Your account is blocked by admin!" });
+        } else{
             const passwordMatch = await bcrypt.compare(loginPassword, userData.password);
 
             if (!passwordMatch) {
@@ -482,6 +484,247 @@ const loadShopping = async (req, res)=>{
 
 
 
+// load user logout ----------------------------------------------
+const userLogout = async(req, res)=>{
+    try {
+        req.session.destroy();
+        res.redirect('/');
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+
+
+
+// verify forgot password mail and send mail -----------------------------------
+const verifyForgetMail = async (req, res)=>{
+    try {
+        const userData = await User.findOne({email: req.body.forgotEmail});
+        console.log('find data with forget email :', userData.firstname);
+
+        if(!userData){
+            return res.status(404).json({ notFound: true, message: 'The email you provided is not registered with us.' });
+        } else {
+            if(userData.isVerified === 0){
+                return res.status(401).json({ notVerified: true, message: "Your account is not verified yet. Please check your email and complete the verification process." });
+            } else {
+                const randomToken = randomString.generate();
+                console.log('random token is :', randomToken);
+
+                const updatedData = await User.updateOne({email: userData.email}, {token: randomToken});
+                console.log('updated user :', updatedData);
+
+                sendforgetPasswordMail(userData, randomToken, res);
+                return res.status(200).json({ success: true });
+            }
+        }
+
+    } catch (error) {
+        console.log('failed verify forget password mail');
+    }
+}
+
+
+
+
+// to send forget password mail ----------------------------------
+const sendforgetPasswordMail = async(userData, randomToken, res)=>{
+    try {
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.emailUser,
+                pass: process.env.emailPassword
+            }
+        });
+
+
+        const mailOptions = {
+          from: process.env.emailUser,
+          to: userData.email,
+          subject: "Request for Reset Password",
+          html: `
+
+            <!DOCTYPE html>
+            <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Glitz Jewellery Boutique - Account Verification</title>
+                    <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        max-width: 700px;
+                        margin: 0;
+                        padding: 0;
+                        background-color: #f5f5f5;
+                        color: #333;
+                    }
+                    .main{
+                        border-radius: 10px;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                        border: 4px solid #9A0056; /* Your special color */
+                    }
+                    .container {
+                        max-width: 600px;
+                        margin: 20px auto;
+                        padding: 10px;
+                        background-color: #fff;
+                    }
+                    .logo {
+                        text-align: center;
+                        margin-bottom: 20px;
+                    }
+                    .logo img {
+                        max-width: 150px;
+                    }
+                    .header {
+                        background-color: #9A0056; /* Your special color */
+                        text-align: center;
+                        border-top-left-radius: 10px;
+                        border-top-right-radius: 10px;
+                        margin-top: -4px; /* Remove gap between border and header */
+                    }
+                    .header h2 {
+                        margin: 0;
+                        color: #fff;
+                        padding: 10px 0; /* Add padding to the h2 directly */
+                    }
+                    h1 {
+                        text-align: center;
+                        color: #9A0056; /* Your special color */
+                    }
+                    p {
+                        line-height: 1.6;
+                        margin-bottom: 20px;
+                    }
+                    .otp {
+                        padding: 10px 20px;
+                        color: #fff;
+                        background-color: #9A0056; /* Your special color */
+                        border-radius: 5px;
+                        display: inline-block;
+                        margin-bottom: 20px;
+                        font-size: 18px;
+                    }
+                    .contact h5 {
+                        color: #9A0056; /* Your special color */
+                        line-height: 0.5;
+                    }
+                    .footer {
+                        text-align: center;
+                        margin-top: 20px;
+                        color: #666;
+                        font-size: 12px;
+                    }
+                    </style>
+                </head>
+
+                <body>
+                    <div class="main">
+                        <div class="header">
+                            <h2>Glitz Jewellery Boutique</h2>
+                        </div>
+                        <div class="container">
+                            <div class="logo">
+                                <img src="https://glitzjewellery.com/cdn/shop/files/glitz_logo_black_320x.png?v=1665889126" alt="Glitz Jewellery Boutique" alt="Glitz Jewellery Boutique">
+                            </div>
+                            <h1>Password Reset Request</h1>
+                            <p>Dear <strong>${userData.firstname} ${userData.lastname}</strong>,</p>
+                            <p>We received a request to reset your password for your account at <strong>Glitz Jewellery Boutique</strong>. If you initiated this request, please follow the instructions below to reset your password:</p>
+                            <p>Please click the following link to reset your password:</p>
+                            <div class="reset-link"> <a href="http://localhost:${process.env.port}/reset-password?id=${userData._id}&token=${randomToken}"><strong>Reset Password</strong></a>
+                            </div>
+                            <p>If you did not request this password reset or if you have any questions, please contact our support team immediately.</p>
+                            <p>Thank you,</p><br>
+                            <div class="contact">
+                                <h5><strong>Glitz Jewellery Team</strong></h5>
+                                <h5><strong>+91 9633699766</strong></h5>
+                                <img src="https://glitzjewellery.com/cdn/shop/files/glitz_logo_black_320x.png?v=1665889126" width="25%" alt="Glitz Jewellery Boutique" alt="Glitz Jewellery Boutique">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="footer">
+                        <p>This email was sent from Glitz Jewellery Boutique. If you have any questions or concerns, please don't hesitate to contact us.</p>
+                    </div>
+                </body>
+
+            </html>
+          
+
+        `,
+        };
+
+
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log('Error in Sending Forget Password Mail', error);
+                res.status(500).json({ error: 'Internal Server Error' });
+            } else {
+                console.log('forget password email sent: ' + info.response);
+                // res.send('Verification email sent successfully');
+            }
+        });
+        
+    
+        
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+
+
+
+
+// load reset password page ---------------------------------------
+const loadResetPassword = async (req, res)=>{
+    try {
+        const tokenUserData = await User.findOne({token: req.query.token});
+        console.log('find the user with token: ', tokenUserData.firstname);
+
+        if(!tokenUserData){
+            res.render('404', {invalidToken: 'Token is expired or not valid anymore to reset the password !'});
+            return;
+        } else{
+            const sessionData = await User.findById(req.session.userId);
+            res.render('resetPassword', {tokenUserData, sessionData});
+            return;
+        }
+
+    } catch (error) {
+        console.log('error in loading reset password page :', error.message);
+        // res.render('500'); // Render a 500 page for internal server error
+        res.render('404'); // Render a 500 page for internal server error
+    }
+    
+}
+
+
+
+
+// reset new password ---------------------------------------------
+const resetPassword = async(req, res)=>{
+    try {
+        const {newPassword, userId} = req.body;
+        const securePass = await bcrypt.hash(newPassword, 10);
+
+        const updatedData = await User.updateOne({_id: userId}, {password: securePass, token: ''});
+        console.log('password updated');
+
+        return res.status(200).json({ success: true });
+
+    } catch (error) {
+        console.log('failed to reset new password', error.message);
+    }
+}
+
+
+
+
+
 
 
 module.exports = {
@@ -496,5 +739,8 @@ module.exports = {
     verifyAccount,
     resendOtp,
     loadShopping,
-
+    userLogout,
+    verifyForgetMail,
+    loadResetPassword,
+    resetPassword
 }

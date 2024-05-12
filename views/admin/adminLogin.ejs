@@ -107,7 +107,7 @@
   <!-- ----------------------------------------------------------------------- -->
   
 <!-- Login form script -->
-  <script>
+<script>
    document.addEventListener("DOMContentLoaded", function () {
       const emailInput = document.getElementById("login-email");
       const passwordInput = document.getElementById("login-password");
@@ -121,7 +121,7 @@
       const errorMessage = document.getElementById("error-message");
 
 
-      
+
       loginButton.addEventListener("click", function (event) {
          event.preventDefault();
 
@@ -174,55 +174,55 @@
                },
                body: JSON.stringify({ loginEmail, loginPassword }),
             })
-            .then((response) => {
-               if (response.ok) {
-                  return response.json();
-               } else {
-                  console.error("Network response was not ok:", response.status);
-                  return response.json();
-                  // throw new Error('Network response was not ok.');
-               }
-            })
-            // .then(response => response.json())
-            .then((data) => {
-                  
-               if (data.success) {
-                  // Show Sweet Alert for successful login
-                  Swal.fire({
-                     title: "Success!",
-                     text: "You have successfully logged in.",
-                     icon: "success",
-                     showConfirmButton: true,
-                     // timer: 1500,
-                  }).then(() => {
-                     window.location.href = "/admin"; // Redirect to homepage after 1.5 seconds
-                  });
-               } else if (data.notFound) {
-                  emailError.textContent = data.message;
-                  emailError.style.display = "block";
-               } else if (data.emailRequired) {
-                  emailError.textContent = data.message;
-                  emailError.style.display = "block";
-               } else if (data.incorrect) {
-                  passwordError.textContent = data.message;
-                  passwordError.style.display = "block";
-               } else if (data.notAdmin) {
-                  errorMessage.textContent = data.message;
-                  errorMessage.style.display = "block";
-               } else {
-                  console.error("Login failed");
-               }
-            })
-            .catch((error) => {
-               console.error("Catch Error:", error);
-            });
+               .then((response) => {
+                  if (response.ok) {
+                     return response.json();
+                  } else {
+                     console.error("Network response was not ok:", response.status);
+                     return response.json();
+                     // throw new Error('Network response was not ok.');
+                  }
+               })
+               // .then(response => response.json())
+               .then((data) => {
+
+                  if (data.success) {
+                     // Show Sweet Alert for successful login
+                     Swal.fire({
+                        title: "Success!",
+                        text: "You have successfully logged in.",
+                        icon: "success",
+                        showConfirmButton: true,
+                        // timer: 1500,
+                     }).then(() => {
+                        window.location.href = "/admin"; // Redirect to homepage after 1.5 seconds
+                     });
+                  } else if (data.notFound) {
+                     emailError.textContent = data.message;
+                     emailError.style.display = "block";
+                  } else if (data.emailRequired) {
+                     emailError.textContent = data.message;
+                     emailError.style.display = "block";
+                  } else if (data.incorrect) {
+                     passwordError.textContent = data.message;
+                     passwordError.style.display = "block";
+                  } else if (data.notAdmin) {
+                     errorMessage.textContent = data.message;
+                     errorMessage.style.display = "block";
+                  } else {
+                     console.error("Login failed");
+                  }
+               })
+               .catch((error) => {
+                  console.error("Catch Error:", error);
+               });
 
             window.formSubmit = formSubmit;
          }
-         
+
       });
    });
-   </script>
+</script>
 <!-- login form script ends -->
 
 
@@ -231,15 +231,14 @@
 
 
 <!-- Modal script -->
-   <script>
-    document.addEventListener("DOMContentLoaded", function () {
+<script>
+   document.addEventListener("DOMContentLoaded", function () {
       const forgotPasswordLink = document.querySelector(".forgot-pass");
       const forgotPasswordModal = new bootstrap.Modal(document.getElementById("forgotPasswordModal"));
 
-
       forgotPasswordLink.addEventListener("click", function (event) {
-        event.preventDefault();
-        forgotPasswordModal.show();
+         event.preventDefault();
+         forgotPasswordModal.show();
       });
 
 
@@ -247,20 +246,20 @@
       const forgetPasswordEmailError = document.getElementById("forgetPasswordEmailError");
 
       forgotPasswordForm.addEventListener("submit", function (event) {
-        event.preventDefault();
+         event.preventDefault();
 
-        forgetPasswordEmailError.textContent = "";
+         forgetPasswordEmailError.textContent = "";
 
-        const forgotPasswordEmail = document.getElementById("forgotPasswordEmail").value.trim();
-        console.log("Reset password requested for email:", forgotPasswordEmail);
+         const forgotPasswordEmail = document.getElementById("forgotPasswordEmail").value.trim();
+         console.log("Reset password requested for email:", forgotPasswordEmail);
 
-        let isValid = true;
+         let isValid = true;
 
 
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const isValidEmail = emailRegex.test(forgotPasswordEmail);
+         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+         const isValidEmail = emailRegex.test(forgotPasswordEmail);
 
-        if (!forgetPasswordEmailError || forgetPasswordEmailError === "") {
+         if (!forgetPasswordEmailError || forgetPasswordEmailError === "") {
             forgetPasswordEmailError.textContent = "Email is required";
             forgetPasswordEmailError.style.display = "block";
             isValid = false;
@@ -274,7 +273,7 @@
 
 
          if (!isValid) {
-            return; // Prevent form submission
+            return;
          } else {
             forgetPasswordEmailSubmit(forgotPasswordEmail);
          }
@@ -292,53 +291,53 @@
                },
                body: JSON.stringify({ forgotPasswordEmail }),
             })
-            .then((response) => {
-               if (response.ok) {
-                  return response.json();
-               } else {
-                  console.error("Network response was not ok:", response.status);
-                  return response.json();
-               }
-            })
-            // .then(response => response.json())
-            .then((data) => {
-                  
-               if (data.success) {
-                  // Show Sweet Alert after sending verification otp to the email.
-                  Swal.fire({
-                     title: "Reset Link Sent!",
-                     text: "The reset password link has been sent to your registered email. Please check.",
-                     icon: "info",
-                     showConfirmButton: true,
-                     // timer: 1500,
-                  }).then(() => {
-                     window.location.href = "/admin/login"; // Redirect to reset new password page
-                  });
-               } else if (data.notFound) {
-                  forgetPasswordEmailError.textContent = data.message;
-                  forgetPasswordEmailError.style.display = "block";
-               } else if (data.notAdmin) {
-                  forgetPasswordEmailError.textContent = data.message;
-                  forgetPasswordEmailError.style.display = "block";
-               } else if (data.notVerified) {
-                  forgetPasswordEmailError.textContent = data.message;
-                  forgetPasswordEmailError.style.display = "block";
-               } else {
-                  console.error("Reset password link sending failed");
-               }
-            })
-            .catch((error) => {
-               console.error("Catch Error in reset password", error);
-            });
+               .then((response) => {
+                  if (response.ok) {
+                     return response.json();
+                  } else {
+                     console.error("Network response was not ok:", response.status);
+                     return response.json();
+                  }
+               })
+               // .then(response => response.json())
+               .then((data) => {
+
+                  if (data.success) {
+                     // Show Sweet Alert after sending verification otp to the email.
+                     Swal.fire({
+                        title: "Reset Link Sent!",
+                        text: "The reset password link has been sent to your registered email. Please check.",
+                        icon: "info",
+                        showConfirmButton: true,
+                        // timer: 1500,
+                     }).then(() => {
+                        window.location.href = "/admin/login"; // Redirect to reset new password page
+                     });
+                  } else if (data.notFound) {
+                     forgetPasswordEmailError.textContent = data.message;
+                     forgetPasswordEmailError.style.display = "block";
+                  } else if (data.notAdmin) {
+                     forgetPasswordEmailError.textContent = data.message;
+                     forgetPasswordEmailError.style.display = "block";
+                  } else if (data.notVerified) {
+                     forgetPasswordEmailError.textContent = data.message;
+                     forgetPasswordEmailError.style.display = "block";
+                  } else {
+                     console.error("Reset password link sending failed");
+                  }
+               })
+               .catch((error) => {
+                  console.error("Catch Error in reset password", error);
+               });
 
             window.forgetPasswordEmailSubmit = forgetPasswordEmailSubmit;
          }
 
-        forgotPasswordModal.hide();
+         forgotPasswordModal.hide();
       });
-    });
+   });
 
-   </script>
+</script>
 
 
 

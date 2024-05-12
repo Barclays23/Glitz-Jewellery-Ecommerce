@@ -29,8 +29,15 @@ userRoute.get('/', userController.loadHome);
 userRoute.get('/login', userAuth.isLogout, userController.loadLogin);
 userRoute.post('/login', userController.verifyLogin);
 
+userRoute.get('/logout', userAuth.isLogin, userController.userLogout);
+
 userRoute.get('/register', userAuth.isLogout, userController.loadRegister);
 userRoute.post('/register', userController.insertUser);
+
+userRoute.post('/forget-password', userAuth.isLogout, userController.verifyForgetMail);
+userRoute.get('/reset-password', userAuth.isLogout, userController.loadResetPassword);
+userRoute.post('/reset-password', userAuth.isLogout, userController.resetPassword);
+
 
 userRoute.get('/verify-account', userAuth.isLogout, userController.loadVerifyAccount);
 userRoute.post('/verify-account', userController.verifyAccount);

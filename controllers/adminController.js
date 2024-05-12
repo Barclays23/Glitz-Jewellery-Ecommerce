@@ -58,19 +58,6 @@ const verifyLogin = async(req, res)=>{
 
 
 
-
-// load admin forget password page ------------------------------------------- (NO NEED THIS PAGE- A MODAL GIVEN IN LOGIN PAGE)
-// const loadForgetPassword = async(req, res)=>{
-//     try {
-//         res.render('adminForgetPassword');
-//     } catch (error) {
-//         console.log('failed loading reset password page', error);
-//     }
-// }
-
-
-
-
 // for verifying the forget password email entered --------------------------
 const verifyForgetMail = async(req, res)=>{
     try {
@@ -93,7 +80,7 @@ const verifyForgetMail = async(req, res)=>{
 
                 } else {
                     console.log('not a verified user');
-                return res.status(401).json({ notVerified: true, message: "Your account is not verified yet. Please check your email and complete the verification process." });
+                    return res.status(401).json({ notVerified: true, message: "Your account is not verified yet. Please check your email and complete the verification process." });
                 }
             }
             else {
@@ -341,7 +328,7 @@ const resetPassword = async(req, res)=>{
 const loadAdminDashboard = async(req, res)=>{
     try {
         const adminData = await User.findById({_id: req.session.adminId});
-        console.log('admin name from session : ' , adminData.firstname);
+        console.log('admin name from session : ' , adminData);
         res.render('adminDashboard', {adminData: adminData});
 
     } catch (error) {
@@ -379,6 +366,7 @@ const loadUsersList = async(req, res)=>{
                 {lastname: {$regex:'.*'+search+'.*', $options: 'i'}},
                 {email: {$regex:'.*'+search+'.*', $options: 'i'}},
                 {mobile: {$regex:'.*'+search+'.*', $options: 'i'}},
+
             ]
         })
         .limit(limit * 1)
@@ -448,6 +436,20 @@ const manageUser = async(req, res)=>{
 
 
 
+// load admin logout --------------------------------------------------
+const adminLogout = async(req, res)=>{
+    try {
+        req.session.destroy();
+        res.redirect('/admin/login');
+    } catch (error) {
+        console.log('admin logout failed', error.message);
+    }
+}
+
+
+
+
+
 module.exports = {
     loadLogin,
     verifyLogin,
@@ -457,5 +459,6 @@ module.exports = {
     loadResetPassword,
     resetPassword,
     loadUsersList,
-    manageUser
+    manageUser,
+    adminLogout
 }

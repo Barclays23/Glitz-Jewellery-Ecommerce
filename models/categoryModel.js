@@ -11,9 +11,9 @@ const categorySchema = new mongoose.Schema({
         type : String,
         required : true
     },
-    isBlocked : {
+    isListed : {
         type : Boolean,
-        default : false
+        default : true
     }
 });
 
