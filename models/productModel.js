@@ -3,47 +3,52 @@ const mongoose = require('mongoose');
 const productSchema = new mongoose.Schema({
     categoryRef: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Category'
+        ref: 'Category',
+        required: true
+    },
+    code : {
+        type: String,
+        unique : true,
+        required: true
     },
     name : {
         type: String,
         required : true
     },
-    code : {
+    description: {
         type: String,
-        required: true,
-        unique : true
-    },
-    quantity : {
-        type: Number,
         required: true
     },
     price: {
         type : Number,
         required: true
     },
-    description: {
-        type: String,
+    quantity : {
+        type: Number,
         required: true
     },
-    images : {
-        image1 : {
-            type: String,
-            required: false
-        },
-        image2 : {
-            type: String,
-            required: false
-        },
-        image3 : {
-            type: String,
-            required: false
-        },
-        image4 : {
-            type: String,
-            required: false
-        },
-    },
+    // images: {
+    //     type: Object,
+    //     required: true
+    // },
+    // images : {
+    //     image1 : {
+    //         type: String,
+    //         required: false
+    //     },
+    //     image2 : {
+    //         type: String,
+    //         required: false
+    //     },
+    //     image3 : {
+    //         type: String,
+    //         required: false
+    //     },
+    //     image4 : {
+    //         type: String,
+    //         required: false
+    //     },
+    // },
     isCategoryBlocked : {
         type: Boolean,
         default: false

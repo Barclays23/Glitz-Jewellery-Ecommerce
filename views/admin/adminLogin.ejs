@@ -166,7 +166,6 @@
          function formSubmit(loginEmail, loginPassword) {
             const url = "/admin/login";
 
-            // Create fetch request
             fetch(url, {
                method: "POST",
                headers: {
@@ -187,15 +186,15 @@
                .then((data) => {
 
                   if (data.success) {
-                     // Show Sweet Alert for successful login
                      Swal.fire({
                         title: "Success!",
                         text: "You have successfully logged in.",
                         icon: "success",
-                        showConfirmButton: true,
-                        // timer: 1500,
+                        showConfirmButton: false,
+                        timer: 1500,
                      }).then(() => {
-                        window.location.href = "/admin"; // Redirect to homepage after 1.5 seconds
+                        Swal.close();
+                        window.location.href = "/admin";
                      });
                   } else if (data.notFound) {
                      emailError.textContent = data.message;
@@ -303,7 +302,6 @@
                .then((data) => {
 
                   if (data.success) {
-                     // Show Sweet Alert after sending verification otp to the email.
                      Swal.fire({
                         title: "Reset Link Sent!",
                         text: "The reset password link has been sent to your registered email. Please check.",
@@ -311,7 +309,7 @@
                         showConfirmButton: true,
                         // timer: 1500,
                      }).then(() => {
-                        window.location.href = "/admin/login"; // Redirect to reset new password page
+                        window.location.href = "/admin/login";
                      });
                   } else if (data.notFound) {
                      forgetPasswordEmailError.textContent = data.message;

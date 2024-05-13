@@ -252,8 +252,10 @@
 <script>
     // for loading the values in the fields of modal from backend.
     $(document).ready(function() {
+
         // Event listener for clicking the "Edit" link
         $('a[data-target="#editCategoryModal"]').click(function() {
+            
             // Retrieve data attributes
             var categoryId = $(this).data('id');
             var categoryName = $(this).data('name');

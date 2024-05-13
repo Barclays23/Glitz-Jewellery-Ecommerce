@@ -4,7 +4,7 @@ const Category = require ('../models/categoryModel');
 
 
 // load category page ------------------------------------------
-const loadCategory = async(req, res)=>{
+const loadCategoryList = async(req, res)=>{
     try {
         console.log('req session in load category : ', req.session);
         const adminData = await User.findOne({_id: req.session.adminId});
@@ -105,7 +105,7 @@ const updateCategory = async(req, res)=>{
 
 
 module.exports = {
-    loadCategory,
+    loadCategoryList,
     addCategory,
     // loadEditCategory,
     updateCategory

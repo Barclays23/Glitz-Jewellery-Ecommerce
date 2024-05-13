@@ -343,9 +343,7 @@ const loadAdminDashboard = async(req, res)=>{
 const loadUsersList = async(req, res)=>{
     try {
 
-        // to display the admin name in navbar and menu in front end
         const adminData = await User.findById({_id: req.session.adminId});
-
 
         let search = '';
         if(req.query.search){
@@ -385,16 +383,19 @@ const loadUsersList = async(req, res)=>{
         })
         .countDocuments();
 
+        let totalPages = Math.ceil(count /limit);
+
         console.log('count of users : ', count);
         // console.log('all users : ', userData);
         console.log('logged admin : ', adminData);
 
 
         res.render('usersList', {
-            adminData: adminData,
-            userData: userData,
-            totalPages: Math.ceil(count /limit),
-            currentPage: pageNo});
+            adminData,
+            userData,
+            totalPages,
+            currentPage: pageNo
+        });
 
 
     } catch (error) {
