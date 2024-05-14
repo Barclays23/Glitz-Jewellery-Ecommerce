@@ -25,10 +25,10 @@ const loadProductList = async(req, res)=>{
             _id: {$exists: true},
             $or: [
                 {name: {$regex:'.*'+search+'.*', $options: 'i'}},
-                // {price: {$regex:'.*'+search+'.*', $options: 'i'}},
                 {category: {$regex:'.*'+search+'.*', $options: 'i'}},
                 {code: {$regex:'.*'+search+'.*', $options: 'i'}},
-            ]
+                // {price: {$regex:'.*'+search+'.*', $options: 'i'}},
+            ],
         }).populate('categoryRef')
         .skip((pageNo -1) * limit)
         .limit(limit *1)
@@ -39,9 +39,9 @@ const loadProductList = async(req, res)=>{
             _id: {$exists: true},
             $or: [
                 {name: {$regex:'.*'+search+'.*', $options: 'i'}},
-                // {price: {$regex:'.*'+search+'.*', $options: 'i'}},
                 {category: {$regex:'.*'+search+'.*', $options: 'i'}},
                 {code: {$regex:'.*'+search+'.*', $options: 'i'}},
+                // {price: {$regex:'.*'+search+'.*', $options: 'i'}},
             ]
         })
         .countDocuments();
@@ -120,10 +120,47 @@ const addProduct = async(req, res)=>{
 
 
 
+// edit / update product -----------------------------------
+const updateProduct = async (req, res)=>{
+    try {
+        console.log('updated data received from edit product form : ' , req.body);
+        const {productId, productCategory, productCode, productName, productDescription, productPrice, productQty, productStatus} = req.body;
+
+        const existProduct = await Product.findOne({ _id: { $ne: productId }, code: productCode });
+
+        if (existProduct) {
+            console.log('product code already existing : ', productCode);
+            return res.json({exists: true, message: "Product code already exists."});
+        } else {
+            const isBlocked = productStatus === 'unlist';
+            console.log('isblocked status in updateProduct :', isBlocked);
+            const categoryData = await Category.findOne({name: productCategory});
+
+            const updatedProductData = await Product.findOneAndUpdate({_id: productId}, {
+                categoryRef : categoryData._id,
+                code : productCode,
+                name : productName,
+                description : productDescription,
+                price : productPrice,
+                quantity : productQty,
+                isBlocked : isBlocked
+            });
+
+            if(updatedProductData){
+                console.log('product details updated');
+                return res.status(200).json({success: true});
+            }
+        }
+
+    } catch (error) {
+        console.log('failed to update product :', error.message);
+    }
+}
+
 
 
 module.exports = {
     loadProductList,
     addProduct,
-
+    updateProduct
 }

@@ -66,8 +66,8 @@
                                         <td> <%= productData[i].categoryRef.name %> </td>
 
                                         <td>
-                                            <% if (productData[i].isBlocked){ %>
-                                                <a class="badge badge-secondary" id="blocked-product" style="text-decoration: none; color: black;" onclick="manageProduct('<%= productData[i]._id %>')">Unblock</a>
+                                            <% if (productData[i].isBlocked === true){ %>
+                                                <a href="#" class="badge badge-secondary" id="blocked-product" style="text-decoration: none; color: black;" onclick="manageProduct('<%= productData[i]._id %>')">Unblock</a>
                                             <% }
                                             else{ %>
                                                 <a href="#" class="badge badge-danger" id="unblocked-product" style="text-decoration: none" onclick="manageProduct('<%= productData[i]._id %>')">Block</a>
@@ -220,7 +220,7 @@
                             <option value="<%= categoryData[i].name %>"> <%= categoryData[i].name %></option>
                             <% } %>
                         </select>
-                        <span id="product-category-error" style="color: orangered; display: none"></span>
+                        <span id="edit-product-category-error" style="color: orangered; display: none"></span>
                     </div>
 
                     <div class="form-group">
@@ -369,10 +369,8 @@
 <!--script for edit product form submission -->
 <script>
     $(document).ready(function() {
-
         // Event listener for clicking the "Edit" link
         $('a[data-target="#editProductModal"]').click(function() {
-
             // Retrieve data attributes
             var productId = $(this).data('id');
             var productCategory = $(this).data('category');
@@ -385,15 +383,16 @@
 
 
 
-            // Set values in the edit product modal fields (default values)
+            // Set values in the edit product modal fields (set default / existing values)
             $('#edit-product-id').val(productId);
             $('#edit-product-category').val(productCategory);
             $('#edit-product-code').val(productCode);
-            $('#edit-product-name').val(productPrice);
-            // others
-            // others
-            // others
-            // others
+            $('#edit-product-name').val(productName);
+            $('#edit-product-description').val(productDescription);
+            $('#edit-product-price').val(productPrice);
+            $('#edit-product-quantity').val(productQty);
+            $('#edit-product-status').val(productStatus ? 'list' : 'unlist');
+
 
             console.log("edit productCategory : ", productCategory);
             console.log("edit productCode : ", productCode);
@@ -405,6 +404,69 @@
         });
     });
 
+
+
+    // for updating the values of edit product modal
+    $(document).ready(function() {
+        $('#updateProductBtn').click(function() {
+            // Retrieve updated values from modal fields
+            const productId = $('#edit-product-id').val();
+            const productCategory = $('#edit-product-category').val();
+            const productCode = $('#edit-product-code').val();
+            const productName = $('#edit-product-name').val();
+            const productDescription = $('#edit-product-description').val();
+            const productPrice = $('#edit-product-price').val();
+            const productQty = $('#edit-product-quantity').val();
+            const productStatus = $('#edit-product-status').val();
+
+
+            const editProductCategoryError = document.getElementById('edit-product-category-error');
+            const editProductCodeError = document.getElementById('edit-product-code-error');
+            const editProductNameError = document.getElementById('edit-product-name-error');
+            const editProductDescriptionError = document.getElementById('edit-product-description-error');
+            const editProductPriceError = document.getElementById('edit-product-price-error');
+            const editProductQtyError = document.getElementById('edit-product-quantity-error');
+            const editProductStatusError = document.getElementById('edit-product-status-error');
+
+
+            // Send updated data to server
+            $.ajax({
+                url: '/admin/edit-product',
+                method: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    productId,
+                    productCategory,
+                    productCode,
+                    productName,
+                    productDescription,
+                    productPrice,
+                    productQty,
+                    productStatus
+                }),
+                success: function(response) {
+                    console.log('Update Product Form submitted');
+                    if (response.success) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Success",
+                            text : "Product Updated Successfully!",
+                        })
+                        .then(location.reload());
+                        
+                    } else if (response.exists) {
+                        editProductCodeError.textContent = response.message;
+                        editProductCodeError.style.display = "block";
+                    } else{
+                        console.error('Update Product Failed:', response.message);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error in updating product:', error);
+                }
+            });
+        });
+    });
 
 
 

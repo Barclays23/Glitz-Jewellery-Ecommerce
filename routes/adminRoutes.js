@@ -53,7 +53,7 @@ adminRoute.put('/edit-category', adminAuth.isLogin, categoryController.updateCat
 // PRODUCT CONTROLLER ROUTES
 adminRoute.get('/products', adminAuth.isLogin, productController.loadProductList);
 adminRoute.post('/add-product', adminAuth.isLogin, productController.addProduct);
-
+adminRoute.put('/edit-product', adminAuth.isLogin, productController.updateProduct);
 
 
 

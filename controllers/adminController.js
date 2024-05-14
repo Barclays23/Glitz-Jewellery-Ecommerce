@@ -20,19 +20,15 @@ const loadLogin = async(req, res)=>{
 const verifyLogin = async(req, res)=>{
     try {
         const { loginEmail, loginPassword } = req.body;
-        console.log(loginEmail, loginPassword);
         const userData = await User.findOne({email: loginEmail});
-        console.log('admin userdata', userData);
+        console.log('logged in admin : ', userData.firstname, userData.lastname, userData.email);
 
         if(userData){
             const passwordMatch = await bcrypt.compare(loginPassword, userData.password);
 
             if (passwordMatch){
-                console.log("userData : ",userData);
                 if(userData.isAdmin === 1){
                     console.log('this user is an Admin');
-                    
-
                     req.session.adminId = userData._id;
                     console.log('req session of admin : ', req.session);
                     
@@ -328,7 +324,7 @@ const resetPassword = async(req, res)=>{
 const loadAdminDashboard = async(req, res)=>{
     try {
         const adminData = await User.findById({_id: req.session.adminId});
-        console.log('admin name from session : ' , adminData);
+        console.log('admin name from session : ' , adminData.firstname, adminData.lastname);
         res.render('adminDashboard', {adminData: adminData});
 
     } catch (error) {

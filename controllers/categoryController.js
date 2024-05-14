@@ -57,20 +57,6 @@ const addCategory = async(req, res)=>{
 
 
 
-// load edit category ---------------------------------------------
-// const loadEditCategory = async(req, res)=>{
-//     try {
-//         console.log(req.query.id);
-//         const categoryData = await Category.findOne({_id: req.query.id});
-//         console.log('finded category data when loading the edit modal :', categoryData);
-
-//     } catch (error) {
-//         console.log('failed loading edit category');
-//     }
-// }
-
-
-
 
 // edit category ---------------------------------------------------
 const updateCategory = async(req, res)=>{
