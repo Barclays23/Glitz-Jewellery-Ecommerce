@@ -50,6 +50,4 @@ userRoute.get('/shopping', userAuth.isLogin, userController.loadShopping);
 
 
 
-
-
 module.exports = userRoute;

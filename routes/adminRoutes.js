@@ -21,7 +21,7 @@ const adminAuth = require('../middlewares/adminAuth');
 const adminController = require('../controllers/adminController');
 const categoryController = require('../controllers/categoryController');
 const productController = require('../controllers/productController');
-
+const goldRateController = require('../controllers/goldRateController');
 
 
 // ADMIN CONTROLLER ROUTES
@@ -33,6 +33,9 @@ adminRoute.get('/logout', adminAuth.isLogin, adminController.adminLogout);
 adminRoute.post('/forget-password', adminController.verifyForgetMail);
 adminRoute.get('/reset-password', adminAuth.isLogout, adminController.loadResetPassword);
 adminRoute.post('/reset-password', adminController.resetPassword);
+adminRoute.get('/send-mail', adminAuth.isLogin, adminController.loadMailDraft);
+adminRoute.post('/send-mail', adminAuth.isLogin, adminController.sendMail);
+
 
 
 
@@ -54,6 +57,18 @@ adminRoute.put('/edit-category', adminAuth.isLogin, categoryController.updateCat
 adminRoute.get('/products', adminAuth.isLogin, productController.loadProductList);
 adminRoute.post('/add-product', adminAuth.isLogin, productController.addProduct);
 adminRoute.put('/edit-product', adminAuth.isLogin, productController.updateProduct);
+adminRoute.patch('/manage-product', adminAuth.isLogin, productController.manageProduct);
+
+
+
+// GOLD RATE CONTROLLER ROUTES
+// adminRoute.get('/gold-rate', adminAuth.isLogin, goldRateController.getGoldRate);
+adminRoute.put('/update-gold-rate', adminAuth.isLogin, goldRateController.updateGoldRate);
+
+
+
+
+
 
 
 

@@ -9,13 +9,13 @@
         <div class="card">
             <div class="card-body">
                 <h3 class="card-title" style="text-align: center">PRODUCT LIST</h3>
+                <div style="text-align: right;">
+                    <button type="button" class="btn btn-success add-product" data-toggle="modal" data-target="#addProductModal">Add Product</button>
+                </div>
                 <div class="table-responsive">
-                    <div style="text-align: right;">
-                        <button type="button" class="btn btn-success add-product" data-toggle="modal" data-target="#addProductModal">Add Product</button>
-                    </div>
                     <table class="table">
                         <thead>
-                            <tr>
+                            <tr class="text-center">
                                 <!-- <th>
                                     <div class="form-check form-check-muted m-0">
                                         <label class="form-check-label">
@@ -25,11 +25,17 @@
                                 </th> -->
                                 <th> No </th>
                                 <th> Image </th>
+                                <th> Category </th>
                                 <th> Product Code </th>
                                 <th> Product Name </th>
-                                <th> Price </th>
-                                <th> Quantity </th>
-                                <th> Category </th>
+                                <th> Weight </th>
+                                <th> VA % </th>
+                                <!-- <th> DB Price </th> -->
+                                <th> Metal Cost </th>
+                                <th> MC Value </th>
+                                <th> GST </th>
+                                <th> Total Price </th>
+                                <th> Qty </th>
                                 <th> Status </th>
                                 <th> Actions </th>
                             </tr>
@@ -37,7 +43,7 @@
 
                         <tbody>
                             <% if (productData.length > 0){
-                                for(let i=0; i<productData.length; i++){ %>
+                                for(let i=0; i < productData.length; i++){ %>
                                     <tr>
 
                                         <!-- <td>
@@ -55,35 +61,81 @@
                                         <% } %>
                                         <td> (Sample Image) </td>
 
+                                        <% if(productData[i].categoryRef.isListed === true){ %>
+                                        <td class="text-success"> <%= productData[i].categoryRef.name %> </td>
+                                        <% } else { %>
+                                            <td class="text-danger"> <%= productData[i].categoryRef.name %> </td>
+                                        <% } %>
+
                                         <td> <%= productData[i].code %> </td>
 
                                         <td> <%= productData[i].name %> </td>
 
-                                        <td> <%= productData[i].price %> </td>
+                                        <td> <%= Number(productData[i].weight).toFixed(3) %> </td>
+
+                                        <td> <%= productData[i].VA %> % </td>
+
+                                        <!-- <td> <%= productData[i].price %> </td> -->
+
+                                        <% const metalCost = goldPriceData.price * productData[i].weight %>
+                                        <td style="text-align: right;"> <%= (metalCost).toFixed(2) %> </td>
+
+                                        <% const makingCharge = metalCost * productData[i].VA/100 %>
+                                        <td> <%= (makingCharge).toFixed(2) %> </td>
+
+                                        <% const GST = (metalCost + makingCharge) * 3/100 %>
+                                        <td style="text-align: right;"> <%= (GST).toFixed(2) %> </td>
+
+                                        <% const totalPrice = metalCost + makingCharge + GST %>
+                                        <td style="text-align: right;"> <%= (totalPrice).toFixed(2) %> </td>
 
                                         <td> <%= productData[i].quantity %> </td>
 
-                                        <td> <%= productData[i].categoryRef.name %> </td>
+                                        <% if(productData[i].isBlocked === false){ %>
+                                            <td class="text-success">
+                                                <!-- <div class="badge badge-outline-success">Verified</div> -->
+                                                <!-- <div class="mdi badge-check-circle text-success">Verified</div> -->
+                                                Listed <i class="mdi mdi-check-circle text-success"></i>
+                                            </td>
+                                        <% } else{ %>
+                                            <td class="text-danger">
+                                                <!-- <div class="badge badge-outline-danger">Not Verified</div> -->
+                                                Unlisted <i class="mdi mdi-do-not-disturb text-danger"></i>
+                                            </td>
+                                        <% } %>
 
                                         <td>
-                                            <% if (productData[i].isBlocked === true){ %>
-                                                <a href="#" class="badge badge-secondary" id="blocked-product" style="text-decoration: none; color: black;" onclick="manageProduct('<%= productData[i]._id %>')">Unblock</a>
-                                            <% }
-                                            else{ %>
-                                                <a href="#" class="badge badge-danger" id="unblocked-product" style="text-decoration: none" onclick="manageProduct('<%= productData[i]._id %>')">Block</a>
-                                            <% } %>
-                                        </td>
-
-                                        <td>
-                                            <a href="<%= `/admin/edit-product?id=${productData[i]._id}` %>" class="badge badge-secondary" style="color: black; text-decoration: none;" data-toggle="modal" data-target="#editProductModal"
+                                            <!-- (use 1st line if using the "EDIT" text, use 2nd line if using the "edit-icon") -->
+                                            <!-- <a href="<%= `/admin/edit-product?id=${productData[i]._id}` %>" class="badge badge-light" style="color: black; text-decoration: none;" data-toggle="modal" data-target="#editProductModal" -->
+                                            <a href="<%= `/admin/edit-product?id=${productData[i]._id}` %>" style="color: black; text-decoration: none;" data-toggle="modal" data-target="#editProductModal"
                                             data-id="<%= productData[i]._id %>" 
                                             data-category="<%= productData[i].categoryRef.name %>" 
                                             data-code="<%= productData[i].code %>" 
                                             data-name="<%= productData[i].name %>" 
                                             data-description="<%= productData[i].description %>" 
+                                            data-weight="<%= productData[i].weight %>" 
+                                            data-mc="<%= productData[i].VA %>" 
                                             data-price="<%= productData[i].price %>" 
                                             data-quantity="<%= productData[i].quantity %>" 
-                                            data-isListed="<%= productData[i].isBlocked %>">Edit</a>
+                                            data-isListed="<%= productData[i].isBlocked %>">
+                                            <img src="/assets/images/icons/edit5.png" alt="edit-icon">
+                                            <!-- add "Edit" text if needed and add first commented line -->
+                                            </a>
+
+                                            <!-- if (productData[i].categoryRef.isListed === true){
+                                                <% if (productData[i].isBlocked === true){ %>
+                                                    <a href="#" class="badge badge-secondary" id="blocked-product" style="text-decoration: none; color: black;" onclick="manageProduct('<%= productData[i]._id %>')">Unblock</a>
+                                                <% } else { %>
+                                                    <a href="#" class="badge badge-danger" id="unblocked-product" style="text-decoration: none" onclick="manageProduct('<%= productData[i]._id %>')">Block</a>
+                                                <% } %>
+                                            } else {
+
+                                            } -->
+                                            <% if (productData[i].isBlocked === true){ %>
+                                                <a href="#" class="badge badge-secondary" id="blocked-product" style="text-decoration: none; color: black;" onclick="manageProduct('<%= productData[i]._id %>')">List</a>
+                                            <% } else { %>
+                                                <a href="#" class="badge badge-danger" id="unblocked-product" style="text-decoration: none" onclick="manageProduct('<%= productData[i]._id %>')">Unlist</a>
+                                            <% } %>
                                         </td>
                                     </tr>
                                 <% }
@@ -132,58 +184,61 @@
             <div class="modal-body">
                 <form id="add-product-form">
                     <div class="form-group">
-                        <label for="product-category">Category:</label>
-                        <select class="form-control" id="product-category" name="product-category" required>
-                            <option value="select-category"> Choose Category</option>
-                            <% for(i=0; i<categoryData.length; i++){ %>
-                            <option value="<%= categoryData[i].name %>"> <%= categoryData[i].name %></option>
-                            <% } %>
-                        </select>
-                        <span id="product-category-error" style="color: orangered; display: none"></span>
-                    </div>
-
-                    <div class="form-group">
                         <div class="row">
                             <div class="col">
-                                <label for="product-code"> Product Code:</label>
-                                <input type="text" class="form-control" id="product-code" name="product-code" required>
-                                <span id="product-code-error" style="color: orangered; display: none"></span>
+                                <label for="add-product-category">Category:</label>
+                                <select class="form-control" id="add-product-category" name="add-product-category" required>
+                                    <option value="select-category"> Choose Category</option>
+                                    <% for(i=0; i<categoryData.length; i++){ %>
+                                    <option value="<%= categoryData[i].name %>"> <%= categoryData[i].name %></option>
+                                    <% } %>
+                                </select>
+                                <span id="add-product-category-error" style="color: orangered; display: none"></span>    
                             </div>
                             <div class="col">
-                                <label for="product-name">Product Name:</label>
-                                <input type="text" class="form-control" id="product-name" name="product-name" required>
-                                <span id="product-name-error" style="color: orangered; display: none"></span>
+                                <label for="add-product-name">Product Name:</label>
+                                <input type="text" class="form-control" id="add-product-name" name="add-product-name" required>
+                                <span id="add-product-name-error" style="color: orangered; display: none"></span>
                             </div>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="product-description">Description:</label>
-                        <textarea class="form-control" id="product-description" name="product-description" rows="3"></textarea>
-                        <span id="product-description-error" style="color: orangered; display: none"></span>
+                        <label for="add-product-description">Description:</label>
+                        <textarea class="form-control" id="add-product-description" name="add-product-description" rows="3"></textarea>
+                        <span id="add-product-description-error" style="color: orangered; display: none"></span>
                     </div>
 
                     <div class="form-group">
                         <div class="row">
                             <div class="col">
-                                <label for="product-price">Price:</label>
-                                <input type="text" class="form-control" id="product-price" name="product-price" required>
-                                <span id="product-price-error" style="color: orangered; display: none"></span>
+                                <label for="add-product-weight"> Weight: (Product Code)</label>
+                                <input type="text" class="form-control" id="add-product-weight" name="add-product-weight" required>
+                                <span id="add-product-weight-error" style="color: orangered; display: none"></span>
                             </div>
                             <div class="col">
-                                <label for="product-quantity">Quantity:</label>
-                                <input type="text" class="form-control" id="product-quantity" name="product-quantity" required>
-                                <span id="product-quantity-error" style="color: orangered; display: none"></span>
+                                <label for="add-product-mc">Making Charge: (Product Name)</label>
+                                <input type="text" class="form-control" id="add-product-mc" name="add-product-mc" required>
+                                <span id="add-product-mc-error" style="color: orangered; display: none"></span>
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="form-group">
-                        <label for="product-status">Status:</label>
-                        <select class="form-control" id="product-status" name="product-status" required>
-                            <option value="list">List</option>
-                            <option value="unlist">Unlist</option>
-                        </select>
+                        <div class="row">
+                            <div class="col">
+                                <label for="add-product-quantity">Quantity:</label>
+                                <input type="text" class="form-control" id="add-product-quantity" name="add-product-quantity" required>
+                                <span id="add-product-quantity-error" style="color: orangered; display: none"></span>
+                            </div>
+                            <div class="col">
+                                <label for="add-product-status">Status:</label>
+                                <select class="form-control" id="add-product-status" name="add-product-status" required>
+                                    <option value="list">List</option>
+                                    <option value="unlist">Unlist</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -211,28 +266,26 @@
             <div class="modal-body">
                 <form id="edit-product-form">
                     <input type="hidden" id="edit-product-id" name="edit-product-id">
+                    <input type="hidden" id="edit-product-code" name="edit-product-code">
 
                     <div class="form-group">
-                        <label for="edit-product-category">Category:</label>
-                        <select class="form-control" id="edit-product-category" name="edit-product-category" required>
-                            <option value="select-category"> Choose Category</option>
-                            <% for(i=0; i<categoryData.length; i++){ %>
-                            <option value="<%= categoryData[i].name %>"> <%= categoryData[i].name %></option>
-                            <% } %>
-                        </select>
-                        <span id="edit-product-category-error" style="color: orangered; display: none"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="edit-product-code">Product Code:</label>
-                        <input type="text" class="form-control" id="edit-product-code" name="edit-product-name" required>
-                        <span id="edit-product-code-error" style="color: orangered; display: none"></span>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="edit-product-name">Product Name:</label>
-                        <input type="text" class="form-control" id="edit-product-name" name="edit-product-name" required>
-                        <span id="edit-product-name-error" style="color: orangered; display: none"></span>
+                        <div class="row">
+                            <div class="col">
+                                <label for="edit-product-category">Category:</label>
+                                <select class="form-control" id="edit-product-category" name="edit-product-category" required>
+                                    <option value="select-category"> Choose Category</option>
+                                    <% for(i=0; i<categoryData.length; i++){ %>
+                                    <option value="<%= categoryData[i].name %>"> <%= categoryData[i].name %></option>
+                                    <% } %>
+                                </select>
+                                <span id="edit-product-category-error" style="color: orangered; display: none"></span>
+                            </div>
+                            <div class="col">
+                                <label for="edit-product-name">Product Name:</label>
+                                <input type="text" class="form-control" id="edit-product-name" name="edit-product-name" required>
+                                <span id="edit-product-name-error" style="color: orangered; display: none"></span>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -244,25 +297,34 @@
                     <div class="form-group">
                         <div class="row">
                             <div class="col">
-                                <label for="edit-product-price">Price:</label>
-                                <input type="text" class="form-control" id="edit-product-price" name="edit-product-price" required>
-                                <span id="edit-product-price-error" style="color: orangered; display: none"></span>
+                                <label for="edit-product-weight">Weight:</label>
+                                <input type="text" class="form-control" id="edit-product-weight" name="edit-product-weight" required>
+                                <span id="edit-product-weight-error" style="color: orangered; display: none"></span>
                             </div>
                             <div class="col">
-                                <label for="edit-product-quantity">Quantity:</label>
-                                <input type="text" class="form-control" id="edit-product-quantity" name="edit-product-quantity" required>
-                                <span id="edit-product-quantity-error" style="color: orangered; display: none"></span>
+                                <label for="edit-product-mc">Making Charge:</label>
+                                <input type="text" class="form-control" id="edit-product-mc" name="edit-product-mc" required>
+                                <span id="edit-product-mc-error" style="color: orangered; display: none"></span>
                             </div>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="edit-product-status">Status:</label>
-                        <select class="form-control" id="edit-product-status" name="edit-product-status" required>
-                        <span id="edit-product-status-error" style="color: orangered; display: none"></span>
-                            <option value="unlist">Unlist</option>
-                            <option value="list">List</option>
-                        </select>
+                        <div class="row">
+                            <div class="col">
+                                <label for="edit-product-quantity">Quantity:</label>
+                                <input type="text" class="form-control" id="edit-product-quantity" name="edit-product-quantity" required>
+                                <span id="edit-product-quantity-error" style="color: orangered; display: none"></span>
+                            </div>
+                            <div class="col">
+                                <label for="edit-product-status">Status:</label>
+                                <select class="form-control" id="edit-product-status" name="edit-product-status" required>
+                                <span id="edit-product-status-error" style="color: orangered; display: none"></span>
+                                    <option value="list">List</option>
+                                    <option value="unlist">Unlist</option>
+                                </select>        
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -294,35 +356,123 @@
         // Event listener for form submission
         $('#saveProductBtn').click(function() {
 
-            const productCategory = $('#product-category').val();
-            const productCode = $('#product-code').val();
-            const productName = $('#product-name').val();
-            const productDescription = $('#product-description').val();
-            const productPrice = $('#product-price').val();
-            const productQty = $('#product-quantity').val();
-            const productStatus = $('#product-status').val();
+            const productCategory = $('#add-product-category').val();
+            const productName = $('#add-product-name').val();
+            const productDescription = $('#add-product-description').val();
+            const productWeight = $('#add-product-weight').val();
+            const productMc = $('#add-product-mc').val();            
+            // const productPrice = $('#add-product-price').val();
+            const productQty = $('#add-product-quantity').val();
+            const productStatus = $('#add-product-status').val();
 
-            const categoryError = document.getElementById('product-category-error');
-            const codeError = document.getElementById('product-code-error');
-            const nameError = document.getElementById('product-name-error');
-            const descriptionError = document.getElementById('product-description-error');
-            const priceError = document.getElementById('product-price-error');
-            const quantityError = document.getElementById('product-quantity-error');
+            const addProductCategoryError = document.getElementById('add-product-category-error');
+            const addProductNameError = document.getElementById('add-product-name-error');
+            const addProductDescriptionError = document.getElementById('add-product-description-error');
+            const addProductWeightError = document.getElementById('add-product-weight-error');
+            const addProductMcError = document.getElementById('add-product-mc-error');
+            // const addProductPriceError = document.getElementById('add-product-price-error');
+            const addProductQtyError = document.getElementById('add-product-quantity-error');
 
+            addProductCategoryError.style.display = "none";
+            addProductNameError.style.display = "none";
+            addProductDescriptionError.style.display = "none";
+            addProductWeightError.style.display = "none";
+            addProductMcError.style.display = "none";
+            // addProductPriceError.style.display = "none";
+            addProductQtyError.style.display = "none";
 
             console.log("productCategory : ", productCategory);
-            console.log("productCode : ", productCode);
             console.log("productName : ", productName);
             console.log("productDescription : ", productDescription);
-            console.log("productPrice : ", productPrice);
+            console.log("productWeight : ", productWeight);
+            console.log("productMC : ", productMc);
+            // console.log("productPrice : ", productPrice);
             console.log("productQty : ", productQty);
             console.log("productStatus : ", productStatus);
 
 
+            let isValid = true;
+            
+            if (productCategory === "select-category") {
+                addProductCategoryError.textContent = "Select product category.";
+                addProductCategoryError.style.display = "block";
+                isValid = false;
+            } else {
+                addProductCategoryError.style.display = "none";
+            }
+
+            if (productName === "") {
+                addProductNameError.textContent = "Product name is required.";
+                addProductNameError.style.display = "block";
+                isValid = false;
+            } else {
+                addProductNameError.style.display = "none";
+            }
+
+            if (productDescription === "") {
+                addProductDescriptionError.textContent = "Product description is required.";
+                addProductDescriptionError.style.display = "block";
+                isValid = false;
+            } else {
+                addProductDescriptionError.style.display = "none";
+            }
 
 
-            // Form validation logic here (if needed)
+            if (productWeight === "") {
+                addProductWeightError.textContent = "Product weight is required.";
+                addProductWeightError.style.display = "block";
+                isValid = false;
+            } else if (!/^\d+(\.\d+)?$/.test(productWeight)) {
+                addProductWeightError.textContent = "Enter a valid weight (numbers only).";
+                addProductWeightError.style.display = "block";
+                isValid = false;
+            } else {
+                addProductWeightError.style.display = "none";
+            }
 
+
+            if (productMc === "") {
+                addProductMcError.textContent = "Making Charge is required.";
+                addProductMcError.style.display = "block";
+                isValid = false;
+            } else if (!/^\d+(\.\d+)?$/.test(productMc)) {
+                addProductMcError.textContent = "Enter a valid MC (numbers only).";
+                addProductMcError.style.display = "block";
+                isValid = false;
+            } else {
+                addProductMcError.style.display = "none";
+            }
+
+
+            // if (productPrice === "") {
+            //     addProductPriceError.textContent = "Product price is required.";
+            //     addProductPriceError.style.display = "block";
+            //     isValid = false;
+            // } else if (!/^\d+(\.\d+)?$/.test(productPrice)) {
+            //     addProductPriceError.textContent = "Enter a valid product price (numbers only).";
+            //     addProductPriceError.style.display = "block";
+            //     isValid = false;
+            // } else {
+            //     addProductPriceError.style.display = "none";
+            // }
+
+            if (productQty === "") {
+                addProductQtyError.textContent = "Product quantity is required.";
+                addProductQtyError.style.display = "block";
+                isValid = false;
+            } else if (!/^\d+$/.test(productQty)) {
+                addProductQtyError.textContent = "Enter a valid product quantity (numbers only).";
+                addProductQtyError.style.display = "block";
+                isValid = false;
+            } else {
+                addProductQtyError.style.display = "none";
+            }
+
+
+
+            if(!isValid){
+                return;
+            }
 
             $.ajax({
                 url: '/admin/add-product',
@@ -330,10 +480,11 @@
                 contentType: 'application/json',
                 data: JSON.stringify({
                     productCategory,
-                    productCode,
                     productName,
                     productDescription,
-                    productPrice,
+                    productWeight,
+                    productMc,
+                    // productPrice,
                     productQty,
                     productStatus
                 }),
@@ -347,11 +498,12 @@
                             text : "New Product Added Successfully!",
                         })
                         .then(location.reload())
-                        
-                    } else if(response.exists){
-                        codeError.textContent = response.message;
-                        codeError.style.display = "block";
-                    }
+
+                    } 
+                    // else if(response.exists){
+                    //     addProductCodeError.textContent = response.message;
+                    //     addProductCodeError.style.display = "block";
+                    // }
 
                     $('#addProductModal').modal('hide');
                 },
@@ -373,11 +525,13 @@
         $('a[data-target="#editProductModal"]').click(function() {
             // Retrieve data attributes
             var productId = $(this).data('id');
-            var productCategory = $(this).data('category');
             var productCode = $(this).data('code');
+            var productCategory = $(this).data('category');
+            var productWeight = $(this).data('weight');
+            var productMc = $(this).data('mc');
             var productName = $(this).data('name');
             var productDescription = $(this).data('description');
-            var productPrice = $(this).data('price');
+            // var productPrice = $(this).data('price');
             var productQty = $(this).data('quantity');
             var productStatus = $(this).data('isListed');
 
@@ -385,20 +539,24 @@
 
             // Set values in the edit product modal fields (set default / existing values)
             $('#edit-product-id').val(productId);
-            $('#edit-product-category').val(productCategory);
             $('#edit-product-code').val(productCode);
+            $('#edit-product-category').val(productCategory);
             $('#edit-product-name').val(productName);
             $('#edit-product-description').val(productDescription);
-            $('#edit-product-price').val(productPrice);
+            $('#edit-product-weight').val(productWeight);
+            $('#edit-product-mc').val(productMc);
+            // $('#edit-product-price').val(productPrice);
             $('#edit-product-quantity').val(productQty);
-            $('#edit-product-status').val(productStatus ? 'list' : 'unlist');
+            $('#edit-product-status').val(productStatus ? 'unlist' : 'list');
 
 
             console.log("edit productCategory : ", productCategory);
-            console.log("edit productCode : ", productCode);
             console.log("edit productName : ", productName);
             console.log("edit productDescription : ", productDescription);
-            console.log("edit productPrice : ", productPrice);
+            console.log("edit productWeight : ", productWeight);
+            console.log("edit productMc : ", productMc);
+            console.log("edit productCode : ", productCode);
+            // console.log("edit productPrice : ", productPrice);
             console.log("edit productQty : ", productQty);
             console.log("edit productStatus : ", productStatus);
         });
@@ -411,22 +569,95 @@
         $('#updateProductBtn').click(function() {
             // Retrieve updated values from modal fields
             const productId = $('#edit-product-id').val();
-            const productCategory = $('#edit-product-category').val();
             const productCode = $('#edit-product-code').val();
+            const productCategory = $('#edit-product-category').val();
             const productName = $('#edit-product-name').val();
             const productDescription = $('#edit-product-description').val();
-            const productPrice = $('#edit-product-price').val();
+            const productWeight = $('#edit-product-weight').val();
+            const productMc = $('#edit-product-mc').val();
+            // const productPrice = $('#edit-product-price').val();
             const productQty = $('#edit-product-quantity').val();
             const productStatus = $('#edit-product-status').val();
 
 
             const editProductCategoryError = document.getElementById('edit-product-category-error');
-            const editProductCodeError = document.getElementById('edit-product-code-error');
             const editProductNameError = document.getElementById('edit-product-name-error');
             const editProductDescriptionError = document.getElementById('edit-product-description-error');
-            const editProductPriceError = document.getElementById('edit-product-price-error');
+            const editProductWeightError = document.getElementById('edit-product-weight-error');
+            const editProductMcError = document.getElementById('edit-product-mc-error');
+            // const editProductPriceError = document.getElementById('edit-product-price-error');
             const editProductQtyError = document.getElementById('edit-product-quantity-error');
             const editProductStatusError = document.getElementById('edit-product-status-error');
+
+            let isValid = true;
+            
+            if (productCategory === "select-category") {
+                editProductCategoryError.textContent = "Select product category.";
+                editProductCategoryError.style.display = "block";
+                isValid = false;
+            } else {
+                editProductCategoryError.style.display = "none";
+            }
+
+            if (productName === "") {
+                editProductNameError.textContent = "Product name is required.";
+                editProductNameError.style.display = "block";
+                isValid = false;
+            } else {
+                editProductNameError.style.display = "none";
+            }
+
+            if (productDescription === "") {
+                editProductDescriptionError.textContent = "Product description is required.";
+                editProductDescriptionError.style.display = "block";
+                isValid = false;
+            } else {
+                editProductDescriptionError.style.display = "none";
+            }
+
+
+            if (productWeight === "") {
+                editProductWeightError.textContent = "Product weight is required.";
+                editProductWeightError.style.display = "block";
+                isValid = false;
+            } else if (!/^\d+(\.\d+)?$/.test(productWeight)) {
+                editProductWeightError.textContent = "Enter a valid weight (numbers only).";
+                editProductWeightError.style.display = "block";
+                isValid = false;
+            } else {
+                editProductWeightError.style.display = "none";
+            }
+
+
+            if (productMc === "") {
+                editProductMcError.textContent = "Making Charge is required.";
+                editProductMcError.style.display = "block";
+                isValid = false;
+            } else if (!/^\d+(\.\d+)?$/.test(productMc)) {
+                editProductMcError.textContent = "Enter a valid MC (numbers only).";
+                editProductMcError.style.display = "block";
+                isValid = false;
+            } else {
+                editProductMcError.style.display = "none";
+            }
+
+            if (productQty === "") {
+                editProductQtyError.textContent = "Product quantity is required.";
+                editProductQtyError.style.display = "block";
+                isValid = false;
+            } else if (!/^\d+$/.test(productQty)) {
+                editProductQtyError.textContent = "Enter a valid product quantity (numbers only).";
+                editProductQtyError.style.display = "block";
+                isValid = false;
+            } else {
+                editProductQtyError.style.display = "none";
+            }
+
+
+
+            if(!isValid){
+                return;
+            }
 
 
             // Send updated data to server
@@ -436,11 +667,13 @@
                 contentType: 'application/json',
                 data: JSON.stringify({
                     productId,
-                    productCategory,
                     productCode,
+                    productCategory,
                     productName,
                     productDescription,
-                    productPrice,
+                    productWeight,
+                    productMc,
+                    // productPrice,
                     productQty,
                     productStatus
                 }),
@@ -453,10 +686,9 @@
                             text : "Product Updated Successfully!",
                         })
                         .then(location.reload());
-                        
-                    } else if (response.exists) {
-                        editProductCodeError.textContent = response.message;
-                        editProductCodeError.style.display = "block";
+                    // } else if (response.exists) {
+                    //     editProductWeightError.textContent = response.message;
+                    //     editProductWeightError.style.display = "block";
                     } else{
                         console.error('Update Product Failed:', response.message);
                     }
@@ -468,35 +700,42 @@
         });
     });
 
-
-
 </script>
 
 
-
-<!-- <script>    
-    function manageUser(id) {
-        console.log('manageUser id: ', id);
+<!--script for manage product (block and unblock) -->
+<script>
+    
+    function manageProduct(id) {
+        console.log('manageProduct id: ', id);
 
         Swal.fire({
-        title: "Are you sure?",
-        text: "Do you want to block/unblock this user?",
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonColor: "#28a745",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, confirm!"
+            title: "Are you sure?",
+            text: "Do you want to block/unblock this product?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#28a745",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, confirm!"
         })
         .then((result) => {
         if (result.isConfirmed) {
             $.ajax({
-                url: '/admin/user-action',
-                type: 'POST',
+                url: '/admin/manage-product',
+                type: 'PATCH',
                 contentType: 'application/json',
                 data: JSON.stringify({id}),
                 success: function(response) {
-                    if(response.status === true){
+                    if (response.success === true){
                         location.reload();
+                    } else if(response.categoryBlocked){
+                        // Swal.fire("SweetAlert2 is working!");
+                        Swal.fire({
+                            icon: "error",
+                            title: "Cannot list this item. Product category is blocked!",
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
                     }
                 },
                 error: function(xhr, status, error) {
@@ -508,7 +747,7 @@
 
     
     }
-</script> -->
+</script>
 
 
 

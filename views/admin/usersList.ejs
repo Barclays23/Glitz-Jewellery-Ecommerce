@@ -170,7 +170,7 @@
             contentType: 'application/json',
             data: JSON.stringify({id}),
             success: function(response) {
-                if(response.status === true){
+                if(response.success === true){
                     location.reload();
                 }
             },

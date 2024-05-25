@@ -6,6 +6,10 @@ const randomString = require('randomstring');
 
 
 
+
+
+
+
 // load user home page----------------------------------------------
 const loadHome = async(req, res)=>{
     try {
@@ -742,5 +746,5 @@ module.exports = {
     userLogout,
     verifyForgetMail,
     loadResetPassword,
-    resetPassword
+    resetPassword,
 }

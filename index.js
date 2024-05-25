@@ -1,5 +1,8 @@
 const express = require ('express');
 const nocache = require ('nocache');
+const cron = require('node-cron');
+const {getGoldRate} = require('./controllers/goldRateController');
+
 
 const config = require('./config/config');
 
@@ -11,6 +14,8 @@ const app = express();
 app.use(nocache());
 
 app.use(express.static('public'));
+
+getGoldRate();
 
 // app.use(session({
 //     secret: process.env.sessionSecret,
@@ -33,6 +38,7 @@ const port = process.env.port;
 
 app.listen(port, ()=>{
     console.log(`server is running on http://localhost:${port}`);
+
 });
 
 

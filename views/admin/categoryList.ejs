@@ -108,17 +108,18 @@
                 <!-- Form for adding new category -->
                 <form id="add-category-form">
                     <div class="form-group">
-                        <label for="category-name">Category Name:</label>
-                        <input type="text" class="form-control" id="category-name" name="category-name" required>
-                        <span id="add-category-error" style="color: orangered; display: none"></span>
+                        <label for="add-category-name">Category Name:</label>
+                        <input type="text" class="form-control" id="add-category-name" name="add-category-name" required>
+                        <span id="add-category-name-error" style="color: orangered; display: none"></span>
                     </div>
                     <div class="form-group">
-                        <label for="category-description">Description:</label>
-                        <textarea class="form-control" id="category-description" name="category-description" rows="3"></textarea>
+                        <label for="add-category-description">Description:</label>
+                        <textarea class="form-control" id="add-category-description" name="add-category-description" rows="3"></textarea>
+                        <span id="add-category-description-error" style="color: orangered; display: none"></span>
                     </div>
                     <div class="form-group">
-                        <label for="category-status">Status:</label>
-                        <select class="form-control" id="category-status" name="category-status" required>
+                        <label for="add-category-status">Status:</label>
+                        <select class="form-control" id="add-category-status" name="add-category-status" required>
                             <option value="list">List</option>
                             <option value="unlist">Unlist</option>
                         </select>
@@ -154,11 +155,12 @@
                     <div class="form-group">
                         <label for="edit-category-name">Category Name:</label>
                         <input type="text" class="form-control" id="edit-category-name" name="edit-category-name" required>
-                        <span id="edit-category-error" style="color: orangered; display: none"></span>
+                        <span id="edit-category-name-error" style="color: orangered; display: none"></span>
                     </div>
                     <div class="form-group">
                         <label for="edit-category-description">Description:</label>
                         <textarea class="form-control" id="edit-category-description" name="edit-category-description" rows="3"></textarea>
+                        <span id="edit-category-description-error" style="color: orangered; display: none"></span>
                     </div>
                     <div class="form-group">
                         <label for="edit-category-status">Status:</label>
@@ -197,18 +199,41 @@
     $(document).ready(function() {
         // Event listener for form submission
         $('#saveCategoryBtn').click(function() {
-            const categoryName = $('#category-name').val();
-            const categoryDescription = $('#category-description').val();
-            const categoryStatus = $('#category-status').val();
+            const categoryName = $('#add-category-name').val().trim();
+            const categoryDescription = $('#add-category-description').val().trim();
+            const categoryStatus = $('#add-category-status').val();
 
-            const categoryError = document.getElementById('add-category-error');
+            const addCategoryNameError = document.getElementById('add-category-name-error');
+            addCategoryNameError.style.display = "none";
+
+            const addCategoryDescriptionError = document.getElementById('add-category-description-error');
+            addCategoryDescriptionError.style.display = "none";
 
             console.log(categoryName);
             console.log(categoryDescription);
             console.log(categoryStatus);
 
-            // Form validation logic here (if needed)
+            let isValid = true;
 
+            if (categoryName === "") {
+                addCategoryNameError.textContent = "Enter Category Name.";
+                addCategoryNameError.style.display = "block";
+                isValid = false;
+            } else {
+                addCategoryNameError.style.display = "none";
+            }
+            
+            if (categoryDescription === ""){
+                addCategoryDescriptionError.textContent = "Enter Category Description.";
+                addCategoryDescriptionError.style.display = "block";
+                isValid = false;
+            } else {
+                addCategoryDescriptionError.style.display = "none";
+            }
+            
+            if (!isValid) {
+                return; // Stop form submission
+            }
 
             $.ajax({
                 url: '/admin/add-category',
@@ -227,11 +252,11 @@
                             title: "Success",
                             text : "New Category Created Successfully!",
                         })
-                        .then(location.reload())
+                        .then(location.reload());
                         
                     } else if(response.exists){
-                        categoryError.textContent = response.message;
-                        categoryError.style.display = "block";
+                        addCategoryNameError.textContent = response.message;
+                        addCategoryNameError.style.display = "block";
                     }
 
                     $('#addCategoryModal').modal('hide');
@@ -284,13 +309,39 @@
         $('#updateCategoryBtn').click(function() {
             // Retrieve updated values from modal fields
             var categoryId = $('#edit-category-id').val();
-            var categoryName = $('#edit-category-name').val();
-            var categoryDescription = $('#edit-category-description').val();
+            var categoryName = $('#edit-category-name').val().trim();
+            var categoryDescription = $('#edit-category-description').val().trim();
             var categoryStatus = $('#edit-category-status').val();
 
-            const categoryError = document.getElementById('edit-category-error');
+            const editCategoryNameError = document.getElementById('edit-category-name-error');
+            editCategoryNameError.style.display = "none";
 
-            // Send updated data to server
+            const editCategoryDescriptionError = document.getElementById('edit-category-description-error');
+            editCategoryDescriptionError.style.display = "none";
+
+            let isValid = true;
+
+            if (categoryName === "") {
+                editCategoryNameError.textContent = "Enter Category Name.";
+                editCategoryNameError.style.display = "block";
+                isValid = false;
+            } else {
+                editCategoryNameError.style.display = "none";
+            }
+            
+            if (categoryDescription === ""){
+                editCategoryDescriptionError.textContent = "Enter Category Description.";
+                editCategoryDescriptionError.style.display = "block";
+                isValid = false;
+            } else {
+                editCategoryDescriptionError.style.display = "none";
+            }
+
+            if (!isValid) {
+                return; // Stop form submission
+            }
+
+
             $.ajax({
                 url: '/admin/edit-category',
                 method: 'PUT',
@@ -309,10 +360,10 @@
                             title: "Success",
                             text : "Category Updated Successfully!",
                         })
-                        .then(location.reload())
+                        .then(location.reload());
                     } else if (response.exists){
-                        categoryError.textContent = response.message;
-                        categoryError.style.display = "block";
+                        editCategoryNameError.textContent = response.message;
+                        editCategoryNameError.style.display = "block";
                     } else {
                         console.error('Update Category Failed:', response.message);
                     }

@@ -1,4 +1,7 @@
 const User = require('../models/userModel');
+const GoldPrice = require('../models/goldPriceModel');
+
+
 const bcrypt = require('bcrypt');
 const randomstring = require('randomstring');
 const nodemailer = require('nodemailer');
@@ -320,12 +323,14 @@ const resetPassword = async(req, res)=>{
 
 
 
-// load admin dashboard -----------------------------------------------
+// load admin dashboard ------------------------------------------
 const loadAdminDashboard = async(req, res)=>{
     try {
         const adminData = await User.findById({_id: req.session.adminId});
+        const goldPriceData = await GoldPrice.findOne({_id: {$exists: true}});
+
         console.log('admin name from session : ' , adminData.firstname, adminData.lastname);
-        res.render('adminDashboard', {adminData: adminData});
+        res.render('adminDashboard', {adminData, goldPriceData});
 
     } catch (error) {
         console.log('failed to load admin dashboard', error.message);
@@ -338,8 +343,8 @@ const loadAdminDashboard = async(req, res)=>{
 // load users list -----------------------------------------------
 const loadUsersList = async(req, res)=>{
     try {
-
         const adminData = await User.findById({_id: req.session.adminId});
+        const goldPriceData = await GoldPrice.findOne({_id: {$exists: true}});
 
         let search = '';
         if(req.query.search){
@@ -390,7 +395,8 @@ const loadUsersList = async(req, res)=>{
             adminData,
             userData,
             totalPages,
-            currentPage: pageNo
+            currentPage: pageNo,
+            goldPriceData
         });
 
 
@@ -405,10 +411,8 @@ const loadUsersList = async(req, res)=>{
 //manage user (block and unblock) -------------------------------
 const manageUser = async(req, res)=>{
     try {
-
         console.log('body of manageUSER",' , req.body);
         const userData = await User.findOne({_id: req.body.id});
-        console.log('managing user is : ', userData._id);
 
         if(userData.isBlocked === true){
             await User.updateOne({_id: req.body.id}, {isBlocked: false});
@@ -420,7 +424,7 @@ const manageUser = async(req, res)=>{
         }
 
 
-        return  res.json({status: true})
+        return res.json({success: true});
 
 
 
@@ -430,6 +434,188 @@ const manageUser = async(req, res)=>{
 }
 
 
+
+
+
+const loadMailDraft = async(req, res)=>{
+    try {
+        const adminData = await User.findById({_id: req.session.adminId});
+        const goldPriceData = await GoldPrice.findOne({_id: {$exists: true}});
+
+        res.render('sendMail', {adminData, goldPriceData});
+
+    } catch (error) {
+        console.log('failed to load the mail drafting page', error);
+    }
+}
+
+
+
+
+// send mail to users ---------------------------------------------
+const sendMail = async(req, res)=>{
+    try {
+
+        let {recipientName, recipientEmail, emailSubject, emailMessage, emailFile} = req.body;
+        console.log('req body: ', req.body);
+
+        if (recipientName === '') {
+            recipientName = 'Concerned'
+        } else {
+
+        }
+
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.emailUser,
+                pass: process.env.emailPassword
+            }
+        });
+
+
+        const mailOptions = {
+          from: process.env.emailUser,
+          to: recipientEmail,
+          subject: emailSubject,
+          html: `
+
+            <!DOCTYPE html>
+            <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Glitz Jewellery Boutique - Account Verification</title>
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+                    <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        max-width: 700px;
+                        margin: 0;
+                        padding: 0;
+                        background-color: #f5f5f5;
+                        color: #333;
+                    }
+                    .main{
+                        border-radius: 10px;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                        border: 4px solid #9A0056; /* Your special color */
+                    }
+                    .container {
+                        max-width: 600px;
+                        margin: 20px auto;
+                        padding: 10px;
+                        background-color: #fff;
+                    }
+                    .logo {
+                        text-align: center;
+                        margin-bottom: 20px;
+                    }
+                    .logo img {
+                        max-width: 150px;
+                    }
+                    .header {
+                        background-color: #9A0056; /* Your special color */
+                        text-align: center;
+                        border-top-left-radius: 10px;
+                        border-top-right-radius: 10px;
+                        margin-top: -4px; /* Remove gap between border and header */
+                    }
+                    .header h2 {
+                        margin: 0;
+                        color: #fff;
+                        padding: 10px 0; /* Add padding to the h2 directly */
+                    }
+                    h1 {
+                        text-align: center;
+                        color: #9A0056; /* Your special color */
+                    }
+                    p {
+                        line-height: 1.6;
+                        margin-bottom: 20px;
+                    }
+                    .otp {
+                        padding: 10px 20px;
+                        color: #fff;
+                        background-color: #9A0056; /* Your special color */
+                        border-radius: 5px;
+                        display: inline-block;
+                        margin-bottom: 20px;
+                        font-size: 18px;
+                    }
+                    .contact h5 {
+                        color: #9A0056; /* Your special color */
+                        line-height: 0.5;
+                    }
+                    .contact a {
+                        color: #9A0056;
+                        text-decoration: none;
+                    }
+                    .footer {
+                        text-align: center;
+                        margin-top: 20px;
+                        color: #666;
+                        font-size: 12px;
+                    }
+                    </style>
+                </head>
+
+                <body>
+                    <div class="main">
+                        <div class="header">
+                            <h2>Glitz Jewellery Boutique</h2>
+                        </div>
+                        <div class="container">
+                            <div class="logo">
+                                <img src="https://glitzjewellery.com/cdn/shop/files/glitz_logo_black_320x.png?v=1665889126" alt="Glitz Jewellery Boutique" alt="Glitz Jewellery Boutique">
+                            </div>
+                            <h1>Password Reset Request</h1>
+                            <p>Dear <strong>${recipientName}</strong>,</p>
+                            <p>${emailMessage}</p>
+                            <p>Thank you,</p>
+                            <br>
+                            <div class="contact">
+                                <h5><strong>Mohammed Sajeer M</strong></h5>
+                                <h5><strong>+91 9633699766</strong></h5>
+                                <a href="https://wa.me/919633699766"><strong> Message Me </strong>
+                                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXvL9zD8qiX_Gp3ChyzcPFx1NGnM2l_iwgwGzNEUjVAoZmYINbUlKCgIhHgYT2QKHMbYE&usqp=CAU" alt="whatsapp-logo" width="30px" height="30px">
+                                </a>
+                                <br>
+
+                                <img src="https://glitzjewellery.com/cdn/shop/files/glitz_logo_black_320x.png?v=1665889126" width="25%" alt="Glitz Jewellery Boutique" alt="Glitz Jewellery Boutique">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="footer">
+                        <p>This email was sent from Glitz Jewellery Boutique. If you have any questions or concerns, please don't hesitate to contact us.</p>
+                    </div>
+                </body>
+
+            </html>
+
+        `,
+        };
+
+
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log('Error in sending mail', error);
+
+                res.status(500).send('Error sending email');
+                // res.status(500).json({ error: 'Internal Server Error' });
+            } else {
+                console.log('email sent to user : ' + info.response);
+                return res.status(200).json({success: true});
+            }
+        });
+        
+    
+        
+    } catch (error) {
+        console.log('failed sending email', error.message);
+    }
+}
 
 
 
@@ -457,5 +643,8 @@ module.exports = {
     resetPassword,
     loadUsersList,
     manageUser,
-    adminLogout
+    loadMailDraft,
+    sendMail,
+    adminLogout,
+
 }
