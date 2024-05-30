@@ -25498,15 +25498,15 @@ dl li {
 .jsgrid .jsgrid-table td {
   vertical-align: middle;
   font-size: 0.875rem;
-  line-height: 1;
+  /* line-height: 1; */
   white-space: nowrap;
   padding: 0.9375rem;
 }
 .table th img, .jsgrid .jsgrid-table th img,
 .table td img,
 .jsgrid .jsgrid-table td img {
-  width: 30px;
-  height: 30px;
+  width: 80px;
+  height: 80px;
   border-radius: 100%;
 }
 .table th .badge, .jsgrid .jsgrid-table th .badge,

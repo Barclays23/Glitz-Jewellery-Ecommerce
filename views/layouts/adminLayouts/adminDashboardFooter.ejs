@@ -7,6 +7,34 @@
                      with
                      <i class="mdi mdi-heart text-danger"></i></span>
                </div>
+               <a href="#" class="text-center" id="fixed-up-arrow">
+                  <img src="assets/images/icons/up-arrow.png" alt="up-arrow">
+                  <style>
+                      #fixed-up-arrow {
+                          position: fixed;
+                          bottom: 20px;
+                          left: 50%;
+                          transform: translateX(-50%);
+                          z-index: 1000;
+                      }
+              
+                      @keyframes upDown {
+                          0%, 100% {
+                              transform: translateY(0);
+                          }
+                          50% {
+                              transform: translateY(-10px);
+                          }
+                      }
+              
+                      #fixed-up-arrow img {
+                          width: 40px;
+                          height: 40px;
+                          cursor: pointer;
+                          animation: upDown 1s infinite;
+                      }
+                  </style>
+              </a>
             </footer>
          </div>
          <!-- main-panel ends -->

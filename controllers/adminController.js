@@ -543,13 +543,28 @@ const sendMail = async(req, res)=>{
                         margin-bottom: 20px;
                         font-size: 18px;
                     }
+                    .contact {
+                        display: flex;
+                        align-items: center;
+                    }
+                    .contact img {
+                        max-width: 100%;
+                        height: auto;
+                    }
                     .contact h5 {
                         color: #9A0056; /* Your special color */
                         line-height: 0.5;
+                        margin-bottom: 3px;
+                        font-size: 13px;
                     }
                     .contact a {
                         color: #9A0056;
                         text-decoration: none;
+                    }
+                    .vertical-line {
+                        border-left: 1px solid black;
+                        height: auto;
+                        margin: 0 10px;
                     }
                     .footer {
                         text-align: center;
@@ -563,32 +578,45 @@ const sendMail = async(req, res)=>{
                 <body>
                     <div class="main">
                         <div class="header">
-                            <h2>Glitz Jewellery Boutique</h2>
+                            <h2>${emailSubject}</h2>
                         </div>
                         <div class="container">
                             <div class="logo">
-                                <img src="https://glitzjewellery.com/cdn/shop/files/glitz_logo_black_320x.png?v=1665889126" alt="Glitz Jewellery Boutique" alt="Glitz Jewellery Boutique">
+                                <img src="https://glitzjewellery.com/cdn/shop/files/glitz_logo_black_320x.png?v=1665889126" alt="Glitz Jewellery Boutique">
                             </div>
-                            <h1>Password Reset Request</h1>
+                            <h1>${emailSubject}</h1>
                             <p>Dear <strong>${recipientName}</strong>,</p>
                             <p>${emailMessage}</p>
                             <p>Thank you,</p>
                             <br>
-                            <div class="contact">
-                                <h5><strong>Mohammed Sajeer M</strong></h5>
-                                <h5><strong>+91 9633699766</strong></h5>
-                                <a href="https://wa.me/919633699766"><strong> Message Me </strong>
-                                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXvL9zD8qiX_Gp3ChyzcPFx1NGnM2l_iwgwGzNEUjVAoZmYINbUlKCgIhHgYT2QKHMbYE&usqp=CAU" alt="whatsapp-logo" width="30px" height="30px">
-                                </a>
-                                <br>
-
-                                <img src="https://glitzjewellery.com/cdn/shop/files/glitz_logo_black_320x.png?v=1665889126" width="25%" alt="Glitz Jewellery Boutique" alt="Glitz Jewellery Boutique">
+                            <div class="row contact">
+                                <div class="contact">
+                                    <img src="https://scontent.fcok6-1.fna.fbcdn.net/v/t1.6435-9/64306097_2400851473307196_4593893454978744320_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=5f2048&_nc_ohc=gJ4pH_IP2_MQ7kNvgGV5m2t&_nc_ht=scontent.fcok6-1.fna&oh=00_AYAn-H33GV-qI95f_Ho8jD9GuGpfgPDAR6ob3NsfXcC9Mw&oe=6678CE8C" width="60" height="auto" alt="profile-pic">
+                                </div>
+                                <div class="vertical-line"></div>
+                                <div>
+                                    <h5><strong>MOHAMMED SAJEER M</strong></h5>
+                                    <div class="about-me">
+                                    <p>
+                                        Mern Stack Developer <strong><span style="color: #9A0056;"> | </span></strong>
+                                        +91 9633699766 <strong><span style="color: #9A0056;"> | </span></strong>
+                                    </p>
+                                    </div>
+                                    <a href="https://www.linkedin.com/in/barclays23/"> <img src="https://toppng.com/uploads/preview/linkedin-logo-png-11660255206h6vpja2o2i.png" width="25" height="auto"</a>
+                                    <a href="https://github.com/Barclays23"> <img src="https://toppng.com/uploads/preview/github-logo-no-background-11659780007hi1mf26doa.png" width="25" height="auto"</a>
+                                    <a href="https://wa.me/919633699766"> <img src="https://toppng.com/uploads/preview/whatsapp-logo-png-download-11662156013fmfqqlrnja.png" width="25" height="auto"</a>
+                                    <a href="https://www.facebook.com/sajee23"> <img src="https://toppng.com/uploads/preview/facebook-transparent-l-11545516607i8qwg3zwap.png" width="25" height="auto"</a>
+                                    <a href="https://www.instagram.com/barclays_sajeer_23/"> <img src="https://toppng.com/uploads/preview/instagram-logo-png-image-11658867227dorxuzmfwf.png" width="25" height="auto"</a>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="footer">
                         <p>This email was sent from Glitz Jewellery Boutique. If you have any questions or concerns, please don't hesitate to contact us.</p>
                     </div>
+                    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+                    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
                 </body>
 
             </html>

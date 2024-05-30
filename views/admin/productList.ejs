@@ -27,12 +27,15 @@
                                 <th> Image </th>
                                 <th> Category </th>
                                 <th> Product Code </th>
+                                <th> Purity </th>
                                 <th> Product Name </th>
-                                <th> Weight </th>
+                                <th> Gross Wt </th>
+                                <th> Stone Wt </th>
+                                <th> Net Wt </th>
                                 <th> VA % </th>
-                                <!-- <th> DB Price </th> -->
                                 <th> Metal Cost </th>
                                 <th> MC Value </th>
+                                <th> Stone Rate </th>
                                 <th> GST </th>
                                 <th> Total Price </th>
                                 <th> Qty </th>
@@ -56,10 +59,11 @@
 
                                         <td> <%= i+1 %></td>
 
-                                        <% if (productData[i].images){ %>
-                                            <td> <%= productData[i].images.image1 %> </td>
+                                        <% if (productData[i].images.image1){ %>
+                                            <td> <img src="assets/images/productImages/<%= productData[i].images.image1 %>" alt="Product Image"> </td>
+                                        <% } else{ %>
+                                            <td class="text-danger"> (No Image) </td>
                                         <% } %>
-                                        <td> (Sample Image) </td>
 
                                         <% if(productData[i].categoryRef.isListed === true){ %>
                                         <td class="text-success"> <%= productData[i].categoryRef.name %> </td>
@@ -69,27 +73,37 @@
 
                                         <td> <%= productData[i].code %> </td>
 
+                                        <td> <%= productData[i].purity %> </td>
+
                                         <td> <%= productData[i].name %> </td>
 
-                                        <td> <%= Number(productData[i].weight).toFixed(3) %> </td>
+                                        <% const grossWeight = Number(productData[i].grossWeight) %>
+                                        <td class="gross-weight"> <%= grossWeight.toFixed(3) %> </td>
+
+                                        <% const stoneWeight = Number(productData[i].stoneWeight) %>
+                                        <td class="stone-weight"> <%= stoneWeight.toFixed(3) %> </td>
+
+                                        <% const netWeight = Number(productData[i].netWeight) %>
+                                        <td class="net-weight"> <%= netWeight.toFixed(3) %> </td>
 
                                         <td> <%= productData[i].VA %> % </td>
 
-                                        <!-- <td> <%= productData[i].price %> </td> -->
-
-                                        <% const metalCost = goldPriceData.price * productData[i].weight %>
-                                        <td style="text-align: right;"> <%= (metalCost).toFixed(2) %> </td>
+                                        <% const metalCost = goldPriceData.price * productData[i].netWeight %>
+                                        <td class="metal-cost" style="text-align: right;"> <%= metalCost.toFixed(2) %> </td>
 
                                         <% const makingCharge = metalCost * productData[i].VA/100 %>
-                                        <td> <%= (makingCharge).toFixed(2) %> </td>
+                                        <td class="making-charge"> <%= (makingCharge).toFixed(2) %> </td>
 
-                                        <% const GST = (metalCost + makingCharge) * 3/100 %>
-                                        <td style="text-align: right;"> <%= (GST).toFixed(2) %> </td>
+                                        <% const stoneCharge = productData[i].stoneCharge %>
+                                        <td class="stone-charge"> <%= (stoneCharge).toFixed(2) %> </td>
 
-                                        <% const totalPrice = metalCost + makingCharge + GST %>
-                                        <td style="text-align: right;"> <%= (totalPrice).toFixed(2) %> </td>
+                                        <% const GST = (metalCost + makingCharge + stoneCharge) * (3/100) %>
+                                        <td class="GST" style="text-align: right;"> <%= GST.toFixed(2) %> </td>
 
-                                        <td> <%= productData[i].quantity %> </td>
+                                        <% const totalPrice = metalCost + makingCharge + stoneCharge + GST %>
+                                        <td class="total-price" style="text-align: right;"> <%= totalPrice.toFixed(2) %> </td>
+
+                                        <td class="quantity"> <%= productData[i].quantity %> </td>
 
                                         <% if(productData[i].isBlocked === false){ %>
                                             <td class="text-success">
@@ -107,18 +121,26 @@
                                         <td>
                                             <!-- (use 1st line if using the "EDIT" text, use 2nd line if using the "edit-icon") -->
                                             <!-- <a href="<%= `/admin/edit-product?id=${productData[i]._id}` %>" class="badge badge-light" style="color: black; text-decoration: none;" data-toggle="modal" data-target="#editProductModal" -->
-                                            <a href="<%= `/admin/edit-product?id=${productData[i]._id}` %>" style="color: black; text-decoration: none;" data-toggle="modal" data-target="#editProductModal"
+                                            <a href="<%= `/admin/edit-product?id=${productData[i]._id}` %>" 
+                                            style="color: black; text-decoration: none;" 
+                                            data-toggle="modal" 
+                                            data-target="#editProductModal"
                                             data-id="<%= productData[i]._id %>" 
+                                            data-images='<%= JSON.stringify(Object.values(productData[i].images)) %>'
                                             data-category="<%= productData[i].categoryRef.name %>" 
                                             data-code="<%= productData[i].code %>" 
                                             data-name="<%= productData[i].name %>" 
                                             data-description="<%= productData[i].description %>" 
-                                            data-weight="<%= productData[i].weight %>" 
-                                            data-mc="<%= productData[i].VA %>" 
+                                            data-grossweight="<%= productData[i].grossWeight %>" 
+                                            data-stoneweight="<%= productData[i].stoneWeight %>" 
+                                            data-netweight="<%= productData[i].netWeight %>" 
+                                            data-makingcharge="<%= productData[i].VA %>" 
+                                            data-stonecharge="<%= productData[i].stoneCharge %>" 
                                             data-price="<%= productData[i].price %>" 
+                                            data-purity="<%= productData[i].purity %>" 
                                             data-quantity="<%= productData[i].quantity %>" 
-                                            data-isListed="<%= productData[i].isBlocked %>">
-                                            <img src="/assets/images/icons/edit5.png" alt="edit-icon">
+                                            data-islisted="<%= productData[i].isBlocked %>">
+                                            <img src="/assets/images/icons/edit5.png" style="width: 35px; height: auto;" alt="edit-icon">
                                             <!-- add "Edit" text if needed and add first commented line -->
                                             </a>
 
@@ -165,11 +187,10 @@
         </div>
     </div>
 </div>
-
-<a href="#" class="text-center"><img src="assets/images/icons/up-arrow.png" width="30px" height="30px" alt="up-arrow"> </a>
 <!-- Product List Ends -->
 
 <!-- ------------------------------------------------ -->
+
 
 <!-- Add New Product Modal Starts-->
 <div class="modal fade" id="addProductModal" tabindex="-1" role="dialog" aria-labelledby="addProductModalLabel" aria-hidden="true">
@@ -182,7 +203,48 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="add-product-form">
+                <form id="add-product-form" enctype="multipart/form-data">
+                    <!-- <div class="form-group">
+                        <div class="row">
+                            <div class="col">
+                                <label for="add-product-image1">Image 1:</label>
+                                <input type="file" class="form-control-file" id="add-product-image1" name="add-product-image1" onchange="previewImage(event, 'image-preview1')">
+                                <img id="image-preview1" src="#" alt="Image Preview" style="max-width: 100px; display: none;">
+                                <span id="add-product-image1-error" style="color: orangered; display: none"></span>
+                            </div>
+                            <div class="col">
+                                <label for="add-product-image2">Image 2:</label>
+                                <input type="file" class="form-control-file" id="add-product-image2" name="add-product-image2" onchange="previewImage(event, 'image-preview2')">
+                                <img id="image-preview2" src="#" alt="Image Preview" style="max-width: 100px; display: none;">
+                                <span id="add-product-image2-error" style="color: orangered; display: none"></span>
+                            </div>
+                            <div class="col">
+                                <label for="add-product-image3">Image 3:</label>
+                                <input type="file" class="form-control-file" id="add-product-image3" name="add-product-image3" onchange="previewImage(event, 'image-preview3')">
+                                <img id="image-preview3" src="#" alt="Image Preview" style="max-width: 100px; display: none;">
+                                <span id="add-product-image3-error" style="color: orangered; display: none"></span>
+                            </div>
+                            <div class="col">
+                                <label for="add-product-image4">Image 4:</label>
+                                <input type="file" class="form-control-file" id="add-product-image4" name="add-product-image4" onchange="previewImage(event, 'image-preview4')">
+                                <img id="image-preview4" src="#" alt="Image Preview" style="max-width: 100px; display: none;">
+                                <span id="add-product-image4-error" style="color: orangered; display: none"></span>
+                            </div>
+                        </div>
+                    </div> -->
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col">
+                                <label for="add-product-images">Upload Images:</label>
+                                <input type="file" name="croppedImages" class="form-control-file" id="add-product-images" multiple accept="image/*" onchange="previewImages(event)">
+                                <span id="file-upload-error" style="color: orangered; display: none"></span>
+                                <div id="add-image-previews"></div>
+                                <span id="add-product-images-error" style="color: orangered; display: none"></span>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <div class="row">
                             <div class="col">
@@ -212,14 +274,41 @@
                     <div class="form-group">
                         <div class="row">
                             <div class="col">
-                                <label for="add-product-weight"> Weight: (Product Code)</label>
-                                <input type="text" class="form-control" id="add-product-weight" name="add-product-weight" required>
-                                <span id="add-product-weight-error" style="color: orangered; display: none"></span>
+                                <label for="add-product-gross-wt"> Gross Weight:</label>
+                                <input type="text" class="form-control" id="add-product-gross-wt" name="add-product-gross-wt" required>
+                                <span id="add-product-gross-wt-error" style="color: orangered; display: none"></span>
                             </div>
                             <div class="col">
-                                <label for="add-product-mc">Making Charge: (Product Name)</label>
+                                <label for="add-product-stone-wt">Stone Weight:</label>
+                                <input type="text" class="form-control" id="add-product-stone-wt" name="add-product-stone-wt" required>
+                                <span id="add-product-stone-wt-error" style="color: orangered; display: none"></span>
+                            </div>
+                            <div class="col">
+                                <label for="add-product-net-wt"> Net Weight:</label>
+                                <input type="text" class="form-control" id="add-product-net-wt" name="add-product-net-wt" required readonly>
+                                <span id="add-product-net-wt-error" style="color: orangered; display: none"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col">
+                                <label for="add-product-mc">Making Charge:</label>
                                 <input type="text" class="form-control" id="add-product-mc" name="add-product-mc" required>
                                 <span id="add-product-mc-error" style="color: orangered; display: none"></span>
+                            </div>
+                            <div class="col">
+                                <label for="add-product-sc">Stone Charge:</label>
+                                <input type="text" class="form-control" id="add-product-sc" name="add-product-sc" required>
+                                <span id="add-product-sc-error" style="color: orangered; display: none"></span>
+                            </div>
+                            <div class="col">
+                                <label for="add-product-purity"> Purity:</label>
+                                <select class="form-control" id="add-product-purity" name="add-product-purity" required>
+                                    <option value="22K (916)">22K (916)</option>
+                                    <option value="18K (750)">18K (750)</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -251,6 +340,8 @@
 </div>
 <!-- Add New Product Modal Ends-->
 
+
+
 <!-- ------------------------------------------------ -->
 
 <!-- Edit Product Modal Starts-->
@@ -264,10 +355,24 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="edit-product-form">
+                <form id="edit-product-form" enctype="multipart/form-data">
+
                     <input type="hidden" id="edit-product-id" name="edit-product-id">
                     <input type="hidden" id="edit-product-code" name="edit-product-code">
-
+               
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col">
+                                <label for="edit-product-images">Upload Images:</label>
+                                <input type="file" name="croppedImages" class="form-control-file" id="edit-product-images" multiple accept="image/*" onchange="previewImages(event)">
+                                <span id="file-upload-error" style="color: orangered; display: none"></span>
+                                <div id="edit-image-previews">
+                                </div>
+                                <span id="edit-product-images-error" style="color: orangered; display: none"></span>
+                            </div>
+                        </div>
+                    </div>
+                
                     <div class="form-group">
                         <div class="row">
                             <div class="col">
@@ -278,7 +383,7 @@
                                     <option value="<%= categoryData[i].name %>"> <%= categoryData[i].name %></option>
                                     <% } %>
                                 </select>
-                                <span id="edit-product-category-error" style="color: orangered; display: none"></span>
+                                <span id="edit-product-category-error" style="color: orangered; display: none"></span>    
                             </div>
                             <div class="col">
                                 <label for="edit-product-name">Product Name:</label>
@@ -287,28 +392,55 @@
                             </div>
                         </div>
                     </div>
-
+                
                     <div class="form-group">
                         <label for="edit-product-description">Description:</label>
                         <textarea class="form-control" id="edit-product-description" name="edit-product-description" rows="3"></textarea>
                         <span id="edit-product-description-error" style="color: orangered; display: none"></span>
                     </div>
-
+                
                     <div class="form-group">
                         <div class="row">
                             <div class="col">
-                                <label for="edit-product-weight">Weight:</label>
-                                <input type="text" class="form-control" id="edit-product-weight" name="edit-product-weight" required>
-                                <span id="edit-product-weight-error" style="color: orangered; display: none"></span>
+                                <label for="edit-product-gross-wt"> Gross Weight:</label>
+                                <input type="text" class="form-control" id="edit-product-gross-wt" name="edit-product-gross-wt" required>
+                                <span id="edit-product-gross-wt-error" style="color: orangered; display: none"></span>
                             </div>
+                            <div class="col">
+                                <label for="edit-product-stone-wt">Stone Weight:</label>
+                                <input type="text" class="form-control" id="edit-product-stone-wt" name="edit-product-stone-wt" required>
+                                <span id="edit-product-stone-wt-error" style="color: orangered; display: none"></span>
+                            </div>
+                            <div class="col">
+                                <label for="edit-product-net-wt"> Net Weight:</label>
+                                <input type="text" class="form-control" id="edit-product-net-wt" name="edit-product-net-wt" required readonly>
+                                <span id="edit-product-net-wt-error" style="color: orangered; display: none"></span>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div class="form-group">
+                        <div class="row">
                             <div class="col">
                                 <label for="edit-product-mc">Making Charge:</label>
                                 <input type="text" class="form-control" id="edit-product-mc" name="edit-product-mc" required>
                                 <span id="edit-product-mc-error" style="color: orangered; display: none"></span>
                             </div>
+                            <div class="col">
+                                <label for="edit-product-sc">Stone Charge:</label>
+                                <input type="text" class="form-control" id="edit-product-sc" name="edit-product-sc" required>
+                                <span id="edit-product-sc-error" style="color: orangered; display: none"></span>
+                            </div>
+                            <div class="col">
+                                <label for="edit-product-purity"> Purity:</label>
+                                <select class="form-control" id="edit-product-purity" name="edit-product-purity" required>
+                                    <option value="22K (916)">22K (916)</option>
+                                    <option value="18K (750)">18K (750)</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
-
+                
                     <div class="form-group">
                         <div class="row">
                             <div class="col">
@@ -319,15 +451,13 @@
                             <div class="col">
                                 <label for="edit-product-status">Status:</label>
                                 <select class="form-control" id="edit-product-status" name="edit-product-status" required>
-                                <span id="edit-product-status-error" style="color: orangered; display: none"></span>
                                     <option value="list">List</option>
                                     <option value="unlist">Unlist</option>
-                                </select>        
+                                </select>
                             </div>
                         </div>
                     </div>
-                </form>
-            </div>
+                </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary" id="updateProductBtn">Update</button>
@@ -343,254 +473,299 @@
 
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <!-- for modals -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="/assets/scripts/adminScripts/add-product-script.js"></script>
 
 
 
-<!--script for add new product form submission -->
+<!-- SCRIPT FOR ADD PRODUCTS FORM SUBMISSION -->
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- SCRIPT FOR EDIT PRODUCTS FORM SUBMISSION -->
 <script>
+    // to fill the net weight automatically.
+    function calculateNetWeight() {
+        const grossWt = document.getElementById('edit-product-gross-wt').value;
+        const stoneWt = document.getElementById('edit-product-stone-wt').value;
+        const netWt = grossWt - stoneWt;
+        document.getElementById('edit-product-net-wt').value = netWt.toFixed(3);
+    }
+
+    // to enable/disble the stone charge field
+    function toggleStoneChargeField() {
+        const stoneWt = parseFloat(document.getElementById('edit-product-stone-wt').value) || 0;
+        const stoneChargeField = document.getElementById('edit-product-sc');
+        if (!stoneWt || stoneWt === "") {
+            stoneChargeField.disabled = true;
+            stoneChargeField.value = 0;
+        } else {
+            stoneChargeField.disabled = false;
+        }
+    }
+
+    document.getElementById('edit-product-gross-wt').addEventListener('input', calculateNetWeight);
+    document.getElementById('edit-product-stone-wt').addEventListener('input', calculateNetWeight);
+    document.getElementById('edit-product-stone-wt').addEventListener('input', toggleStoneChargeField);
+
+
+
+    // to show the default values in the edit product modal fields (including images)
     $(document).ready(function() {
-        // Event listener for form submission
-        $('#saveProductBtn').click(function() {
+        var removedImages = [];
+        // Function to handle image preview and remove button
+        function addImagePreview(imageUrl, isExisting = false, imageName = "") {
+            const imgContainer = $('<div>').css('display', 'inline-block').css('position', 'relative');
+            const img = $('<img>');
+            img.attr('src', imageUrl);
+            img.css('maxWidth', '100px');
+            img.css('margin', '10px');
+            imgContainer.append(img);
 
-            const productCategory = $('#add-product-category').val();
-            const productName = $('#add-product-name').val();
-            const productDescription = $('#add-product-description').val();
-            const productWeight = $('#add-product-weight').val();
-            const productMc = $('#add-product-mc').val();            
-            // const productPrice = $('#add-product-price').val();
-            const productQty = $('#add-product-quantity').val();
-            const productStatus = $('#add-product-status').val();
-
-            const addProductCategoryError = document.getElementById('add-product-category-error');
-            const addProductNameError = document.getElementById('add-product-name-error');
-            const addProductDescriptionError = document.getElementById('add-product-description-error');
-            const addProductWeightError = document.getElementById('add-product-weight-error');
-            const addProductMcError = document.getElementById('add-product-mc-error');
-            // const addProductPriceError = document.getElementById('add-product-price-error');
-            const addProductQtyError = document.getElementById('add-product-quantity-error');
-
-            addProductCategoryError.style.display = "none";
-            addProductNameError.style.display = "none";
-            addProductDescriptionError.style.display = "none";
-            addProductWeightError.style.display = "none";
-            addProductMcError.style.display = "none";
-            // addProductPriceError.style.display = "none";
-            addProductQtyError.style.display = "none";
-
-            console.log("productCategory : ", productCategory);
-            console.log("productName : ", productName);
-            console.log("productDescription : ", productDescription);
-            console.log("productWeight : ", productWeight);
-            console.log("productMC : ", productMc);
-            // console.log("productPrice : ", productPrice);
-            console.log("productQty : ", productQty);
-            console.log("productStatus : ", productStatus);
-
-
-            let isValid = true;
-            
-            if (productCategory === "select-category") {
-                addProductCategoryError.textContent = "Select product category.";
-                addProductCategoryError.style.display = "block";
-                isValid = false;
-            } else {
-                addProductCategoryError.style.display = "none";
-            }
-
-            if (productName === "") {
-                addProductNameError.textContent = "Product name is required.";
-                addProductNameError.style.display = "block";
-                isValid = false;
-            } else {
-                addProductNameError.style.display = "none";
-            }
-
-            if (productDescription === "") {
-                addProductDescriptionError.textContent = "Product description is required.";
-                addProductDescriptionError.style.display = "block";
-                isValid = false;
-            } else {
-                addProductDescriptionError.style.display = "none";
-            }
-
-
-            if (productWeight === "") {
-                addProductWeightError.textContent = "Product weight is required.";
-                addProductWeightError.style.display = "block";
-                isValid = false;
-            } else if (!/^\d+(\.\d+)?$/.test(productWeight)) {
-                addProductWeightError.textContent = "Enter a valid weight (numbers only).";
-                addProductWeightError.style.display = "block";
-                isValid = false;
-            } else {
-                addProductWeightError.style.display = "none";
-            }
-
-
-            if (productMc === "") {
-                addProductMcError.textContent = "Making Charge is required.";
-                addProductMcError.style.display = "block";
-                isValid = false;
-            } else if (!/^\d+(\.\d+)?$/.test(productMc)) {
-                addProductMcError.textContent = "Enter a valid MC (numbers only).";
-                addProductMcError.style.display = "block";
-                isValid = false;
-            } else {
-                addProductMcError.style.display = "none";
-            }
-
-
-            // if (productPrice === "") {
-            //     addProductPriceError.textContent = "Product price is required.";
-            //     addProductPriceError.style.display = "block";
-            //     isValid = false;
-            // } else if (!/^\d+(\.\d+)?$/.test(productPrice)) {
-            //     addProductPriceError.textContent = "Enter a valid product price (numbers only).";
-            //     addProductPriceError.style.display = "block";
-            //     isValid = false;
-            // } else {
-            //     addProductPriceError.style.display = "none";
-            // }
-
-            if (productQty === "") {
-                addProductQtyError.textContent = "Product quantity is required.";
-                addProductQtyError.style.display = "block";
-                isValid = false;
-            } else if (!/^\d+$/.test(productQty)) {
-                addProductQtyError.textContent = "Enter a valid product quantity (numbers only).";
-                addProductQtyError.style.display = "block";
-                isValid = false;
-            } else {
-                addProductQtyError.style.display = "none";
-            }
-
-
-
-            if(!isValid){
-                return;
-            }
-
-            $.ajax({
-                url: '/admin/add-product',
-                method: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({
-                    productCategory,
-                    productName,
-                    productDescription,
-                    productWeight,
-                    productMc,
-                    // productPrice,
-                    productQty,
-                    productStatus
-                }),
-                success: function(response) {
-                    console.log('Add Product Form submitted');
-
-                    if(response.success){
-                        Swal.fire({
-                            icon: "success",
-                            title: "Success",
-                            text : "New Product Added Successfully!",
-                        })
-                        .then(location.reload())
-
-                    } 
-                    // else if(response.exists){
-                    //     addProductCodeError.textContent = response.message;
-                    //     addProductCodeError.style.display = "block";
-                    // }
-
-                    $('#addProductModal').modal('hide');
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error submitting form:', error);
+            const removeBtn = $('<button>').text('X').css({
+                position: 'absolute',
+                top: '0px',
+                right: '0px',
+                background: 'red',
+                color: 'white',
+                border: 'none',
+                borderRadius: '50%',
+                cursor: 'pointer'
+            }).click(function() {
+                imgContainer.remove();
+                if (isExisting) {
+                    removedImages.push(imageName);
                 }
             });
-        });
-    });
-</script>
+
+            imgContainer.append(removeBtn);
+            $('#edit-image-previews').append(imgContainer);
+        }
 
 
-
-
-<!--script for edit product form submission -->
-<script>
-    $(document).ready(function() {
-        // Event listener for clicking the "Edit" link
         $('a[data-target="#editProductModal"]').click(function() {
-            // Retrieve data attributes
+            // Retrieve data attributes from <a> tag (.data attibutes must be in small letter. eg: makingcharge, grossweight etc)
             var productId = $(this).data('id');
-            var productCode = $(this).data('code');
+            var productImages = $(this).data('images');
             var productCategory = $(this).data('category');
-            var productWeight = $(this).data('weight');
-            var productMc = $(this).data('mc');
+            var productCode = $(this).data('code');
             var productName = $(this).data('name');
             var productDescription = $(this).data('description');
-            // var productPrice = $(this).data('price');
+            var productGrossWeight = $(this).data('grossweight');
+            var productStoneWeight = $(this).data('stoneweight');
+            var productNetWeight = $(this).data('netweight');
+            var productMc = $(this).data('makingcharge');
+            var productSc = $(this).data('stonecharge');
+            var productPurity = $(this).data('purity');
             var productQty = $(this).data('quantity');
-            var productStatus = $(this).data('isListed');
+            var productStatus = $(this).data('islisted');
 
-
-
-            // Set values in the edit product modal fields (set default / existing values)
+            // Set default values in the form fields.
             $('#edit-product-id').val(productId);
             $('#edit-product-code').val(productCode);
             $('#edit-product-category').val(productCategory);
             $('#edit-product-name').val(productName);
             $('#edit-product-description').val(productDescription);
-            $('#edit-product-weight').val(productWeight);
+            $('#edit-product-gross-wt').val(productGrossWeight);
+            $('#edit-product-stone-wt').val(productStoneWeight);
+            $('#edit-product-net-wt').val(productNetWeight);
             $('#edit-product-mc').val(productMc);
-            // $('#edit-product-price').val(productPrice);
+            $('#edit-product-sc').val(productSc);
+            $('#edit-product-purity').val(productPurity);
             $('#edit-product-quantity').val(productQty);
-            $('#edit-product-status').val(productStatus ? 'unlist' : 'list');
+            $('#edit-product-status').val(productStatus ? 'list' : 'unlist');
+
+            // Clear previous images
+            $('#edit-image-previews').html('');
+            $('#edit-product-images').val(''); // Clear the file input
+            removedImages = []; // Reset removed images array
+
+            // Display default images
+            if (productImages) {
+                productImages.forEach(imageUrl => {
+                    addImagePreview('/assets/images/productImages/' + imageUrl, true, imageUrl);
+                });
+            }
+
+            // Display default images
+            // for (const key in productImages) {
+            //     if (productImages.hasOwnProperty(key)) {
+            //         const imageUrl = productImages[key];
+            //         const imgContainer = $('<div>').css('display', 'inline-block').css('position', 'relative');
+            //         const img = $('<img>');
+            //         img.attr('src', '/assets/images/productImages/' + imageUrl);
+            //         img.css('maxWidth', '100px');
+            //         img.css('margin', '10px');
+            //         $('#edit-image-previews').append(img);
+
+            //         const removeBtn = $('<button>').text('X').css({
+            //             position: 'absolute',
+            //             top: '0px',
+            //             right: '0px',
+            //             background: 'red',
+            //             color: 'white',
+            //             border: 'none',
+            //             borderRadius: '50%',
+            //             cursor: 'pointer'
+            //         }).click(function() {
+            //             imgContainer.remove();
+            //         });
+
+            //         imgContainer.append(removeBtn);
+            //         $('#edit-image-previews').append(imgContainer);
+            //     }
+            // }
 
 
-            console.log("edit productCategory : ", productCategory);
-            console.log("edit productName : ", productName);
-            console.log("edit productDescription : ", productDescription);
-            console.log("edit productWeight : ", productWeight);
-            console.log("edit productMc : ", productMc);
-            console.log("edit productCode : ", productCode);
-            // console.log("edit productPrice : ", productPrice);
-            console.log("edit productQty : ", productQty);
-            console.log("edit productStatus : ", productStatus);
+            console.log('Showing all the default values below: ');
+            console.log("ProductId : ", productId);
+            console.log("productImages : ", productImages);
+            console.log("ProductCategory : ", productCategory);
+            console.log("ProductCode : ", productCode);
+            console.log("ProductName : ", productName);
+            console.log("ProductDescription : ", productDescription);
+            console.log("ProductGrossWt : ", productGrossWeight);
+            console.log("ProductStoneWt : ", productStoneWeight);
+            console.log("ProductNetWt : ", productNetWeight);
+            console.log("ProductMC : ", productMc);
+            console.log("ProductSC : ", productSc);
+            console.log("ProductPurity : ", productPurity);
+            console.log("ProductQty : ", productQty);
+            console.log("ProductStatus : ", productStatus);
+        });
+
+
+        // Event listener for file input change
+        $('#edit-product-images').change(function() {
+            // Clear the current image previews
+            $('#edit-image-previews').html('');
+
+            // Get the selected files
+            var files = this.files;
+
+            // Loop through the files and display previews
+            for (var i = 0; i < files.length; i++) {
+                var file = files[i];
+                var reader = new FileReader();
+
+                
+
+                // reader.onload = function(e) {
+                //     const imgContainer = $('<div>').css('display', 'inline-block').css('position', 'relative');
+                //     var img = $('<img>');
+                //     img.attr('src', e.target.result);
+                //     img.css('maxWidth', '100px');
+                //     img.css('margin', '10px');
+                //     imgContainer.append(img);
+
+                //     const removeBtn = $('<button>').text('X').css({
+                //         position: 'absolute',
+                //         top: '0px',
+                //         right: '0px',
+                //         background: 'red',
+                //         color: 'white',
+                //         border: 'none',
+                //         borderRadius: '50%',
+                //         cursor: 'pointer'
+                //     }).click(function() {
+                //         imgContainer.remove();
+                //     });
+
+                //     imgContainer.append(removeBtn);
+                //     $('#edit-image-previews').append(imgContainer);
+                // }
+                
+                reader.onload = function(e) {
+                    addImagePreview(e.target.result);
+                }
+
+
+                reader.readAsDataURL(file);
+            }
         });
     });
 
 
 
-    // for updating the values of edit product modal
+
+
+    // for validating and submitting edit product form
     $(document).ready(function() {
         $('#updateProductBtn').click(function() {
             // Retrieve updated values from modal fields
             const productId = $('#edit-product-id').val();
-            const productCode = $('#edit-product-code').val();
+            const productImages = $('#edit-product-images')[0].files;
             const productCategory = $('#edit-product-category').val();
+            const productCode = $('#edit-product-code').val();
             const productName = $('#edit-product-name').val();
             const productDescription = $('#edit-product-description').val();
-            const productWeight = $('#edit-product-weight').val();
-            const productMc = $('#edit-product-mc').val();
-            // const productPrice = $('#edit-product-price').val();
-            const productQty = $('#edit-product-quantity').val();
+            const productGrossWt = parseFloat($('#edit-product-gross-wt').val()) || 0;
+            const productStoneWt = parseFloat($('#edit-product-stone-wt').val()) || 0;
+            const productNetWt = parseFloat($('#edit-product-net-wt').val()) || 0;
+            const productMc = parseFloat($('#edit-product-mc').val()) || 0;
+            const productSc = parseFloat($('#edit-product-sc').val()) || 0;
+            const productPurity = $('#edit-product-purity').val();
+            const productQty = parseInt($('#edit-product-quantity').val()) || 0;
             const productStatus = $('#edit-product-status').val();
 
 
+
+            const editProductImagesError = document.getElementById('edit-product-images-error');
+            const choosenFileError = document.getElementById('choosen-file-error');
             const editProductCategoryError = document.getElementById('edit-product-category-error');
             const editProductNameError = document.getElementById('edit-product-name-error');
             const editProductDescriptionError = document.getElementById('edit-product-description-error');
-            const editProductWeightError = document.getElementById('edit-product-weight-error');
+            const editProductGrossWtError = document.getElementById('edit-product-gross-wt-error');
+            const editProductStoneWtError = document.getElementById('edit-product-stone-wt-error');
+            const editProductNetWtError = document.getElementById('edit-product-net-wt-error');
             const editProductMcError = document.getElementById('edit-product-mc-error');
-            // const editProductPriceError = document.getElementById('edit-product-price-error');
+            const editProductScError = document.getElementById('edit-product-sc-error');
             const editProductQtyError = document.getElementById('edit-product-quantity-error');
-            const editProductStatusError = document.getElementById('edit-product-status-error');
+
+            editProductImagesError.style.display = "none";
+            editProductCategoryError.style.display = "none";
+            editProductNameError.style.display = "none";
+            editProductDescriptionError.style.display = "none";
+            editProductGrossWtError.style.display = "none";
+            editProductStoneWtError.style.display = "none";
+            editProductNetWtError.style.display = "none";
+            editProductMcError.style.display = "none";
+            editProductScError.style.display = "none";
+            editProductQtyError.style.display = "none";
+
 
             let isValid = true;
             
+            const existingImages = $('#edit-image-previews').children().length;
+            var allowedFormats = ["jpg", "jpeg", "png", "gif", "webp"]; // Add more formats if needed
+
+            if (existingImages === 0 && productImages.length === 0) {
+                editProductImagesError.textContent = "Please choose image files to proceed.";
+                editProductImagesError.style.display = "block";
+                isValid = false;
+            } else {
+                for (const file of productImages) {
+                    const fileExtension = file.name.split('.').pop().toLowerCase();
+                    if (!allowedFormats.includes(fileExtension)) {
+                        editProductImagesError.textContent = "Please select files in JPG, PNG, GIF, or another supported image format.";
+                        editProductImagesError.style.display = "block";
+                        isValid = false;
+                        break;
+                    }
+                }
+            }
+
             if (productCategory === "select-category") {
                 editProductCategoryError.textContent = "Select product category.";
                 editProductCategoryError.style.display = "block";
@@ -616,24 +791,67 @@
             }
 
 
-            if (productWeight === "") {
-                editProductWeightError.textContent = "Product weight is required.";
-                editProductWeightError.style.display = "block";
+
+            if (!productGrossWt) {
+                editProductGrossWtError.textContent = "Gross weight is required.";
+                editProductGrossWtError.style.display = "block";
                 isValid = false;
-            } else if (!/^\d+(\.\d+)?$/.test(productWeight)) {
-                editProductWeightError.textContent = "Enter a valid weight (numbers only).";
-                editProductWeightError.style.display = "block";
+            } else if (productGrossWt < 0){
+                editProductGrossWtError.textContent = "Gross weight must be greater than 0.";
+                editProductGrossWtError.style.display = "block";
+                isValid = false;
+            } else if (!/^\d+(\.\d+)?$/.test(productGrossWt)) {
+                editProductGrossWtError.textContent = "Enter a valid weight (numbers only).";
+                editProductGrossWtError.style.display = "block";
                 isValid = false;
             } else {
-                editProductWeightError.style.display = "none";
+                editProductGrossWtError.style.display = "none";
             }
 
 
-            if (productMc === "") {
+            if (productStoneWt < 0) {
+                editProductStoneWtError.textContent = "Stone weight must be greater than or equal to 0.";
+                editProductStoneWtError.style.display = "block";
+                isValid = false;
+            }if (productStoneWt > productGrossWt) {
+                editProductStoneWtError.textContent = "Stone weight must be less than gross weight.";
+                editProductStoneWtError.style.display = "block";
+                isValid = false;
+            } else if (!/^\d+(\.\d+)?$/.test(productStoneWt)){
+                editProductStoneWtError.textContent = "Enter a valid weight (numbers only).";
+                editProductStoneWtError.style.display = "block";
+                isValid = false;
+            } else {
+                editProductStoneWtError.style.display = "none";
+            }
+
+
+            if (!productNetWt) {
+                editProductNetWtError.textContent = "Net weight is required.";
+                editProductNetWtError.style.display = "block";
+                isValid = false;
+            } else if (productNetWt < 0){
+                editProductNetWtError.textContent = " negative value";
+                editProductNetWtError.style.display = "block";
+                isValid = false;
+            } else if (!/^\d+(\.\d+)?$/.test(productNetWt)) {
+                editProductNetWtError.textContent = "Enter a valid weight (numbers only).";
+                editProductNetWtError.style.display = "block";
+                isValid = false;
+            } else {
+                editProductNetWtError.style.display = "none";
+            }
+
+
+            if (!productMc) {
                 editProductMcError.textContent = "Making Charge is required.";
                 editProductMcError.style.display = "block";
                 isValid = false;
-            } else if (!/^\d+(\.\d+)?$/.test(productMc)) {
+            } else if(productMc <= 0){
+                editProductMcError.textContent = "Making charge must be greater than 0.";
+                editProductMcError.style.display = "block";
+                isValid = false;
+            }else if (!/^\d+(\.\d+)?$/.test(productMc)) {
                 editProductMcError.textContent = "Enter a valid MC (numbers only).";
                 editProductMcError.style.display = "block";
                 isValid = false;
@@ -641,8 +859,13 @@
                 editProductMcError.style.display = "none";
             }
 
-            if (productQty === "") {
-                editProductQtyError.textContent = "Product quantity is required.";
+
+            if (!productQty) {
+                editProductQtyError.textContent = "Quantity is required.";
+                editProductQtyError.style.display = "block";
+                isValid = false;
+            } else if (productQty <= 0) {
+                editProductQtyError.textContent = "Quantity must be greater than 0.";
                 editProductQtyError.style.display = "block";
                 isValid = false;
             } else if (!/^\d+$/.test(productQty)) {
@@ -660,23 +883,38 @@
             }
 
 
+            console.log('productImages to send is : ', productImages);
+            const formData = new FormData();
+            for (let i = 0; i < productImages.length; i++) {
+                formData.append(`croppedImages`, productImages[i]);
+                // formData.append(`croppedImages`, productImages[i]);
+            }
+
+            formData.append('productId', productId);
+            formData.append('productCode', productCode);
+            formData.append('productCategory', productCategory);
+            formData.append('productName', productName);
+            formData.append('productDescription', productDescription);
+            formData.append('productGrossWt', productGrossWt.toFixed(3));
+            formData.append('productStoneWt', productStoneWt.toFixed(3));
+            formData.append('productNetWt', productNetWt.toFixed(3));
+            formData.append('productMc', productMc);
+            formData.append('productSc', productSc.toFixed(2));
+            formData.append('productPurity', productPurity);
+            formData.append('productQty', productQty);
+            formData.append('productStatus', productStatus);
+
+            console.log('formData is: ', formData);
+
+
             // Send updated data to server
             $.ajax({
                 url: '/admin/edit-product',
                 method: 'PUT',
-                contentType: 'application/json',
-                data: JSON.stringify({
-                    productId,
-                    productCode,
-                    productCategory,
-                    productName,
-                    productDescription,
-                    productWeight,
-                    productMc,
-                    // productPrice,
-                    productQty,
-                    productStatus
-                }),
+                // contentType: 'application/json',
+                contentType: false, // Don't set contentType when using FormData
+                data: formData,
+                processData: false,
                 success: function(response) {
                     console.log('Update Product Form submitted');
                     if (response.success) {
@@ -699,11 +937,17 @@
             });
         });
     });
-
 </script>
 
 
-<!--script for manage product (block and unblock) -->
+
+
+
+
+
+
+
+<!-- SCRIPT TO MANAGE PRODUCT (BLOCK AND UNBLOCK) -->
 <script>
     
     function manageProduct(id) {

@@ -68,6 +68,39 @@
          console.log('emailMessage: ', emailMessage);
 
          try {
+            Swal.fire({
+               title: 'Sending email...',
+               html: `<div style="display: flex;">
+                        <div style="width: 200px; background: #f0f0f0; margin: 0 auto; border-radius: 5px; overflow: hidden; display: flex; align-items: center;">
+                        <div id="progress-bar" style="width: 0%; height: 30px;" class="bg-success"></div>
+                     </div>
+                     <div> <b id="progress-text" style="margin-left: 10px;">0%</b> </div>
+                     `,
+               timer: 2000,
+               timerProgressBar: true,
+               didOpen: () => {
+                  Swal.showLoading();
+                  const content = Swal.getHtmlContainer();
+                  const $b = content.querySelector('b');
+                  const $progressBar = content.querySelector('#progress-bar');
+                  let timerInterval;
+
+                  timerInterval = setInterval(() => {
+                     const elapsedTime = Swal.getTimerLeft();
+                     const percentage = Math.round((1 - elapsedTime / 2000) * 100);
+                     $b.textContent = `${percentage}%`;
+                     $progressBar.style.width = `${percentage}%`;
+
+                     if (percentage >= 100) {
+                           clearInterval(timerInterval);
+                     }
+                  }, 50); // Update the content every 50ms
+               },
+               willClose: () => {
+                  clearInterval(timerInterval);
+               }
+            });
+
             const response = await fetch('/admin/send-mail', {
                method: 'POST',
                headers: {
@@ -78,8 +111,12 @@
 
             if (response.ok) {
                const result = await response.json();
-               // Handle successful response
-               alert('Email sent successfully!');
+               Swal.fire({
+                  icon: "success",
+                  title: "Email has been sent",
+                  showConfirmButton: false,
+                  timer: 1500
+               });
             } else {
                // Handle errors
                alert('Failed to send email.');

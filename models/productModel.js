@@ -11,6 +11,10 @@ const productSchema = new mongoose.Schema({
         unique : true,
         required: true
     },
+    purity : {
+        type: String,
+        required: true
+    },
     name : {
         type: String,
         required : true
@@ -23,11 +27,23 @@ const productSchema = new mongoose.Schema({
         type : Number,
         // required: true
     },
-    weight: {
+    grossWeight: {
+        type : Number,
+        required: true
+    },
+    stoneWeight: {
+        type : Number,
+        required: true
+    },
+    netWeight: {
         type : Number,
         required: true
     },
     VA: {
+        type : Number,
+        required: true
+    },
+    stoneCharge: {
         type : Number,
         required: true
     },
@@ -39,24 +55,24 @@ const productSchema = new mongoose.Schema({
     //     type: Object,
     //     required: true
     // },
-    // images : {
-    //     image1 : {
-    //         type: String,
-    //         required: false
-    //     },
-    //     image2 : {
-    //         type: String,
-    //         required: false
-    //     },
-    //     image3 : {
-    //         type: String,
-    //         required: false
-    //     },
-    //     image4 : {
-    //         type: String,
-    //         required: false
-    //     },
-    // },
+    images : {
+        image1 : {
+            type: String,
+            required: false
+        },
+        image2 : {
+            type: String,
+            required: false
+        },
+        image3 : {
+            type: String,
+            required: false
+        },
+        image4 : {
+            type: String,
+            required: false
+        },
+    },
     isCategoryBlocked : {
         type: Boolean,
         default: false

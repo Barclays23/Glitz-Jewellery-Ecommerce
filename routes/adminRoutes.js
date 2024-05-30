@@ -17,7 +17,9 @@ adminRoute.use(express.urlencoded({extended: true}));
 adminRoute.use(express.static('public'));
 
 
+// Import controllers and middlewares
 const adminAuth = require('../middlewares/adminAuth');
+const multer = require('../middlewares/multer');
 const adminController = require('../controllers/adminController');
 const categoryController = require('../controllers/categoryController');
 const productController = require('../controllers/productController');
@@ -55,8 +57,8 @@ adminRoute.put('/edit-category', adminAuth.isLogin, categoryController.updateCat
 
 // PRODUCT CONTROLLER ROUTES
 adminRoute.get('/products', adminAuth.isLogin, productController.loadProductList);
-adminRoute.post('/add-product', adminAuth.isLogin, productController.addProduct);
-adminRoute.put('/edit-product', adminAuth.isLogin, productController.updateProduct);
+adminRoute.post('/add-product', adminAuth.isLogin, multer.uploadProductImages, productController.addProduct);
+adminRoute.put('/edit-product', adminAuth.isLogin, multer.uploadProductImages, productController.updateProduct);
 adminRoute.patch('/manage-product', adminAuth.isLogin, productController.manageProduct);
 
 
