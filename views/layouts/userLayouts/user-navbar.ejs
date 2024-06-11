@@ -1,4 +1,4 @@
-<!-- <% try { %> -->
+<% try { %>
 
 
     <!-- navbar section starts -->
@@ -17,7 +17,7 @@
                             <div class="tm-dropdown tm-header-links">
                                 <button>
                                     <% if(sessionData){ %>
-                                        <a href=""><%= sessionData.firstname %> <%= sessionData.lastname %></a>
+                                        <a href="#"><%= sessionData.firstname %> <%= sessionData.lastname %></a>
                                     <% } else { %>
                                         <a href="/login">Login</a>
                                     <% } %>
@@ -57,7 +57,6 @@
                         <ul class="tm-header-icons">
                             <% if(sessionData){ %>
                                 <li><a href="#"><img src="assets/images/icons/user2.png" width="22px" height="22px" alt="user"></a></li>
-                                <!-- <li><a href="profile.html"><i class="ion-person"></i></a></li> -->
                                 <li><a href="wishlist.html"><i class="ion-android-favorite-outline"></i><span>0</span></a></li>
                                 <li><a href="cart.html"><i class="ion-bag"></i><span>0</span></a></li>
                             <% } else { %>
@@ -68,6 +67,37 @@
                 </div>
             </div>
         </div>
+        <!-- this if condition is not nessessary here. some times get error. -->
+        <% if(goldPriceData.price){ %>
+            <% const k22 = goldPriceData.price; %>
+            <% const k18 = goldPriceData.price / 22 * 18; %>
+        <% } %>
+
+        <%
+            const dateAndTime1 = new Date(goldPriceData.updatedAt);
+            const options1 = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false };
+            const formattedDate1 = dateAndTime1.toLocaleDateString('en-GB', options1).replace(',', '');
+            console.log('formattedDate1 : ', formattedDate1);
+        %>
+
+        <% 
+            const dateAndTime2 = new Date(goldPriceData.updatedAt); 
+            const year = dateAndTime2.getFullYear();
+            const month = String(dateAndTime2.getMonth() + 1).padStart(2, '0');
+            const day = String(dateAndTime2.getDate()).padStart(2, '0');
+            const hours = String(dateAndTime2.getHours()).padStart(2, '0');
+            const minutes = String(dateAndTime2.getMinutes()).padStart(2, '0');
+            const formattedDate2 = `${day}-${month}-${year} ${hours}:${minutes}`;
+            console.log('formattedDate2 : ', formattedDate2)
+        %>
+
+        <%
+            const dateAndTime3 = new Date(goldPriceData.updatedAt);
+            const options2 = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true };
+            const formattedDate3 = dateAndTime3.toLocaleDateString('en-GB', options2).replace(',', '');
+            console.log('formattedDate3 : ', formattedDate3);
+        %>
+
         <div class="tm-header-bottomarea">
             <div class="container">
                 <nav class="tm-header-nav">
@@ -81,7 +111,7 @@
                                 <li><a href="cart.html">Wishlist</a></li>
                                 <li><a href="wishlist.html">Orders</a></li>
                                 <li><a href="wishlist.html">Wallet</a></li>
-                                <li><a href="checkout.html">Logout</a></li>
+                                <li><a href="/logout">Logout</a></li>
                             </ul>
                         </li>
                         <% } %>
@@ -96,14 +126,26 @@
                         <li><a href="about.html">About</a></li>
                         <li><a href="contact.html">Contact</a></li>
                         <li class="tm-header-nav-dropdown"><a href="#">Gold Rate</a>
-                            <ul class="gold-rate text-white">
-                                <span class=" text-white text-center">Today's Gold Rate</span>
+                            <ul class="gold-rate text-white text-center">
+                                <span class="text-white text-center">Today's Gold Rate</span>
                                 <hr style="border: 1px solid rgb(255, 138, 210);">
-                                <span class=" text-white ml-2">22K (916) :</span>
+                                <li class="price-item">
+                                    <span>22K (916)</span>
+                                    <span style="margin: 10px;"> : </span>
+                                    <span><b><%= goldPriceData.price %> /gm </b></span>
+                                </li>
                                 <hr style="border: 1px solid rgb(255, 138, 210);">
-                                <span class=" text-white  ml-2"> 18K (750) :</span>
+                                <li class="price-item">
+                                    <span>18K (750)</span>
+                                    <span style="margin: 10px;"> : </span>
+                                    <span><b><%= Math.round(goldPriceData.price / 22 * 18) %> /gm </b></span>
+                                </li>
                                 <hr style="border: 1px solid rgb(255, 138, 210);">
-                                <span class=" text-white ml-2"> Updated on: </span>
+                                <li class="price-item">
+                                    <span>Updated on:</span> <br>
+                                    <span><%= formattedDate3 %></span>
+                                    <!-- change the format as per convenience (all formats are given above) -->
+                                </li>
                             </ul>
                         </li>
                     </ul>
@@ -115,8 +157,8 @@
 
 
 
-<!-- <% } catch (error) { %> -->
+<% } catch (error) { %>
     <!-- Handle the error here -->
     <!-- <p>An error occurred while rendering the navbar.</p> -->
     <!-- <p>Error details: <%= error.message %></p> -->
-<!-- <% } %> -->
+<% } %>

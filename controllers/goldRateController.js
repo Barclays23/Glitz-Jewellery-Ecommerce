@@ -13,7 +13,7 @@ const moment = require('moment-timezone');
 
 
 
-// manually update gold rate -----------------------------------------
+// manually update gold rate (manually)-----------------------------------------
 const updateGoldRate = async(req, res)=>{
     try {
         const goldRate = req.body.goldRate;
@@ -27,7 +27,7 @@ const updateGoldRate = async(req, res)=>{
             })
 
             const goldPriceData = await goldPrice.save();
-            console.log('saved goldrate : ', goldPriceData);
+            console.log('created & saved goldrate : ', goldPriceData);
 
             res.json({success: true});
 
@@ -44,51 +44,6 @@ const updateGoldRate = async(req, res)=>{
 }
 
 
-
-
-
-// get gold rate from API --------------------------------------------
-// const getGoldRateAFSAL = async(req, res)=>{
-
-//     cron.schedule('0 10 * * *', () => {
-//         console.log('Running a task at 10 AM IST');
-
-//         let goldRateToday = 0;
-
-//         async function findRate (){
-//             const options = {
-//                 method: 'GET',
-//                 url: 'https://gold-rates-india.p.rapidapi.com/api/state-gold-rates',
-//                 headers: {
-//                   'X-RapidAPI-Key': '42b6aa1f64mshce6165021e64bdep1239ccjsnd8cc0d341067',
-//                   'X-RapidAPI-Host': 'gold-rates-india.p.rapidapi.com'
-//                 }
-//               };
-              
-//               try {
-//                 const response = await axios.request(options);
-//                 console.log(response.data);
-    
-//                 goldRateToday = response.data.GoldRate[18].TenGram22K;
-//                 return goldRateToday;
-        
-//               } catch (error) {
-//                   console.error(error);
-//               }
-
-//         }
-
-//         const aaa = findRate();
-//         console.log('aaa is: ', aaa);
-//         const goldRateData = GoldPrice.updateOne({_id: {$exists: true}}, {price: goldRateToday});
-//         console.log('updated gold price data: ', goldRateData);
-
-//     },{
-//         scheduled: true,
-//         timezone: "Asia/Kolkata"
-//     });
-
-// };
 
 
 

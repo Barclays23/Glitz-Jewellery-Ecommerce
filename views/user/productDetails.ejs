@@ -1,0 +1,611 @@
+<%- include('../layouts/userLayouts/user-header.ejs') %>
+
+<%- include('../layouts/userLayouts/user-preloader.ejs') %>
+
+<%- include('../layouts/userLayouts/user-navbar.ejs') %>
+
+
+<div id="wrapper" class="wrapper">
+    <div class="tm-breadcrumb-area tm-padding-section bg-grey" data-bgimage="assets/images/breadcrumb-bg.jpg">
+        <div class="container">
+            <div class="tm-breadcrumb">
+                <h2 style="color: black;">Product Details</h2>
+                <ul>
+                    <li><a href="index.html" style="color: black;">Home</a></li>
+                    <li><a href="products.html" style="color: black;">Products</a></li>
+                    <li style="color: black;"><%= productData.code %></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <main class="page-content">
+        <div class="tm-product-details-area tm-section tm-padding-section bg-white">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-9 col-12">
+                        <div class="tm-prodetails">
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-sm-10 col-12">
+                                    <div class="tm-prodetails-images">
+                                        <div class="tm-prodetails-largeimages">
+                                            <% for(let i = 1; i <= Object.keys(productData.images).length; i++){ %>
+                                                <div class="tm-prodetails-largeimage">
+                                                    <a data-fancybox="tm-prodetails-imagegallery"
+                                                        href="assets/images/productImages/<%= productData.images[`image${i}`] %>"
+                                                        data-caption="Product Zoom Image <%= i %>">
+                                                        <img src="assets/images/productImages/<%= productData.images[`image${i}`] %>"
+                                                            alt="product image">
+                                                    </a>
+                                                </div>
+                                            <% } %>                                            
+                                            <!-- <div class="tm-prodetails-largeimage">
+                                                <a data-fancybox="tm-prodetails-imagegallery"
+                                                    href="assets/images/productImages/<%= productData.images.image1 %>"
+                                                    data-caption="Product Zoom Image 1">
+                                                    <img src="assets/images/productImages/<%= productData.images.image1 %>"
+                                                        alt="product image">
+                                                </a>
+                                            </div> -->
+                                        </div>
+                                        <div class="tm-prodetails-thumbnails">
+                                            <% for(let i = 1; i <= Object.keys(productData.images).length; i++){ %>
+                                                <div class="tm-prodetails-thumbnail">
+                                                    <img src="assets/images/productImages/<%= productData.images[`image${i}`] %>"
+                                                        alt="product image">
+                                                </div>
+                                            <% } %>
+
+                                            <!-- <div class="tm-prodetails-thumbnail">
+                                                <img src="assets/images/products/product-image-2-thumb.jpg"
+                                                    alt="product image">
+                                            </div> -->
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <% const netWeight = Number(productData.netWeight) %>
+                                <% const metalCost = goldPriceData.price * productData.netWeight %>
+                                <% const makingCharge = metalCost * productData.VA/100 %>
+                                <% const stoneCharge = productData.stoneCharge %>
+                                <% const GST = (metalCost + makingCharge + stoneCharge) * (3/100) %>
+                                <% const totalPrice = metalCost + makingCharge + stoneCharge + GST %>
+
+                                <div class="col-lg-6 col-md-6 col-12">
+                                    <div class="tm-prodetails-content">
+                                        <!-- <h3 class="tm-prodetails-title"><%= productData.name %></h3> -->
+                                        <h4><%= productData.name %></h4>
+                                        <h6><%= productData.code %></h6>
+                                        <span class="tm-prodetails-price"><del>₹ <%= (totalPrice+2500).toFixed(2) %></del> ₹ <%= (totalPrice).toFixed(2) %></span>
+                                        <div class="tm-ratingbox">
+                                            <span class="is-active"><i class="ion-android-star-outline"></i></span>
+                                            <span class="is-active"><i class="ion-android-star-outline"></i></span>
+                                            <span class="is-active"><i class="ion-android-star-outline"></i></span>
+                                            <span class="is-active"><i class="ion-android-star-outline"></i></span>
+                                            <span><i class="ion-android-star-outline"></i></span>
+                                        </div>
+                                        <div class="tm-prodetails-infos">
+                                            <table border="0" cellpadding="5">
+                                                <th style="width: 120px"></th>
+                                                <th></th>
+                                                <th></th>
+                                                <tr>
+                                                    <td><b>Availability</b></td>
+                                                    <td><b>:</b></td>
+                                                    <% if (productData.quantity >= 1 ){ %>
+                                                        <td><span class="color-theme text-success">In Stock</span></td>
+                                                        <% } else { %>
+                                                            <td><span class="color-theme text-danger">Out of Stock</span></td>
+                                                            <!-- <td><span class="color-theme">സാധനം കഴിഞ്ഞു</span></td> -->
+                                                    <% } %>
+                                                </tr>
+                                                <tr>
+                                                    <td><b>Product Code</b></td>
+                                                    <td><b>:</b></td>
+                                                    <td><%= productData.code %></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b>Category</b></td>
+                                                    <td><b>:</b></td>
+                                                    <td><%= productData.categoryRef.name %></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b>Purity</b></td>
+                                                    <td><b>:</b></td>
+                                                    <td><%= productData.purity %></td>
+                                                </tr>
+                                                <tr style="vertical-align: top;">
+                                                    <td><b>Description</b></td>
+                                                    <td><b>:</b></td>
+                                                    <td><%= productData.description %> Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the when an unknown printer took a galley of type and scrambled it to make a type specimen book.</td>
+                                                </tr>
+                                            </table>
+
+                                            <table style="border-collapse: collapse;">
+                                                <tr style="text-align: center;">
+                                                    <th style="border: 1px solid black; padding: 0 17px;">Gross Weight</th>
+                                                    <th style="border: 1px solid black; padding: 0 17px;">Stone Weight</th>
+                                                    <th style="border: 1px solid black; padding: 0 17px;">Net Weight</th>
+                                                </tr>
+                                                <tr style="text-align: center;">
+                                                    <td style="border: 1px solid black; padding: 8px;"><%= (productData.grossWeight).toFixed(3) %></td>
+                                                    <td style="border: 1px solid black; padding: 8px;"><%= (productData.stoneWeight).toFixed(3) %></td>
+                                                    <td style="border: 1px solid black; padding: 8px;"><%= (productData.netWeight).toFixed(3) %></td>
+                                                </tr>
+                                            </table>
+
+                                            <table cellpadding="5">
+                                                <tr>
+                                                    <td><b>Price Breakup : </b></td>
+                                                    <td style="width: 100px;"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Metal Price</td>
+                                                    <td style="text-align: right;"> ₹ </td>
+                                                    <td style="text-align: right;"> <%= (metalCost).toFixed(2) %> </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Making Charge (<%= productData.VA %> %)</td>
+                                                    <td style="text-align: right;"> ₹ </td>
+                                                    <td style="text-align: right;"> <%= (makingCharge).toFixed(2) %> </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Stone Charge</td>
+                                                    <td style="text-align: right;"> ₹ </td>
+                                                    <td style="text-align: right;"> <%= (stoneCharge).toFixed(2) %> </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Tax</td>
+                                                    <td style="text-align: right;"> ₹ </td>
+                                                    <td style="text-align: right;"> <%= (GST).toFixed(2) %> </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="3"> <hr style="border: 1px solid black;"></td>
+                                                </tr>
+                                                <tr style="color: #9A0056; font-size: 18px;">
+                                                    <td><b>TOTAL</b></td>
+                                                    <td style="text-align: right;"><b>₹</b></td>
+                                                    <td style="text-align: right;"><b> <%= (totalPrice).toFixed(2) %></b></td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div class="tm-prodetails-quantitycart">
+                                            <h6>Quantity :</h6>
+                                            <div class="tm-quantitybox">
+                                                <input type="text" value="1">
+                                            </div>
+                                            <a href="#" class="tm-button tm-button-dark">Add To Cart</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tm-prodetails-desreview tm-padding-section-sm-top">
+                            <ul class="nav tm-tabgroup2" id="prodetails" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="prodetails-area1-tab" data-toggle="tab"
+                                        href="#prodetails-area1" role="tab" aria-controls="prodetails-area1"
+                                        aria-selected="true">Description</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="prodetails-area2-tab" data-toggle="tab"
+                                        href="#prodetails-area2" role="tab" aria-controls="prodetails-area2"
+                                        aria-selected="false">Reviews
+                                        (1)</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="prodetails-content">
+                                <div class="tab-pane fade show active" id="prodetails-area1" role="tabpanel"
+                                    aria-labelledby="prodetails-area1-tab">
+                                    <div class="tm-prodetails-description">
+                                        <h4>Product Description</h4>
+                                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+                                            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+                                            veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+                                            com modo consequat. Duis aute irure dolor in reprehenderit in voluptate
+                                            velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
+                                            occaecat cupidatat non proident.</p>
+                                        <p>Sunt in culpa qui officia deserunt mollit anim id est laborum consectetur
+                                            adipiscing elit, sed do eiusmod tempor incid
+                                            idunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
+                                            nostrud exercitation ullamco laboris nisiut aliquip ex ea commodo
+                                            consequat. Duis aute irure dolor in reprehenderit in voluptate velit
+                                            esse cillum dolore
+                                            eufugiat nulla pariatur. </p>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="prodetails-area2" role="tabpanel"
+                                    aria-labelledby="prodetails-area2-tab">
+                                    <div class="tm-prodetails-review">
+                                        <h5>1 Review For Stylist daimond ring</h5>
+                                        <div class="tm-comment-wrapper mb-50">
+                                            <div class="tm-comment">
+                                                <div class="tm-comment-thumb">
+                                                    <img src="assets/images/author-image-1.jpg" alt="author image">
+                                                </div>
+                                                <div class="tm-comment-content">
+                                                    <h6 class="tm-comment-authorname"><a href="#">Frida Bins</a>
+                                                    </h6>
+                                                    <span class="tm-comment-date">Wednesday, October 17, 2018 at
+                                                        4:00PM.</span>
+                                                    <div class="tm-ratingbox">
+                                                        <span class="is-active"><i
+                                                                class="ion-android-star-outline"></i></span>
+                                                        <span class="is-active"><i
+                                                                class="ion-android-star-outline"></i></span>
+                                                        <span class="is-active"><i
+                                                                class="ion-android-star-outline"></i></span>
+                                                        <span class="is-active"><i
+                                                                class="ion-android-star-outline"></i></span>
+                                                        <span><i class="ion-android-star-outline"></i></span>
+                                                    </div>
+                                                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit,
+                                                        sed do
+                                                        eiusmod
+                                                        tempor incididunt ut labore dolore magna aliqua. Ut enim ad
+                                                        minim
+                                                        veniam.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <h5>Add a review</h5>
+                                        <form action="#" class="tm-form">
+                                            <div class="tm-form-inner">
+                                                <div class="tm-form-field">
+                                                    <div class="tm-ratingbox tm-ratingbox-input">
+                                                        <span class="is-active"><i
+                                                                class="ion-android-star-outline"></i></span>
+                                                        <span class="is-active"><i
+                                                                class="ion-android-star-outline"></i></span>
+                                                        <span class="is-active"><i
+                                                                class="ion-android-star-outline"></i></span>
+                                                        <span class="is-active"><i
+                                                                class="ion-android-star-outline"></i></span>
+                                                        <span><i class="ion-android-star-outline"></i></span>
+                                                    </div>
+                                                </div>
+                                                <div class="tm-form-field tm-form-fieldhalf">
+                                                    <input type="text" placeholder="Your Name*" required="required">
+                                                </div>
+                                                <div class="tm-form-field tm-form-fieldhalf">
+                                                    <input type="Email" placeholder="Your Email*"
+                                                        required="required">
+                                                </div>
+                                                <div class="tm-form-field">
+                                                    <textarea name="product-review" cols="30" rows="5"
+                                                        placeholder="Your Review"></textarea>
+                                                </div>
+                                                <div class="tm-form-field">
+                                                    <button type="submit" class="tm-button">Submit</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tm-similliar-products tm-padding-section-sm-top">
+                            <h4 class="small-title">Similar Products</h4>
+                            <div class="row tm-products-slider3">
+                                <% for (let i=0; i < 4; i++) { %>
+                                    <% if (similarProducts[i] && goldPriceData) { %>
+
+                                        <% const similarNetWeight = Number(similarProducts[i].netWeight) %>
+                                        <% console.log('similar netWeight -------------------- : ', similarNetWeight); %>
+                                        
+                                        <% const similarMetalCost = goldPriceData.price * similarProducts[i].netWeight %>
+                                        <% console.log('similar metalCost -------------------- : ', similarMetalCost); %>
+
+                                        <% const similarMakingCharge = similarMetalCost * similarProducts[i].VA/100 %>
+                                        <% console.log('similar makingCharge -------------------- : ', similarMakingCharge); %>
+
+                                        <% const similarStoneCharge = similarProducts[i].stoneCharge %>
+                                        <% console.log('similar stoneCharge -------------------- : ', similarStoneCharge); %>
+
+                                        <% const similarGST = (similarMetalCost + similarMakingCharge + similarStoneCharge) * (3/100) %>
+                                        <% console.log('similar GST -------------------- : ', similarGST); %>
+
+                                        <% const similarTotalPrice = similarMetalCost + similarMakingCharge + similarStoneCharge + similarGST %>
+                                        <% console.log('similar totalPrice -------------------- : ', similarTotalPrice); %>
+                                        <% console.log('++++++++++++++++++++++++++++++++++++++++++++++'); %>
+
+                                        <div class="col-12">
+                                            <div class="tm-product tm-scrollanim">
+                                                <div class="tm-product-topside">
+                                                    <div class="tm-product-images">
+                                                        <img src="assets/images/productImages/<%= similarProducts[i].images.image1 %>" alt="product image">
+                                                        <img src="assets/images/productImages/<%= similarProducts[i].images.image2 %>" alt="product image">
+                                                    </div>
+                                                    <ul class="tm-product-actions">
+                                                        <li><a href="#"><i class="ion-android-cart"></i> Add to cart</a>
+                                                        </li>
+                                                        <li><button data-fancybox data-src="#tm-product-quickview"><i
+                                                                    class="ion-eye"></i></button></li>
+                                                        <li><a href="#"><i class="ion-heart"></i></a></li>
+                                                    </ul>
+                                                    <div class="tm-product-badges">
+                                                        <span class="tm-product-badges-new">New</span>
+                                                        <span class="tm-product-badges-sale">Sale</span>
+                                                    </div>
+                                                </div>
+                                                <div class="tm-product-bottomside">
+                                                    <h6 class="tm-product-title"><a href="product-details?id=<%= similarProducts[i]._id %>"><%= similarProducts[i].name %></a></h6>
+                                                    <p> <%= similarProducts[i].code %></p>
+                                                    <div class="tm-ratingbox">
+                                                        <span class="is-active"><i
+                                                                class="ion-android-star-outline"></i></span>
+                                                        <span class="is-active"><i
+                                                                class="ion-android-star-outline"></i></span>
+                                                        <span class="is-active"><i
+                                                                class="ion-android-star-outline"></i></span>
+                                                        <span class="is-active"><i
+                                                                class="ion-android-star-outline"></i></span>
+                                                        <span><i class="ion-android-star-outline"></i></span>
+                                                    </div>
+                                                    <span class="tm-product-price">₹<%= Math.round(similarTotalPrice).toFixed(2) %></span>
+                                                    <div class="tm-product-content">
+                                                        <p>Lorem 4444</p>
+                                                        <ul class="tm-product-actions">
+                                                            <li><a href="#"><i class="ion-android-cart"></i> Add to cart</a></li>
+                                                            <li><button data-fancybox data-src="assets/images/productImages/<%= similarProducts[i].images.image1 %>"><i class="ion-eye"></i></button></li>
+                                                            <li><a href="#"><i class="ion-heart"></i></a></li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <% } %>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-12 bg-grey">
+                        <div class="widgets">
+                            <div class="single-widget widget-categories">
+                                <h6 class="widget-title">Categories</h6>
+                                <ul>
+                                    <% for(let i=0; i< categoryData.length; i++){ %>
+                                        <li><a href="products.html"><%= categoryData[i].name %></a></li>
+                                    <% } %>
+                                </ul>
+                            </div>
+                            <div class="single-widget widget-pricefilter">
+                                <h6 class="widget-title">Filter by Price</h6>
+                                <div class="widget-pricefilter-inner">
+                                    <div class="tm-rangeslider" data-range_min="0" data-range_max="500000"
+                                        data-cur_min="20000" data-cur_max="100000">
+                                        <div class="tm-rangeslider-bar nst-animating"></div>
+                                        <span class="tm-rangeslider-leftgrip nst-animating" tabindex="0"></span>
+                                        <span class="tm-rangeslider-rightgrip nst-animating" tabindex="0"></span>
+                                    </div>
+                                    <div class="widget-pricefilter-actions">
+                                        <p class="widget-pricefilter-price">Price: ₹ <span
+                                                class="tm-rangeslider-leftlabel">308</span>
+                                            - ₹ <span class="tm-rangeslider-rightlabel">798</span></p>
+                                        <button class="widget-pricefilter-button">Filter</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="single-widget widget-popularproduct">
+                                <h6 class="widget-title">Popular Products</h6>
+                                <ul>
+                                    <% for(let i = 0; i <= 4; i++) { %>
+                                        <% if (popularProducts[i] && goldPriceData) { %>
+                                            <% const popularNetWeight = Number(popularProducts[i].netWeight) %>
+                                            <% console.log('popular netWeight -------------------- : ', popularNetWeight); %>
+                                            
+                                            <% const popularMetalCost = goldPriceData.price * popularProducts[i].netWeight %>
+                                            <% console.log('popular metalCost -------------------- : ', popularMetalCost); %>
+
+                                            <% const popularMakingCharge = popularMetalCost * popularProducts[i].VA/100 %>
+                                            <% console.log('popular makingCharge -------------------- : ', popularMakingCharge); %>
+
+                                            <% const popularStoneCharge = popularProducts[i].stoneCharge %>
+                                            <% console.log('popular stoneCharge -------------------- : ', popularStoneCharge); %>
+
+                                            <% const popularGST = (popularMetalCost + popularMakingCharge + popularStoneCharge) * (3/100) %>
+                                            <% console.log('popular GST -------------------- : ', popularGST); %>
+
+                                            <% const popularTotalPrice = popularMetalCost + popularMakingCharge + popularStoneCharge + popularGST %>
+                                            <% console.log('popular totalPrice -------------------- : ', popularTotalPrice); %>
+                                            <% console.log('++++++++++++++++++++++++++++++++++++++++++++++'); %>
+
+                                            <li>
+                                                <a href="product-details?id=<%= popularProducts[i]._id %>" class="widget-popularproduct-image">
+                                                    <img src="assets/images/productImages/<%= popularProducts[i].images[`image${1}`] %>" alt="product thumbnail">
+                                                </a>
+                                                <div class="widget-popularproduct-content">
+                                                    <h6><a href="product-details?id=<%= popularProducts[i]._id %>"><%= popularProducts[i].name %></a></h6>
+                                                    <span>₹<%= Math.round(popularTotalPrice).toFixed(2) %></span>
+                                                </div>
+                                            </li>
+                                        <% } %>
+                                    <% } %>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- this area is for the similar products. when clicking the eye button, the below codes will work -->
+    <div class="tm-product-quickview" id="tm-product-quickview">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xl-9 col-lg-10 col-12">
+                    <div class="tm-product-quickview-inner">
+                        <div class="tm-prodetails">
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-sm-10 col-12">
+                                    <div class="tm-prodetails-images">
+                                        <div class="tm-prodetails-largeimages">
+                                            <div class="tm-prodetails-largeimage">
+                                                <img src="assets/images/products/product-image-2.jpg" alt="product image">
+                                            </div>
+                                            <div class="tm-prodetails-largeimage">
+                                                <img src="assets/images/products/product-image-2.jpg" alt="product image">
+                                            </div>
+                                            <div class="tm-prodetails-largeimage">
+                                                <img src="assets/images/products/product-image-3.jpg"
+                                                    alt="product image">
+                                            </div>
+                                            <div class="tm-prodetails-largeimage">
+                                                <img src="assets/images/products/product-image-4.jpg"
+                                                    alt="product image">
+                                            </div>
+                                            <div class="tm-prodetails-largeimage">
+                                                <img src="assets/images/products/product-image-6.jpg"
+                                                    alt="product image">
+                                            </div>
+                                            <div class="tm-prodetails-largeimage">
+                                                <img src="assets/images/products/product-image-6.jpg"
+                                                    alt="product image">
+                                            </div>
+                                        </div>
+                                        <div class="tm-prodetails-thumbnails">
+                                            <div class="tm-prodetails-thumbnail">
+                                                <img src="assets/images/products/product-image-1-thumb.jpg"
+                                                    alt="product image">
+                                            </div>
+                                            <div class="tm-prodetails-thumbnail">
+                                                <img src="assets/images/products/product-image-2-thumb.jpg"
+                                                    alt="product image">
+                                            </div>
+                                            <div class="tm-prodetails-thumbnail">
+                                                <img src="assets/images/products/product-image-3-thumb.jpg"
+                                                    alt="product image">
+                                            </div>
+                                            <div class="tm-prodetails-thumbnail">
+                                                <img src="assets/images/products/product-image-4-thumb.jpg"
+                                                    alt="product image">
+                                            </div>
+                                            <div class="tm-prodetails-thumbnail">
+                                                <img src="assets/images/products/product-image-5-thumb.jpg"
+                                                    alt="product image">
+                                            </div>
+                                            <div class="tm-prodetails-thumbnail">
+                                                <img src="assets/images/products/product-image-6-thumb.jpg"
+                                                    alt="product image">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-12">
+                                    <div class="tm-prodetails-content">
+                                        <h4 class="tm-prodetails-title">Stylist daimond ring</h4>
+                                        <span class="tm-prodetails-price"><del>$75000.99</del> $50009.99</span>
+                                        <div class="tm-ratingbox">
+                                            <span class="is-active"><i class="ion-android-star-outline"></i></span>
+                                            <span class="is-active"><i class="ion-android-star-outline"></i></span>
+                                            <span class="is-active"><i class="ion-android-star-outline"></i></span>
+                                            <span class="is-active"><i class="ion-android-star-outline"></i></span>
+                                            <span><i class="ion-android-star-outline"></i></span>
+                                        </div>
+                                        <div class="tm-prodetails-infos">
+                                            <div class="tm-prodetails-singleinfo">
+                                                <b>Product ID : </b>010
+                                            </div>
+                                            <div class="tm-prodetails-singleinfo">
+                                                <b>Category : </b><a href="#">Ring</a>
+                                            </div>
+                                            <div class="tm-prodetails-singleinfo tm-prodetails-tags">
+                                                <b>Tags : </b>
+                                                <ul>
+                                                    <li><a href="#">bracelets</a></li>
+                                                    <li><a href="#">diamond</a></li>
+                                                    <li><a href="#">ring</a></li>
+                                                    <li><a href="#">necklaces</a></li>
+                                                </ul>
+                                            </div>
+                                            <div class="tm-prodetails-singleinfo">
+                                                <b>Available : </b>
+                                                <span class="color-theme">In Stock</span>
+                                            </div>
+                                            <div class="tm-prodetails-singleinfo tm-prodetails-share">
+                                                <b>Share : </b>
+                                                <ul>
+                                                    <li><a href="#"><i class="ion-social-facebook"></i></a></li>
+                                                    <li><a href="#"><i class="ion-social-instagram-outline"></i></a>
+                                                    </li>
+                                                    <li><a href="#"><i class="ion-social-skype-outline"></i></a>
+                                                    </li>
+                                                    <li><a href="#"><i class="ion-social-pinterest-outline"></i></a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quis quemi
+                                            dolor, malesuada id metus a, mattis eleifend elit. Nullam pharetra
+                                            consequat ex in dapibus. Vestibulum ante ipsum primis in faucibus
+                                            orciluctus curae.</p>
+                                        <div class="tm-prodetails-quantitycart">
+                                            <h6>Quantity :</h6>
+                                            <div class="tm-quantitybox">
+                                                <input type="text" value="1">
+                                            </div>
+                                            <a href="#" class="tm-button tm-button-dark">Add To Cart</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button id="back-top-top"><i class="ion-arrow-up-c"></i></button>
+</div>
+
+<style>
+    .tm-prodetails-largeimage {
+  position: relative;
+  overflow: hidden;
+}
+
+.tm-prodetails-largeimage img {
+  width: 100%;
+  transition: transform 0.5s ease;
+  transform-origin: top left;
+}
+
+.zoom-container {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+</style>
+
+<script>
+    document.querySelectorAll('.tm-prodetails-largeimage').forEach(container => {
+      const img = container.querySelector('img');
+      const zoomContainer = container.querySelector('.zoom-container');
+      
+      container.addEventListener('mousemove', function(e) {
+        const rect = container.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const xPercent = x / rect.width * 100;
+        const yPercent = y / rect.height * 100;
+
+        img.style.transform = `scale(2) translate(-${xPercent}%, -${yPercent}%)`;
+      });
+
+      container.addEventListener('mouseleave', function() {
+        img.style.transform = 'scale(1) translate(0, 0)';
+      });
+    });
+</script>
+
+
+
+<%- include('../layouts/userLayouts/brands.ejs') %>
+
+
+<%- include('../layouts/userLayouts/user-footer.ejs') %>

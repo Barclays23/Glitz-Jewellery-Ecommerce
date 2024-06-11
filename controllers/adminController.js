@@ -356,38 +356,30 @@ const loadUsersList = async(req, res)=>{
             pageNo = req.query.page;
         }
 
-        const limit = 5;
+        const limit = 2;
 
-        const userData = await User.find({
+
+        const userQuery = {
             isAdmin: 0,
             $or: [
                 {firstname: {$regex:'.*'+search+'.*', $options: 'i'}},
                 {lastname: {$regex:'.*'+search+'.*', $options: 'i'}},
                 {email: {$regex:'.*'+search+'.*', $options: 'i'}},
                 {mobile: {$regex:'.*'+search+'.*', $options: 'i'}},
-
             ]
-        })
+        };
+
+        const userData = await User.find(userQuery)
         .limit(limit * 1)
         .skip((pageNo -1) * limit)
         .exec()
 
 
-        let count = await User.find({
-            isAdmin: 0,
-            $or: [
-                {firstname: {$regex:'.*'+search+'.*', $options: 'i'}},
-                {lastname: {$regex:'.*'+search+'.*', $options: 'i'}},
-                {email: {$regex:'.*'+search+'.*', $options: 'i'}},
-                {mobile: {$regex:'.*'+search+'.*', $options: 'i'}},
-            ]
-        })
-        .countDocuments();
+        let count = await User.find(userQuery).countDocuments();
 
         let totalPages = Math.ceil(count /limit);
 
         console.log('count of users : ', count);
-        // console.log('all users : ', userData);
         console.log('logged admin : ', adminData);
 
 

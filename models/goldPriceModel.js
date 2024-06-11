@@ -8,14 +8,10 @@ const goldRateSchema = new mongoose.Schema({
     price: {
         type : Number,
         required: true
-    },
-    // isBlocked : {
-    //     type: Boolean,
-    //     required: true,
-    //     default: false
-    // }
-
-})
+    }
+},
+{ timestamps: true }
+);
 
 
 

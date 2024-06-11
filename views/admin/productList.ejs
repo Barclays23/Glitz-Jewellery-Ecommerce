@@ -57,7 +57,7 @@
                                             </div>
                                         </td> -->
 
-                                        <td> <%= i+1 %></td>
+                                        <td> <%= (currentPage - 1) * limit + i + 1 %></td>
 
                                         <% if (productData[i].images.image1){ %>
                                             <td> <img src="assets/images/productImages/<%= productData[i].images.image1 %>" alt="Product Image"> </td>
@@ -153,6 +153,7 @@
                                             } else {
 
                                             } -->
+                                            
                                             <% if (productData[i].isBlocked === true){ %>
                                                 <a href="#" class="badge badge-secondary" id="blocked-product" style="text-decoration: none; color: black;" onclick="manageProduct('<%= productData[i]._id %>')">List</a>
                                             <% } else { %>
@@ -174,12 +175,13 @@
                     <br>
 
                     <div class="list-pagination text-center">
-                        <% if (totalPages > 1){ %>
-                            <p> Pages : 
-                                <% for(let j=1; j<= totalPages; j++){ %>
-                                    <a href="?page=<%= j %>"> <%= j %> </a>
-                                <% } %>
-                            </p>
+
+                        <% for(let j=1; j <= totalPages; j++){ %>
+                            <% if (j === currentPage) { %>
+                                <span class="active"><%= j %></span>
+                            <% } else { %>
+                                <a href="?page=<%= j %>&search=<%= search %>"><%= j %></a>
+                            <% } %>
                         <% } %>
                     </div>
                 </div>
@@ -211,24 +213,6 @@
                                 <input type="file" class="form-control-file" id="add-product-image1" name="add-product-image1" onchange="previewImage(event, 'image-preview1')">
                                 <img id="image-preview1" src="#" alt="Image Preview" style="max-width: 100px; display: none;">
                                 <span id="add-product-image1-error" style="color: orangered; display: none"></span>
-                            </div>
-                            <div class="col">
-                                <label for="add-product-image2">Image 2:</label>
-                                <input type="file" class="form-control-file" id="add-product-image2" name="add-product-image2" onchange="previewImage(event, 'image-preview2')">
-                                <img id="image-preview2" src="#" alt="Image Preview" style="max-width: 100px; display: none;">
-                                <span id="add-product-image2-error" style="color: orangered; display: none"></span>
-                            </div>
-                            <div class="col">
-                                <label for="add-product-image3">Image 3:</label>
-                                <input type="file" class="form-control-file" id="add-product-image3" name="add-product-image3" onchange="previewImage(event, 'image-preview3')">
-                                <img id="image-preview3" src="#" alt="Image Preview" style="max-width: 100px; display: none;">
-                                <span id="add-product-image3-error" style="color: orangered; display: none"></span>
-                            </div>
-                            <div class="col">
-                                <label for="add-product-image4">Image 4:</label>
-                                <input type="file" class="form-control-file" id="add-product-image4" name="add-product-image4" onchange="previewImage(event, 'image-preview4')">
-                                <img id="image-preview4" src="#" alt="Image Preview" style="max-width: 100px; display: none;">
-                                <span id="add-product-image4-error" style="color: orangered; display: none"></span>
                             </div>
                         </div>
                     </div> -->
@@ -338,7 +322,7 @@
         </div>
     </div>
 </div>
-<!-- Add New Product Modal Ends-->
+<!-- Add New Product Modal Ends -->
 
 
 
@@ -359,20 +343,26 @@
 
                     <input type="hidden" id="edit-product-id" name="edit-product-id">
                     <input type="hidden" id="edit-product-code" name="edit-product-code">
-               
+
                     <div class="form-group">
+                        <!-- <label for="edit-product-images">Upload Images:</label> -->
+                        <label>Upload Images:</label>
                         <div class="row">
-                            <div class="col">
-                                <label for="edit-product-images">Upload Images:</label>
-                                <input type="file" name="croppedImages" class="form-control-file" id="edit-product-images" multiple accept="image/*" onchange="previewImages(event)">
-                                <span id="file-upload-error" style="color: orangered; display: none"></span>
-                                <div id="edit-image-previews">
-                                </div>
-                                <span id="edit-product-images-error" style="color: orangered; display: none"></span>
+                            <% for (let i = 1; i <= 4; i++) { %>
+                            <label for="edit-product-image<%= i %>">Image <%= i %>:</label>
+                            <div class="row-md-3 d-flex align-items-center">
+                                <input type="file" name="croppedImages[]" class="form-control-file d-none" id="edit-product-image<%= i %>" accept="image/*">
+                                <div id="edit-image-preview<%= i %>" class="col-md-10"></div>
+                                <button type="button" class="btn btn-primary col-md-2" style="height: min-content;" onclick="document.getElementById('edit-product-image<%= i %>').click()">Change</button>
+                                <span id="edit-product-image<%= i %>-error" style="color: orangered; display: none;"></span>
                             </div>
+                            <% } %>
                         </div>
+                        <span id="file-upload-error" style="color: orangered; display: none"></span>
+                        <div id="edit-image-previews"></div>
+                        <span id="edit-product-images-error" style="color: orangered; display: none"></span>
                     </div>
-                
+
                     <div class="form-group">
                         <div class="row">
                             <div class="col">
@@ -480,20 +470,8 @@
 
 
 
-<!-- SCRIPT FOR ADD PRODUCTS FORM SUBMISSION -->
-
-
-
-
-
-
-
-
-
-
-
-
 <!-- SCRIPT FOR EDIT PRODUCTS FORM SUBMISSION -->
+
 <script>
     // to fill the net weight automatically.
     function calculateNetWeight() {
@@ -521,191 +499,132 @@
 
 
 
-    // to show the default values in the edit product modal fields (including images)
-    $(document).ready(function() {
-        var removedImages = [];
-        // Function to handle image preview and remove button
-        function addImagePreview(imageUrl, isExisting = false, imageName = "") {
-            const imgContainer = $('<div>').css('display', 'inline-block').css('position', 'relative');
-            const img = $('<img>');
-            img.attr('src', imageUrl);
-            img.css('maxWidth', '100px');
-            img.css('margin', '10px');
+    // Function to handle image preview and remove button
+    $(document).ready(function () {
+        const imagePreviews = ['edit-image-preview1', 'edit-image-preview2', 'edit-image-preview3', 'edit-image-preview4'];
+        const imageInputs = ['edit-product-image1', 'edit-product-image2', 'edit-product-image3', 'edit-product-image4'];
+        const replacedImages = [];
+        let existingImages = [];
+
+
+        // Function to add image preview with remove button
+        function addImagePreview(imageUrl, index, fileName, isExisting = false, imageName = "") {
+            const imgContainer = $('<div>').css('position', 'relative').css('display', 'flex').css('align-items', 'center');
+            const img = $('<img>').attr('src', imageUrl).css('maxWidth', '100px').css('margin', '10px').css('border', '1px solid white');
+            const fileNameElement = $('<p>').text(fileName).css('margin', '0').css('marginLeft', '5px');
+            
             imgContainer.append(img);
+            imgContainer.append(fileNameElement);
 
-            const removeBtn = $('<button>').text('X').css({
-                position: 'absolute',
-                top: '0px',
-                right: '0px',
-                background: 'red',
-                color: 'white',
-                border: 'none',
-                borderRadius: '50%',
-                cursor: 'pointer'
-            }).click(function() {
-                imgContainer.remove();
-                if (isExisting) {
-                    removedImages.push(imageName);
-                }
-            });
+            $('#' + imagePreviews[index]).html(imgContainer);
 
-            imgContainer.append(removeBtn);
-            $('#edit-image-previews').append(imgContainer);
+            // if (isExisting) {
+            //     existingImages[index] = fileName; // Keep track of existing images
+            //     console.log(existingImages[index]);
+            // } else {
+            //     replacedImages[index] = fileName; // Keep track of new images
+            //     console.log(replacedImages[index]);
+            // } 
         }
 
-
-        $('a[data-target="#editProductModal"]').click(function() {
-            // Retrieve data attributes from <a> tag (.data attibutes must be in small letter. eg: makingcharge, grossweight etc)
-            var productId = $(this).data('id');
-            var productImages = $(this).data('images');
-            var productCategory = $(this).data('category');
-            var productCode = $(this).data('code');
-            var productName = $(this).data('name');
-            var productDescription = $(this).data('description');
-            var productGrossWeight = $(this).data('grossweight');
-            var productStoneWeight = $(this).data('stoneweight');
-            var productNetWeight = $(this).data('netweight');
-            var productMc = $(this).data('makingcharge');
-            var productSc = $(this).data('stonecharge');
-            var productPurity = $(this).data('purity');
-            var productQty = $(this).data('quantity');
-            var productStatus = $(this).data('islisted');
-
-            // Set default values in the form fields.
-            $('#edit-product-id').val(productId);
-            $('#edit-product-code').val(productCode);
-            $('#edit-product-category').val(productCategory);
-            $('#edit-product-name').val(productName);
-            $('#edit-product-description').val(productDescription);
-            $('#edit-product-gross-wt').val(productGrossWeight);
-            $('#edit-product-stone-wt').val(productStoneWeight);
-            $('#edit-product-net-wt').val(productNetWeight);
-            $('#edit-product-mc').val(productMc);
-            $('#edit-product-sc').val(productSc);
-            $('#edit-product-purity').val(productPurity);
-            $('#edit-product-quantity').val(productQty);
-            $('#edit-product-status').val(productStatus ? 'list' : 'unlist');
-
-            // Clear previous images
-            $('#edit-image-previews').html('');
-            $('#edit-product-images').val(''); // Clear the file input
-            removedImages = []; // Reset removed images array
-
-            // Display default images
-            if (productImages) {
-                productImages.forEach(imageUrl => {
-                    addImagePreview('/assets/images/productImages/' + imageUrl, true, imageUrl);
+        // Event listener for file input change (for inserted images)
+        imageInputs.forEach((inputId, index) => {
+            const inputElement = document.getElementById(inputId);
+            
+            if (inputElement) {
+                inputElement.addEventListener('change', function () {
+                    const file = this.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            addImagePreview(e.target.result, index, file.name);
+                            replacedImages[index] = file;
+                        }
+                        reader.readAsDataURL(file);
+                    }
                 });
             }
-
-            // Display default images
-            // for (const key in productImages) {
-            //     if (productImages.hasOwnProperty(key)) {
-            //         const imageUrl = productImages[key];
-            //         const imgContainer = $('<div>').css('display', 'inline-block').css('position', 'relative');
-            //         const img = $('<img>');
-            //         img.attr('src', '/assets/images/productImages/' + imageUrl);
-            //         img.css('maxWidth', '100px');
-            //         img.css('margin', '10px');
-            //         $('#edit-image-previews').append(img);
-
-            //         const removeBtn = $('<button>').text('X').css({
-            //             position: 'absolute',
-            //             top: '0px',
-            //             right: '0px',
-            //             background: 'red',
-            //             color: 'white',
-            //             border: 'none',
-            //             borderRadius: '50%',
-            //             cursor: 'pointer'
-            //         }).click(function() {
-            //             imgContainer.remove();
-            //         });
-
-            //         imgContainer.append(removeBtn);
-            //         $('#edit-image-previews').append(imgContainer);
-            //     }
-            // }
-
-
-            console.log('Showing all the default values below: ');
-            console.log("ProductId : ", productId);
-            console.log("productImages : ", productImages);
-            console.log("ProductCategory : ", productCategory);
-            console.log("ProductCode : ", productCode);
-            console.log("ProductName : ", productName);
-            console.log("ProductDescription : ", productDescription);
-            console.log("ProductGrossWt : ", productGrossWeight);
-            console.log("ProductStoneWt : ", productStoneWeight);
-            console.log("ProductNetWt : ", productNetWeight);
-            console.log("ProductMC : ", productMc);
-            console.log("ProductSC : ", productSc);
-            console.log("ProductPurity : ", productPurity);
-            console.log("ProductQty : ", productQty);
-            console.log("ProductStatus : ", productStatus);
         });
 
 
-        // Event listener for file input change
-        $('#edit-product-images').change(function() {
-            // Clear the current image previews
-            $('#edit-image-previews').html('');
 
-            // Get the selected files
-            var files = this.files;
+        // set the default values in the edit product form fields (including images)
+        $(document).ready(function () {
+            $('a[data-target="#editProductModal"]').click(function () {
+                // Retrieve data attributes from <a> tag (.data attibutes must be in small letter. eg: makingcharge, grossweight etc)
+                var productId = $(this).data('id');
+                var productImages = $(this).data('images'); //array
+                var productCategory = $(this).data('category');
+                var productCode = $(this).data('code');
+                var productName = $(this).data('name');
+                var productDescription = $(this).data('description');
+                var productGrossWeight = $(this).data('grossweight');
+                var productStoneWeight = $(this).data('stoneweight');
+                var productNetWeight = $(this).data('netweight');
+                var productMc = $(this).data('makingcharge');
+                var productSc = $(this).data('stonecharge');
+                var productPurity = $(this).data('purity');
+                var productQty = $(this).data('quantity');
+                var productStatus = $(this).data('islisted');
 
-            // Loop through the files and display previews
-            for (var i = 0; i < files.length; i++) {
-                var file = files[i];
-                var reader = new FileReader();
+                console.log("Default productImages A : ", productImages[1]);
 
-                
 
-                // reader.onload = function(e) {
-                //     const imgContainer = $('<div>').css('display', 'inline-block').css('position', 'relative');
-                //     var img = $('<img>');
-                //     img.attr('src', e.target.result);
-                //     img.css('maxWidth', '100px');
-                //     img.css('margin', '10px');
-                //     imgContainer.append(img);
+                // Set the default values in the form fields.
+                $('#edit-product-id').val(productId);
+                $('#edit-product-code').val(productCode);
+                $('#edit-product-category').val(productCategory);
+                $('#edit-product-name').val(productName);
+                $('#edit-product-description').val(productDescription);
+                $('#edit-product-gross-wt').val(productGrossWeight);
+                $('#edit-product-stone-wt').val(productStoneWeight);
+                $('#edit-product-net-wt').val(productNetWeight);
+                $('#edit-product-mc').val(productMc);
+                $('#edit-product-sc').val(productSc);
+                $('#edit-product-purity').val(productPurity);
+                $('#edit-product-quantity').val(productQty);
+                $('#edit-product-status').val(productStatus ? 'unlist' : 'list');
 
-                //     const removeBtn = $('<button>').text('X').css({
-                //         position: 'absolute',
-                //         top: '0px',
-                //         right: '0px',
-                //         background: 'red',
-                //         color: 'white',
-                //         border: 'none',
-                //         borderRadius: '50%',
-                //         cursor: 'pointer'
-                //     }).click(function() {
-                //         imgContainer.remove();
-                //     });
+                // Clear previous images
+                imagePreviews.forEach(preview => $('#' + preview).html(''));
+                replacedImages.length = 0;
+                existingImages.length = 0;
 
-                //     imgContainer.append(removeBtn);
-                //     $('#edit-image-previews').append(imgContainer);
-                // }
-                
-                reader.onload = function(e) {
-                    addImagePreview(e.target.result);
+                // Display default images
+                if (productImages) {
+                    productImages.forEach((imageUrl, index) => {
+                        addImagePreview('/assets/images/productImages/' + imageUrl, index, imageUrl, true, imageUrl);
+                    });
                 }
 
-
-                reader.readAsDataURL(file);
-            }
+                console.log("Default ProductId : ", productId);
+                console.log("Default productImages B : ", productImages);
+                console.log("Default ProductCategory : ", productCategory);
+                console.log("Default ProductCode : ", productCode);
+                console.log("Default ProductName : ", productName);
+                console.log("Default ProductDescription : ", productDescription);
+                console.log("Default ProductGrossWt : ", productGrossWeight);
+                console.log("Default ProductStoneWt : ", productStoneWeight);
+                console.log("Default ProductNetWt : ", productNetWeight);
+                console.log("Default ProductMC : ", productMc);
+                console.log("Default ProductSC : ", productSc);
+                console.log("Default ProductPurity : ", productPurity);
+                console.log("Default ProductQty : ", productQty);
+                console.log("Default ProductStatus : ", productStatus);
+            });
         });
-    });
 
 
 
+        //for validating and submitting the edit form
+        $('#updateProductBtn').click(function () {
+            console.log('updateProductBtn function started execute' );
 
-
-    // for validating and submitting edit product form
-    $(document).ready(function() {
-        $('#updateProductBtn').click(function() {
             // Retrieve updated values from modal fields
             const productId = $('#edit-product-id').val();
-            const productImages = $('#edit-product-images')[0].files;
+            // const productImages = $('#edit-product-images');
+            // const productImages = $('#edit-product-image1');
+            const existingImages = $('#edit-image-previews').children().length;
             const productCategory = $('#edit-product-category').val();
             const productCode = $('#edit-product-code').val();
             const productName = $('#edit-product-name').val();
@@ -718,6 +637,23 @@
             const productPurity = $('#edit-product-purity').val();
             const productQty = parseInt($('#edit-product-quantity').val()) || 0;
             const productStatus = $('#edit-product-status').val();
+
+
+            console.log("Current ProductId : ", productId);
+            // console.log("Current productImages : ", productImages);
+            console.log("Current existingImages : ", existingImages);
+            console.log("Current ProductCategory : ", productCategory);
+            console.log("Current ProductCode : ", productCode);
+            console.log("Current ProductName : ", productName);
+            console.log("Current ProductDescription : ", productDescription);
+            console.log("Current productGrossWeight : ", productGrossWt);
+            console.log("Current productStoneWeight : ", productStoneWt);
+            console.log("Current productNetWeight : ", productNetWt);
+            console.log("Current ProductMc : ", productMc);
+            console.log("Current ProductSc : ", productSc);
+            console.log("Current ProductPurity : ", productPurity);
+            console.log("Current ProductQty : ", productQty);
+            console.log("Current ProductStatus : ", productStatus);
 
 
 
@@ -746,22 +682,25 @@
 
 
             let isValid = true;
-            
-            const existingImages = $('#edit-image-previews').children().length;
-            var allowedFormats = ["jpg", "jpeg", "png", "gif", "webp"]; // Add more formats if needed
 
-            if (existingImages === 0 && productImages.length === 0) {
+            var allowedFormats = ["jpg", "jpeg", "png", "gif", "webp"]; // Add more formats if needed
+            const hasNewImages = replacedImages.some(img => img);
+
+
+            if (!hasNewImages && existingImages.length === 0) {
                 editProductImagesError.textContent = "Please choose image files to proceed.";
                 editProductImagesError.style.display = "block";
                 isValid = false;
-            } else {
-                for (const file of productImages) {
-                    const fileExtension = file.name.split('.').pop().toLowerCase();
-                    if (!allowedFormats.includes(fileExtension)) {
-                        editProductImagesError.textContent = "Please select files in JPG, PNG, GIF, or another supported image format.";
-                        editProductImagesError.style.display = "block";
-                        isValid = false;
-                        break;
+            } else if (hasNewImages) {
+                for (const file of replacedImages) {
+                    if (file) {
+                        const fileExtension = file.name.split('.').pop().toLowerCase();
+                        if (!allowedFormats.includes(fileExtension)) {
+                            editProductImagesError.textContent = "Please select files in JPG, PNG, GIF, or another supported image format.";
+                            editProductImagesError.style.display = "block";
+                            isValid = false;
+                            break;
+                        }
                     }
                 }
             }
@@ -796,7 +735,7 @@
                 editProductGrossWtError.textContent = "Gross weight is required.";
                 editProductGrossWtError.style.display = "block";
                 isValid = false;
-            } else if (productGrossWt < 0){
+            } else if (productGrossWt < 0) {
                 editProductGrossWtError.textContent = "Gross weight must be greater than 0.";
                 editProductGrossWtError.style.display = "block";
                 isValid = false;
@@ -813,11 +752,11 @@
                 editProductStoneWtError.textContent = "Stone weight must be greater than or equal to 0.";
                 editProductStoneWtError.style.display = "block";
                 isValid = false;
-            }if (productStoneWt > productGrossWt) {
+            } if (productStoneWt > productGrossWt) {
                 editProductStoneWtError.textContent = "Stone weight must be less than gross weight.";
                 editProductStoneWtError.style.display = "block";
                 isValid = false;
-            } else if (!/^\d+(\.\d+)?$/.test(productStoneWt)){
+            } else if (!/^\d+(\.\d+)?$/.test(productStoneWt)) {
                 editProductStoneWtError.textContent = "Enter a valid weight (numbers only).";
                 editProductStoneWtError.style.display = "block";
                 isValid = false;
@@ -830,7 +769,7 @@
                 editProductNetWtError.textContent = "Net weight is required.";
                 editProductNetWtError.style.display = "block";
                 isValid = false;
-            } else if (productNetWt < 0){
+            } else if (productNetWt < 0) {
                 editProductNetWtError.textContent = " negative value";
                 editProductNetWtError.style.display = "block";
                 isValid = false;
@@ -847,11 +786,11 @@
                 editProductMcError.textContent = "Making Charge is required.";
                 editProductMcError.style.display = "block";
                 isValid = false;
-            } else if(productMc <= 0){
+            } else if (productMc <= 0) {
                 editProductMcError.textContent = "Making charge must be greater than 0.";
                 editProductMcError.style.display = "block";
                 isValid = false;
-            }else if (!/^\d+(\.\d+)?$/.test(productMc)) {
+            } else if (!/^\d+(\.\d+)?$/.test(productMc)) {
                 editProductMcError.textContent = "Enter a valid MC (numbers only).";
                 editProductMcError.style.display = "block";
                 isValid = false;
@@ -878,66 +817,85 @@
 
 
 
-            if(!isValid){
-                return;
-            }
+            if (isValid) {
+                const formData = new FormData();
 
-
-            console.log('productImages to send is : ', productImages);
-            const formData = new FormData();
-            for (let i = 0; i < productImages.length; i++) {
-                formData.append(`croppedImages`, productImages[i]);
-                // formData.append(`croppedImages`, productImages[i]);
-            }
-
-            formData.append('productId', productId);
-            formData.append('productCode', productCode);
-            formData.append('productCategory', productCategory);
-            formData.append('productName', productName);
-            formData.append('productDescription', productDescription);
-            formData.append('productGrossWt', productGrossWt.toFixed(3));
-            formData.append('productStoneWt', productStoneWt.toFixed(3));
-            formData.append('productNetWt', productNetWt.toFixed(3));
-            formData.append('productMc', productMc);
-            formData.append('productSc', productSc.toFixed(2));
-            formData.append('productPurity', productPurity);
-            formData.append('productQty', productQty);
-            formData.append('productStatus', productStatus);
-
-            console.log('formData is: ', formData);
-
-
-            // Send updated data to server
-            $.ajax({
-                url: '/admin/edit-product',
-                method: 'PUT',
-                // contentType: 'application/json',
-                contentType: false, // Don't set contentType when using FormData
-                data: formData,
-                processData: false,
-                success: function(response) {
-                    console.log('Update Product Form submitted');
-                    if (response.success) {
-                        Swal.fire({
-                            icon: "success",
-                            title: "Success",
-                            text : "Product Updated Successfully!",
-                        })
-                        .then(location.reload());
-                    // } else if (response.exists) {
-                    //     editProductWeightError.textContent = response.message;
-                    //     editProductWeightError.style.display = "block";
-                    } else{
-                        console.error('Update Product Failed:', response.message);
+                imageInputs.forEach((inputId, index) => {
+                    const inputElement = document.getElementById(inputId);
+                    if (inputElement && inputElement.files.length > 0) {
+                        formData.append('croppedImages', inputElement.files[0]);
+                        formData.append('imageIndex[]', index); // Indicate which image slot this file belongs to
+                    } else {
+                        // If no new file is selected, check if there's an existing image
+                        const existingImage = $('#' + imagePreviews[index] + ' img');
+                        if (existingImage.length > 0) {
+                            const imageUrl = existingImage.attr('src');
+                            const imageName = imageUrl.substring(imageUrl.lastIndexOf('/') + 1); // Extract image name
+                            formData.append('existingImages[]', imageName);
+                            formData.append('imageIndex[]', index); // Indicate which image slot this existing image belongs to
+                        }
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error in updating product:', error);
+                });
+
+                formData.append('productId', productId);
+                formData.append('productCode', productCode);
+                formData.append('productCategory', productCategory);
+                formData.append('productName', productName);
+                formData.append('productDescription', productDescription);
+                formData.append('productGrossWt', productGrossWt.toFixed(3));
+                formData.append('productStoneWt', productStoneWt.toFixed(3));
+                formData.append('productNetWt', productNetWt.toFixed(3));
+                formData.append('productMc', productMc);
+                formData.append('productSc', productSc.toFixed(2));
+                formData.append('productPurity', productPurity);
+                formData.append('productQty', productQty);
+                formData.append('productStatus', productStatus);
+
+
+                function logFormData(formData) {
+                    for (let [key, value] of formData.entries()) {
+                        console.log(key, value);
+                    }
                 }
-            });
+
+                console.log('sending formData is given below.');
+                logFormData(formData);
+
+
+
+                $.ajax({
+                    url: '/admin/edit-product',
+                    method: 'PUT',
+                    // contentType: 'application/json',
+                    contentType: false, // Don't set contentType when using FormData
+                    data: formData,
+                    processData: false,
+                    success: function (response) {
+                        console.log('Update Product Form submitted', response);
+                        if (response.success) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "Success",
+                                text: "Product Updated Successfully!",
+                            })
+                            .then(location.reload());
+                        } else {
+                            console.error('Update Product Failed:', response.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error in updating product:', error);
+                    }
+                });
+            }
+
+
+            
         });
     });
+
 </script>
+
 
 
 

@@ -5,15 +5,329 @@
 
 <%- include('../layouts/userLayouts/user-navbar.ejs') %>
 
-<%- include('../layouts/userLayouts/top-banner.ejs') %>
 
-<%- include('../layouts/userLayouts/popular-products.ejs') %>
 
-<%- include('../layouts/userLayouts/small-banners.ejs') %>
 
-<%- include('../layouts/userLayouts/new-arrivals.ejs') %>
+<!-- services area starts -->
+<div class="tm-section tm-feature-area bg-grey">
+    <div class="container">
+        <div class="row mt-30-reverse">
+            <div class="col-lg-4 mt-30">
+                <div class="tm-feature">
+                    <span class="tm-feature-icon">
+                        <img data-pagespeed-lazy-src="assets/images/icons/icon-free-shipping.png" alt="free shipping"
+                            src="assets/images/icons/icon-free-shipping.png"
+                            onload="pagespeed.lazyLoadImages.loadIfVisibleAndMaybeBeacon(this);"
+                            onerror="this.onerror=null;pagespeed.lazyLoadImages.loadIfVisibleAndMaybeBeacon(this);">
+                    </span>
+                    <div class="tm-feature-content">
+                        <h6>Free Shipping</h6>
+                        <p>We provide free shipping for all order over ₹100000.00</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 mt-30">
+                <div class="tm-feature">
+                    <span class="tm-feature-icon">
+                        <img data-pagespeed-lazy-src="assets/images/icons/icon-fast-delivery.png" alt="fast delivery"
+                            src="assets/images/icons/icon-fast-delivery.png"
+                            onload="pagespeed.lazyLoadImages.loadIfVisibleAndMaybeBeacon(this);"
+                            onerror="this.onerror=null;pagespeed.lazyLoadImages.loadIfVisibleAndMaybeBeacon(this);">
+                    </span>
+                    <div class="tm-feature-content">
+                        <h6>Fast Delivery</h6>
+                        <p>We always deliver our customers very quickly.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 mt-30">
+                <div class="tm-feature">
+                    <span class="tm-feature-icon">
+                        <img data-pagespeed-lazy-src="assets/images/icons/icon-247-support.png" alt="24/7 Support"
+                            src="assets/images/icons/icon-247-support.png"
+                            onload="pagespeed.lazyLoadImages.loadIfVisibleAndMaybeBeacon(this);"
+                            onerror="this.onerror=null;pagespeed.lazyLoadImages.loadIfVisibleAndMaybeBeacon(this);">
+                    </span>
+                    <div class="tm-feature-content">
+                        <h6>24/7 Support</h6>
+                        <p>We provide support to our customers within 24 hours. </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- services area ends -->
 
-<%- include('../layouts/userLayouts/offer-banner.ejs') %>
+
+
+<!-- products area starts -->
+<div id="wrapper" class="wrapper">        
+    <main class="page-content">
+        <div class="tm-products-area tm-section tm-padding-section bg-white">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-9 col-12">
+                        <form action="#" class="tm-shop-header d-flex">
+                            <div class="tm-shop-productview">
+                                <span>View:</span>
+                                <button data-view="grid" class="active"><i class="ion-android-apps"></i></button>
+                                <button data-view="list"><i class="ion-android-menu"></i></button>
+                            </div>
+
+                            <% const startProductIndex = (currentPage - 1) * limit + 1 %>
+                            <% const endProductIndex = Math.min(currentPage * limit, productCount) %>
+
+                            <p class="tm-shop-countview">Showing <%= startProductIndex %> to <%= endProductIndex %> of <%= productCount %> </p>
+                            <!-- <p class="tm-shop-countview"> Showing 1 to 3 of 150 </p> -->
+                            <div class="tm-product-search d-flex" style="align-items: center;">
+                                <input type="text" class="form-control" name="search" placeholder="Search product...">
+                                <!-- <button><i class="ion-android-search"></i></button> -->
+                                <input type="submit" class="text-white bg-success m-1 w-50" style="height: 40px;" value="Search">
+                            </div>
+                            <select>
+                                <option value="value">Default Sorting</option>
+                                <option value="value">Name: A-Z</option>
+                                <option value="value">Name: Z-A</option>
+                                <option value="value">Date</option>
+                                <option value="value">Best Sellers</option>
+                                <option value="value">Price: Lowest first </option>
+                                <option value="value">Price: Highest first </option>
+                            </select>
+                        </form>
+
+                        <div class="tm-shop-products">
+                            <div class="row mt-30-reverse">
+                                <% for(i=0; i < limit; i++){ %>
+                                    <% if (productData[i]){ %>
+                                    <div class="col-xl-4 col-lg-6 col-md-6 col-sm-6 col-12 mt-50" style="border: 1px solid darkgray;">
+                                        <div class="tm-product tm-scrollanim">
+                                            <div class="tm-product-topside">
+                                                <div class="tm-product-images">
+                                                    <img src="assets/images/productImages/<%= productData[i].images.image1 %>" alt="product image">
+                                                    <img src="assets/images/productImages/<%= productData[i].images.image2 %>" alt="product image">
+                                                    <!-- <img src="assets/images/products/product-image-1.jpg" alt="product image"> -->
+                                                    <!-- <img src="assets/images/products/product-image-2.jpg" alt="product image"> -->
+                                                </div>
+                                                <ul class="tm-product-actions">
+                                                    <li> <a href="#"><i class="ion-android-cart"></i> Add to cart </a> </li>
+                                                    <li> <button data-fancybox data-src="assets/images/productImages/<%= productData[i].images.image1 %>"><i class="ion-eye"></i> </button> </li>
+                                                    <li> <a href="#"><i class="ion-heart"></i> </a> </li>
+                                                </ul>
+                                                <div class="tm-product-badges">
+                                                    <span class="tm-product-badges-new">New</span>
+                                                    <span class="tm-product-badges-sale">Sale</span>
+                                                </div>
+                                            </div>
+                                            <div class="tm-product-bottomside">
+                                                <br>
+                                                <!-- <h6 class="tm-product-title"><a href="product-details.html">Stylist daimond earring</a></h6> -->
+                                                <h6 class="tm-product-title"><a href="product-details?id=<%= productData[i]._id %>"><%= productData[i].code %></a></h6>
+                                                <h6 class="tm-product-title"><a href="product-details?id=<%= productData[i]._id %>"><%= productData[i].name %></a></h6>
+                                                <div class="tm-ratingbox">
+                                                    <span class="is-active"><i class="ion-android-star-outline"></i></span>
+                                                    <span class="is-active"><i class="ion-android-star-outline"></i></span>
+                                                    <span class="is-active"><i class="ion-android-star-outline"></i></span>
+                                                    <span class="is-active"><i class="ion-android-star-outline"></i></span>
+                                                    <span><i class="ion-android-star-outline"></i></span>
+                                                </div>
+                                                <% const netWeight = Number(productData[i].netWeight)%>
+                                                <% const metalCost = goldPriceData.price * productData[i].netWeight %>
+                                                <% const makingCharge = metalCost * productData[i].VA/100 %>
+                                                <% const stoneCharge = productData[i].stoneCharge %>
+                                                <% const GST = (metalCost + makingCharge + stoneCharge) * (3/100) %>
+                                                <% const totalPrice = metalCost + makingCharge + stoneCharge + GST %>
+                                                <span class="tm-product-price">₹ <%= Math.round(totalPrice).toFixed(2) %></span>
+                                                <div class="tm-product-content">
+                                                    
+                                                    <table border="0" cellpadding="5">
+                                                        <th style="width: 120px"></th>
+                                                        <th></th>
+                                                        <th></th>
+                                                        <tr style="vertical-align: top;">
+                                                          <td><b>Description</b></td>
+                                                          <td> <b> : </b></td>
+                                                          <td>  <%= productData[i].description %> Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the when an unknown printer took a galley of type and scrambled it to make a type specimen book.</td>
+                                                        </tr>
+                                                    </table>
+
+                                                    <table style="border-collapse: collapse;">
+                                                        <tr>
+                                                            <th style="border: 1px solid black; padding: 8px;">Gross Weight</th>
+                                                            <th style="border: 1px solid black; padding: 8px;">Stone Weight</th>
+                                                            <th style="border: 1px solid black; padding: 8px;">Net Weight</th>
+                                                        </tr>
+                                                        <tr style="text-align: right;">
+                                                            <td style="border: 1px solid black; padding: 8px;"><%= (productData[i].grossWeight).toFixed(3) %></td>
+                                                            <td style="border: 1px solid black; padding: 8px;"><%= (productData[i].stoneWeight).toFixed(3) %></td>
+                                                            <td style="border: 1px solid black; padding: 8px;"><%= (productData[i].netWeight).toFixed(3) %></td>
+                                                        </tr>
+                                                    </table>
+
+                                                    <table cellpadding="5">
+                                                        <tr>
+                                                          <td><b>Price Breakup : </b></td>
+                                                          <td style="width: 100px;"></td>
+                                                        </tr>
+                                                        <tr>
+                                                          <td>Metal Price</td>
+                                                          <td style="text-align: right;"> ₹ </td>
+                                                          <td style="text-align: right;"> <%= (metalCost).toFixed(2) %> </td>
+                                                        </tr>
+                                                        <tr>
+                                                          <td>Making Charge (<%= productData[i].VA %> %)</td>
+                                                          <td style="text-align: right;"> ₹ </td>
+                                                          <td style="text-align: right;"> <%= (makingCharge).toFixed(2) %> </td>
+                                                        </tr>
+                                                        <tr>
+                                                          <td>Stone Charge</td>
+                                                          <td style="text-align: right;"> ₹ </td>
+                                                          <td style="text-align: right;"> <%= (stoneCharge).toFixed(2) %> </td>
+                                                        </tr>
+                                                        <tr>
+                                                          <td>Tax</td>
+                                                          <td style="text-align: right;"> ₹ </td>
+                                                          <td style="text-align: right;"> <%= (GST).toFixed(2) %> </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="3"> <hr style="border: 1px solid black;"></td>
+                                                        </tr>
+                                                        <tr style="color: #9A0056; font-size: 18px;">
+                                                            <td><b>TOTAL</b></td>
+                                                            <td style="text-align: right;"><b>₹</b></td>
+                                                            <td style="text-align: right;"><b> <%= (totalPrice).toFixed(2) %></b></td>
+                                                        </tr>
+                                                        <!-- <tr>
+                                                            <td style="text-align: right;"><b>₹</b></td>
+                                                            <td><b>TOTAL</b></td>
+                                                            <td style="text-align: right;"><b> <%= (totalPrice).toFixed(2) %></b></td>
+                                                        </tr> -->
+                                                    </table>
+
+                                                    <ul class="tm-product-actions">
+                                                        <li><a href="#"><i class="ion-android-cart"></i> Add to cart</a></li>
+                                                        <li><button data-fancybox data-src="assets/images/productImages/<%= productData[i].images.image1 %>"><i class="ion-eye"></i></button></li>
+                                                        <li><a href="#"><i class="ion-heart"></i></a></li>
+                                                    </ul>
+                                                    <br>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <% } %>
+                                <% } %>
+                            </div>
+                        </div>
+
+                        <div class="tm-pagination mt-50">
+                            <h6> Pages : </h6>
+                            <ul>
+                                <% if (totalPages > 0){ %>
+                                    <% for(let j=1; j <= totalPages; j++){ %>
+                                        <% if (currentPage === j) { %>
+                                            <li class="m-3"><%= j %></li>
+                                        <% } else { %>
+                                            <li class="is-active"><a href="?page=<%= j %>&search=<%= search %>"><%= j %></a></li>
+                                        <% } %>
+                                    <% } %>
+                                    <li><a href="products.html"><i class="ion-chevron-right"></i></a></li>
+                                <% } %>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-12">
+                        <div class="widgets">
+                            <div class="single-widget widget-categories">
+                                <h6 class="widget-title">Categories</h6>
+                                <ul>
+                                    <% if(categoryData){ %>
+                                        <% for(let i=0; i< categoryData.length; i++){ %>
+                                            <li><a href="products.html"> <%= categoryData[i].name %> </a></li>
+                                        <% } %>
+                                    <% } %>
+                                </ul>
+                            </div>
+                            <div class="single-widget widget-pricefilter">
+                                <h6 class="widget-title">Filter by Price</h6>
+                                <div class="widget-pricefilter-inner">
+                                    <div class="tm-rangeslider" data-range_min="0" data-range_max="500000"
+                                        data-cur_min="10000" data-cur_max="50000">
+                                        <div class="tm-rangeslider-bar nst-animating"></div>
+                                        <span class="tm-rangeslider-leftgrip nst-animating" tabindex="0"></span>
+                                        <span class="tm-rangeslider-rightgrip nst-animating" tabindex="0"></span>
+                                    </div>
+                                    <div class="widget-pricefilter-actions">
+                                        <p class="widget-pricefilter-price">Price: ₹<span
+                                                class="tm-rangeslider-leftlabel">308</span>
+                                            - ₹<span class="tm-rangeslider-rightlabel">798</span></p>
+                                        <button class="widget-pricefilter-button">Filter</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="single-widget widget-popularproduct">
+                                <h6 class="widget-title">Popular Products</h6>
+                                <ul>
+                                    <% for(i=0; i<=3; i++){ %>
+                                        <% if(popularProducts[i]){ %>
+                                            <% const popularNetWeight = Number(popularProducts[i].netWeight) %>
+                                            
+                                            <% const popularMetalCost = goldPriceData.price * popularProducts[i].netWeight %>
+
+                                            <% const popularMakingCharge = popularMetalCost * popularProducts[i].VA/100 %>
+
+                                            <% const popularStoneCharge = popularProducts[i].stoneCharge %>
+
+                                            <% const popularGST = (popularMetalCost + popularMakingCharge + popularStoneCharge) * (3/100) %>
+
+                                            <% const popularTotalPrice = popularMetalCost + popularMakingCharge + popularStoneCharge + popularGST %>
+                                        <li>
+                                            <a href="product-details?id=<%= popularProducts[i]._id %>" class="widget-popularproduct-image">
+                                                <img src="assets/images/productImages/<%= popularProducts[i].images.image1 %>" alt="product thumbnail">
+                                            </a>
+                                            <div class="widget-popularproduct-content">
+                                                <h6><a href="product-details?id=<%= popularProducts[i]._id %>"><%= popularProducts[i].name %></a></h6>
+                                                <span>₹<%= Math.round(popularTotalPrice).toFixed(2) %></span>
+                                            </div>
+                                        </li>
+                                        <% } %>
+                                    <% } %>
+                                    <!-- <li>
+                                        <a href="product-details.html" class="widget-popularproduct-image">
+                                            <img src="assets/images/products/product-image-2-thumb.jpg"
+                                                alt="product thumbnail">
+                                        </a>
+                                        <div class="widget-popularproduct-content">
+                                            <h6><a href="product-details.html">Top of amber bottle</a></h6>
+                                            <span>$35.99</span>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <a href="product-details.html" class="widget-popularproduct-image">
+                                            <img src="assets/images/products/product-image-3-thumb.jpg"
+                                                alt="product thumbnail">
+                                        </a>
+                                        <div class="widget-popularproduct-content">
+                                            <h6><a href="product-details.html">Mario badescu bottle</a></h6>
+                                            <span>$99.99</span>
+                                        </div>
+                                    </li> -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+
+
+    <button id="back-top-top"><i class="ion-arrow-up-c"></i></button>
+</div>
+<!-- products area ends -->
+
+
+
 
 <%- include('../layouts/userLayouts/brands.ejs') %>
 

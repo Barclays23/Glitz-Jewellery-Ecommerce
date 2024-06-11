@@ -18,37 +18,31 @@ const loadProductList = async(req, res)=>{
             search = req.query.search;
         }
 
-        let pageNo = 1;
+        let pageNo = parseInt(req.query.page) || 1;
         if(req.query.page){
             pageNo = req.query.page;
         }
 
-        const limit = 10;
+        const limit = 3;
 
-        let productData = await Product.find({
+        const productQuery = {
             _id: {$exists: true},
             $or: [
-                {name: {$regex:'.*'+search+'.*', $options: 'i'}},
-                {category: {$regex:'.*'+search+'.*', $options: 'i'}},
-                {code: {$regex:'.*'+search+'.*', $options: 'i'}},
-                // {price: {$regex:'.*'+search+'.*', $options: 'i'}},
-            ],
-        }).populate('categoryRef')
-        .skip((pageNo -1) * limit)
-        .limit(limit *1)
-        .exec()
-
-
-        let count = await Product.find({
-            _id: {$exists: true},
-            $or: [
-                {name: {$regex:'.*'+search+'.*', $options: 'i'}},
-                {category: {$regex:'.*'+search+'.*', $options: 'i'}},
-                {code: {$regex:'.*'+search+'.*', $options: 'i'}},
+                {name: {$regex: '.*' + search + '.*', $options: 'i'}},
+                {category: {$regex: '.*' + search + '.*', $options: 'i'}},
+                {code: {$regex: '.*' + search + '.*', $options: 'i'}},
                 // {price: {$regex:'.*'+search+'.*', $options: 'i'}},
             ]
-        })
-        .countDocuments();
+        };
+
+
+        const productData = await Product.find(productQuery)
+        .populate('categoryRef')
+        .skip((pageNo - 1) * limit)
+        .limit(limit)
+        .exec();
+
+        const count = await Product.countDocuments(productQuery);
 
         let totalPages = Math.ceil(count / limit);
 
@@ -59,8 +53,11 @@ const loadProductList = async(req, res)=>{
             goldPriceData,
             productData,
             categoryData,
+            search,
+            count,
+            limit,
             totalPages,
-            currentPage: pageNo
+            currentPage: pageNo,
         });
 
     } catch (error) {

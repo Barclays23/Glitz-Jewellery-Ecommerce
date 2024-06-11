@@ -61,6 +61,8 @@ function previewImages(event) {
         img.style.margin = '10px';
 
         removeBtn.textContent = 'Remove'; // Text for remove button
+        removeBtn.style.backgroundColor = 'red';
+        removeBtn.style.color = 'white';
         removeBtn.onclick = function() {
             imgContainer.remove(); // Remove the image container when remove button is clicked
             selectedImages.splice(index, 1); // Remove corresponding image file from selectedImages array
@@ -80,7 +82,7 @@ function previewImages(event) {
     });
 }
 const fileInput = document.getElementById('edit-product-images');
-fileInput.addEventListener('change', previewImages);
+// fileInput.addEventListener('change', previewImages);
 
 
 // for validating and submitting add product form

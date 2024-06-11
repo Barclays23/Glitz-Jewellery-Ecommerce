@@ -3940,7 +3940,7 @@ button.tm-videobutton img {
 }
 
 .tm-product-bottomside h6 a:hover {
-    color: #f2ba59
+    color: #9A0056;
 }
 
 .tm-product-bottomside .tm-ratingbox {
@@ -3953,7 +3953,7 @@ button.tm-videobutton img {
 
 .tm-product-price {
     margin-top: 10px;
-    color: #f2ba59;
+    color: #9A0056;
     font-weight: 600;
     margin-top: 5px;
     display: block;
@@ -4080,7 +4080,7 @@ button.tm-videobutton img {
 }
 
 .tm-ratingbox span.is-active {
-    color: #fdc716
+    color: #9A0056;
 }
 
 .tm-offer-content h6 {
@@ -5059,6 +5059,7 @@ button.tm-videobutton img {
 
 .tm-breadcrumb ul li::after {
     content: '/';
+    color: #000;
     padding: 0 5px
 }
 

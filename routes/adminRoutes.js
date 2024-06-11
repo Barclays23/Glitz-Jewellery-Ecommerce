@@ -58,7 +58,7 @@ adminRoute.put('/edit-category', adminAuth.isLogin, categoryController.updateCat
 // PRODUCT CONTROLLER ROUTES
 adminRoute.get('/products', adminAuth.isLogin, productController.loadProductList);
 adminRoute.post('/add-product', adminAuth.isLogin, multer.uploadProductImages, productController.addProduct);
-adminRoute.put('/edit-product', adminAuth.isLogin, multer.uploadProductImages, productController.updateProduct);
+adminRoute.put('/edit-product', adminAuth.isLogin, multer.modifyProductImages, productController.updateProduct);
 adminRoute.patch('/manage-product', adminAuth.isLogin, productController.manageProduct);
 
 

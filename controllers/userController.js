@@ -1,4 +1,7 @@
 const User = require ('../models/userModel');
+const Product = require ('../models/productModel');
+const Category = require ('../models/categoryModel');
+const GoldPrice = require('../models/goldPriceModel');
 const UserOtp = require ('../models/otpModel');
 const bcrypt =  require ('bcrypt');
 const nodemailer = require ('nodemailer');
@@ -14,15 +17,16 @@ const randomString = require('randomstring');
 const loadHome = async(req, res)=>{
     try {
         const sessionData = await User.findOne({_id : req.session.userId});
-        // console.log('sessiondata in user home page :', sessionData);
-        // console.log('username in session data :', sessionData.firstname);
+        const goldPriceData = await GoldPrice.findOne({});
+        const popularProducts = await Product.find({});
+        const newProducts = await Product.find({});
 
         // if(!userData){
         //     req.session.destroy();
         //     res.redirect ('/login');
         // }
 
-        res.render('home', {sessionData: sessionData});
+        res.render('home', {sessionData, goldPriceData, popularProducts, newProducts});
 
     } catch (error) {
         console.log(error.message);
@@ -36,13 +40,12 @@ const loadLogin = async (req, res)=>{
     try {
         const verificationSuccess = req.query.verification === 'success';
         const passwordResetSuccess = req.query.passwordReset === 'success';
+        const goldPriceData = await GoldPrice.findOne({});
 
         const sessionData = await User.findById(req.session.userId);
         console.log('session data in login page is : ' , sessionData);
 
-        res.render('login', { sessionData, verificationSuccess, passwordResetSuccess });
-        // res.render('login', {userData: userData});
-        // res.render('login');
+        res.render('login', { sessionData, verificationSuccess, passwordResetSuccess, goldPriceData });
 
     } catch (error) {
         console.log('error in loading the login page', error.message);
@@ -108,8 +111,9 @@ const loadRegister = async (req, res)=>{
 
         const sessionData = await User.findById(req.session.userId);
         console.log('session data in register page is : ' , sessionData);
+        const goldPriceData = await GoldPrice.findOne({});
 
-        res.render('registration', {sessionData});
+        res.render('registration', {sessionData, goldPriceData});
 
     } catch (error) {
         console.log(error.message);
@@ -470,20 +474,113 @@ const verifyAccount = async (req, res)=>{
 // load shopping page / products page ---------------------------
 const loadShopping = async (req, res)=>{
     try {
-        const sessionData = await User.findById({_id: req.session.userId});
-        console.log('session user name in shopping page :', sessionData.email);
+        const sessionId = req.session.userId;
+        console.log('session id in shopping', sessionId);
+        // const productData = await Product.find({}).populate('categoryRef');
+        const categoryData = await Category.find({});
+        const goldPriceData = await GoldPrice.findOne({});
+        const popularProducts = await Product.find({});
 
-        // if(!sessionData){
-        //     req.session.destroy();
-        //     res.redirect('/login');
-        // }
 
-        res.render('shopping', {sessionData: sessionData});
+        let search = '';
+        if(req.query.search){
+            search = req.query.search;
+        }
+
+        let pageNo = parseInt(req.query.page) || 1;
+        if(req.query.page){
+            pageNo = req.query.page;
+        }
+
+        const limit = 3;
+
+        const productQuery = {
+            _id: {$exists: true},
+            $or: [
+                {name: {$regex: '.*' + search + '.*', $options: 'i'}},
+                {category: {$regex: '.*' + search + '.*', $options: 'i'}},
+                {code: {$regex: '.*' + search + '.*', $options: 'i'}},
+                // {price: {$regex:'.*'+search+'.*', $options: 'i'}},
+            ]
+        };
+
+        const productData = await Product.find(productQuery)
+        .populate('categoryRef')
+        .skip((pageNo - 1) * limit)
+        .limit(limit)
+        .exec();
+
+        const productCount = await Product.countDocuments(productQuery);
+
+        let totalPages = Math.ceil(productCount / limit);
+
+
+        if(sessionId){
+            const sessionData = await User.findById({_id: req.session.userId});
+            console.log('session user name in shopping page :', sessionData.email);
+            res.render('shopping', {
+                sessionData : sessionData, 
+                goldPriceData,
+                productData, 
+                categoryData, 
+                search, 
+                productCount, 
+                limit,
+                totalPages,
+                currentPage : pageNo, 
+                popularProducts
+            });
+
+        } else{
+            console.log('no session data in shopping page');
+            res.render('shopping', {
+                sessionData : null, 
+                goldPriceData,
+                productData, 
+                categoryData, 
+                search, 
+                productCount, 
+                limit,
+                totalPages,
+                currentPage : pageNo, 
+                popularProducts, 
+            });
+        }
+
 
     } catch (error) {
         console.log('error in loading shopping page :', error.message);
     }
 }
+
+
+
+
+// load product details page -------------------------------------
+const productDetals = async(req, res)=>{
+    try {
+        const sessionId = req.session.userId;
+        console.log('sessionId', sessionId);
+        const productData = await Product.findOne({_id: req.query.id}).populate('categoryRef');
+        // console.log("ref is :" , productData.categoryRef._id);
+        const categoryData = await Category.find({});
+        const goldPriceData = await GoldPrice.findOne({});
+        const similarProducts = await Product.find({categoryRef: productData.categoryRef._id});
+        const popularProducts = await Product.find({});
+        // console.log("other is :" , otherProducts);
+        if (sessionId) {
+            const sessionData = await User.findById({_id: req.session.userId});
+            res.render('productDetails', {sessionData, productData, categoryData, goldPriceData, similarProducts, popularProducts});
+        } else{
+            res.render('productDetails', {sessionData: null, productData, categoryData, goldPriceData, similarProducts, popularProducts });
+        }
+
+    } catch (error) {
+        console.log('failed to load product details page :', error.message);
+    }
+}
+
+
 
 
 
@@ -743,6 +840,7 @@ module.exports = {
     verifyAccount,
     resendOtp,
     loadShopping,
+    productDetals,
     userLogout,
     verifyForgetMail,
     loadResetPassword,

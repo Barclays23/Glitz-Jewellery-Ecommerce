@@ -27,13 +27,16 @@ const productStorage = multer.diskStorage({
     }
 });
 
+
 const uploadProductImages = multer({storage: productStorage}).array('croppedImages', 4);
+const modifyProductImages = multer({storage: productStorage}).array('croppedImages', 4);
 
 
 
 module.exports = {
     // uploadUserImages,
-    uploadProductImages
+    uploadProductImages,
+    modifyProductImages
 }
 
 
