@@ -4,7 +4,7 @@ const fs = require('fs');
 
 
 
-
+// --------------------------------------------------------
 // To create destination paths based on product category
 const getProductDestination = function (req, file, cb) {
     const destination = path.join(__dirname, `../public/assets/images/productImages`);
@@ -27,14 +27,28 @@ const productStorage = multer.diskStorage({
     }
 });
 
-
 const uploadProductImages = multer({storage: productStorage}).array('croppedImages', 4);
 const modifyProductImages = multer({storage: productStorage}).array('croppedImages', 4);
 
 
 
+// -----------------------------------------------------------
+// Configure multer for user profile photo uploads
+const userStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, path.join(__dirname,'../public/assets/images/userImages'));
+    },
+    filename: (req, file, cb) => {
+        // const fileName = Date.now()+'-'+file.originalname;
+        cb(null, Date.now() + path.extname(file.originalname)); // Create a unique filename
+    }
+});
+const uploadUserImages = multer({ storage: userStorage }).single('profile-pic'); //input type name="" in form
+
+
+
 module.exports = {
-    // uploadUserImages,
+    uploadUserImages,
     uploadProductImages,
     modifyProductImages
 }

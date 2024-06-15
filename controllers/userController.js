@@ -825,6 +825,217 @@ const resetPassword = async(req, res)=>{
 
 
 
+// load user-account page----------------------------------------
+const loadUserAccount = async (req, res)=>{
+    try {
+        const goldPriceData = await GoldPrice.findOne({});
+
+        const sessionData = await User.findById(req.session.userId);
+        console.log('session data in user profile page : ' , sessionData);
+
+        // res.render('userProfile', { sessionData, goldPriceData });
+        res.render('userAccount', { sessionData, goldPriceData });
+
+    } catch (error) {
+        console.log('error in loading user profile', error.message);
+    }
+}
+
+
+
+// load user-profile page----------------------------------------
+const loadUserProfile = async (req, res)=>{
+    try {
+        const goldPriceData = await GoldPrice.findOne({});
+
+        const userData = await User.findById(req.session.userId);
+        const sessionData = await User.findById(req.session.userId); //need either userData or sessionData (and edit in all front end pages)
+        console.log('session data in user profile page : ' , userData);
+
+        res.render('userProfile', { userData, sessionData, goldPriceData });
+
+    } catch (error) {
+        console.log('error in loading user profile', error.message);
+    }
+}
+
+
+
+// load user-profile page----------------------------------------
+const loadEditUserProfile = async (req, res)=>{
+    try {
+        const goldPriceData = await GoldPrice.findOne({});
+
+        const userData = await User.findById(req.session.userId);
+        const sessionData = await User.findById(req.session.userId); //need either userData or sessionData (and edit in all front end pages)
+        console.log('session data in user profile page : ' , userData);
+
+        res.render('editUserProfile', { userData, sessionData, goldPriceData });
+
+    } catch (error) {
+        console.log('error in loading user profile', error.message);
+    }
+}
+
+
+
+
+// update user-profile ------------------------------------------
+const updateUserProfile = async (req, res)=>{
+    try {
+        const body = req.body;
+        const file = req.file;
+        console.log('body from user profile : ', body);
+        console.log('file from user profile : ', file);
+        console.log('session details : ', req.session);
+        
+        if (file) {
+            const updatedUserData = await User.findByIdAndUpdate(
+              { _id: req.session.userId },
+              { $set: {
+                  firstname: req.body.firstname,
+                  lastname: req.body.lastname,
+                  email: req.body.email, //not editable
+                  mobile: req.body.mobile,
+                  photo: req.file.filename,
+                },
+              },
+              { new : true }
+              
+            );
+
+            console.log('updatedUserData with file : ', updatedUserData);
+
+        } else {
+            const updatedUserData = await User.findByIdAndUpdate(
+              { _id: req.session.userId },
+              { $set: {
+                  firstname: req.body.firstname,
+                  lastname: req.body.lastname,
+                  email: req.body.email, //not editable
+                  mobile: req.body.mobile,
+                },
+              },
+              { new : true }
+            );
+
+            console.log('updatedUserData without file : ', updatedUserData);
+        }
+
+        return res.status(200).json({ success: true });
+
+        
+    } catch (error) {
+        console.log('error in loading user profile :', error.message);
+    }
+}
+
+
+
+
+// update user-password ------------------------------------------
+const updateUserPassword = async (req, res)=>{
+    try {
+        const {oldPassword, newPassword} = req.body;
+        console.log('oldPassword :', oldPassword);
+        console.log('newPassword :', newPassword);
+        
+        const userData = await User.findOne({_id: req.session.userId});
+        console.log('userData :', userData._id);
+        
+        const matchPassword = await bcrypt.compare(oldPassword, userData.password);
+        console.log('matchPassword: ', matchPassword);
+
+        if (!matchPassword) {
+            console.log('incorrect password');
+            return res.json({ incorrect: true, message: 'Incorrect password' });
+        }
+
+        const securePassword = await bcrypt.hash(newPassword, 10);
+        console.log('securePass :', securePassword);
+
+        const updatedUserData = await User.updateOne({_id: req.session.userId}, {password: securePassword});
+        console.log('password changed');
+        return res.status(200).json({success: true});
+        
+        
+    } catch (error) {
+        console.log('error in changing user password :', error.message);
+        return res.status(500).json({ message: 'An error occurred' });
+    }
+}
+
+
+
+// load user-wishlist page----------------------------------------
+const loadUserWishlist = async (req, res)=>{
+    try {
+        const goldPriceData = await GoldPrice.findOne({});
+
+        const sessionData = await User.findById(req.session.userId);
+        console.log('session data in user profile page : ' , sessionData);
+
+        res.render('userWishlist', { sessionData, goldPriceData });
+
+    } catch (error) {
+        console.log('error in loading user profile', error.message);
+    }
+}
+
+
+
+// load user-cart page----------------------------------------
+const loadUserCart = async (req, res)=>{
+    try {
+        const goldPriceData = await GoldPrice.findOne({});
+
+        const sessionData = await User.findById(req.session.userId);
+        console.log('session data in user profile page : ' , sessionData);
+
+        res.render('userCart', { sessionData, goldPriceData });
+
+    } catch (error) {
+        console.log('error in loading user profile', error.message);
+    }
+}
+
+
+
+// load user-order page----------------------------------------
+const loadUserOrders = async (req, res)=>{
+    try {
+        const goldPriceData = await GoldPrice.findOne({});
+
+        const sessionData = await User.findById(req.session.userId);
+        console.log('session data in user profile page : ' , sessionData);
+
+        res.render('userOrders', { sessionData, goldPriceData });
+
+    } catch (error) {
+        console.log('error in loading user profile', error.message);
+    }
+}
+
+
+
+
+// load user-address page----------------------------------------
+const loadUserAddress = async (req, res)=>{
+    try {
+        const goldPriceData = await GoldPrice.findOne({});
+
+        const sessionData = await User.findById(req.session.userId);
+        console.log('session data in user profile page : ' , sessionData);
+
+        res.render('userAddress', { sessionData, goldPriceData });
+
+    } catch (error) {
+        console.log('error in loading user profile', error.message);
+    }
+}
+
+
+
 
 
 
@@ -845,4 +1056,13 @@ module.exports = {
     verifyForgetMail,
     loadResetPassword,
     resetPassword,
+    loadUserAccount,
+    loadUserProfile,
+    loadEditUserProfile,
+    updateUserProfile,
+    updateUserPassword,
+    loadUserWishlist,
+    loadUserCart,
+    loadUserOrders,
+    loadUserAddress
 }

@@ -32,7 +32,7 @@ passport.use(new GoogleStrategy({
                   'googleAccount.displayName': profile.displayName,
                   'googleAccount.firstname': profile.name.givenName,
                   'googleAccount.lastname': profile.name.familyName,
-                  // 'googleAccount.googlePhoto': profile.photos[0].value, bcoz, this will replace the image that user uploaded nanually in profile.
+                  'googleAccount.googlePhoto': profile.photos[0].value, //only change googlePhoto (bcoz google account data can be changed any time)
                   isVerified: 1
               }
             });
@@ -52,6 +52,7 @@ passport.use(new GoogleStrategy({
                firstname : profile.name.givenName,
                lastname : profile.name.familyName,
                email : profile.emails[0].value,
+               photo: profile.photos[0].value,
                // mobile : req.body.userMobile,
                // password : securedPass,
                isBlocked : false,

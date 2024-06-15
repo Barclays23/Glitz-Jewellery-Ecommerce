@@ -1,0 +1,510 @@
+<%- include('../layouts/userLayouts/user-header.ejs') %>
+
+<%- include('../layouts/userLayouts/user-preloader.ejs') %>
+
+<%- include('../layouts/userLayouts/user-navbar.ejs') %>
+
+
+<div id="wrapper" class="wrapper">
+
+    <!-- Breadcrumbs area starts -->
+    <div class="tm-breadcrumb-area tm-padding-section bg-grey" data-bgimage="assets/images/breadcrumb-bg.jpg">
+        <div class="container">
+            <div class="tm-breadcrumb">
+                <h2 style="color: black;">Edit Profile</h2>
+                <ul>
+                    <li><a href="/" style="color: black;">Home</a></li>
+                    <li><a href="#" style="color: black;">My Account</a></li>
+                    <li style="color: black;"> My Profile </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumbs area ends -->
+
+    <main class="page-content">
+        <div class="tm-section tm-my-account-area bg-white tm-padding-section">
+            <div class="container">
+                <div class="tm-myaccount">
+                    <!-- account tabs starts -->
+                    <ul class="nav tm-tabgroup" id="account" role="tablist">
+                        <!-- tab 1: dashboard -->
+                        <li class="nav-item">
+                            <a class="nav-link" id="account-dashboard-tab"
+                                href="my-account" 
+                                role="tab" aria-controls="account-dashboard" aria-selected="true">Dashboard
+                            </a>
+                        </li>
+
+                        <!-- tab 2: profile information-->
+                        <li class="nav-item">
+                            <a class="nav-link active" id="account-acdetails-tab" href="/profile"
+                                role="tab" aria-controls="account-acdetails" aria-selected="true">My Profile
+                            </a>
+                        </li>
+
+                        <!-- tab 3: wishlist -->
+                        <li class="nav-item">
+                            <a class="nav-link" id="account-wishlist-tab" href="/wishlist"
+                                role="tab" aria-controls="account-wishlist" aria-selected="true">Wishlist
+                            </a>
+                        </li>
+
+                        <!-- Tab 4: My Cart -->
+                        <li class="nav-item">
+                            <a class="nav-link" id="account-cart-tab" href="/cart"
+                                role="tab" aria-controls="account-cart" aria-selected="false">Cart
+                            </a>
+                        </li>
+
+                        <!-- tab 5: -->
+                        <li class="nav-item">
+                            <a class="nav-link" id="account-orders-tab" href="/orders"
+                                role="tab" aria-controls="account-orders" aria-selected="false">Orders
+                            </a>
+                        </li>
+
+                        <!-- tab 6: -->
+                        <li class="nav-item">
+                            <a class="nav-link" id="account-address-tab" href="#account-address"
+                                role="tab" aria-controls="account-address" aria-selected="false">Address
+                            </a>
+                        </li>
+
+                        <!-- tab 8: -->
+                        <li class="nav-item">
+                            <a class="nav-link" id="account-logout-tab" href="/logout" 
+                                role="tab" aria-controls="account-address" aria-selected="false">Logout
+                            </a>
+                        </li>
+                    </ul>
+                    <!-- account tabs ends -->
+
+                    <h4>Personal Information</h4>
+                    <!-- account tab-content starts -->
+                    <!-- <div class="tab-content" id="account-ontent"> -->
+                        <div class="tab-content col-lg-6 bg-grey" id="account-ontent">
+                            <!-- section 2: Profile Information -->
+                            <div class="tab-pane fade show active" id="account-acdetails" role="tabpanel" aria-labelledby="account-acdetails-tab">
+                                <div class="tm-myaccount-acdetails">
+                                    <!-- form -->
+                                    <form enctype="multipart/form-data" class="tm-form tm-form-bordered" id="user-profile-update-form">
+                                        <div class="tm-form-inner">
+                                            <div class="tm-form-field no-border row">
+                                                <div class="col-6 image-container">
+                                                    <% if(userData.photo){ %>
+                                                        <% const profilePic = userData.photo ? userData.photo : userData.googleAccount.googlePhoto %>
+                                                        <div class="image-wrapper">
+                                                            <img id="image-preview" src="assets/images/userImages/<%= userData.photo %>" alt="selectedImage">
+                                                        <!-- <img id="image-preview" src="<%= userData.googleAccount.googlePhoto %>" alt="selectedImage"> -->
+                                                        </div>
+                                                    <% } else{ %>
+                                                        <div class="image-wrapper">
+                                                            <img id="image-preview" src="assets/images/icons/dummy-profile-pic2.png" alt="selectedImage">
+                                                        </div>
+                                                    <% } %>
+                                                    <!-- <button> -->
+                                                        <label for="acdetails-photo" class="edit-icon">
+                                                            <i class="fas fa-pencil"></i>
+                                                        </label>
+                                                        <input type="file" name="profile-pic" id="acdetails-photo" accept="image/*" style="display: none;">
+                                                    <!-- </button> -->
+                                                </div>
+                                                <div class="col-6 name-container">
+                                                    <h1> <%= userData.firstname %> <%= userData.lastname %></h1>
+                                                </div>
+                                            </div>
+
+                                            <div class="tm-form-field tm-form-flex">
+                                                <label for="acdetails-fullname">Full Name</label>
+                                                <input type="text" id="acdetails-firstname" name="firstname" value="<%= userData.firstname %>" placeholder="Enter First Name">
+                                                <input type="text" id="acdetails-lastname" name="lastname" value="<%= userData.lastname %>" placeholder="Enter Last Name">
+                                            </div>
+                                            <span id="first-name-error" style="color: red; display: none;"></span>
+                                            <span id="last-name-error" style="color: red; display: none;"></span>
+                                            
+                                            <div class="tm-form-field">
+                                                <div class="input-group">
+                                                    <label for="acdetails-email">Email Address 
+                                                        <% if(userData.isVerified){ %>
+                                                            <i class="fa-solid fa-circle-check text-success"></i>
+                                                        <% } %>
+                                                    </label>
+                                                    <div class="input-wrapper">
+                                                        <input type="email" id="acdetails-email" value="<%= userData.email %>" placeholder="Enter Email Address" readonly>
+                                                        <i class="fa-solid fa-lock email-lock"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                                <span id="email-error" style="color: red; display: none;"></span>
+
+                                            <div class="tm-form-field">
+                                                <label for="acdetails-mobile">Mobile Number</label>
+                                                <input type="tel" id="acdetails-mobile" value="<%= userData.mobile %>" placeholder="Enter Mobile Number">
+                                            </div>
+                                            <span id="mobile-error" style="color: red; display: none;"></span>
+
+                                            <div class="tm-form-field">
+                                                <button type="submit" class="tm-button">Save Changes</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    <!-- </div> -->
+
+                    <!-- account tab-content ends -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+
+    <button id="back-top-top"><i class="ion-arrow-up-c"></i></button>
+</div>
+
+
+<!-- ------------------------------------------------------------------ -->
+
+<!-- CSS Styles for Edit userProfiles.ejs -->
+<style>
+.tm-form-field {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.tm-form-field label {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.tm-form-field .input-group {
+    display: flex;
+    flex: 2;
+    width: 100%;
+}
+
+.tm-form-field .input-group input[type="text"] {
+    flex: 1;
+    min-width: 0; /* Allow inputs to shrink */
+    margin-left: 10px;
+    box-sizing: border-box;
+}
+
+.tm-form-field .input-group input[type="text"]:first-child {
+    margin-left: 0;
+}
+
+
+
+
+.tm-form-field input[type="text"],
+.tm-form-field input[type="email"],
+.tm-form-field input[type="tel"],
+.tm-form-field input[type="password"],
+.tm-form-field input[type="file"] {
+    flex: 2;
+}
+
+.tm-form-field.no-border {
+    border: none;
+}
+
+
+.tm-form-field.no-border input {
+    border: none;
+    box-shadow: none;
+}
+
+.tm-form-field.tm-form-flex input[type="checkbox"] {
+    flex: initial;
+    margin-right: 10px;
+}
+
+.tm-form-field.tm-form-flex label[for="acdetails-agreeterms"] {
+    flex: initial;
+}
+
+.tm-form-field.tm-form-flex {
+    flex-wrap: nowrap;
+    display: flex;
+    flex: 1;
+}
+
+.tm-form-field.tm-form-flex label {
+    flex: 1 0 100px; /* Adjust this value based on your design */
+    margin-right: 10px;
+}
+
+.tm-form-field.tm-form-flex input {
+    flex: 3;
+    width: 175px;
+    min-width: 125px; /* Adjust this value based on your design */
+    margin-left: 10px;
+}
+
+/* -------------------------------------------- FOR IMAGES */
+.image-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.image-wrapper {
+    width: 100%;
+    padding-top: 100%; /* 1:1 aspect ratio */
+    position: relative;
+    border-radius: 50%; /* Make the image circular if it is square */
+    border: 2px solid #9a0056;
+}
+
+#image-preview {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%; /* Make the image circular if it is square */
+    object-fit: cover; /* Ensure the image covers the container properly */
+}
+
+
+/* -------------------------------------------- FOR EDIT ICON */
+.edit-icon {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    bottom: 4%;
+    left: 74%;
+    /* background-color: rgba(141, 125, 125, 0.7); */
+    background-color: rgba(255, 255, 255, 88%);
+    padding: 14px;
+    border-radius: 100%;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.edit-icon:hover {
+    background-color: rgba(0, 0, 0, 0.9);
+    /* background-color: rgba(255, 255, 255, 0.9); */
+}
+
+.edit-icon i {
+    color: #333;
+}
+
+.name-container {
+    width: 50%;
+    display: flex;
+    align-items: center; /* Center vertically */
+    padding-left: 10px; /* Adjust padding as needed */
+    box-sizing: border-box; /* Include padding in width calculations */
+}
+
+.name-container h1 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* white-space: nowrap; */
+    width: 100%; /* Ensure it takes up the full width of the container */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    margin: 0; /* Remove default margin */
+    font-size: clamp(16px, 5vw, 36px);
+}
+
+/* ---------------------------------------- FOR EMAIL LOCK */
+.input-wrapper {
+    position: relative;
+    width: 68%;
+}
+
+.input-wrapper input[type="email"] {
+    padding-right: 2.5rem; /* Space for the icon */
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.input-wrapper .email-lock {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #888; /* Adjust the icon color as needed */
+}
+
+</style>
+
+
+<!-- ------------------------------------------------------------------ -->
+
+<!-- Script for userProfiles.ejs -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    const fileInput = document.getElementById('acdetails-photo');
+    const editIcon = document.querySelector('.edit-icon');
+
+    // for image preview
+    fileInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('image-preview').src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+
+    // for update profile form submission
+    const profileUpdateForm = document.getElementById('user-profile-update-form');
+    profileUpdateForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const photo = document.getElementById('acdetails-photo').files[0];
+        const firstname = document.getElementById('acdetails-firstname').value.trim();
+        const lastname = document.getElementById('acdetails-lastname').value.trim();
+        const email = document.getElementById('acdetails-email').value.trim();
+        const mobile = document.getElementById('acdetails-mobile').value.trim();
+        const oldPassword = document.getElementById('acdetails-password').value.trim();
+        const newPassword = document.getElementById('acdetails-newpassword').value.trim();
+        const confirmPassword = document.getElementById('acdetails-confirmpass').value.trim();
+
+        console.log('photo :', photo);
+        console.log('firstname :', firstname);
+        console.log('lastname :', lastname);
+        console.log('email :', email);
+        console.log('mobile :', mobile);
+        console.log('oldPassword :', oldPassword);
+        console.log('newPassword :', newPassword);
+        console.log('confirmPassword :', confirmPassword);
+
+
+        const firstnameError = document.getElementById('first-name-error');
+        const lastnameError = document.getElementById('last-name-error');
+        const emailError = document.getElementById('email-error');
+        const mobileError = document.getElementById('mobile-error');
+        const oldPasswordError = document.getElementById('old-password-error');
+        const newPasswordError = document.getElementById('new-password-error');
+        const confirmPasswordError = document.getElementById('confirm-password-error');
+        const termsError = document.getElementById('terms-error');
+
+        firstnameError.textContent = '';
+        lastnameError.textContent = '';
+        emailError.textContent = '';
+        mobileError.textContent = '';
+        oldPasswordError.textContent = '';
+        newPasswordError.textContent = '';
+        confirmPasswordError.textContent = '';
+        termsError.textContent = '';
+
+        firstnameError.style.display = 'none';
+        lastnameError.style.display = 'none';
+        emailError.style.display = 'none';
+        mobileError.style.display = 'none';
+        oldPasswordError.style.display = 'none';
+        newPasswordError.style.display = 'none';
+        confirmPasswordError.style.display = 'none';
+        termsError.style.display = 'none';
+
+        let isValid = true;
+
+        // Validate firstname: letters only, no special characters
+        if (!/^[A-Za-z]+$/.test(firstname)) {
+            firstnameError.textContent = 'First name must contain letters only.';
+            firstnameError.style.display = 'block';
+            isValid = false;
+        }
+
+        // Validate lastname: letters only, no special characters
+        if (!/^[A-Za-z]+$/.test(lastname)) {
+            lastnameError.textContent = 'Last name must contain letters only.';
+            lastnameError.style.display = 'block';
+            isValid = false;
+        }
+
+        // Validate mobile number: numbers only, 10 digits
+        if (!/^\d{10}$/.test(mobile)) {
+            mobileError.textContent = 'Mobile number must be exactly 10 digits.';
+            mobileError.style.display = 'block';
+            isValid = false;
+        }
+
+        // Validate new password: at least 8 characters, one number, one lowercase, one uppercase, one special character
+        if (!/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).{8,}$/.test(newPassword)) {
+            newPasswordError.textContent = 'Password must be at least 8 characters long, include at least one number, one lowercase letter, one uppercase letter, and one special character.';
+            newPasswordError.style.display = 'block';
+            isValid = false;
+        }
+
+        // Validate confirm password: matches new password
+        if (newPassword !== confirmPassword) {
+            confirmPasswordError.textContent = 'Password mismatch!';
+            confirmPasswordError.style.display = 'block';
+            isValid = false;
+        }
+
+
+
+
+        if (isValid) {        
+            const formData = new FormData();
+            
+            formData.append('profile-pic', photo);
+            formData.append('firstname', firstname);
+            formData.append('lastname', lastname);
+            formData.append('email', email);
+            formData.append('mobile', mobile);
+            formData.append('oldPassword', oldPassword);
+            formData.append('newPassword', newPassword);
+            formData.append('confirmPassword', confirmPassword);
+
+            fetch('/update-profile', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+                if (data.success) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Profile has been updated.",
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        location.reload();
+                        });
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Failed to update profile !",
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                        icon: "error",
+                        title: "An error occurred while updating the profile. !",
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                // alert('An error occurred while updating the profile.');
+            });
+        }
+    });
+    
+</script>
+
+
+
+
+<%- include('../layouts/userLayouts/user-footer.ejs') %>

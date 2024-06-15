@@ -288,7 +288,9 @@ button {
 [type=reset]:not(:disabled),
 [type=submit]:not(:disabled),
 button:not(:disabled) {
-  cursor: pointer
+  cursor: pointer;
+  border: 0px; /* button border newly added */
+  padding: 0px; /* button padding newly added */
 }
 
 [type=button]::-moz-focus-inner,
@@ -1776,7 +1778,8 @@ pre code {
 
 .table td,
 .table th {
-  padding: .75rem;
+  /* padding: .75rem; */
+  padding: .50rem;
   vertical-align: top;
   border-top: 1px solid #dee2e6
 }
@@ -4450,14 +4453,16 @@ input[type=submit].btn-block {
   }
 }
 
+/* user account tab navbar also see (".tm-tabgroup li a") in userStyles.css */
 .nav {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
   padding-left: 0;
-  margin-bottom: 0;
-  list-style: none
+  margin-bottom: 1;
+  list-style: none;
+  /* border: solid 1px #AA0056; */
 }
 
 .nav-link {

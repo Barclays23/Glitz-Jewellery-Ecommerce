@@ -1770,7 +1770,9 @@ button.tm-button {
     display: inline-block;
     height: 50px;
     min-width: 150px;
-    background: #9A0056;
+    /* background: #9A0056; */
+    background: #f2ba59; /* yellow background*/
+    /* background: #000000cd; */
     color: #fff;
     text-align: center;
     line-height: 50px;
@@ -1793,7 +1795,9 @@ button.tm-button::before {
     top: -100%;
     height: 100%;
     width: 100%;
-    background: #28a745; /* success color code */
+    background: #9A0056;
+    /* background: #008819; hard green button hover */
+    /* background: #28a745; success color code green */
     z-index: -1;
     -webkit-transition: all .4s ease-in-out 0s;
     -o-transition: all .4s ease-in-out 0s;
@@ -1900,9 +1904,14 @@ a.tm-button.tm-button-small,
 button.tm-button.tm-button-small {
     height: 45px;
     line-height: 45px;
-    min-width: 100px;
-    padding: 0 25px
+    /* min-width: 100px; */
+    min-width: 80px;
+    /* padding: 0 25px; */
+    padding: 0 10px;
 }
+
+
+
 
 @media only screen and (max-width:767px) {
 
@@ -2074,7 +2083,8 @@ button.tm-videobutton img {
     -webkit-flex-wrap: wrap;
     -ms-flex-wrap: wrap;
     flex-wrap: wrap;
-    margin-top: -30px
+    /* margin-top: -30px; */
+    margin-top: 0px;
 }
 
 .tm-form-field {
@@ -2380,17 +2390,21 @@ button.tm-videobutton img {
     margin-right: 1px
 }
 
+/* user account tab navbar also see (".nav {") in plugins.min.css */
 .tm-tabgroup li a {
     display: inline-block;
     height: 50px;
     line-height: 48px;
-    min-width: 170px;
+    /* min-width: 170px; original */
+    min-width: 156px; /* adjust according to if added more tabs */
     text-align: center;
-    padding: 0 35px;
+    padding: 0 35px; /* adjust according to if added more tabs */
     color: #333;
+    /* color: #9A0056; */
     font-size: 18px;
     font-weight: 700;
-    border-radius: 100px
+    border-radius: 100px;
+    /* border: solid 1px #9A0056; */
 }
 
 .tm-tabgroup li a:hover {
@@ -2398,7 +2412,8 @@ button.tm-videobutton img {
 }
 
 .tm-tabgroup li a.active {
-    background: #f2ba59;
+    /* background: #f2ba59; */
+    background: #9A0056;
     color: #fff
 }
 
@@ -6629,11 +6644,15 @@ button.tm-videobutton img {
     min-width: 180px
 }
 
-.tm-cart-table .tm-cart-col-remove,
-.tm-cart-table .tm-wishlist-col-remove,
 .tm-wishlist-table .tm-cart-col-remove,
+.tm-cart-table .tm-wishlist-col-remove,
 .tm-wishlist-table .tm-wishlist-col-remove {
     width: 100px;
+    min-width: 100px
+}
+
+.tm-cart-table .tm-cart-col-actions {
+    width: 250px;
     min-width: 100px
 }
 
@@ -6808,13 +6827,14 @@ button.tm-videobutton img {
 }
 
 .tm-cart-pricebox table {
-    margin-bottom: 30px
-}
-
-.tm-cart-pricebox table td {
-    padding: 10px 0;
-    font-size: 16px;
-    color: #707070
+    margin-bottom: 30px;
+    }
+    
+    .tm-cart-pricebox table td {
+        padding: 10px 15px;
+        font-size: 16px;
+        color: #707070;
+        background-color: #ffffff;
 }
 
 .tm-cart-pricebox table tr {
@@ -7010,6 +7030,74 @@ button.tm-videobutton img {
 .tm-myaccount-dashboard p a:hover {
     color: #f2ba59
 }
+/* ------------------------------------------------------ */
+.tm-myaccount-wishlist table {
+    text-align: center;
+}
+
+.tm-myaccount-wishlist table td,
+.tm-myaccount-wishlist table th {
+    vertical-align: middle;
+}
+
+.tm-myaccount-wishlist-col-image {
+    width: 150px;
+    /* height: auto; */
+}
+
+.tm-myaccount-wishlist-col-product {
+    width: 300px; /* Adjust width according to your design */
+}
+
+.tm-myaccount-wishlist-col-price {
+    width: 150px;
+}
+
+.tm-myaccount-wishlist-col-qty {
+    width: 100px; /* Adjust width for smaller size */
+}
+
+.tm-myaccount-wishlist-col-add-to-cart {
+    width: 160px; /* Adjust width according to your design */
+}
+.tm-myaccount-wishlist-col-remove {
+    width: 50px; /* Adjust width according to your design */
+}
+
+/* ----------------------------------------------------------- */
+.tm-myaccount-cart table {
+    text-align: center;
+}
+
+.tm-myaccount-cart table td,
+.tm-myaccount-cart table th {
+    vertical-align: middle;
+}
+
+.tm-myaccount-cart-col-image {
+    min-width: 100px;
+}
+
+.tm-myaccount-cart-col-product {
+    min-width: 200px; /* Adjust width according to your design */
+}
+
+.tm-myaccount-cart-col-price {
+    min-width: 100px;
+}
+
+.tm-myaccount-cart-col-qty {
+    width: 100px; /* Adjust width for smaller size */
+}
+
+.tm-myaccount-cart-col-total {
+    min-width: 100px;
+}
+
+.tm-myaccount-cart-col-actions {
+    min-width: 150px; /* Adjust width according to your design */
+}
+
 
 .tm-myaccount-orders table {
     text-align: center

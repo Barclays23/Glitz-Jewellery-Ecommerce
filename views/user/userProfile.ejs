@@ -1,0 +1,523 @@
+<%- include('../layouts/userLayouts/user-header.ejs') %>
+
+<%- include('../layouts/userLayouts/user-preloader.ejs') %>
+
+<%- include('../layouts/userLayouts/user-navbar.ejs') %>
+
+
+<div id="wrapper" class="wrapper">
+
+    <!-- Breadcrumbs area starts -->
+    <div class="tm-breadcrumb-area tm-padding-section bg-grey" data-bgimage="assets/images/breadcrumb-bg.jpg">
+        <div class="container">
+            <div class="tm-breadcrumb">
+                <h2 style="color: black;">Profile</h2>
+                <ul>
+                    <li><a href="/" style="color: black;">Home</a></li>
+                    <li><a href="#" style="color: black;">My Account</a></li>
+                    <li style="color: black;"> My Profile </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumbs area ends -->
+
+    <main class="page-content">
+        <div class="tm-section tm-my-account-area bg-white tm-padding-section">
+            <div class="container">
+                <div class="tm-myaccount">
+                    <!-- account tabs starts -->
+                    <ul class="nav tm-tabgroup" id="account" role="tablist">
+                        <!-- tab 1: dashboard -->
+                        <li class="nav-item">
+                            <a class="nav-link" id="account-dashboard-tab"
+                                href="my-account" 
+                                role="tab" aria-controls="account-dashboard" aria-selected="true">Dashboard
+                            </a>
+                        </li>
+
+                        <!-- tab 2: profile information-->
+                        <li class="nav-item">
+                            <a class="nav-link active" id="account-acdetails-tab" href="/profile"
+                                role="tab" aria-controls="account-acdetails" aria-selected="true">My Profile
+                            </a>
+                        </li>
+
+                        <!-- tab 3: wishlist -->
+                        <li class="nav-item">
+                            <a class="nav-link" id="account-wishlist-tab" href="/wishlist"
+                                role="tab" aria-controls="account-wishlist" aria-selected="true">Wishlist
+                            </a>
+                        </li>
+
+                        <!-- Tab 4: My Cart -->
+                        <li class="nav-item">
+                            <a class="nav-link" id="account-cart-tab" href="/cart"
+                                role="tab" aria-controls="account-cart" aria-selected="false">Cart
+                            </a>
+                        </li>
+
+                        <!-- tab 5: -->
+                        <li class="nav-item">
+                            <a class="nav-link" id="account-orders-tab" href="/orders"
+                                role="tab" aria-controls="account-orders" aria-selected="false">Orders
+                            </a>
+                        </li>
+
+                        <!-- tab 6: -->
+                        <li class="nav-item">
+                            <a class="nav-link" id="account-address-tab" href="#account-address"
+                                role="tab" aria-controls="account-address" aria-selected="false">Address
+                            </a>
+                        </li>
+
+                        <!-- tab 8: -->
+                        <li class="nav-item">
+                            <a class="nav-link" id="account-logout-tab" href="/logout" 
+                                role="tab" aria-controls="account-address" aria-selected="false">Logout
+                            </a>
+                        </li>
+                    </ul>
+                    <!-- account tabs ends -->
+
+                    <h4>Personal Information</h4>
+                    <!-- account tab-content starts -->
+                        <div class="tab-content col-lg-6 bg-grey" id="account-ontent">
+                            <!-- section 2: Profile Information -->
+                            <div class="tab-pane fade show active" id="account-acdetails" role="tabpanel" aria-labelledby="account-acdetails-tab">
+                                <div class="tm-myaccount-acdetails">
+
+                                    <!-- table -->
+                                    <div class="tm-form tm-form-bordered" id="user-profile-view">
+                                        <div class="tm-form-inner">
+                                            <div class="tm-form-field no-border row">
+                                                <div class="col-6 image-container">
+                                                    <% if(userData.photo){ %>
+                                                        <div class="image-wrapper">
+                                                            <img id="image-preview" src="assets/images/userImages/<%= userData.photo %>" alt="Profile Image">
+                                                        </div>
+                                                    <% } else { %>
+                                                        <div class="image-wrapper">
+                                                            <img id="image-preview" src="assets/images/icons/dummy-profile-pic2.png" alt="Profile Image">
+                                                        </div>
+                                                    <% } %>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 name-container">
+                                                <h1><%= userData.firstname %> <%= userData.lastname %></h1>
+                                                <a href="/edit-profile"><i class="fa-solid fa-edit"></i></a>
+                                            </div>
+                                            <div class="col-6 actions-container">
+                                                <button class="change-password-btn" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                                                    <i class="fa-solid fa-key"></i> Change Password
+                                                </button>
+                                            </div>
+                                            <table class="profile-table">
+                                                <tr>
+                                                    <th>Full Name</th>
+                                                    <td> : </td>
+                                                    <td><%= userData.firstname %> <%= userData.lastname %></td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Email Address</th>
+                                                    <td> : </td>
+                                                    <td>
+                                                        <%= userData.email %>
+                                                        <% if(userData.isVerified){ %>
+                                                            <i class="fa-solid fa-circle-check text-success"></i>
+                                                        <% } %>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Mobile Number</th>
+                                                    <td> : </td>
+                                                    <td><%= userData.mobile %></td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    <!-- account tab-content ends -->
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+
+    <button id="back-top-top"><i class="ion-arrow-up-c"></i></button>
+</div>
+
+
+
+<!-- Change Password Modal Starts -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" 
+    aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="changePasswordModalLabel">Change Password</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="change-password-form">
+                    <div class="form-group">
+                        <label for="acdetails-password">Old Password</label>
+                        <input type="password" class="form-control modal-input" id="acdetails-password" placeholder="Enter Old Password">
+                    </div>
+                    <p id="old-password-error" style="color: red; display: none; margin-top: -1.4rem;"></p>
+                    <div class="form-group">
+                        <label for="acdetails-newpassword">New Password</label>
+                        <input type="password" class="form-control modal-input" id="acdetails-newpassword" placeholder="Enter New Password">
+                    </div>
+                    <p id="new-password-error" style="color: red; display: none; margin-top: -1.5rem;"></p>
+                    <div class="form-group">
+                        <label for="acdetails-confirmpass">Confirm Password</label>
+                        <input type="password" class="form-control modal-input" id="acdetails-confirmpass" placeholder="Confirm New Password">
+                    </div>
+                    <p id="confirm-password-error" style="color: red; display: none; margin-top: -1.5rem;"></p>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="save-password-btn">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Change Password Modal Ends -->
+
+
+
+<!-- =========================================================== -->
+
+
+ <!-- style for password modal -->
+<style>
+.form-group {
+    display: flex;
+    align-items: center;
+    margin-top: 2.5rem;
+}
+.form-group label,
+.form-group input {
+    flex: 1;
+    max-width: 50%;
+}
+.form-group input {
+    margin-left: 10px; /* Optional: to add some space between label and input */
+}
+
+.modal-input {
+    border: 1px solid #aa005565;
+}
+
+.modal-content {
+    background-color: #ffffff; /* White background */
+    border: 1px solid #e0e0e0; /* Light gray border */
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.modal-header {
+    background-color: #9A0056; /* Header background color */
+    color: #ffffff; /* Header text color */
+    border-bottom: 1px solid #7A003C; /* Darker border for header */
+}
+
+.modal-footer {
+    background-color: #ffffff; /* Footer background color */
+    border-top: 1px solid #e0e0e0; /* Light gray border for footer */
+}
+
+.modal-title {
+    color: #ffffff;
+}
+.tm-form-field input[type="password"],
+.tm-form-field input[type="text"],
+.tm-form-field textarea {
+    border: 1px solid #aa005565; /* Text area border color */
+    padding: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 4px;
+    font-size: 14px;
+    line-height: 1.5;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.tm-form-field input[type="password"]:focus,
+.tm-form-field input[type="text"]:focus,
+.tm-form-field textarea:focus {
+    border-color: #9A0056;
+    outline: 0;
+}
+.modal-footer .btn {
+    padding: 0 25px;
+}
+
+.btn-primary {
+    background-color: #9A0056;
+    border-color: #9A0056;
+}
+
+.btn-primary:hover {
+    background-color: #7A003C;
+    border-color: #7A003C;
+}
+
+.btn-secondary {
+    color: black;
+    background-color: #b7b7b7;
+    border-color: #9A0056;
+}
+
+.btn-secondary:hover {
+    color: #ffffff;
+    background-color: rgb(143, 142, 142);
+}
+
+
+
+</style>
+
+
+<!-- CSS Styles for userProfiles.ejs -->
+<style>
+/* Flexbox for form fields */
+.tm-form-field {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.tm-form-field.no-border {
+    border: none;
+}
+
+/* Image container styles */
+.image-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.image-wrapper {
+    width: 100%;
+    padding-top: 100%; /* 1:1 aspect ratio */
+    position: relative;
+    border-radius: 50%; /* Make the image circular if it is square */
+    border: 2px solid #9a0056;
+}
+
+#image-preview {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%; /* Make the image circular if it is square */
+    object-fit: cover; /* Ensure the image covers the container properly */
+}
+
+/* Name container styles */
+.name-container {
+    width: 50%;
+    display: flex;
+    align-items: center; /* Center vertically */
+    padding-left: 10px; /* Adjust padding as needed */
+    box-sizing: border-box; /* Include padding in width calculations */
+}
+
+.name-container h1 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%; /* Ensure it takes up the full width of the container */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    margin: 0; /* Remove default margin */
+    font-size: clamp(16px, 5vw, 36px);
+}
+
+/* Table styles */
+.profile-table th,
+.profile-table td {
+    padding: 10px;
+    text-align: left;
+}
+
+/* Lock icon for email */
+.input-wrapper {
+    position: relative;
+    width: 68%;
+}
+
+.input-wrapper input[type="email"] {
+    padding-right: 2.5rem; /* Space for the icon */
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.input-wrapper .email-lock {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #888; /* Adjust the icon color as needed */
+}
+
+
+/* -------------------------------------- for edit icons */
+
+.name-container a :hover{
+    color: #9A0056;
+}
+
+/* Base size for edit icons */
+.edit-profile-btn .fa-edit,
+.name-container .fa-edit {
+    font-size: 20px; /* Base size, adjust as needed */
+}
+
+/* Larger screens (desktops) */
+@media (min-width: 768px) {
+    .edit-profile-btn .fa-edit,
+    .name-container .fa-edit {
+        font-size: 24px; /* Adjust as needed for larger screens */
+    }
+}
+
+/* Extra large screens (large desktops) */
+@media (min-width: 1200px) {
+    .edit-profile-btn .fa-edit,
+    .name-container .fa-edit {
+        font-size: 28px; /* Adjust as needed for extra large screens */
+    }
+}
+
+/* Smaller screens (tablets and phones) */
+@media (max-width: 767px) {
+    .edit-profile-btn .fa-edit,
+    .name-container .fa-edit {
+        font-size: 18px; /* Adjust as needed for smaller screens */
+    }
+}
+
+/* Extra small screens (phones) */
+@media (max-width: 480px) {
+    .edit-profile-btn .fa-edit,
+    .name-container .fa-edit {
+        font-size: 16px; /* Adjust as needed for extra small screens */
+    }
+}
+
+</style>
+
+
+
+<!-- Scripts Change Password Modal ------------------------------------------- -->
+<!-- for sweet alert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- for modal -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+
+<script>
+    $(document).ready(function () {
+
+        $('#changePasswordModal').on('shown.bs.modal', function () {
+            $('#acdetails-password').prop('readonly', false);
+            $('#acdetails-newpassword').prop('readonly', false);
+            $('#acdetails-confirmpass').prop('readonly', false);
+        });
+
+
+        $('#save-password-btn').click(function () {
+            const oldPassword = $('#acdetails-password').val();
+            const newPassword = $('#acdetails-newpassword').val();
+            const confirmPassword = $('#acdetails-confirmpass').val();
+
+            console.log('oldPassword : ', oldPassword);
+            console.log('newPassword : ', newPassword);
+            console.log('confirmPassword : ', confirmPassword);
+
+            let isValid = true;
+
+            // Clear previous errors
+            $('#old-password-error').hide();
+            $('#new-password-error').hide();
+            $('#confirm-password-error').hide();
+
+            // Validate old password
+            if (!oldPassword) {
+                $('#old-password-error').text('Old password is required').show();
+                isValid = false;
+            }
+
+            // Validate new password
+            if (!newPassword) {
+                $('#new-password-error').text('New password is required').show();
+                isValid = false;
+            } else if (newPassword.length < 8) {
+                $('#new-password-error').text('Password must be at least 8 characters').show();
+                isValid = false;
+            } else if(!/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])/.test(newPassword)){
+                $('#new-password-error').text('Password must be at least 8 characters long, include at least one number, one lowercase letter, one uppercase letter, and one special character.').show();
+                isValid = false;
+            }
+
+            // Validate confirm password
+            if (newPassword !== confirmPassword) {
+                $('#confirm-password-error').text('Passwords do not match').show();
+                isValid = false;
+            }
+
+
+            if (isValid) {
+                $.ajax({
+                    url: '/change-password',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ oldPassword, newPassword }),
+                    success: function (response) {
+                        console.log(response,"res");
+                        if (response.success) {
+                            $('#changePasswordModal').modal('hide');
+                            // alert('Password updated successfully');
+                            Swal.fire({
+                                icon: "success",
+                                title: "Password updated successfully",
+                                showConfirmButton: false,
+                                timer: 1500
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else if(response.incorrect){
+                            $('#old-password-error').text('Incorrect Password').show();
+                            Swal.fire({
+                                icon: "error",
+                                text: "Sorry, the current password is incorrect. Try again.",
+                                showConfirmButton: false,
+                            });
+                        } else {
+                            $('#old-password-error').text(response.message).show();
+                        }
+                    },
+                    error: function (err) {
+                        alert('An error occurred while updating the password',err);
+                    }
+                });
+            }
+        });
+    });
+</script>
+    
+
+<%- include('../layouts/userLayouts/user-footer.ejs') %>

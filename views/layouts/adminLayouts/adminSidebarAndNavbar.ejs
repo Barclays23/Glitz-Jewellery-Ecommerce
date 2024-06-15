@@ -15,8 +15,13 @@
                <div class="profile-desc">
                   <div class="profile-pic">
                      <div class="count-indicator">
-                        <img class="img-xs rounded-circle " src="../assets/images/userImages/faces/face15.jpg" alt="">
+                        <% if (adminData.photo){ %>
+                        <img class="img-xs rounded-circle " src="../assets/images/userImages/<%= adminData.photo %>" alt="">
                         <span class="count bg-success"></span>
+                        <% } else{ %>
+                           <img class="img-xs rounded-circle " src="../assets/images/icons/dummy-profile-pic1.png" alt="">
+                           <span class="count bg-success"></span>
+                        <% } %>
                      </div>
                      <div class="profile-name">
                         <h5 class="mb-0 font-weight-normal text-success">
@@ -365,7 +370,13 @@
                   <li class="nav-item dropdown">
                      <a class="nav-link" id="profileDropdown" href="#" data-bs-toggle="dropdown">
                         <div class="navbar-profile">
-                           <img class="img-xs rounded-circle" src="../assets/images/userImages/faces/face15.jpg" alt="">
+                           <% if (adminData.photo){ %>
+                              <img class="img-xs rounded-circle" src="../assets/images/userImages/<%= adminData.photo %>" alt="">
+                              <span class="count bg-success"></span>
+                              <% } else{ %>
+                                 <img class="img-xs rounded-circle" src="../assets/images/icons/dummy-profile-pic1.png" alt="">
+                                 <span class="count bg-success"></span>
+                              <% } %>                           
                            <p class="mb-0 d-none d-sm-block navbar-profile-name text-success">
                               <%= adminData.firstname %> <%= adminData.lastname %>
                            </p>

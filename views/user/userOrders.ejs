@@ -1,0 +1,139 @@
+<%- include('../layouts/userLayouts/user-header.ejs') %>
+
+<%- include('../layouts/userLayouts/user-preloader.ejs') %>
+
+<%- include('../layouts/userLayouts/user-navbar.ejs') %>
+
+
+<div id="wrapper" class="wrapper">
+
+    <!-- Breadcrumbs area starts -->
+    <div class="tm-breadcrumb-area tm-padding-section bg-grey" data-bgimage="assets/images/breadcrumb-bg.jpg">
+        <div class="container">
+            <div class="tm-breadcrumb">
+                <h2 style="color: black;">My Orders</h2>
+                <ul>
+                    <li><a href="/" style="color: black;">Home</a></li>
+                    <li><a href="#" style="color: black;">My Account</a></li>
+                    <li style="color: black;"> Orders </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumbs area ends -->
+
+    <main class="page-content">
+        <div class="tm-section tm-my-account-area bg-white tm-padding-section">
+            <div class="container">
+                <div class="tm-myaccount">
+                    <!-- account tabs starts -->
+                    <ul class="nav tm-tabgroup" id="account" role="tablist">
+                        <!-- tab 1: dashboard -->
+                        <li class="nav-item">
+                            <a class="nav-link" id="account-dashboard-tab"
+                                href="/my-account" 
+                                role="tab" aria-controls="account-dashboard" aria-selected="true">Dashboard
+                            </a>
+                        </li>
+
+                        <!-- tab 2: profile information-->
+                        <li class="nav-item">
+                            <a class="nav-link" id="account-acdetails-tab" href="/profile"
+                                role="tab" aria-controls="account-acdetails" aria-selected="true">Profile
+                            </a>
+                        </li>
+
+                        <!-- tab 3: wishlist -->
+                        <li class="nav-item">
+                            <a class="nav-link" id="account-wishlist-tab" href="/wishlist"
+                                role="tab" aria-controls="account-wishlist" aria-selected="false">Wishlist
+                            </a>
+                        </li>
+
+                        <!-- Tab 4: My Cart -->
+                        <li class="nav-item">
+                            <a class="nav-link" id="account-cart-tab" href="/cart"
+                                role="tab" aria-controls="account-cart" aria-selected="false">Cart
+                            </a>
+                        </li>
+
+                        <!-- tab 5: -->
+                        <li class="nav-item">
+                            <a class="nav-link active" id="account-orders-tab" href="/orders"
+                                role="tab" aria-controls="account-orders" aria-selected="true">Orders
+                            </a>
+                        </li>
+
+                        <!-- tab 6: -->
+                        <li class="nav-item">
+                            <a class="nav-link" id="account-address-tab" href="/address"
+                                role="tab" aria-controls="account-address" aria-selected="false">Address
+                            </a>
+                        </li>
+
+                        <!-- tab 8: -->
+                        <li class="nav-item">
+                            <a class="nav-link" id="account-logout-tab" href="#" 
+                                role="tab" aria-controls="account-address" aria-selected="false">Logout
+                            </a>
+                        </li>
+                    </ul>
+                    <!-- account tabs ends -->
+
+
+                    
+                    <!-- account tab-content starts -->
+                    <!-- Section 5: My Orders -->
+                    <h4>Ordered Items</h4>
+                    <div class="tab-content col" id="account-ontent">
+                        <div class="tab-pane fade show active" id="account-orders" role="tabpanel"
+                            aria-labelledby="account-orders-tab">
+                            <div class="tm-myaccount-orders">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th class="tm-myaccount-orders-col-id">ORDER ID</th>
+                                                <th class="tm-myaccount-orders-col-image">IMAGE</th>
+                                                <th class="tm-myaccount-orders-col-date">DATE</th>
+                                                <th class="tm-myaccount-orders-col-status">STATUS</th>
+                                                <th class="tm-myaccount-orders-col-total">TOTAL</th>
+                                                <th class="tm-myaccount-orders-col-view">VIEW</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>#12345</td>
+                                                <td><img src="path/to/product/image1.jpg" alt="Product Image 1"></td>
+                                                <td>30 December 2018</td>
+                                                <td>On Hold</td>
+                                                <td>$132.00 for 2 items xxxxxxxxxxxxx</td>
+                                                <td><a href="#" class="tm-button tm-button-small">View</a>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>#12346</td>
+                                                <td><img src="path/to/product/image1.jpg" alt="Product Image 1"></td>
+                                                <td>30 December 2018</td>
+                                                <td>On Hold</td>
+                                                <td>$220.00 for 3 items</td>
+                                                <td><a href="#" class="tm-button tm-button-small">View</a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- account tab-content ends -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+
+    <button id="back-top-top"><i class="ion-arrow-up-c"></i></button>
+</div>
+
+<%- include('../layouts/userLayouts/user-footer.ejs') %>

@@ -1,0 +1,252 @@
+<%- include('../layouts/userLayouts/user-header.ejs') %>
+
+<%- include('../layouts/userLayouts/user-preloader.ejs') %>
+
+<%- include('../layouts/userLayouts/user-navbar.ejs') %>
+
+
+<div id="wrapper" class="wrapper">
+
+    <!-- Breadcrumbs area starts -->
+    <div class="tm-breadcrumb-area tm-padding-section bg-grey" data-bgimage="assets/images/breadcrumb-bg.jpg">
+        <div class="container">
+            <div class="tm-breadcrumb">
+                <h2 style="color: black;">Shopping Cart</h2>
+                <ul>
+                    <li><a href="/" style="color: black;">Home</a></li>
+                    <li><a href="#" style="color: black;">My Account</a></li>
+                    <li style="color: black;"> Cart </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumbs area ends -->
+
+    <main class="page-content">
+        <div class="tm-section tm-my-account-area bg-white tm-padding-section">
+            <div class="container">
+                <div class="tm-myaccount">
+                    <!-- account tabs starts -->
+                    <ul class="nav tm-tabgroup" id="account" role="tablist">
+                        <!-- tab 1: dashboard -->
+                        <li class="nav-item">
+                            <a class="nav-link" id="account-dashboard-tab"
+                                href="/my-account" 
+                                role="tab" aria-controls="account-dashboard" aria-selected="true">Dashboard
+                            </a>
+                        </li>
+
+                        <!-- tab 2: profile information-->
+                        <li class="nav-item">
+                            <a class="nav-link" id="account-acdetails-tab" href="/profile"
+                                role="tab" aria-controls="account-acdetails" aria-selected="true">My Profile
+                            </a>
+                        </li>
+
+                        <!-- tab 3: wishlist -->
+                        <li class="nav-item">
+                            <a class="nav-link" id="account-wishlist-tab" href="/wishlist"
+                                role="tab" aria-controls="account-wishlist" aria-selected="false">Wishlist
+                            </a>
+                        </li>
+
+                        <!-- Tab 4: My Cart -->
+                        <li class="nav-item">
+                            <a class="nav-link active" id="account-cart-tab" href="/cart"
+                                role="tab" aria-controls="account-cart" aria-selected="false"> Cart
+                            </a>
+                        </li>
+
+                        <!-- tab 5: -->
+                        <li class="nav-item">
+                            <a class="nav-link" id="account-orders-tab" href="/orders"
+                                role="tab" aria-controls="account-orders" aria-selected="false">Orders
+                            </a>
+                        </li>
+
+                        <!-- tab 6: -->
+                        <li class="nav-item">
+                            <a class="nav-link" id="account-address-tab" data-toggle="tab" href="#account-address"
+                                role="tab" aria-controls="account-address" aria-selected="false">Address
+                            </a>
+                        </li>
+
+                        <!-- tab 8: -->
+                        <li class="nav-item">
+                            <a class="nav-link" id="account-logout-tab" href="#" 
+                                role="tab" aria-controls="account-address" aria-selected="false">Logout
+                            </a>
+                        </li>
+                    </ul>
+                    <!-- account tabs ends -->
+
+
+                    
+                    <!-- account tab-content starts -->
+                    <!-- Section 4: My Cart -->
+                    <h4>Carted Items</h4>
+                    <!-- FROM MY ACCOUNT HTML -->
+                    <!-- <div class="tab-content" id="account-ontent">
+                        <div class="tab-pane fade show active" id="account-cart" role="tabpanel"
+                            aria-labelledby="account-cart-tab">
+                            <div class="tm-myaccount-cart">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th class="tm-myaccount-cart-col-image">IMAGE</th>
+                                                <th class="tm-myaccount-cart-col-product">PRODUCT</th>
+                                                <th class="tm-myaccount-cart-col-price">PRICE</th>
+                                                <th class="tm-myaccount-cart-col-qty">QTY</th>
+                                                <th class="tm-myaccount-cart-col-total">TOTAL</th>
+                                                <th class="tm-myaccount-cart-col-actions">ACTIONS</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><img src="path_to_image" alt="Product Image" width="50"></td>
+                                                <td>Product Name</td>
+                                                <td>$99.00</td>
+                                                <td>
+                                                    <input type="number" value="1" min="1">
+                                                </td>
+                                                <td>$99.00</td>
+                                                <td>
+                                                    <button class="tm-button tm-button-small">Update</button>
+                                                    <button class="tm-button tm-button-small">Remove</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div> -->
+                    <!-- account tab-content ends -->
+
+                    <!-- ADDED FROM CART HTML -->
+                    <div>
+                        <div class="tm-cart-table table-responsive">
+                            <table class="table table-bordered mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="tm-cart-col-image" scope="col">Image</th>
+                                        <th class="tm-cart-col-productname" scope="col">Product</th>
+                                        <th class="tm-cart-col-price" scope="col">Price</th>
+                                        <th class="tm-cart-col-quantity" scope="col">Quan</th>
+                                        <th class="tm-cart-col-total" scope="col">Total</th>
+                                        <th class="tm-cart-col-actions" scope="col">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <a href="product-details.html" class="tm-cart-productimage">
+                                                <img src="assets/images/products/product-image-1-thumb.jpg" alt="product image">
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="product-details.html" class="tm-cart-productname">Stylist daimond earring</a>
+                                        </td>
+                                        <td class="tm-cart-price">$75.00</td>
+                                        <td>
+                                            <div class="tm-quantitybox">
+                                                <input type="text" value="1">
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="tm-cart-totalprice">$75.00</span>
+                                        </td>
+                                        <td>
+                                            <button class="tm-button tm-button-small">Save for Later</button>
+                                            <!-- <button class="tm-cart-removeproduct bg-danger"><i class="ion-close"></i></button> -->
+                                            <!-- <a href=""><img src="/assets/images/icons/remove2.png" style="width: 41px; height: auto;" alt="remove-icon"> </a> -->
+                                            <button class="tm-button tm-button-small">Remove</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <a href="product-details.html" class="tm-cart-productimage">
+                                                <img src="assets/images/products/product-image-2-thumb.jpg" alt="product image">
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="product-details.html" class="tm-cart-productname">Stylist daimond earring</a>
+                                        </td>
+                                        <td class="tm-cart-price">$75.00</td>
+                                        <td>
+                                            <div class="tm-quantitybox">
+                                                <input type="text" value="1">
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="tm-cart-totalprice">$75.00</span>
+                                        </td>
+                                        <td>
+                                            <button class="tm-button tm-button-small">Save for Later</button>
+                                            <!-- <button class="tm-cart-removeproduct bg-danger"><i class="ion-close"></i></button> -->
+                                            <!-- <a href=""><img src="/assets/images/icons/remove2.png" style="width: 41px; height: auto;" alt="remove-icon"> </a> -->
+                                            <button class="tm-button tm-button-small">Remove</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+    
+                        <div class="tm-cart-bottomarea mt-5">
+                            <div class="row">
+                                <div class="col-lg-8 col-md-6">
+                                    <div class="tm-buttongroup">
+                                        <a href="#" class="tm-button">Continue Shopping</a>
+                                        <a href="#" class="tm-button">Update Cart</a>
+                                    </div>
+                                    <form action="#" class="tm-cart-coupon">
+                                        <label for="coupon-field">Have a coupon code?</label>
+                                        <input type="text" id="coupon-field" placeholder="Enter coupon code"
+                                            required="required">
+                                        <button type="submit" class="tm-button">Submit</button>
+                                    </form>
+                                </div>
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="tm-cart-pricebox">
+                                        <h2>Cart Totals</h2>
+                                        <div class="table-responsive">
+                                            <table class="table table-borderless">
+                                                <tbody>
+                                                    <tr class="tm-cart-pricebox-subtotal">
+                                                        <td>Cart Subtotal</td>
+                                                        <td>$175.00</td>
+                                                    </tr>
+                                                    <tr class="tm-cart-pricebox-shipping">
+                                                        <td>(+) Shipping Charge</td>
+                                                        <td>$15.00</td>
+                                                    </tr>
+                                                    <tr class="tm-cart-pricebox-total">
+                                                        <td>Total</td>
+                                                        <td>$190.00</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="text-center">
+                                            <a href="#" class="tm-button">Proceed To Checkout</a>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+
+    <button id="back-top-top"><i class="ion-arrow-up-c"></i></button>
+</div>
+
+<%- include('../layouts/userLayouts/user-footer.ejs') %>
