@@ -6,7 +6,7 @@ const nocache = require ('nocache');
 
 
 const cron = require('node-cron');
-const {getGoldRate} = require('./controllers/goldRateController');
+const {getGoldRateFromAPI} = require('./controllers/goldRateController');
 
 
 const config = require('./config/config');
@@ -19,7 +19,7 @@ app.use(nocache());
 
 app.use(express.static('public'));
 
-getGoldRate();
+getGoldRateFromAPI();
 
 // app.use(session({
 //     secret: process.env.sessionSecret,

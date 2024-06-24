@@ -31,6 +31,7 @@ userRoute.use(express.static('public'));
 
 
 const userController = require ('../controllers/userController');
+const cartController = require ('../controllers/cartController');
 const userAuth = require('../middlewares/userAuth');
 const googleAuth = require('../middlewares/googleAuth');
 const multer = require('../middlewares/multer');
@@ -73,16 +74,22 @@ userRoute.get('/resend-otp', userController.resendOtp);
 userRoute.get('/shopping', userController.loadShopping);
 userRoute.get('/product-details', userController.productDetals);
 
-userRoute.get('/my-account', userController.loadUserAccount);  //userAuth.isLogin,
-userRoute.get('/profile', userController.loadUserProfile);  //userAuth.isLogin,
-userRoute.get('/edit-profile', userController.loadEditUserProfile);  //userAuth.isLogin,
-userRoute.post('/update-profile', multer.uploadUserImages, userController.updateUserProfile);  //userAuth.isLogin,
-userRoute.post('/change-password', userController.updateUserPassword);  //userAuth.isLogin,
+userRoute.get('/my-account', userAuth.isLogin, userController.loadUserAccount);  //userAuth.isLogin,
+userRoute.get('/profile', userAuth.isLogin, userController.loadUserProfile);  //userAuth.isLogin,
+userRoute.get('/edit-profile', userAuth.isLogin, userController.loadEditUserProfile);  //userAuth.isLogin,
+userRoute.post('/update-profile', userAuth.isLogin, multer.uploadUserImages, userController.updateUserProfile);  //userAuth.isLogin,
+userRoute.post('/change-password', userAuth.isLogin, userController.updateUserPassword);  //userAuth.isLogin,
 
-userRoute.get('/wishlist', userController.loadUserWishlist);  //userAuth.isLogin,
-userRoute.get('/cart', userController.loadUserCart);  //userAuth.isLogin,
-userRoute.get('/orders', userController.loadUserOrders);  //userAuth.isLogin,
-userRoute.get('/address', userController.loadUserAddress);  //userAuth.isLogin,
+
+// CART ROUTES
+userRoute.get('/cart', userAuth.isLogin, cartController.loadUserCart);  //userAuth.isLogin,
+userRoute.post('/add-to-cart', userAuth.isLogin, cartController.addToCart);  //userAuth.isLogin,
+userRoute.post('/update-cart-quantity', userAuth.isLogin, cartController.updateCartQuantity)  //userAuth.isLogin,
+
+
+userRoute.get('/wishlist', userAuth.isLogin, userController.loadUserWishlist);  //userAuth.isLogin,
+userRoute.get('/orders', userAuth.isLogin, userController.loadUserOrders);  //userAuth.isLogin,
+userRoute.get('/address', userAuth.isLogin, userController.loadUserAddress);  //userAuth.isLogin,
 
 
 

@@ -23,10 +23,6 @@ const productSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    price: {
-        type : Number,
-        // required: true
-    },
     grossWeight: {
         type : Number,
         required: true
@@ -44,6 +40,22 @@ const productSchema = new mongoose.Schema({
         required: true
     },
     stoneCharge: {
+        type : Number,
+        required: true
+    },
+    metalPrice : {
+        type : Number,
+        required: true
+    },
+    makingCharge : {
+        type : Number,
+        required: true
+    },
+    GST : {
+        type : Number,
+        required: true
+    },
+    totalPrice: {
         type : Number,
         required: true
     },

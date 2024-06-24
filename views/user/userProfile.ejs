@@ -490,7 +490,6 @@
                         console.log(response,"res");
                         if (response.success) {
                             $('#changePasswordModal').modal('hide');
-                            // alert('Password updated successfully');
                             Swal.fire({
                                 icon: "success",
                                 title: "Password updated successfully",
@@ -500,12 +499,12 @@
                                 location.reload();
                             });
                         } else if(response.incorrect){
-                            $('#old-password-error').text('Incorrect Password').show();
                             Swal.fire({
                                 icon: "error",
                                 text: "Sorry, the current password is incorrect. Try again.",
                                 showConfirmButton: false,
                             });
+                            $('#old-password-error').text('Incorrect Password.').show();
                         } else {
                             $('#old-password-error').text(response.message).show();
                         }

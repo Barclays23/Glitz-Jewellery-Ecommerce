@@ -369,48 +369,25 @@
         const photo = document.getElementById('acdetails-photo').files[0];
         const firstname = document.getElementById('acdetails-firstname').value.trim();
         const lastname = document.getElementById('acdetails-lastname').value.trim();
-        const email = document.getElementById('acdetails-email').value.trim();
         const mobile = document.getElementById('acdetails-mobile').value.trim();
-        const oldPassword = document.getElementById('acdetails-password').value.trim();
-        const newPassword = document.getElementById('acdetails-newpassword').value.trim();
-        const confirmPassword = document.getElementById('acdetails-confirmpass').value.trim();
 
         console.log('photo :', photo);
         console.log('firstname :', firstname);
         console.log('lastname :', lastname);
-        console.log('email :', email);
         console.log('mobile :', mobile);
-        console.log('oldPassword :', oldPassword);
-        console.log('newPassword :', newPassword);
-        console.log('confirmPassword :', confirmPassword);
 
 
         const firstnameError = document.getElementById('first-name-error');
         const lastnameError = document.getElementById('last-name-error');
-        const emailError = document.getElementById('email-error');
         const mobileError = document.getElementById('mobile-error');
-        const oldPasswordError = document.getElementById('old-password-error');
-        const newPasswordError = document.getElementById('new-password-error');
-        const confirmPasswordError = document.getElementById('confirm-password-error');
-        const termsError = document.getElementById('terms-error');
 
         firstnameError.textContent = '';
         lastnameError.textContent = '';
-        emailError.textContent = '';
         mobileError.textContent = '';
-        oldPasswordError.textContent = '';
-        newPasswordError.textContent = '';
-        confirmPasswordError.textContent = '';
-        termsError.textContent = '';
 
         firstnameError.style.display = 'none';
         lastnameError.style.display = 'none';
-        emailError.style.display = 'none';
         mobileError.style.display = 'none';
-        oldPasswordError.style.display = 'none';
-        newPasswordError.style.display = 'none';
-        confirmPasswordError.style.display = 'none';
-        termsError.style.display = 'none';
 
         let isValid = true;
 
@@ -435,22 +412,6 @@
             isValid = false;
         }
 
-        // Validate new password: at least 8 characters, one number, one lowercase, one uppercase, one special character
-        if (!/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).{8,}$/.test(newPassword)) {
-            newPasswordError.textContent = 'Password must be at least 8 characters long, include at least one number, one lowercase letter, one uppercase letter, and one special character.';
-            newPasswordError.style.display = 'block';
-            isValid = false;
-        }
-
-        // Validate confirm password: matches new password
-        if (newPassword !== confirmPassword) {
-            confirmPasswordError.textContent = 'Password mismatch!';
-            confirmPasswordError.style.display = 'block';
-            isValid = false;
-        }
-
-
-
 
         if (isValid) {        
             const formData = new FormData();
@@ -458,11 +419,7 @@
             formData.append('profile-pic', photo);
             formData.append('firstname', firstname);
             formData.append('lastname', lastname);
-            formData.append('email', email);
             formData.append('mobile', mobile);
-            formData.append('oldPassword', oldPassword);
-            formData.append('newPassword', newPassword);
-            formData.append('confirmPassword', confirmPassword);
 
             fetch('/update-profile', {
                 method: 'POST',
@@ -492,12 +449,11 @@
             .catch(error => {
                 console.error('Error:', error);
                 Swal.fire({
-                        icon: "error",
-                        title: "An error occurred while updating the profile. !",
-                        showConfirmButton: false,
-                        timer: 1500
-                    });
-                // alert('An error occurred while updating the profile.');
+                    icon: "error",
+                    title: "An error occurred while updating the profile. !",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
             });
         }
     });

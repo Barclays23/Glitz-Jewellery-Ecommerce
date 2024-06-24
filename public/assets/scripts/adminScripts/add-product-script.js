@@ -12,6 +12,7 @@ function calculateNetWeight() {
 function toggleStoneChargeField() {
     const stoneWt = parseFloat(document.getElementById('add-product-stone-wt').value) || 0;
     const stoneChargeField = document.getElementById('add-product-sc');
+    
     if (!stoneWt || stoneWt === "") {
         stoneChargeField.disabled = true;
         stoneChargeField.value = 0;
@@ -101,7 +102,8 @@ $(document).ready(function() {
         const productMc = parseFloat($('#add-product-mc').val()) || 0;
         const productSc = parseFloat($('#add-product-sc').val()) || 0;
         const productPurity = $('#add-product-purity').val();
-        const productQty = parseInt($('#add-product-quantity').val()) || 0;
+        // const productQty = parseInt($('#add-product-quantity').val()) || 0;
+        const productQty = $('#add-product-quantity').val().trim();
         const productStatus = $('#add-product-status').val();
 
         console.log("Product Category : ", productCategory);
@@ -113,6 +115,7 @@ $(document).ready(function() {
         console.log("Product Purity : ", productPurity);
         console.log("Product MC : ", productMc);
         console.log("Product SC : ", productSc);
+        console.log('type of stoneCharge : ', typeof(productSc));
         console.log("Product Qty : ", productQty);
         console.log("Product Status : ", productStatus);
 
@@ -255,21 +258,48 @@ $(document).ready(function() {
         }
 
 
-        if (!productQty) {
+
+        if (productStoneWt > 0 && !productSc) {
+            addProductScError.textContent = "Stone charge is required.";
+            addProductScError.style.display = "block";
+            isValid = false;
+        } else if (productStoneWt > 0 && productSc <= 0) {
+            addProductScError.textContent = "Stone charge must be greater than 0.";
+            addProductScError.style.display = "block";
+            isValid = false;
+        } else if (!productStoneWt && productSc > 0) {
+            addProductScError.textContent = "Cannot enter stone rate for stoneless ornaments.";
+            addProductScError.style.display = "block";
+            isValid = false;
+        } else if (!/^\d+(\.\d+)?$/.test(productSc)) {
+            addProductScError.textContent = "Enter a valid service charge (numbers only).";
+            addProductScError.style.display = "block";
+            isValid = false;
+        } else {
+            addProductScError.style.display = "none";
+        }
+        
+
+
+        if (productQty === "") {
             addProductQtyError.textContent = "Quantity is required.";
             addProductQtyError.style.display = "block";
             isValid = false;
-        } else if (productQty <= 0) {
-            addProductQtyError.textContent = "Quantity must be greater than 0.";
-            addProductQtyError.style.display = "block";
-            isValid = false;
-        } else if (!/^\d+$/.test(productQty)) {
-            addProductQtyError.textContent = "Enter a valid product quantity (numbers only).";
+        } else if (!/^[-+]?\d+$/.test(productQty)) {
+            addProductQtyError.textContent = "Enter a valid quantity (numbers only).";
             addProductQtyError.style.display = "block";
             isValid = false;
         } else {
-            addProductQtyError.style.display = "none";
+            const parsedQty = parseInt(productQty, 10); // Parse the trimmed input as an integer
+            if (parsedQty < 0) {
+                addProductQtyError.textContent = "Quantity cannot be a negative value.";
+                addProductQtyError.style.display = "block";
+                isValid = false;
+            } else {
+                addProductQtyError.style.display = "none";
+            }
         }
+        
 
 
         if(!isValid){
@@ -299,9 +329,9 @@ $(document).ready(function() {
             url: '/admin/add-product',
             method: 'POST',
             // contentType: 'application/json',
-            contentType: false, // Don't set contentType when using FormData
             data: formData,
             processData: false,
+            contentType: false, // Don't set contentType when using FormData
             success: function(response) {
                 console.log('Add Product Form submitted');
 

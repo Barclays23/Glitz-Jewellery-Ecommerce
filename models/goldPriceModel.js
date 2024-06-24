@@ -1,12 +1,9 @@
 const mongoose = require('mongoose');
 
 const goldRateSchema = new mongoose.Schema({
-    // date : {
-    //     type: String,
-    //     required : true
-    // },
     price: {
         type : Number,
+        default : 0,
         required: true
     }
 },

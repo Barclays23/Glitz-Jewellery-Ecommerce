@@ -635,7 +635,8 @@
             const productMc = parseFloat($('#edit-product-mc').val()) || 0;
             const productSc = parseFloat($('#edit-product-sc').val()) || 0;
             const productPurity = $('#edit-product-purity').val();
-            const productQty = parseInt($('#edit-product-quantity').val()) || 0;
+            // const productQty = parseInt($('#edit-product-quantity').val()) || 0;
+            const productQty = $('#edit-product-quantity').val().trim();
             const productStatus = $('#edit-product-status').val();
 
 
@@ -799,20 +800,45 @@
             }
 
 
-            if (!productQty) {
+
+            if (productStoneWt > 0 && !productSc) {
+                editProductScError.textContent = "Stone charge is required.";
+                editProductScError.style.display = "block";
+                isValid = false;
+            } else if (productStoneWt > 0 && productSc <= 0) {
+                editProductScError.textContent = "Stone charge must be greater than 0.";
+                editProductScError.style.display = "block";
+                isValid = false;
+            } else if (!productStoneWt && productSc > 0) {
+                editProductScError.textContent = "Cannot enter stone rate for stoneless ornaments.";
+                editProductScError.style.display = "block";
+                isValid = false;
+            } else if (!/^\d+(\.\d+)?$/.test(productSc)) {
+                editProductScError.textContent = "Enter a valid service charge (numbers only).";
+                editProductScError.style.display = "block";
+                isValid = false;
+            } else {
+                editProductScError.style.display = "none";
+            }
+
+
+            if (productQty === "") {
                 editProductQtyError.textContent = "Quantity is required.";
                 editProductQtyError.style.display = "block";
                 isValid = false;
-            } else if (productQty <= 0) {
-                editProductQtyError.textContent = "Quantity must be greater than 0.";
-                editProductQtyError.style.display = "block";
-                isValid = false;
-            } else if (!/^\d+$/.test(productQty)) {
+            } else if (!/^[-+]?\d+$/.test(productQty)) {
                 editProductQtyError.textContent = "Enter a valid product quantity (numbers only).";
                 editProductQtyError.style.display = "block";
                 isValid = false;
             } else {
-                editProductQtyError.style.display = "none";
+                const parsedQty = parseInt(productQty, 10); // Parse the trimmed input as an integer
+                if (parsedQty < 0) {
+                    editProductQtyError.textContent = "Quantity cannot be a negative value.";
+                    editProductQtyError.style.display = "block";
+                    isValid = false;
+                } else {
+                    editProductQtyError.style.display = "none";
+                }
             }
 
 
@@ -889,8 +915,6 @@
                 });
             }
 
-
-            
         });
     });
 

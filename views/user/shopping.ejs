@@ -109,13 +109,19 @@
                                                     <!-- <img src="assets/images/products/product-image-2.jpg" alt="product image"> -->
                                                 </div>
                                                 <ul class="tm-product-actions">
-                                                    <li> <a href="#"><i class="ion-android-cart"></i> Add to cart </a> </li>
+                                                    <li> <a href="#" onclick="addToCart('<%= productData[i]._id %>')"><i class="ion-android-cart"></i> Add to cart </a> </li>
                                                     <li> <button data-fancybox data-src="assets/images/productImages/<%= productData[i].images.image1 %>"><i class="ion-eye"></i> </button> </li>
-                                                    <li> <a href="#"><i class="ion-heart"></i> </a> </li>
+                                                    <li> <a href="#"><i class="ion-android-favorite-outline"></i> </a> </li>
+                                                    <!-- <li> <a href="#"><i class="ion-heart"></i> </a> </li> -->
+                                                    <li> <a href="#"><i class="ion-android-favorite"></i> </a> </li>
                                                 </ul>
                                                 <div class="tm-product-badges">
-                                                    <span class="tm-product-badges-new">New</span>
-                                                    <span class="tm-product-badges-sale">Sale</span>
+                                                    <!-- <span class="tm-product-badges-new">New</span> -->
+                                                    <% if(productData[i].quantity === 0){ %>
+                                                        <span class="tm-product-badges-outofstock">Out of Stock</span>
+                                                    <% } else if (productData[i].quantity < 5){ %>
+                                                        <span class="tm-product-badges-lowquantity">Only <%= productData[i].quantity %> items left</span>
+                                                    <% } %>
                                                 </div>
                                             </div>
                                             <div class="tm-product-bottomside">
@@ -324,6 +330,96 @@
     <button id="back-top-top"><i class="ion-arrow-up-c"></i></button>
 </div>
 <!-- products area ends -->
+
+
+
+
+
+<!-- ---------------------------------------------------------------------------- -->
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+<!-- script for add to cart -->
+<script>
+    const signInButtonId = 'signInSwalButton';
+    const registerButtonId = 'registerSwalButton';
+
+    // Function to show the authentication SweetAlert
+    function showAuthSwal() {
+        Swal.fire({
+            title: 'Authentication Required',
+            text: "You need to sign in to add products to your cart.",
+            icon: 'warning',
+            showCloseButton: true, // Show close button
+            showCancelButton: true,
+            confirmButtonText: '<span id="'+signInButtonId+'">Sign In</span>',
+            cancelButtonText: '<span id="'+registerButtonId+'">Register</span>',
+            allowOutsideClick: true,
+        }).then((result) => {
+            // const currentUrl = window.location.href;
+            const currentUrl = '/shopping';
+            if (result.isConfirmed) {
+                const signInUrl = `/login?redirect=${encodeURIComponent(currentUrl)}`;
+                window.location.href = signInUrl;
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                const currentUrl = window.location.href;
+                const registerUrl = `/register?redirect=${encodeURIComponent(currentUrl)}`;
+                window.location.href = registerUrl;
+            }
+        });
+
+        // Add event listeners to the buttons in the SweetAlert
+        document.getElementById(signInButtonId).onclick = function() {
+            const currentUrl = window.location.href;
+            const signInUrl = `/login-in?redirect=${encodeURIComponent(currentUrl)}`;
+            window.location.href = signInUrl;
+        };
+
+        document.getElementById(registerButtonId).onclick = function() {
+            const currentUrl = window.location.href;
+            const registerUrl = `/register?redirect=${encodeURIComponent(currentUrl)}`;
+            window.location.href = registerUrl;
+        };
+    }
+
+
+    // to add the product to the cart (send data to backend)
+    function addToCart(productId) {
+        console.log('product id for adding to cart: ', productId);
+
+        $.ajax ({
+            url : '/add-to-cart',
+            type : 'POST',
+            contentType : 'application/JSON',
+            data : JSON.stringify({productId}),
+            success: function(response) {
+                if (response.success === true){
+                    Swal.fire({
+                        text: "Added to your cart.",
+                        icon: 'success',
+                        timer: 1500
+                    });
+                    $("#cart-count").load("/shopping #cart-count");
+                    // location.reload();
+                } else if (response.nosession){
+                    showAuthSwal()
+                    // window.location.href;
+                } else if (response.existProduct){
+                    Swal.fire({
+                        text: "Product already added to your cart!",
+                        // icon: 'warning',
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log('Error in adding to cart :', error);
+            }
+        })
+    }
+</script>
 
 
 

@@ -65,7 +65,7 @@ adminRoute.patch('/manage-product', adminAuth.isLogin, productController.manageP
 
 // GOLD RATE CONTROLLER ROUTES
 // adminRoute.get('/gold-rate', adminAuth.isLogin, goldRateController.getGoldRate);
-adminRoute.put('/update-gold-rate', adminAuth.isLogin, goldRateController.updateGoldRate);
+adminRoute.put('/update-gold-rate', adminAuth.isLogin, goldRateController.updateGoldRateManually);
 
 
 

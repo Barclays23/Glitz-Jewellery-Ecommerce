@@ -265,7 +265,11 @@
                   <li class="nav-item nav-gold-rate d-none d-lg-block text-center">
                      <h3 class="nav-link text-white price-label"> GOLD RATE </h3>
                      <hr>
-                     <h3 class="gold-price"> <%= goldPriceData.price %></h3>
+                     <% if(goldPriceData){ %>
+                        <h3 class="gold-price"> <%= goldPriceData.price %></h3>
+                     <% } else { %>
+                        <h3 class="gold-price">₹000</h3>
+                        <% } %>
                   </li>
                   <li class="nav-item nav-settings d-none d-lg-block">
                      <a class="nav-link" href="#">

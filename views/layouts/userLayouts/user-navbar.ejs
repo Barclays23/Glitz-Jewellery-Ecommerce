@@ -59,7 +59,7 @@
                             <% if(sessionData){ %>
                                 <li><a href="/my-account"><img src="assets/images/icons/user2.png" width="22px" height="22px" alt="user"></a></li>
                                 <li><a href="/wishlist"><i class="ion-android-favorite-outline"></i><span>0</span></a></li>
-                                <li><a href="/cart"><i class="ion-bag"></i><span>0</span></a></li>
+                                <li id="cart-count"><a href="/cart"><i class="ion-bag"></i><span><%= cartCount %></span></a></li>
                             <% } else { %>
                                 <li><a href="/login"><img src="assets/images/icons/enter.png" width="23px" height="23px" alt="login"></a></li>
                             <% } %>
@@ -78,7 +78,6 @@
             const dateAndTime1 = new Date(goldPriceData.updatedAt);
             const options1 = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false };
             const formattedDate1 = dateAndTime1.toLocaleDateString('en-GB', options1).replace(',', '');
-            console.log('formattedDate1 : ', formattedDate1);
         %>
 
         <% 
@@ -89,14 +88,12 @@
             const hours = String(dateAndTime2.getHours()).padStart(2, '0');
             const minutes = String(dateAndTime2.getMinutes()).padStart(2, '0');
             const formattedDate2 = `${day}-${month}-${year} ${hours}:${minutes}`;
-            console.log('formattedDate2 : ', formattedDate2)
         %>
 
         <%
             const dateAndTime3 = new Date(goldPriceData.updatedAt);
             const options2 = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true };
             const formattedDate3 = dateAndTime3.toLocaleDateString('en-GB', options2).replace(',', '');
-            console.log('formattedDate3 : ', formattedDate3);
         %>
 
         <div class="tm-header-bottomarea">

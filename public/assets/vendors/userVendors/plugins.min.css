@@ -175,8 +175,9 @@ a {
 }
 
 a:hover {
-  color: #0056b3;
-  text-decoration: underline
+  /* color: #0056b3; */
+  color: #ffffff;
+  text-decoration: none;
 }
 
 a:not([href]):not([tabindex]) {
@@ -344,7 +345,7 @@ progress {
 
 [type=number]::-webkit-inner-spin-button,
 [type=number]::-webkit-outer-spin-button {
-  height: auto
+  height: auto;
 }
 
 [type=search] {

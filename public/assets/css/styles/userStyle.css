@@ -2870,7 +2870,8 @@ button.tm-videobutton img {
     left: auto;
     right: -10px;
     font-size: 11px;
-    background: #f2ba59;
+    /* background: #f2ba59; */
+    background: #9A0056;
     color: #fff;
     text-align: center
 }
@@ -3867,6 +3868,18 @@ button.tm-videobutton img {
     background: #000
 }
 
+.tm-product-badges span.tm-product-badges-outofstock {
+    left: auto;
+    right: 0;
+    background: red;
+}
+
+.tm-product-badges span.tm-product-badges-lowquantity {
+    left: auto;
+    right: 0;
+    background: green;
+}
+
 .tm-product-badges .tm-product-badges-new+.tm-product-badges-sale {
     top: 25px
 }
@@ -3911,13 +3924,15 @@ button.tm-videobutton img {
     padding: 0;
     line-height: 40px;
     border-radius: 4px;
+    /* background: #ffffff; */
     background: #f2ba59;
     outline: 0;
     text-align: center;
-    color: #fff;
+    color: white;
+    /* color: #9a0056; */
     font-size: 15px;
     vertical-align: middle;
-    border-color: #f2ba59
+    /* border: 1px solid #9a0056; */
 }
 
 .tm-product-actions li a i,
@@ -3992,6 +4007,11 @@ button.tm-videobutton img {
     -webkit-transform: translateY(0);
     -ms-transform: translateY(0);
     transform: translateY(0)
+}
+
+.tm-product-actions li :hover {
+    background-color: #9A0056;
+    text-decoration: none;
 }
 
 .list-view [class^=col] {
@@ -6535,20 +6555,20 @@ button.tm-videobutton img {
 .tm-quantitybox {
     position: relative;
     display: inline-block;
-    width: 80px
+    width: 80px;
 }
 
-.tm-quantitybox input {
+.tm-quantitybox .quantity-input {
     padding-left: 5px;
-    padding-right: 30px;
-    text-align: center
+    padding-right: 10px;
+    text-align: center;
 }
 
 .tm-quantitybox input:focus {
     border-color: #ebebeb
 }
 
-.tm-quantitybox-button {
+/* .tm-quantitybox-button {
     position: absolute;
     right: 0;
     top: 0;
@@ -6558,13 +6578,15 @@ button.tm-videobutton img {
     line-height: 23px;
     text-align: center;
     cursor: pointer
-}
+} */
 
 .tm-quantitybox-button.increment-button {
+    display: none;
     top: 0
 }
 
 .tm-quantitybox-button.decrement-button {
+    display: none;
     top: auto;
     bottom: 0
 }
@@ -6621,7 +6643,7 @@ button.tm-videobutton img {
 
 .tm-cart-table,
 .tm-wishlist-table {
-    text-align: center
+    text-align: center;
 }
 
 .tm-cart-table tr th,

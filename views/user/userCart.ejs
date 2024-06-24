@@ -130,65 +130,55 @@
                             <table class="table table-bordered mb-0">
                                 <thead>
                                     <tr>
-                                        <th class="tm-cart-col-image" scope="col">Image</th>
-                                        <th class="tm-cart-col-productname" scope="col">Product</th>
-                                        <th class="tm-cart-col-price" scope="col">Price</th>
-                                        <th class="tm-cart-col-quantity" scope="col">Quan</th>
-                                        <th class="tm-cart-col-total" scope="col">Total</th>
-                                        <th class="tm-cart-col-actions" scope="col">Actions</th>
+                                        <th class="tm-cart-col-image bg-light" scope="col">Image</th>
+                                        <th class="tm-cart-col-productname bg-light" scope="col">Product</th>
+                                        <th class="tm-cart-col-price bg-light" scope="col">Price</th>
+                                        <th class="tm-cart-col-quantity bg-light" scope="col">Quantity</th>
+                                        <th class="tm-cart-col-total bg-light" scope="col">Total</th>
+                                        <th class="tm-cart-col-actions bg-light" scope="col">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>
-                                            <a href="product-details.html" class="tm-cart-productimage">
-                                                <img src="assets/images/products/product-image-1-thumb.jpg" alt="product image">
-                                            </a>
-                                        </td>
-                                        <td>
-                                            <a href="product-details.html" class="tm-cart-productname">Stylist daimond earring</a>
-                                        </td>
-                                        <td class="tm-cart-price">$75.00</td>
-                                        <td>
-                                            <div class="tm-quantitybox">
-                                                <input type="text" value="1">
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span class="tm-cart-totalprice">$75.00</span>
-                                        </td>
-                                        <td>
-                                            <button class="tm-button tm-button-small">Save for Later</button>
-                                            <!-- <button class="tm-cart-removeproduct bg-danger"><i class="ion-close"></i></button> -->
-                                            <!-- <a href=""><img src="/assets/images/icons/remove2.png" style="width: 41px; height: auto;" alt="remove-icon"> </a> -->
-                                            <button class="tm-button tm-button-small">Remove</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <a href="product-details.html" class="tm-cart-productimage">
-                                                <img src="assets/images/products/product-image-2-thumb.jpg" alt="product image">
-                                            </a>
-                                        </td>
-                                        <td>
-                                            <a href="product-details.html" class="tm-cart-productname">Stylist daimond earring</a>
-                                        </td>
-                                        <td class="tm-cart-price">$75.00</td>
-                                        <td>
-                                            <div class="tm-quantitybox">
-                                                <input type="text" value="1">
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span class="tm-cart-totalprice">$75.00</span>
-                                        </td>
-                                        <td>
-                                            <button class="tm-button tm-button-small">Save for Later</button>
-                                            <!-- <button class="tm-cart-removeproduct bg-danger"><i class="ion-close"></i></button> -->
-                                            <!-- <a href=""><img src="/assets/images/icons/remove2.png" style="width: 41px; height: auto;" alt="remove-icon"> </a> -->
-                                            <button class="tm-button tm-button-small">Remove</button>
-                                        </td>
-                                    </tr>
+                                    <% let subTotal = 0 %>
+                                    <% if (userCart){ %>
+                                        <% console.log('length of user cart : ', userCart.product.length) %>
+                                        <% for(i=0; i< userCart.product.length; i++){ %>
+                                            <tr>
+                                                <td class="bg-light">
+                                                    <!-- http://localhost:3000/product-details?id=6659b86610faf8b255d2de86 -->
+    
+                                                    <a href="/product-details?id=<%= userCart.product[i].productRef._id %>" class="tm-cart-productimage">
+                                                        <img src="assets/images/productImages/<%= userCart.product[i].productRef.images.image1 %>" alt="product image">
+                                                    </a>
+                                                </td>
+                                                <td class="bg-light">
+                                                    <a href="/product-details?id=<%= userCart.product[i].productRef._id %>" class="tm-cart-productname"><%= userCart.product[i].productRef.name %></a>
+                                                </td>
+                                                <td class="tm-cart-price bg-light">₹<%= (userCart.product[i].productRef.totalPrice).toFixed(2) %></td>
+                                                <td class="bg-light">
+                                                    <div class="tm-quantitybox bg-white">
+                                                        <input type="number" class="quantity-input" value="<%= userCart.product[i].quantity %>" id="quantity_<%= i %>" data-product-id="<%= userCart.product[i]._id %>" data-index="<%= i %>">
+                                                    </div>
+                                                </td>
+                                                <td class="bg-light">
+                                                    <span class="tm-cart-totalprice" id="total_price_<%= i %>">₹<%= (userCart.product[i].productRef.totalPrice * userCart.product[i].quantity).toFixed(2) %></span>
+                                                    <% subTotal = subTotal + (userCart.product[i].productRef.totalPrice * userCart.product[i].quantity) %>
+                                                    <% console.log('subTotal is : ', subTotal) %>
+                                                </td>
+                                                <td class="bg-light">
+                                                    <button class="tm-button tm-button-small">Save for Later</button>
+                                                    <!-- <button class="tm-cart-removeproduct bg-danger"><i class="ion-close"></i></button> -->
+                                                    <!-- <a href=""><img src="/assets/images/icons/remove2.png" style="width: 41px; height: auto;" alt="remove-icon"> </a> -->
+                                                    <button class="tm-button tm-button-small">Remove</button>
+                                                </td>
+                                            </tr>
+                                        <% } %>
+                                    <% } else { %>
+                                        <tr >
+                                            <td colspan="6" class="p-5 text-dark bg-light"> YOUR SHOPPING CART IS EMPTY </td>
+                                        </tr>
+                                    <% } %>
+
                                 </tbody>
                             </table>
                         </div>
@@ -197,7 +187,7 @@
                             <div class="row">
                                 <div class="col-lg-8 col-md-6">
                                     <div class="tm-buttongroup">
-                                        <a href="#" class="tm-button">Continue Shopping</a>
+                                        <a href="/shopping" class="tm-button">Continue Shopping</a>
                                         <a href="#" class="tm-button">Update Cart</a>
                                     </div>
                                     <form action="#" class="tm-cart-coupon">
@@ -210,20 +200,22 @@
                                 <div class="col-lg-4 col-md-6">
                                     <div class="tm-cart-pricebox">
                                         <h2>Cart Totals</h2>
-                                        <div class="table-responsive">
+                                        <div class="table-responsive" id="cart-summary">
                                             <table class="table table-borderless">
                                                 <tbody>
                                                     <tr class="tm-cart-pricebox-subtotal">
                                                         <td>Cart Subtotal</td>
-                                                        <td>$175.00</td>
+                                                        <td>₹ <%= (subTotal).toFixed(2) %></td>
                                                     </tr>
                                                     <tr class="tm-cart-pricebox-shipping">
                                                         <td>(+) Shipping Charge</td>
-                                                        <td>$15.00</td>
+                                                        <% let shippingCharge = subTotal >= 100000 ? 0 : 300 %>
+                                                        <td>₹ <%= (shippingCharge).toFixed(2) %></td>
                                                     </tr>
                                                     <tr class="tm-cart-pricebox-total">
                                                         <td>Total</td>
-                                                        <td>$190.00</td>
+                                                        <% let cartTotal = subTotal + shippingCharge %>
+                                                        <td>₹ <%= (cartTotal).toFixed(2) %></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -237,9 +229,6 @@
                             </div>
                         </div>
                     </div>
-                
-
-
                 </div>
             </div>
         </div>
@@ -250,3 +239,64 @@
 </div>
 
 <%- include('../layouts/userLayouts/user-footer.ejs') %>
+
+
+
+
+
+
+<!-- ---------------------------------------------------------------------- -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+<script>
+    $(document).ready(function(){
+        $('.quantity-input').on('change', function() {
+            var newQuantity = $(this).val();
+            var productId = $(this).data('product-id');
+            var index = $(this).data('index');
+            
+            var isValid = true;
+
+            // Ensure newQuantity is a positive integer greater than 0
+            if (newQuantity < 1 || isNaN(newQuantity) || parseInt(newQuantity) != newQuantity) {
+                Swal.fire({
+                    text: "The quantity must be at least one or more.",
+                    icon: 'warning',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                $(this).val(1);
+                newQuantity = 1;
+                isValid = false;
+            }
+            
+            console.log('productId is :' , productId);
+            console.log('index is :' , index);
+            console.log('newQuantity is :' , newQuantity);
+
+            if(isValid){
+                $.ajax({
+                    url: '/update-cart-quantity',
+                    method: 'POST',
+                    data: {
+                        productId,
+                        index,
+                        newQuantity
+                    },
+                    success: function(response) {
+                        // Update the total price for the product
+                        $("#cart-summary").load("/cart #cart-summary");
+                        $("#cart-count").load("/cart #cart-count");
+                        $('#total_price_' + response.index).text('₹' + response.updatedTotalPrice.toFixed(2));
+                    },
+                    error: function(error) {
+                        console.error('Error updating quantity:', error);
+                    }
+                });
+            }
+        });
+
+    });
+</script>
