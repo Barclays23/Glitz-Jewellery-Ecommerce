@@ -111,7 +111,6 @@ const sendforgetPasswordMail = async(userData, randomString, res)=>{
         // const hashedOtp = await bcrypt.hash(otp.toString(), 10);
 
 
-
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -657,7 +656,6 @@ module.exports = {
     loadLogin,
     verifyLogin,
     loadAdminDashboard,
-    // loadForgetPassword,
     verifyForgetMail,
     loadResetPassword,
     resetPassword,
@@ -666,5 +664,4 @@ module.exports = {
     loadMailDraft,
     sendMail,
     adminLogout,
-
 }

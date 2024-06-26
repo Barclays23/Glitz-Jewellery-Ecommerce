@@ -3954,6 +3954,21 @@ button.tm-videobutton img {
     margin-right: 0
 }
 
+/* sweet alert customization */
+.warning-swal-text {
+    color: #ffffff;
+}
+.warning-swal-background {
+    background-color: #fff156;
+}
+.success-swal-background {
+    background-color: #b2ff73;
+}
+.error-swal-background {
+    /* background-color: #fc8080eb; */
+    background-color: #fd3700eb;
+}
+
 .tm-product-bottomside {
     padding-top: 25px
 }

@@ -8,15 +8,13 @@ const categoryModel = require('../models/categoryModel');
 
 
 
-// load user-cart page----------------------------------------
+// load user-cart page ----------------------------------------
 const loadUserCart = async (req, res)=>{
     try {
         const goldPriceData = await GoldPrice.findOne({});
         const sessionData = await User.findById(req.session.userId);
-        console.log('session data in user profile page : ' , sessionData);
 
         const userCart = await Cart.findOne({ userRef: req.session.userId }).populate('product.productRef').exec();
-        console.log('userCart :', userCart);
         
         let cartCount = 0;
         
@@ -39,22 +37,26 @@ const loadUserCart = async (req, res)=>{
 
 
 
-// add product to the cart
+// add product to the cart ------------------------------------
 const addToCart = async (req, res)=>{
     try {
         const userId = req.session.userId;
         const productId = req.body.productId;
         console.log('productId received in addtocart :', productId);
-        console.log('cart session user :', userId);
 
-        if(!userId){
-            console.log('no sessionssssss');
-            return res.json({ nosession: true});
-        } else {
-            console.log('session undeeee');
+        const productData = await Product.findOne({_id: productId});
+
+        if (productData.quantity === 0){
+            return res.json({ outofstock: true });
+
+        } else{
+            if(!userId){
+                return res.status(401).json({ nosession: true });
+            }
+    
             let userCart = await Cart.findOne({userRef: userId});
             console.log('find cart :', userCart);
-
+    
             if (!userCart){
                 userCart = new Cart ({
                     userRef : userId,
@@ -63,28 +65,27 @@ const addToCart = async (req, res)=>{
                         quantity : 1
                     }]
                 })
-
+    
                 const cartCreated = await userCart.save();
                 console.log('new cart created : ', cartCreated);
-
+    
                 return res.status(201).json({ success: true });
-
+    
             } else {
                 const existingProduct = userCart.product.find(p => p.productRef.toString() === productId);
-
+    
                 if(existingProduct){
                     console.log('this product already exist in cart.');
                     return res.json({existProduct: true});
                 } else{
                     userCart.product.push({ productRef: productId, quantity: 1 });
                     const cartUpdated = await userCart.save();
-
+    
                     console.log('cart updated new product : ', cartUpdated);
-                    res.json({ success: true });
+                    return res.json({ success: true });
                 }
             }
         }
-
 
     } catch (error) {
         console.log('error in adding to cart :', error.message);
@@ -94,38 +95,75 @@ const addToCart = async (req, res)=>{
 
 
 
-// update cart product quantity.
+// update cart product quantity. ------------------------------
 const updateCartQuantity = async (req, res)=>{
     const {productId, index, newQuantity} = req.body;
     console.log('req.body received for update cart quantity :', req.body);
 
     const userId = req.session.userId;
 
+    // Insufficient Stock
+    // Unfortunately, we only have 10 units of this product in stock. Please adjust the quantity in your cart accordingly.
+
+    
     try {
+        // const userCart = await Cart.findOne({userRef: userId, 'product._id': productId});
+        let userCart = await Cart.findOne({userRef: userId}).populate('product.productRef').exec();
+
+        const inventoryQuantity = userCart.product[index].productRef.quantity;
+        console.log('inventoryQuantity :', inventoryQuantity);
+
+        if (newQuantity > inventoryQuantity){
+            console.log('added more than inventory quantity.');
+            return res.json({insufficient: true, inventoryQuantity});
+        }
+
         let updatedUserCart = await Cart.findOneAndUpdate(
             {userRef: userId, "product._id": productId }, 
             {$set: { "product.$.quantity": newQuantity }}, 
             { new: true }
-        );
+        ).populate('product.productRef');
         
-        console.log('updated cart : ', updatedUserCart);
-        console.log('find product with index : ', updatedUserCart.product[index]);
-        console.log('find product quantity with index : ', updatedUserCart.product[index].quantity);
+        console.log('updatedUserCart : ', updatedUserCart);
+        console.log('updated product quantity found with index : ', updatedUserCart.product[index].quantity);
+        
 
-        
-        let userCart = await Cart.findOne({userRef: userId}).populate('product.productRef').exec();
-        
         // Calculate the updated total price for the product
-        const updatedTotalPrice = userCart.product[index].productRef.totalPrice * userCart.product[index].quantity;
-        console.log('updatedProduct', updatedTotalPrice);
+        const updatedTotalPrice = (updatedUserCart.product[index].productRef.totalPrice) * (updatedUserCart.product[index].quantity);
+        console.log('updatedTotalPrice', updatedTotalPrice);
 
         // Send the updated total price back to the client
-        res.json({ index, updatedTotalPrice });
+        res.json({success: true, index, updatedTotalPrice });
 
     } catch (error) {
-        console.log('error in updating cart quantity :', error.message);
+        console.log('error while updating cart quantity :', error.message);
     }
 }
+
+
+
+// remove product from user cart. -----------------------------
+const removeFromCart = async(req, res)=>{
+    try {
+        const userId = req.session.userId;
+        const {index, productId} = req.body;
+
+        const userCart = await Cart.findOne({userRef: userId});
+
+        userCart.product.splice(index, 1);
+        await userCart.save();
+
+        return res.status(200).json({ success: true });
+
+    } catch (error) {
+        console.log('error while removing from cart :', error.message);
+    }
+}
+
+
+
+
+
 
 
 
@@ -133,5 +171,6 @@ const updateCartQuantity = async (req, res)=>{
 module.exports = {
     loadUserCart,
     addToCart,
-    updateCartQuantity
+    updateCartQuantity,
+    removeFromCart
 }

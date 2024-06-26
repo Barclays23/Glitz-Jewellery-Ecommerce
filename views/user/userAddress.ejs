@@ -81,46 +81,61 @@
 
 
                     
-                    <!-- account tab-content starts -->
                     <!-- Section 6: Address -->
-                    <h4>Address</h4>
+                    <h4>Manage Your Address</h4>
                     <div class="tab-content" id="account-ontent">
-                        <div class="tab-pane fade show active" id="account-address" role="tabpanel"
-                            aria-labelledby="account-address-tab">
+                        <div class="tab-pane fade show active" id="account-address" role="tabpanel" aria-labelledby="account-address-tab">
                             <div class="tm-myaccount-address">
-                                <p><b>The following addresses will be used on the checkout page by default.</b></p>
-                                <div class="row">
-                                    <div class="col-lg-6 col-md-6">
-                                        <div class="tm-myaccount-address-billing">
-                                            <a href="#" class="edit-button">Edit</a>
-                                            <h3>Billing Address</h3>
-                                            <address>
-                                                Jonathon Doe<br>
-                                                Example company<br>
-                                                516 Wintheiser Circles <br>
-                                                Lake Jordanmouth <br>
-                                                Jordan
-                                            </address>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6 col-md-6 mt-30 mt-md-0">
-                                        <div class="tm-myaccount-address-shipping">
-                                            <a href="#" class="edit-button">Edit</a>
-                                            <h3>Shipping Address</h3>
-                                            <address>
-                                                Jonathon Doe<br>
-                                                Example company<br>
-                                                516 Wintheiser Circles <br>
-                                                Lake Jordanmouth <br>
-                                                Jordan
-                                            </address>
-                                        </div>
-                                    </div>
+                                <% if(userAddress && userAddress.address){ %>
+                                    <p><b>The following addresses will be used on the checkout page by default.</b></p>
+                                <% } else{ %>
+                                    <p><b>"Hello! <br>
+                                        It seems there is no address saved in your profile.
+                                        Please add a new address to ensure smooth delivery of your orders. <br>
+                                        Thank you!"</b>
+                                    </p>
+                                <% } %>
+                                <div class="col-lg-6 col-md-6 mb-3">
+                                    <a href="#" class="btn add-button btn-primary text-white" data-toggle="modal" data-target="#addAddressModal"> Add Address </a>
                                 </div>
+                                <% if(userAddress && userAddress.address){ %>
+                                    <% for(i=0; i< userAddress.address.length; i++){ %>
+                                        <div class="row mb-3">
+                                            <!-- Billing Address -->
+                                            <div class="col-lg-6 col-md-6">
+                                                <div class="tm-myaccount-address-billing bg-grey">
+                                                    <div class="text-right">
+                                                        <a href="#" class="btn add-button btn-primary text-white edit-address-link" id="edit-address-link"
+                                                        data-toggle="modal" data-target="#editAddressModal" 
+                                                        data-address-id="<%= userAddress.address[i]._id %>" 
+                                                        data-index="<%= i %>" 
+                                                        data-firstname="<%= userAddress.address[i].firstname %>" 
+                                                        data-lastname="<%= userAddress.address[i].lastname %>" 
+                                                        data-street="<%= userAddress.address[i].street %>" 
+                                                        data-city="<%= userAddress.address[i].city %>" 
+                                                        data-state="<%= userAddress.address[i].state %>" 
+                                                        data-pincode="<%= userAddress.address[i].pincode %>" 
+                                                        data-contact="<%= userAddress.address[i].contact %>" >
+                                                        Edit </a>
+                                                    </div>
+                                                    <h3>Billing Address <%= i+1 %></h3>
+                                                    <address>
+                                                        <%= userAddress.address[i].firstname %>
+                                                        <%= userAddress.address[i].lastname %> <br>
+                                                        <%= userAddress.address[i].street %> <br>
+                                                        <%= userAddress.address[i].city %> <br>
+                                                        <%= userAddress.address[i].state %>
+                                                        <%= userAddress.address[i].pincode %> <br>
+                                                        Phone: <%= userAddress.address[i].contact %> <br>
+                                                    </address>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <% } %>
+                                <% } %>
                             </div>
                         </div>
                     </div>
-                    <!-- account tab-content ends -->
                 </div>
             </div>
         </div>
@@ -130,4 +145,483 @@
     <button id="back-top-top"><i class="ion-arrow-up-c"></i></button>
 </div>
 
+
+
+<!-- Add Address Modal Starts-->
+<div class="modal fade" id="addAddressModal" tabindex="-1" role="dialog" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="small-title"><b>ADD BILLING INFORMATION</b></h4>
+                <button type="button" class="close bg-black text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="#" class="tm-form tm-checkout-form">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="tm-checkout-billingform">
+                                <div class="tm-form-inner">
+                                    <div class="tm-form-field tm-form-fieldhalf">
+                                        <label for="add-firstname">First name<span class="red-asterisk">*</span></label>
+                                        <input type="text" id="add-firstname"/>
+                                        <span id="firstname-error" style="color: red; display: none;"></span>
+                                    </div>
+                                    <div class="tm-form-field tm-form-fieldhalf">
+                                        <label for="add-lastname">Last name<span class="red-asterisk">*</label>
+                                        <input type="text" id="add-lastname"/>
+                                        <span id="lastname-error" style="color: red; display: none;"></span>
+                                    </div>
+                                    <div class="tm-form-field">
+                                        <label for="add-address">Address<span class="red-asterisk">*</label>
+                                        <input type="text" id="add-address" placeholder="Apartment, Area and Street"/>
+                                        <span id="address-error" style="color: red; display: none;"></span>
+                                    </div>
+                                    <div class="tm-form-field tm-form-fieldhalf">
+                                        <label for="add-city">City<span class="red-asterisk">*</label>
+                                        <input type="text" id="add-city" placeholder="City / Town / District"/>
+                                        <span id="city-error" style="color: red; display: none;"></span>
+                                    </div>
+                                    <div class="tm-form-field tm-form-fieldhalf">
+                                        <label for="add-pincode">Zip / Postcode<span class="red-asterisk">*</label>
+                                        <input type="text" id="add-pincode"/>
+                                        <span id="pincode-error" style="color: red; display: none;"></span>
+                                    </div>
+                                    <div class="tm-form-field tm-form-fieldhalf dropdown">
+                                        <label for="add-state">State<span class="red-asterisk">*</label><br>
+                                        <div class="dropdown-selector">
+                                            <input type="text" id="state-input" placeholder="Type to filter states">
+                                            <ul class="dropdown-list" id="add-state">
+                                                <li data-value="Andhra Pradesh">Andhra Pradesh</li>
+                                                <li data-value="Arunachal Pradesh">Arunachal Pradesh</li>
+                                                <li data-value="Assam">Assam</li>
+                                                <li data-value="Bihar">Bihar</li>
+                                                <li data-value="Chhattisgarh">Chhattisgarh</li>
+                                                <li data-value="Goa">Goa</li>
+                                                <li data-value="Gujarat">Gujarat</li>
+                                                <li data-value="Haryana">Haryana</li>
+                                                <li data-value="Himachal Pradesh">Himachal Pradesh</li>
+                                                <li data-value="Jharkhand">Jharkhand</li>
+                                                <li data-value="Karnataka">Karnataka</li>
+                                                <li data-value="Kerala">Kerala</li>
+                                                <li data-value="Madhya Pradesh">Madhya Pradesh</li>
+                                                <li data-value="Maharashtra">Maharashtra</li>
+                                                <li data-value="Manipur">Manipur</li>
+                                                <li data-value="Meghalaya">Meghalaya</li>
+                                                <li data-value="Mizoram">Mizoram</li>
+                                                <li data-value="Nagaland">Nagaland</li>
+                                                <li data-value="Odisha">Odisha</li>
+                                                <li data-value="Punjab">Punjab</li>
+                                                <li data-value="Rajasthan">Rajasthan</li>
+                                                <li data-value="Sikkim">Sikkim</li>
+                                                <li data-value="Tamil Nadu">Tamil Nadu</li>
+                                                <li data-value="Telangana">Telangana</li>
+                                                <li data-value="Tripura">Tripura</li>
+                                                <li data-value="Uttar Pradesh">Uttar Pradesh</li>
+                                                <li data-value="Uttarakhand">Uttarakhand</li>
+                                                <li data-value="West Bengal">West Bengal</li>
+                                            </ul>
+                                        </div>
+                                        <span id="state-error" style="color: red; display: none;"></span>
+                                    </div>
+                                    
+                                    <div class="tm-form-field tm-form-fieldhalf">
+                                        <label for="add-phone">Contact No<span class="red-asterisk">*</label>
+                                        <input type="text" id="add-phone"/>
+                                        <span id="phone-error" style="color: red; display: none;"></span>
+                                    </div>
+                                    <div class="tm-form-field">
+                                        <input type="checkbox" name="billform-dirrentswitch" id="billform-dirrentswitch"/>
+                                        <label for="billform-dirrentswitch"><b>Ship to another address</b></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal"> Close </button>
+                <button type="button" class="btn btn-primary" id="saveChanges"> Save changes </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Add Address Modal Ends -->
+
+
+
+<!-- Edit Address Modal Starts-->
+<div class="modal fade" id="editAddressModal" tabindex="-1" role="dialog" aria-labelledby="editAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="small-title"><b>EDIT BILLING INFORMATION</b></h4>
+                <button type="button" class="close bg-black text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="#" class="tm-form tm-checkout-form">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="tm-checkout-billingform">
+                                <div class="tm-form-inner">
+                                    <div class="tm-form-field tm-form-fieldhalf">
+                                        <label for="edit-firstname">First name<span class="red-asterisk">*</span></label>
+                                        <input type="text" id="edit-firstname"/>
+                                        <span id="edit-firstname-error" style="color: red; display: none;"></span>
+                                    </div>
+                                    <div class="tm-form-field tm-form-fieldhalf">
+                                        <label for="edit-lastname">Last name<span class="red-asterisk">*</label>
+                                        <input type="text" id="edit-lastname"/>
+                                        <span id="edit-lastname-error" style="color: red; display: none;"></span>
+                                    </div>
+                                    <div class="tm-form-field">
+                                        <label for="edit-address">Address<span class="red-asterisk">*</label>
+                                        <input type="text" id="edit-address" placeholder="Apartment, Area and Street"/>
+                                        <span id="edit-address-error" style="color: red; display: none;"></span>
+                                    </div>
+                                    <div class="tm-form-field tm-form-fieldhalf">
+                                        <label for="edit-city">City<span class="red-asterisk">*</label>
+                                        <input type="text" id="edit-city" placeholder="City / Town / District"/>
+                                        <span id="edit-city-error" style="color: red; display: none;"></span>
+                                    </div>
+                                    <div class="tm-form-field tm-form-fieldhalf">
+                                        <label for="edit-pincode">Zip / Postcode<span class="red-asterisk">*</label>
+                                        <input type="text" id="edit-pincode"/>
+                                        <span id="edit-pincode-error" style="color: red; display: none;"></span>
+                                    </div>
+                                    <div class="tm-form-field tm-form-fieldhalf dropdown">
+                                        <label for="edit-state">State<span class="red-asterisk">*</label><br>
+                                        <div class="dropdown-selector">
+                                            <input type="text" id="edit-state-input" placeholder="Type to filter states">
+                                            <ul class="dropdown-list" id="edit-state">
+                                                <li data-value="Andhra Pradesh">Andhra Pradesh</li>
+                                                <li data-value="Arunachal Pradesh">Arunachal Pradesh</li>
+                                                <li data-value="Assam">Assam</li>
+                                                <li data-value="Bihar">Bihar</li>
+                                                <li data-value="Chhattisgarh">Chhattisgarh</li>
+                                                <li data-value="Goa">Goa</li>
+                                                <li data-value="Gujarat">Gujarat</li>
+                                                <li data-value="Haryana">Haryana</li>
+                                                <li data-value="Himachal Pradesh">Himachal Pradesh</li>
+                                                <li data-value="Jharkhand">Jharkhand</li>
+                                                <li data-value="Karnataka">Karnataka</li>
+                                                <li data-value="Kerala">Kerala</li>
+                                                <li data-value="Madhya Pradesh">Madhya Pradesh</li>
+                                                <li data-value="Maharashtra">Maharashtra</li>
+                                                <li data-value="Manipur">Manipur</li>
+                                                <li data-value="Meghalaya">Meghalaya</li>
+                                                <li data-value="Mizoram">Mizoram</li>
+                                                <li data-value="Nagaland">Nagaland</li>
+                                                <li data-value="Odisha">Odisha</li>
+                                                <li data-value="Punjab">Punjab</li>
+                                                <li data-value="Rajasthan">Rajasthan</li>
+                                                <li data-value="Sikkim">Sikkim</li>
+                                                <li data-value="Tamil Nadu">Tamil Nadu</li>
+                                                <li data-value="Telangana">Telangana</li>
+                                                <li data-value="Tripura">Tripura</li>
+                                                <li data-value="Uttar Pradesh">Uttar Pradesh</li>
+                                                <li data-value="Uttarakhand">Uttarakhand</li>
+                                                <li data-value="West Bengal">West Bengal</li>
+                                            </ul>
+                                        </div>
+                                        <span id="edit-state-error" style="color: red; display: none;"></span>
+                                    </div>
+                                    
+                                    <div class="tm-form-field tm-form-fieldhalf">
+                                        <label for="edit-phone">Contact No<span class="red-asterisk">*</label>
+                                        <input type="text" id="edit-phone"/>
+                                        <span id="edit-phone-error" style="color: red; display: none;"></span>
+                                    </div>
+                                    <div class="tm-form-field">
+                                        <input type="checkbox" name="billform-dirrentswitch" id="edit-billform-dirrentswitch"/>
+                                        <label for="edit-billform-dirrentswitch"><b>Ship to another address</b></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal"> Close </button>
+                <button type="button" class="btn btn-primary" id="updateChanges"> Update </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Edit Address Modal Ends -->
+
+
+
+
+
 <%- include('../layouts/userLayouts/user-footer.ejs') %>
+
+
+
+<!-- ------------------------------------------------------------ -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- importing the script for add address modal form -->
+<script src="/assets/scripts/userScripts/add-address-modal-script.js"></script>
+
+
+
+<!-- script for edit address modal -->
+<script>
+    $(document).ready(function() {
+        // Toggle dropdown list visibility when clicking selector or typing
+        $('.dropdown-selector').on('click', function(event) {
+            event.stopPropagation();
+            $(this).find('.dropdown-list').toggle();
+        });
+    
+        // Close dropdown when clicking outside of it
+        $(document).on('click', function() {
+            $('.dropdown-list').hide();
+        });
+    
+    
+        // Filter dropdown list based on input
+        $('#edit-state-input').on('input', function() {
+            const inputValue = $(this).val().toLowerCase().trim();
+            $('#edit-state li').each(function() {
+                const state = $(this).data('value').toLowerCase();
+                if (state.includes(inputValue)) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+            $('.dropdown-list').show();
+        });
+    
+        
+        // Handle selection of state from dropdown list
+        $('#edit-state').on('click', 'li', function() {
+            const selectedState = $(this).data('value');
+            $('#edit-state-input').val(selectedState);
+            $('.dropdown-list').hide(); // Hide the dropdown list after selection
+        });
+
+    
+    
+        // Handle edit address link click to populate modal fields
+        $('.edit-address-link').on('click', function(event) {
+            event.preventDefault();
+            const addressId = $(this).data('address-id');
+            const index = $(this).data('index');
+            const firstname = $(this).data('firstname');
+            const lastname = $(this).data('lastname');
+            const street = $(this).data('street');
+            const city = $(this).data('city');
+            const state = $(this).data('state');
+            const pincode = $(this).data('pincode');
+            const contact = $(this).data('contact');
+    
+            // Populate modal form fields with default values
+            $('#edit-firstname').val(firstname);
+            $('#edit-lastname').val(lastname);
+            $('#edit-address').val(street);
+            $('#edit-city').val(city);
+            $('#edit-pincode').val(pincode);
+            $('#edit-state-input').val(state);
+            $('#edit-phone').val(contact);
+            $('#editAddressModal').attr('data-address-id', addressId); // Store address ID in a hidden field or data attribute in modal
+        });
+    
+    
+        $('#updateChanges').on('click', function() {
+            event.preventDefault();
+    
+            const firstname = $('#edit-firstname').val()
+            const lastname = $('#edit-lastname').val()
+            const address = $('#edit-address').val()
+            const city = $('#edit-city').val()
+            const zipcode = $('#edit-pincode').val()
+            const state = $('#edit-state-input').val().trim()
+            const phone = $('#edit-phone').val()
+            const addressId = $('#editAddressModal').data('address-id')
+    
+            console.log("Firstname: ", firstname);
+            console.log("Lastname: ", lastname);
+            console.log("Address: ", address);
+            console.log("City: ", city);
+            console.log("Pincode: ", zipcode);
+            console.log("State: ", state);
+            console.log("Phone: ", phone);
+            console.log("addressId: ", addressId);
+    
+            let isValid = true;
+    
+    
+            if (firstname === '') {
+                $('#edit-firstname-error').text('Please enter your first name.').show();
+                isValid = false;
+            } else if (!/^[a-zA-Z\s.-]+$/.test(firstname)) {
+                $('#edit-firstname-error').text('Avoid invalid characters in the first name').show();
+                isValid = false;
+            } else {
+                $('#edit-firstname-error').hide();
+            }
+    
+            if (lastname === '') {
+                $('#edit-lastname-error').text('Please enter your last name.').show();
+                isValid = false;
+            } else if (!/^[a-zA-Z\s.-]+$/.test(lastname)) {
+                $('#edit-lastname-error').text('Avoid invalid characters in the last name').show();
+                isValid = false;
+            } else {
+                $('#edit-lastname-error').hide();
+            }
+    
+    
+            if (address === '') {
+                $('#edit-address-error').text('Address is required.').show();
+                isValid = false;
+            } else {
+                $('#edit-address-error').hide();
+            }
+    
+            if (city === '') {
+                $('#edit-city-error').text('City is required.').show();
+                isValid = false;
+            } else {
+                $('#edit-city-error').hide();
+            }
+    
+            if (zipcode === '') {
+                $('#edit-pincode-error').text('Zipcode is required.').show();
+                isValid = false;
+            } else if (!/^\d{6}$/.test(zipcode)) {
+                $('#edit-pincode-error').text('Enter a valid 6-digit zipcode.').show();
+                isValid = false;
+            } else {
+                $('#edit-pincode-error').hide();
+            }
+    
+    
+            if (phone === '') {
+                $('#edit-phone-error').text('Phone number is required.').show();
+                isValid = false;
+            } else if (!/^\d{10}$/.test(phone)) {
+                $('#edit-phone-error').text('Enter a valid 10-digit phone number.').show();
+                isValid = false;
+            } else {
+                $('#edit-phone-error').hide();
+            }
+    
+    
+            // Check if the selected state matches exactly (spelling mistakes in state name)
+            let stateExists = false;
+            $('#edit-state li').each(function() {
+                if (state.toLowerCase() === $(this).data('value').toLowerCase()) {
+                    stateExists = true;
+                    return false; // break the loop
+                    $('.dropdown-list').hide();
+                }
+            });
+    
+            if (!stateExists) {
+                $('#edit-state-error').text('Select a valid state from the list.').show();
+                isValid = false;
+            } else {
+                $('#edit-state-error').hide();
+            }
+    
+    
+            if (isValid) { 
+                const formData = {
+                    firstname,
+                    lastname,
+                    address,
+                    city,
+                    zipcode,
+                    state,
+                    phone,
+                    // ship_to_another_address: $('#billform-dirrentswitch').is(':checked')
+                };
+    
+    
+    
+                // AJAX request for EDITING address
+                $.ajax({
+                    type: 'PATCH',
+                    url: '/edit-address',
+                    data: formData,
+                    dataType: 'json',
+                    success: function(response) {
+                        console.log('Response after sending address:', response);
+                        if(response.success){
+                            Swal.fire({
+                                text: "Address has been modified.",
+                                icon: 'success',
+                                showConfirmButton: false,
+                                timer: 1500
+                            })
+                            .then(() => {
+                                location.reload();
+                            });
+                        }
+                    },
+                    error: function(error) {
+                        console.error('Error:', error);
+                    }
+                });
+            }
+        });
+    });
+</script>
+
+<!-- style for address modal -->
+<style>
+.red-asterisk {
+    color: red;
+}
+
+.dropdown {
+    position: relative;
+    width: 100%;
+}
+
+.dropdown-selector {
+    width: 100%;
+}
+
+#state-input {
+    width: calc(100% - 10px);
+    padding: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.dropdown-list {
+    position: absolute;
+    z-index: 1000;
+    top: 100%;
+    left: 0;
+    width: calc(100% + 2px);
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: none;
+}
+
+.dropdown-list li {
+    list-style-type: none;
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.dropdown-list li:hover {
+    background-color: #f0f0f0;
+}
+
+</style>

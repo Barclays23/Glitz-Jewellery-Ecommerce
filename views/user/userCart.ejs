@@ -126,7 +126,7 @@
 
                     <!-- ADDED FROM CART HTML -->
                     <div>
-                        <div class="tm-cart-table table-responsive">
+                        <div class="tm-cart-table table-responsive" id="cart-table">
                             <table class="table table-bordered mb-0">
                                 <thead>
                                     <tr>
@@ -140,7 +140,7 @@
                                 </thead>
                                 <tbody>
                                     <% let subTotal = 0 %>
-                                    <% if (userCart){ %>
+                                    <% if (userCart && userCart.product.length > 0){ %>
                                         <% console.log('length of user cart : ', userCart.product.length) %>
                                         <% for(i=0; i< userCart.product.length; i++){ %>
                                             <tr>
@@ -162,14 +162,14 @@
                                                 </td>
                                                 <td class="bg-light">
                                                     <span class="tm-cart-totalprice" id="total_price_<%= i %>">₹<%= (userCart.product[i].productRef.totalPrice * userCart.product[i].quantity).toFixed(2) %></span>
+                                                    <!-- finding the subtotal for cart summary -->
                                                     <% subTotal = subTotal + (userCart.product[i].productRef.totalPrice * userCart.product[i].quantity) %>
-                                                    <% console.log('subTotal is : ', subTotal) %>
                                                 </td>
                                                 <td class="bg-light">
                                                     <button class="tm-button tm-button-small">Save for Later</button>
                                                     <!-- <button class="tm-cart-removeproduct bg-danger"><i class="ion-close"></i></button> -->
                                                     <!-- <a href=""><img src="/assets/images/icons/remove2.png" style="width: 41px; height: auto;" alt="remove-icon"> </a> -->
-                                                    <button class="tm-button tm-button-small">Remove</button>
+                                                    <button class="tm-button tm-button-small remove-product" data-product-id="<%= userCart.product[i]._id %>" data-index="<%= i %>">Remove</button>
                                                 </td>
                                             </tr>
                                         <% } %>
@@ -206,11 +206,12 @@
                                                     <tr class="tm-cart-pricebox-subtotal">
                                                         <td>Cart Subtotal</td>
                                                         <td>₹ <%= (subTotal).toFixed(2) %></td>
+                                                        <% console.log('subTotal is : ', subTotal) %>
                                                     </tr>
                                                     <tr class="tm-cart-pricebox-shipping">
                                                         <td>(+) Shipping Charge</td>
                                                         <% let shippingCharge = subTotal >= 100000 ? 0 : 300 %>
-                                                        <td>₹ <%= (shippingCharge).toFixed(2) %></td>
+                                                        <td>₹ <%= (shippingCharge) %></td>
                                                     </tr>
                                                     <tr class="tm-cart-pricebox-total">
                                                         <td>Total</td>
@@ -221,7 +222,7 @@
                                             </table>
                                         </div>
                                         <div class="text-center">
-                                            <a href="#" class="tm-button">Proceed To Checkout</a>
+                                            <a href="/checkout?id=<%= sessionData._id %>" class="tm-button">Proceed To Checkout</a>
                                         </div>
                                         
                                     </div>
@@ -250,6 +251,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 
+<!-- to update cart product quantity -->
 <script>
     $(document).ready(function(){
         $('.quantity-input').on('change', function() {
@@ -286,10 +288,28 @@
                         newQuantity
                     },
                     success: function(response) {
-                        // Update the total price for the product
-                        $("#cart-summary").load("/cart #cart-summary");
-                        $("#cart-count").load("/cart #cart-count");
-                        $('#total_price_' + response.index).text('₹' + response.updatedTotalPrice.toFixed(2));
+                        if (response.insufficient) {
+                            Swal.fire({
+                                text: "Unfortunately, we only have " + response.inventoryQuantity + " units of this product in stock. Please adjust the quantity in your cart accordingly.",
+                                // icon: 'warning',
+                                showConfirmButton: false,
+                                timer: 3500,
+                                customClass: {
+                                    popup: 'warning-swal-background',
+                                    htmlContainer: 'warning-swal-text'
+                                }
+                            });
+                            $('#quantity_' + index).val(response.inventoryQuantity);
+                            newQuantity = response.inventoryQuantity;
+
+                        } else if(response.success){
+                            // Update the total price for the product (reload the div / id)
+                            $("#total_price_"+index).load("/cart #total_price_"+index);
+                            $("#cart-summary").load("/cart #cart-summary");
+                            $("#cart-count").load("/cart #cart-count");
+                            // $('#total_price_' + response.index).text('₹' + response.updatedTotalPrice.toFixed(2));
+                        }
+                        
                     },
                     error: function(error) {
                         console.error('Error updating quantity:', error);
@@ -300,3 +320,67 @@
 
     });
 </script>
+
+
+
+
+<!-- to remove product from the cart -->
+<script>
+    $(document).ready(function(){
+        $('.remove-product').on('click', function() {
+            var productId = $(this).data('product-id');
+            var index = $(this).data('index');
+
+            console.log('productId for removing :' , productId);
+            console.log('product index for removing :' , index);
+
+            $.ajax({
+                url: '/remove-from-cart',
+                method: 'DELETE',
+                data: {
+                    productId,
+                    index,
+                },
+                success: function(response) {
+                    if(response.success){
+                        Swal.fire({
+                            text: "Item removed from your cart.",
+                            showConfirmButton: false,
+                            timer: 1500,
+                            customClass: {
+                                popup: 'success-swal-background',
+                                htmlContainer: 'success-swal-text'
+                            }
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        console.log('Failed to remove product from cart');
+                    }
+                },
+                error: function(error) {
+                    console.error('Error in removing from cart :', error);
+                }
+            });
+
+        });
+    });
+</script>
+
+
+
+
+
+
+
+<!-- <style>
+.warning-swal-text {
+    color: #ffffff;
+}
+.warning-swal-background {
+    background-color: #fff156;
+}
+.success-swal-background {
+    background-color: #b2ff73;
+}
+</style> -->

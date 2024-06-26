@@ -119,7 +119,7 @@
                                                     <!-- <span class="tm-product-badges-new">New</span> -->
                                                     <% if(productData[i].quantity === 0){ %>
                                                         <span class="tm-product-badges-outofstock">Out of Stock</span>
-                                                    <% } else if (productData[i].quantity < 5){ %>
+                                                    <% } else if (productData[i].quantity <= 3){ %>
                                                         <span class="tm-product-badges-lowquantity">Only <%= productData[i].quantity %> items left</span>
                                                     <% } %>
                                                 </div>
@@ -210,7 +210,7 @@
                                                     </table>
 
                                                     <ul class="tm-product-actions">
-                                                        <li><a href="#"><i class="ion-android-cart"></i> Add to cart</a></li>
+                                                        <li><a href="#" onclick="addToCart('<%= productData[i]._id %>')"><i class="ion-android-cart"></i> Add to cart</a></li>
                                                         <li><button data-fancybox data-src="assets/images/productImages/<%= productData[i].images.image1 %>"><i class="ion-eye"></i></button></li>
                                                         <li><a href="#"><i class="ion-heart"></i></a></li>
                                                     </ul>
@@ -346,42 +346,66 @@
     const registerButtonId = 'registerSwalButton';
 
     // Function to show the authentication SweetAlert
+    // function showAuthSwal() {
+    //     Swal.fire({
+    //         title: 'Authentication Required',
+    //         text: "You need to sign in to add products to your cart.",
+    //         icon: 'warning',
+    //         showCloseButton: true, // Show close button
+    //         showCancelButton: true,
+    //         confirmButtonText: '<span id="'+signInButtonId+'">Sign In</span>',
+    //         cancelButtonText: '<span id="'+registerButtonId+'">Register</span>',
+    //         allowOutsideClick: true,
+    //     }).then((result) => {
+    //         // const currentUrl = window.location.href;
+    //         const currentUrl = '/shopping';
+    //         if (result.isConfirmed) {
+    //             const signInUrl = `/login?redirect=${encodeURIComponent(currentUrl)}`;
+    //             window.location.href = signInUrl;
+    //         } else if (result.dismiss === Swal.DismissReason.cancel) {
+    //             const currentUrl = window.location.href;
+    //             const registerUrl = `/register?redirect=${encodeURIComponent(currentUrl)}`;
+    //             window.location.href = registerUrl;
+    //         }
+    //     });
+
+    //     // Add event listeners to the buttons in the SweetAlert
+    //     document.getElementById(signInButtonId).onclick = function() {
+    //         const currentUrl = window.location.href;
+    //         const signInUrl = `/login-in?redirect=${encodeURIComponent(currentUrl)}`;
+    //         window.location.href = signInUrl;
+    //     };
+
+    //     document.getElementById(registerButtonId).onclick = function() {
+    //         const currentUrl = window.location.href;
+    //         const registerUrl = `/register?redirect=${encodeURIComponent(currentUrl)}`;
+    //         window.location.href = registerUrl;
+    //     };
+    // }
+
+
+    // Function to show the authentication SweetAlert
     function showAuthSwal() {
         Swal.fire({
-            title: 'Authentication Required',
             text: "You need to sign in to add products to your cart.",
-            icon: 'warning',
-            showCloseButton: true, // Show close button
+            // icon: 'warning',
+            showCloseButton: true,
             showCancelButton: true,
             confirmButtonText: '<span id="'+signInButtonId+'">Sign In</span>',
             cancelButtonText: '<span id="'+registerButtonId+'">Register</span>',
             allowOutsideClick: true,
         }).then((result) => {
-            // const currentUrl = window.location.href;
-            const currentUrl = '/shopping';
+            const currentUrl = window.location.href;
             if (result.isConfirmed) {
                 const signInUrl = `/login?redirect=${encodeURIComponent(currentUrl)}`;
                 window.location.href = signInUrl;
             } else if (result.dismiss === Swal.DismissReason.cancel) {
-                const currentUrl = window.location.href;
                 const registerUrl = `/register?redirect=${encodeURIComponent(currentUrl)}`;
                 window.location.href = registerUrl;
             }
         });
-
-        // Add event listeners to the buttons in the SweetAlert
-        document.getElementById(signInButtonId).onclick = function() {
-            const currentUrl = window.location.href;
-            const signInUrl = `/login-in?redirect=${encodeURIComponent(currentUrl)}`;
-            window.location.href = signInUrl;
-        };
-
-        document.getElementById(registerButtonId).onclick = function() {
-            const currentUrl = window.location.href;
-            const registerUrl = `/register?redirect=${encodeURIComponent(currentUrl)}`;
-            window.location.href = registerUrl;
-        };
     }
+
 
 
     // to add the product to the cart (send data to backend)
@@ -394,21 +418,33 @@
             contentType : 'application/JSON',
             data : JSON.stringify({productId}),
             success: function(response) {
-                if (response.success === true){
+                console.log('response from add to cart :', response);
+                if (response.success){
                     Swal.fire({
                         text: "Added to your cart.",
                         icon: 'success',
+                        showConfirmButton: false,
                         timer: 1500
                     });
                     $("#cart-count").load("/shopping #cart-count");
-                    // location.reload();
+                } else if (response.outofstock){
+                    Swal.fire({
+                        // text: "Unfortunately, this item is out of stock and cannot be added to your cart.",
+                        text: "We are sorry, but this product is currently unavailable for purchase.",
+                        showConfirmButton: false,
+                        timer: 2000,
+                        customClass: {
+                            popup: 'error-swal-background',
+                            // htmlContainer: 'error-swal-text',
+                            // popup: 'bg-danger',
+                            htmlContainer: 'text-white'
+                        }
+                    })
                 } else if (response.nosession){
-                    showAuthSwal()
-                    // window.location.href;
+                    showAuthSwal();
                 } else if (response.existProduct){
                     Swal.fire({
                         text: "Product already added to your cart!",
-                        // icon: 'warning',
                         showConfirmButton: false,
                         timer: 1500
                     })
@@ -416,6 +452,15 @@
             },
             error: function(xhr, status, error) {
                 console.log('Error in adding to cart :', error);
+                if (xhr.status === 401) {
+                    showAuthSwal();
+                } else {
+                    Swal.fire({
+                        text: "An error occurred while adding to the cart.",
+                        icon: 'error',
+                        showConfirmButton: true
+                    });
+                }
             }
         })
     }

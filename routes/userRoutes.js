@@ -30,20 +30,25 @@ userRoute.use(express.urlencoded({extended:true}));
 userRoute.use(express.static('public'));
 
 
+
 const userController = require ('../controllers/userController');
 const cartController = require ('../controllers/cartController');
+const wishlistController = require ('../controllers/wishlistController');
+const addressController = require ('../controllers/addressController');
+
 const userAuth = require('../middlewares/userAuth');
 const googleAuth = require('../middlewares/googleAuth');
 const multer = require('../middlewares/multer');
 // console.log('googleAuth require : ', googleAuth);
 
-userRoute.get('/', userController.loadHome);
 
+
+
+userRoute.get('/', userController.loadHome);
 userRoute.get('/login', userAuth.isLogout, userController.loadLogin);
 userRoute.post('/login', userController.verifyLogin);
 
 userRoute.get('/auth/google', googleAuth.authenticate('google', { scope: ['profile', 'email'] }));
-
 userRoute.get('/auth/google/callback', googleAuth.authenticate('google', { failureRedirect: '/login' }),
   function(req, res) {
     console.log('Successful authentication');
@@ -56,40 +61,47 @@ userRoute.get('/auth/google/callback', googleAuth.authenticate('google', { failu
 
 
 userRoute.get('/logout', userAuth.isLogin, userController.userLogout);
-
 userRoute.get('/register', userAuth.isLogout, userController.loadRegister);
 userRoute.post('/register', userController.insertUser);
-
 userRoute.post('/forget-password', userAuth.isLogout, userController.verifyForgetMail);
 userRoute.get('/reset-password', userAuth.isLogout, userController.loadResetPassword);
 userRoute.post('/reset-password', userAuth.isLogout, userController.resetPassword);
 
-
 userRoute.get('/verify-account', userAuth.isLogout, userController.loadVerifyAccount);
 userRoute.post('/verify-account', userController.verifyAccount);
-
 userRoute.get('/resend-otp', userController.resendOtp);
-
 
 userRoute.get('/shopping', userController.loadShopping);
 userRoute.get('/product-details', userController.productDetals);
 
-userRoute.get('/my-account', userAuth.isLogin, userController.loadUserAccount);  //userAuth.isLogin,
-userRoute.get('/profile', userAuth.isLogin, userController.loadUserProfile);  //userAuth.isLogin,
-userRoute.get('/edit-profile', userAuth.isLogin, userController.loadEditUserProfile);  //userAuth.isLogin,
-userRoute.post('/update-profile', userAuth.isLogin, multer.uploadUserImages, userController.updateUserProfile);  //userAuth.isLogin,
-userRoute.post('/change-password', userAuth.isLogin, userController.updateUserPassword);  //userAuth.isLogin,
-
+// USER PROFILE ROUTES
+userRoute.get('/my-account', userAuth.isLogin, userController.loadUserAccount);
+userRoute.get('/profile', userAuth.isLogin, userController.loadUserProfile);
+userRoute.get('/edit-profile', userAuth.isLogin, userController.loadEditUserProfile);
+userRoute.post('/update-profile', userAuth.isLogin, multer.uploadUserImages, userController.updateUserProfile);
+userRoute.post('/change-password', userAuth.isLogin, userController.updateUserPassword);
 
 // CART ROUTES
-userRoute.get('/cart', userAuth.isLogin, cartController.loadUserCart);  //userAuth.isLogin,
-userRoute.post('/add-to-cart', userAuth.isLogin, cartController.addToCart);  //userAuth.isLogin,
-userRoute.post('/update-cart-quantity', userAuth.isLogin, cartController.updateCartQuantity)  //userAuth.isLogin,
+userRoute.get('/cart', userAuth.isLogin, cartController.loadUserCart);
+userRoute.post('/add-to-cart', cartController.addToCart);
+userRoute.post('/update-cart-quantity', userAuth.isLogin, cartController.updateCartQuantity);
+userRoute.delete('/remove-from-cart', userAuth.isLogin, cartController.removeFromCart);
+
+// WISHLIST ROUTES
+userRoute.get('/wishlist', userAuth.isLogin, wishlistController.loadUserWishlist);
+// userRoute.post('add-to-wishlist', userAuth.isLogin, wishlistController.addToWishlist);
+
+// ADDRESS ROUTES
+userRoute.get('/address', userAuth.isLogin, addressController.loadUserAddress);
+userRoute.post('/add-address', userAuth.isLogin, addressController.addNewAddress);
+userRoute.patch('/edit-address', userAuth.isLogin, addressController.editAddress);
 
 
-userRoute.get('/wishlist', userAuth.isLogin, userController.loadUserWishlist);  //userAuth.isLogin,
-userRoute.get('/orders', userAuth.isLogin, userController.loadUserOrders);  //userAuth.isLogin,
-userRoute.get('/address', userAuth.isLogin, userController.loadUserAddress);  //userAuth.isLogin,
+// CHECKOUT ROUTES
+userRoute.get('/checkout', userAuth.isLogin, userController.loadCheckout);
+
+userRoute.get('/orders', userAuth.isLogin, userController.loadUserOrders);
+
 
 
 

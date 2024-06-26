@@ -18,7 +18,7 @@ const randomString = require('randomstring');
 const loadHome = async(req, res)=>{
     try {
         const userId = req.session.userId;
-        console.log("User ID:", userId);
+        console.log("User ID in home page:", userId);
 
         const sessionData = await User.findOne({_id : userId});
         const goldPriceData = await GoldPrice.findOne({});
@@ -32,7 +32,7 @@ const loadHome = async(req, res)=>{
             userCart.product.forEach((product) => {
                 cartCount += product.quantity;
             });
-            console.log("Total Quantity of Carted Items:", cartCount);
+            console.log("Total Quantity of Carted Items in home:", cartCount);
         }
 
         res.render('home', {sessionData, cartCount, goldPriceData, popularProducts, newProducts});
@@ -71,7 +71,6 @@ const verifyLogin = async (req, res) => {
         console.log('user details received after login is : ', req.body);
         console.count("verifyLogin");
         const userData = await User.findOne({ email: loginEmail });
-        console.log('userData is : ', userData);
 
         if (!userData) {
             console.log('no userdata');
@@ -1033,8 +1032,9 @@ const updateUserPassword = async (req, res)=>{
 
 
 
-// load user-wishlist page----------------------------------------
-const loadUserWishlist = async (req, res)=>{
+
+// load user-order page----------------------------------------
+const loadCheckout = async (req, res)=>{
     try {
         const sessionData = await User.findById(req.session.userId);
         console.log('session data in user profile page : ' , sessionData);
@@ -1049,18 +1049,15 @@ const loadUserWishlist = async (req, res)=>{
             userCart.product.forEach((product) => {
                 cartCount += product.quantity;
             });
-            console.log("Total Quantity of Carted Items:", cartCount);
+            console.log("Total Quantity of Carted Items in checkout page :", cartCount);
         }
-        
-        res.render('userWishlist', { sessionData, cartCount, goldPriceData });
+
+        res.render('checkout', { sessionData, cartCount, goldPriceData });
 
     } catch (error) {
         console.log('error in loading user profile', error.message);
     }
 }
-
-
-
 
 
 
@@ -1095,32 +1092,7 @@ const loadUserOrders = async (req, res)=>{
 
 
 
-// load user-address page----------------------------------------
-const loadUserAddress = async (req, res)=>{
-    try {
-        const sessionData = await User.findById(req.session.userId);
-        console.log('session data in user profile page : ' , sessionData);
 
-        const goldPriceData = await GoldPrice.findOne({});
-        const userCart = await Cart.findOne({ userRef: req.session.userId });
-
-        let cartCount = 0;
-
-        if (sessionData && userCart){
-            console.log("Cart Documents for User:", userCart);
-            userCart.product.forEach((product) => {
-                cartCount += product.quantity;
-            });
-            console.log("Total Quantity of Carted Items:", cartCount);
-        }
-
-
-        res.render('userAddress', { sessionData, cartCount, goldPriceData });
-
-    } catch (error) {
-        console.log('error in loading user profile', error.message);
-    }
-}
 
 
 
@@ -1152,7 +1124,6 @@ module.exports = {
     loadEditUserProfile,
     updateUserProfile,
     updateUserPassword,
-    loadUserWishlist,
+    loadCheckout,
     loadUserOrders,
-    loadUserAddress
 }

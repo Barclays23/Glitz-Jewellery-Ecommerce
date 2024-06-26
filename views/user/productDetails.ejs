@@ -94,11 +94,13 @@
                                                 <tr>
                                                     <td><b>Availability</b></td>
                                                     <td><b>:</b></td>
-                                                    <% if (productData.quantity >= 1 ){ %>
+                                                    <% if (productData.quantity > 3 ){ %>
                                                         <td><span class="color-theme text-success">In Stock</span></td>
-                                                        <% } else { %>
-                                                            <td><span class="color-theme text-danger">Out of Stock</span></td>
-                                                            <!-- <td><span class="color-theme">സാധനം കഴിഞ്ഞു</span></td> -->
+                                                    <% } else if (productData.quantity <= 3 && productData.quantity >= 1){ %>
+                                                        <td><span class="color-theme text-white bg-success p-1">Only <%=productData.quantity %> items left </span></td>
+                                                    <% } else if (productData.quantity === 0){ %>
+                                                        <td><span class="color-theme text-white bg-danger p-1">Out of Stock</span></td>
+                                                        <!-- <td><span class="color-theme">സാധനം കഴിഞ്ഞു</span></td> -->
                                                     <% } %>
                                                 </tr>
                                                 <tr>
@@ -176,7 +178,7 @@
                                             <div class="tm-quantitybox">
                                                 <input type="text" value="1">
                                             </div>
-                                            <a href="#" class="tm-button tm-button-dark">Add To Cart</a>
+                                            <a href="#" class="tm-button tm-button-dark" onclick="addToCart('<%= productData._id %>')">Add To Cart</a>
                                         </div>
                                     </div>
                                 </div>
@@ -320,15 +322,18 @@
                                                         <img src="assets/images/productImages/<%= similarProducts[i].images.image2 %>" alt="product image">
                                                     </div>
                                                     <ul class="tm-product-actions">
-                                                        <li><a href="#"><i class="ion-android-cart"></i> Add to cart</a>
-                                                        </li>
-                                                        <li><button data-fancybox data-src="#tm-product-quickview"><i
-                                                                    class="ion-eye"></i></button></li>
+                                                        <li><a href="#" onclick="addToCart('<%= similarProducts[i]._id %>')"><i class="ion-android-cart"></i> Add to cart</a></li>
+                                                        <li><button data-fancybox data-src="#tm-product-quickview"><i class="ion-eye"></i></button></li>
                                                         <li><a href="#"><i class="ion-heart"></i></a></li>
                                                     </ul>
                                                     <div class="tm-product-badges">
-                                                        <span class="tm-product-badges-new">New</span>
-                                                        <span class="tm-product-badges-sale">Sale</span>
+                                                        <!-- <span class="tm-product-badges-new">New</span> -->
+                                                        <!-- <span class="tm-product-badges-sale">Sale</span> -->
+                                                        <% if(similarProducts[i].quantity === 0){ %>
+                                                            <span class="tm-product-badges-outofstock">Out of Stock</span>
+                                                        <% } else if (similarProducts[i].quantity <= 3){ %>
+                                                            <span class="tm-product-badges-lowquantity">Only <%= similarProducts[i].quantity %> items left</span>
+                                                        <% } %>
                                                     </div>
                                                 </div>
                                                 <div class="tm-product-bottomside">
@@ -346,6 +351,8 @@
                                                         <span><i class="ion-android-star-outline"></i></span>
                                                     </div>
                                                     <span class="tm-product-price">₹<%= Math.round(similarTotalPrice).toFixed(2) %></span>
+                                                    
+                                                    <!-- cannot find the below div -->
                                                     <div class="tm-product-content">
                                                         <p>Lorem 4444</p>
                                                         <ul class="tm-product-actions">
@@ -354,6 +361,7 @@
                                                             <li><a href="#"><i class="ion-heart"></i></a></li>
                                                         </ul>
                                                     </div>
+
                                                 </div>
                                             </div>
                                         </div>
@@ -563,6 +571,21 @@
     <button id="back-top-top"><i class="ion-arrow-up-c"></i></button>
 </div>
 
+
+
+
+<%- include('../layouts/userLayouts/brands.ejs') %>
+
+
+<%- include('../layouts/userLayouts/user-footer.ejs') %>
+
+
+
+<!-- -------------------------------------------------------------------------------- -->
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- style for product details -->
 <style>
     .tm-prodetails-largeimage {
   position: relative;
@@ -585,6 +608,8 @@
 }
 </style>
 
+
+<!-- script for image zooming in product details -->
 <script>
     document.querySelectorAll('.tm-prodetails-largeimage').forEach(container => {
       const img = container.querySelector('img');
@@ -608,7 +633,88 @@
 
 
 
-<%- include('../layouts/userLayouts/brands.ejs') %>
+<!-- script for add to cart from product details page -->
+<script>
+    const signInButtonId = 'signInSwalButton';
+    const registerButtonId = 'registerSwalButton';
+
+    // Function to show the authentication SweetAlert
+    function showAuthSwal() {
+        Swal.fire({
+            text: "You need to sign in to add products to your cart.",
+            showCloseButton: true,
+            showCancelButton: true,
+            confirmButtonText: '<span id="'+signInButtonId+'">Sign In</span>',
+            cancelButtonText: '<span id="'+registerButtonId+'">Register</span>',
+            allowOutsideClick: true,
+        }).then((result) => {
+            const currentUrl = window.location.href;
+            if (result.isConfirmed) {
+                const signInUrl = `/login?redirect=${encodeURIComponent(currentUrl)}`;
+                window.location.href = signInUrl;
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                const registerUrl = `/register?redirect=${encodeURIComponent(currentUrl)}`;
+                window.location.href = registerUrl;
+            }
+        });
+    }
 
 
-<%- include('../layouts/userLayouts/user-footer.ejs') %>
+
+    // to add the product to the cart (send data to backend)
+    function addToCart(productId) {
+        console.log('product id for adding to cart: ', productId);
+
+        $.ajax ({
+            url : '/add-to-cart',
+            type : 'POST',
+            contentType : 'application/JSON',
+            data : JSON.stringify({productId}),
+            success: function(response) {
+                console.log('response from add to cart :', response);
+                if (response.success){
+                    Swal.fire({
+                        text: "Added to your cart.",
+                        icon: 'success',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    $("#cart-count").load("/shopping #cart-count");
+                } else if (response.outofstock){
+                    Swal.fire({
+                        // text: "Unfortunately, this item is out of stock and cannot be added to your cart.",
+                        text: "We are sorry, but this product is currently unavailable for purchase.",
+                        showConfirmButton: false,
+                        timer: 2000,
+                        customClass: {
+                            // popup: 'error-swal-background',
+                            // htmlContainer: 'error-swal-text',
+                            popup: 'bg-danger',
+                            htmlContainer: 'text-white'
+                        }
+                    })
+                } else if (response.nosession){
+                    showAuthSwal();
+                } else if (response.existProduct){
+                    Swal.fire({
+                        text: "Product is already added to your cart!",
+                        showConfirmButton: false,
+                        timer: 1500
+                    })
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log('Error in adding to cart :', error);
+                if (xhr.status === 401) {
+                    showAuthSwal();
+                } else {
+                    Swal.fire({
+                        text: "An error occurred while adding to the cart.",
+                        icon: 'error',
+                        showConfirmButton: true,
+                    });
+                }
+            }
+        })
+    }
+</script>
