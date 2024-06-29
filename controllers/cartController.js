@@ -2,6 +2,7 @@ const GoldPrice = require ('../models/goldPriceModel');
 const User = require ('../models/userModel');
 const Cart = require ('../models/cartModel');
 const Product = require ('../models/productModel');
+const Address = require('../models/addressModel');
 const categoryModel = require('../models/categoryModel');
 
 
@@ -101,10 +102,6 @@ const updateCartQuantity = async (req, res)=>{
     console.log('req.body received for update cart quantity :', req.body);
 
     const userId = req.session.userId;
-
-    // Insufficient Stock
-    // Unfortunately, we only have 10 units of this product in stock. Please adjust the quantity in your cart accordingly.
-
     
     try {
         // const userCart = await Cart.findOne({userRef: userId, 'product._id': productId});
@@ -146,14 +143,48 @@ const updateCartQuantity = async (req, res)=>{
 const removeFromCart = async(req, res)=>{
     try {
         const userId = req.session.userId;
-        const {index, productId} = req.body;
+        const {index, productId, outOfStockItems } = req.body;
 
-        const userCart = await Cart.findOne({userRef: userId});
+        console.log('recieved productId for single product removing :', productId);
+        console.log('recieved index of single product for removing :', index);
 
-        userCart.product.splice(index, 1);
-        await userCart.save();
 
-        return res.status(200).json({ success: true });
+        // for removing the selected product from cart / checkout (single)
+        if(productId){
+            const updatedUserCart = await Cart.findOneAndUpdate(
+                {userRef: userId},
+                {$pull: {product: {_id: productId}}}
+            )
+
+            console.log('produt removed from cart');
+            return res.status(200).json({ removedProduct: true });
+        }
+
+
+        // for removing the out of items products from cart / checkout (may be multiple items)
+        if (outOfStockItems && outOfStockItems.length > 0) {
+
+            for (const products of outOfStockItems) {
+                console.log('productId for multiple product removing (outOfStockItems) :', products._id);
+            }
+
+            for (const products of outOfStockItems) {
+                let updatedUserCart = await Cart.findOneAndUpdate(
+                    { userRef: userId },
+                    { $pull: { product: { _id: products._id } } }
+                );
+
+                console.log('updatedUserCart :', updatedUserCart);
+            }
+
+            console.log('produt removed from cart');
+            return res.status(200).json({ removedOutOfStock: true });
+        }
+
+
+        // console.log('produt removed from cart');
+        // return res.status(200).json({ removedProduct: true });
+
 
     } catch (error) {
         console.log('error while removing from cart :', error.message);
@@ -162,6 +193,87 @@ const removeFromCart = async(req, res)=>{
 
 
 
+
+// proceed to checkout validation
+const proceedToCheckout = async(req, res)=>{
+    try {
+        const userId = req.session.userId;
+        const sessionData = await User.findById(userId);
+
+        const goldPriceData = await GoldPrice.findOne({});
+        const userCart = await Cart.findOne({ userRef: userId }).populate('product.productRef');
+        const userAddress = await Address.findOne({userRef: userId});
+
+        if (userCart && userCart.product){
+            // Check the stock for each product in the cart
+            let outOfStockItems = [];
+            userCart.product.forEach((cartItem) => {
+                if (cartItem.productRef.quantity === 0) {
+                outOfStockItems.push(cartItem);
+                }
+            });
+
+            if (outOfStockItems.length > 0){
+                console.log('out of outOfStockItems found :', outOfStockItems);
+                return res.json({outofstockfound : true, outOfStockItems});
+            }
+        } else {
+            console.log('no cart for user or no product in user cart');
+            return res.json({nocartItems: true});
+        }
+
+        return res.json({proceed: true});
+
+        // let cartCount = 0;
+        // if (sessionData && userCart){
+        //     console.log("Cart Documents for User:", userCart);
+        //     userCart.product.forEach((product) => {
+        //         cartCount += product.quantity;
+        //     });
+        // }
+
+        // res.render('checkout', { sessionData, userAddress, userCart, cartCount, goldPriceData });
+
+    } catch (error) {
+        console.log('error in loading checkout page: ', error.message);
+    }
+}
+
+
+
+
+
+
+
+// load thank you page.
+const loadThankyou = async(req, res)=>{
+    try {
+        res.render('thankYou');
+    } catch (error) {
+        console.log('error while loading the thank you page.', error.message);
+    }
+}
+
+
+
+// load thank you page.
+const placeOrder = async(req, res)=>{
+    try {
+        const userId = req.session.useId;
+        const data = req.body
+        
+        console.log('data received in backend : ', data);
+
+        if(data){
+            return res.json({successful: true});
+        }
+
+        // res.render('thankYou');
+
+    } catch (error) {
+        console.log('error while loading the thank you page.', error.message);
+    }
+}
 
 
 
@@ -172,5 +284,8 @@ module.exports = {
     loadUserCart,
     addToCart,
     updateCartQuantity,
-    removeFromCart
+    removeFromCart,
+    proceedToCheckout,
+    placeOrder,
+    loadThankyou
 }

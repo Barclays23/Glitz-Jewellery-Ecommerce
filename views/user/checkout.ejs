@@ -11,9 +11,7 @@
     <div class="tm-section tm-checkout-area bg-white tm-padding-section">
         <div class="container">
             <div class="tm-checkout-coupon">
-                <a href="#checkout-couponform" data-toggle="collapse"><span>Have a coupon code?</span> Click here and
-                    enter your
-                    code.</a>
+                <a href="#checkout-couponform" data-toggle="collapse"><span>Have a coupon code?</span> Click here and enter your code.</a>
                 <div id="checkout-couponform" class="collapse">
                     <form action="#" class="tm-checkout-couponform">
                         <input type="text" id="coupon-field" placeholder="Enter coupon code" required="required" />
@@ -21,163 +19,285 @@
                     </form>
                 </div>
             </div>
-            <form action="#" class="tm-form tm-checkout-form">
-                <div class="row">
-                    <div class="col-lg-6">
+
+            <!-- can give the address details here if needed (and if not given at bottom of this page) -->
+            <!-- <div class="row checkout-border-row p-2 mb-5">
+                <% if(userAddress && userAddress.address){ %>
+                    <div>
                         <h4 class="small-title">BILLING INFORMATION</h4>
-                        <div class="tm-checkout-billingform">
-                            <div class="tm-form-inner">
-                                <div class="tm-form-field tm-form-fieldhalf">
-                                    <label for="billingform-firstname">First name*</label>
-                                    <input type="text" id="billingform-firstname" />
-                                </div>
-                                <div class="tm-form-field tm-form-fieldhalf">
-                                    <label for="billingform-lastname">Last name*</label>
-                                    <input type="text" id="billingform-lastname" />
-                                </div>
-                                <div class="tm-form-field">
-                                    <label for="billingform-companyname">Company name</label>
-                                    <input type="text" id="billingform-companyname" />
-                                </div>
-                                <div class="tm-form-field">
-                                    <label for="billingform-email">Email address</label>
-                                    <input type="email" id="billingform-email" />
-                                </div>
-                                <div class="tm-form-field">
-                                    <label for="billingform-phone">Phone (Optional)</label>
-                                    <input type="text" id="billingform-phone" />
-                                </div>
-                                <div class="tm-form-field">
-                                    <label for="billingform-country">Country</label>
-                                    <select name="billingform-country" id="billingform-country">
-                                        <option value="bangladesh">United States</option>
-                                        <option value="bangladesh">Mexico</option>
-                                        <option value="bangladesh">Australia</option>
-                                        <option value="bangladesh">Germany</option>
-                                        <option value="bangladesh">Sweden</option>
-                                        <option value="bangladesh">France</option>
-                                    </select>
-                                </div>
-                                <div class="tm-form-field">
-                                    <label for="billingform-address">Address</label>
-                                    <input type="text" id="billingform-address"
-                                        placeholder="Apartment, Street Address" />
-                                </div>
-                                <div class="tm-form-field tm-form-fieldhalf">
-                                    <label for="billingform-streetaddress">State</label>
-                                    <input type="text" id="billingform-streetaddress" />
-                                </div>
-                                <div class="tm-form-field tm-form-fieldhalf">
-                                    <label for="billingform-zipcode">Zip / Postcode</label>
-                                    <input type="text" id="billingform-zipcode" />
-                                </div>
-                                <div class="tm-form-field">
-                                    <input type="checkbox" name="billform-dirrentswitch" id="billform-dirrentswitch" />
-                                    <label for="billform-dirrentswitch"><b>Ship to another address</b></label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tm-checkout-differentform">
-                            <div class="tm-form-inner">
-                                <div class="tm-form-field tm-form-fieldhalf">
-                                    <label for="differentform-firstname">First name*</label>
-                                    <input type="text" id="differentform-firstname" />
-                                </div>
-                                <div class="tm-form-field tm-form-fieldhalf">
-                                    <label for="differentform-lastname">Last name*</label>
-                                    <input type="text" id="differentform-lastname" />
-                                </div>
-                                <div class="tm-form-field">
-                                    <label for="differentform-companyname">Company name</label>
-                                    <input type="text" id="differentform-companyname" />
-                                </div>
-                                <div class="tm-form-field">
-                                    <label for="differentform-email">Email address</label>
-                                    <input type="email" id="differentform-email" />
-                                </div>
-                                <div class="tm-form-field">
-                                    <label for="differentform-phone">Phone (Optional)</label>
-                                    <input type="text" id="differentform-phone" />
-                                </div>
-                                <div class="tm-form-field">
-                                    <label for="differentform-country">Country</label>
-                                    <select name="differentform-country" id="differentform-country">
-                                        <option value="bangladesh">United States</option>
-                                        <option value="bangladesh">Mexico</option>
-                                        <option value="bangladesh">Australia</option>
-                                        <option value="bangladesh">Germany</option>
-                                        <option value="bangladesh">Sweden</option>
-                                        <option value="bangladesh">France</option>
-                                    </select>
-                                </div>
-                                <div class="tm-form-field">
-                                    <label for="differentform-address">Address</label>
-                                    <input type="text" id="differentform-address"
-                                        placeholder="Apartment, Street Address" />
-                                </div>
-                                <div class="tm-form-field tm-form-fieldhalf">
-                                    <label for="differentform-streetaddress">State</label>
-                                    <input type="text" id="differentform-streetaddress" />
-                                </div>
-                                <div class="tm-form-field tm-form-fieldhalf">
-                                    <label for="differentform-zipcode">Zip / Postcode</label>
-                                    <input type="text" id="differentform-zipcode" />
+                        <p><b>The following address will be used for shipping by default.</b></p>
+                        <a href="#" class="btn add-button btn-success text-white" data-toggle="modal" data-target="#addAddressModal"> Add Address </a>
+                        <a href="#" class="btn add-button btn-primary text-white" data-toggle="modal" data-target="#chooseAddressModal">Choose Another Address</a> <br><br>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-lg-6 col-md-6">
+                            <div class="tm-myaccount-address-billing bg-grey">
+                                <div class="text-right">
+                                    <a href="#" class="btn add-button btn-secondary text-white edit-address-link" id="edit-address-link"
+                                    data-toggle="modal" data-target="#editAddressModal" 
+                                    data-address-id="<%= userAddress.address[0]._id %>" 
+                                    data-index="0" 
+                                    data-firstname="<%= userAddress.address[0].firstname %>" 
+                                    data-lastname="<%= userAddress.address[0].lastname %>" 
+                                    data-street="<%= userAddress.address[0].street %>" 
+                                    data-city="<%= userAddress.address[0].city %>" 
+                                    data-state="<%= userAddress.address[0].state %>" 
+                                    data-pincode="<%= userAddress.address[0].pincode %>" 
+                                    data-contact="<%= userAddress.address[0].contact %>" >
+                                    Edit </a>
+
+                                    <address class="text-left">
+                                        <%= userAddress.address[0].firstname %>
+                                        <%= userAddress.address[0].lastname %> <br>
+                                        <%= userAddress.address[0].street %> <br>
+                                        <%= userAddress.address[0].city %> <br>
+                                        <%= userAddress.address[0].state %>
+                                        <%= userAddress.address[0].pincode %> <br>
+                                        Phone: <%= userAddress.address[0].contact %> <br>
+                                    </address>
                                 </div>
                             </div>
                         </div>
                     </div>
+                <% } else{ %>
+                    <div>
+                        <p><b>"Hello! <br>
+                            It seems there is no saved address in your profile.
+                            Please add a new address to ensure smooth delivery of your orders. <br>
+                            Thank you!"</b>
+                        </p>
+                    <a href="#" class="btn add-button btn-success text-white" data-toggle="modal" data-target="#addAddressModal"> Add Address </a> <br><br>
+                    </div>
+                <% } %>
+            </div> -->
+
+
+            <div class="row checkout-border-row p-2 mb-5">
+                <div class="mb-1">
+                    <h4 class="small-title">ITEMS IN YOUR SHOPPING CART</h4>
+                </div>
+                <div class="tm-cart-table table-responsive" id="cart-table">
+                    <table class="table table-bordered mb-0">
+                        <thead>
+                            <tr>
+                                <th class="tm-cart-col-image bg-light" scope="col">Image</th>
+                                <th class="tm-cart-col-productname bg-light" scope="col">Product</th>
+                                <th class="tm-cart-col-price bg-light" scope="col">Price</th>
+                                <th class="tm-cart-col-quantity bg-light" scope="col">Quantity</th>
+                                <th class="tm-cart-col-total bg-light" scope="col">Total</th>
+                                <th class="tm-cart-col-actions bg-light" scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (userCart && userCart.product.length > 0){ %>
+                                <% console.log('length of user cart : ', userCart.product.length) %>
+                                <% for(i=0; i< userCart.product.length; i++){ %>
+                                    <tr>
+                                        <td class="bg-light">
+                                            <!-- http://localhost:3000/product-details?id=6659b86610faf8b255d2de86 -->
+    
+                                            <a href="/product-details?id=<%= userCart.product[i].productRef._id %>" class="tm-cart-productimage">
+                                                <img src="assets/images/productImages/<%= userCart.product[i].productRef.images.image1 %>" alt="product image">
+                                            </a>
+                                            <% if(userCart.product[i].productRef.quantity === 0){ %>
+                                                <h6 id="outofstock-error" style="color: red; display: block;"> Currently <br> Unavailable </h6>
+                                            <% } %>
+                                        </td>
+                                        <td class="bg-light text-left">
+                                            <h5><a href="/product-details?id=<%= userCart.product[i].productRef._id %>" class="tm-cart-productname"><%= userCart.product[i].productRef.name %></a></h5>
+                                            <h6><%= userCart.product[i].productRef.code %></h6>
+                                        </td>
+                                        <td class="tm-cart-price bg-light"> <h6>₹<%= (userCart.product[i].productRef.totalPrice).toFixed(2) %></h6></td>
+                                        <td class="bg-light">
+                                            <div class="tm-quantitybox bg-white">
+                                                <input type="number" class="quantity-input" value="<%= userCart.product[i].quantity %>" id="quantity_<%= i %>" data-product-id="<%= userCart.product[i]._id %>" data-index="<%= i %>">
+                                            </div>
+                                        </td>
+                                        <td class="bg-light">
+                                            <span class="tm-cart-totalprice" id="total_price_<%= i %>">₹<%= (userCart.product[i].productRef.totalPrice * userCart.product[i].quantity).toFixed(2) %></span>
+                                        </td>
+                                        <td class="bg-light">
+                                            <button class="tm-button tm-button-small">Save for Later</button>
+                                            <!-- <button class="tm-cart-removeproduct bg-danger"><i class="ion-close"></i></button> -->
+                                            <!-- <a href=""><img src="/assets/images/icons/remove2.png" style="width: 41px; height: auto;" alt="remove-icon"> </a> -->
+                                            <button class="tm-button tm-button-small" onclick="removeFromCart('<%= userCart.product[i]._id, i %>', '<%= i %>')"> Remove </button>
+    
+                                            <% if(userCart.product[i].productRef.quantity === 0){ %>
+                                                <br><br>
+                                                <h6 id="outofstock-error" style="color: red; display: block;"> Currently <br> Unavailable </h6>
+                                            <% } %>
+                                        </td>
+                                    </tr>
+                                <% } %>
+                            <% } else { %>
+                                <tr >
+                                    <td colspan="6" class="p-5 text-dark bg-light"> YOUR SHOPPING CART IS EMPTY </td>
+                                </tr>
+                            <% } %>
+    
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+            
+            <div class="row checkout-border-row p-2 mb-5">
+                <div class="mt-1">
+                    <h4 class="small-title">BILLING INFORMATION</h4>
+                </div>
+                <div class="tm-checkout-coupon">
+                    <a href="#checkout-couponform" data-toggle="collapse"><span>Have a coupon code?</span> Click here and enter your code.</a>
+                    <div id="checkout-couponform" class="collapse">
+                        <form action="#" class="tm-checkout-couponform">
+                            <input type="text" id="coupon-field" placeholder="Enter coupon code" required="required" />
+                            <button type="submit" class="tm-button">Submit</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="row">
+
+                    <!-- shipping address section starts -->
+                    <div class="col-lg-6">
+                        <!-- can give the address details here if needed (and if not given at top of this page) -->
+                        <div>
+                            <h4 class="small-title">Shipping Address</h4>
+
+                            <% if(userAddress && userAddress.address){ %>
+                                <p><b>The following address will be used for shipping by default.</b></p>
+                                <a href="#" class="btn add-button btn-success text-white" data-toggle="modal" data-target="#addAddressModal"> Add Address </a>
+                                <a href="#" class="btn add-button btn-primary text-white" data-toggle="modal" data-target="#chooseAddressModal">Choose Another Address</a> <br><br>
+    
+                                <% for(i=0; i< userAddress.address.length; i++){ %>
+                                    <div class="row">
+                                        <div class="tm-checkout-address bg-grey pb-4">
+                                            <div class="tm-form-inner">
+                                                <div class="tm-form-field">
+                                                    <div class="text-right">
+                                                        <a href="#" class="btn add-button btn-secondary text-white edit-address-link" id="edit-address-link"
+                                                            data-toggle="modal" data-target="#editAddressModal" 
+                                                            data-address-id="<%= userAddress.address[i]._id %>" 
+                                                            data-index="0" 
+                                                            data-firstname="<%= userAddress.address[i].firstname %>" 
+                                                            data-lastname="<%= userAddress.address[i].lastname %>" 
+                                                            data-street="<%= userAddress.address[i].street %>" 
+                                                            data-city="<%= userAddress.address[i].city %>" 
+                                                            data-state="<%= userAddress.address[i].state %>" 
+                                                            data-pincode="<%= userAddress.address[i].pincode %>" 
+                                                            data-contact="<%= userAddress.address[i].contact %>" >
+                                                            Edit
+                                                        </a>
+                                                    </div>
+                                                    <input type="radio" name="checkout-address" id="checkout-address-<%= i %>" value="<%= userAddress.address[i]._id %>" <%= i === 0 ? 'checked' : '' %> />
+                                                    <label for="checkout-address-<%= i %>" class="text-left">
+                                                        <b> <%= (userAddress.address[i].firstname).toUpperCase() %> </b>
+                                                        <b> <%= (userAddress.address[i].lastname).toUpperCase() %> </b> <br>
+                                                    </label>
+
+                                                    <div class="tm-checkout-address-content">
+                                                        <p class="text-left">
+                                                            <%= userAddress.address[i].firstname %>
+                                                            <%= userAddress.address[i].lastname %> <br>
+                                                            <%= userAddress.address[i].street %> <br>
+                                                            <%= userAddress.address[i].city %> <br>
+                                                            <%= userAddress.address[i].state %>
+                                                            <%= userAddress.address[i].pincode %> <br>
+                                                            Phone: <%= userAddress.address[i].contact %> <br>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% } %>
+                                
+
+                            <% }else{ %>
+                                <p><b>"Hello! <br>
+                                    It seems there is no saved address in your profile. <br>
+                                    Please add a new address to ensure smooth delivery of your orders. <br>
+                                    Thank you!"</b>
+                                </p>
+                                <a href="#" class="btn add-button btn-success text-white" data-toggle="modal" data-target="#addAddressModal"> Add Address </a> <br><br>
+                            <% } %>
+                        </div>
+                    </div>
+
+                    <!-- checkout summary starts -->
                     <div class="col-lg-6">
                         <div class="tm-checkout-orderinfo">
-                            <div class="table-responsive">
+                            <!-- remove id="cart-summary" -->
+                            <div class="table-responsive" id="checkout-summary">
+                                <h3>Checkout Summary</h3>
                                 <table class="table table-borderless tm-checkout-ordertable">
                                     <thead>
                                         <tr>
-                                            <th>Product</th>
+                                            <th>Products</th>
                                             <th>Total</th>
                                         </tr>
                                     </thead>
+
                                     <tbody>
-                                        <tr>
-                                            <td>Cosmetic plastic compact powder * 1</td>
-                                            <td>$75.00</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Cosmetics and makeup brushes * 1</td>
-                                            <td>$70.50</td>
-                                        </tr>
+                                        <% let subTotal = 0 %>
+                                        <% let individualTotal = [] %>
+
+                                        <% if (userCart && userCart.product.length > 0){ %>
+                                            <% for(i=0; i< userCart.product.length; i++){ %>
+                                                <tr>
+                                                    <td style="padding: 0.50rem;"> <%= userCart.product[i].productRef.name %> </td>
+                                                    <% individualTotal.push((userCart.product[i].productRef.totalPrice * userCart.product[i].quantity)) %>
+                                                    <td style="padding: 0.50rem;"> ₹ <%= individualTotal[i].toFixed(2) %> </td>
+                                                </tr>
+                                                <!-- finding the subtotal for cart summary -->
+                                                <% subTotal = individualTotal.reduce((acc, prices)=> acc + prices) %>
+                                            <% } %>
+                                        <% } %>
                                     </tbody>
-                                    <tfoot>
+
+                                    <tfoot class="fw-bold">
+                                        <tr>
+                                            <td colspan="2"><hr style="border: 1px solid black;"></td>
+                                        </tr>
                                         <tr class="tm-checkout-subtotal">
-                                            <td>Cart Subtotal</td>
-                                            <td>$175.00</td>
+                                            <td>TOTAL</td>
+                                            <td>₹ <%= (subTotal).toFixed(2) %></td>
+                                            <% console.log('subTotal is : ', subTotal) %>
                                         </tr>
                                         <tr class="tm-checkout-shipping">
-                                            <td>(+) Shipping Charge</td>
-                                            <td>$15.00</td>
+                                            <td> Shipping Charge (+) </td>
+                                            <% let shippingCharge = subTotal >= 100000 ? 0 : 300 %>
+                                            <td>₹ <%= shippingCharge.toFixed(2) %></td>
+                                        </tr>
+                                        <tr class="tm-checkout-discount">
+                                            <td> Discount (-) </td>
+                                            <% let discountAmount = subTotal >= 10000000 ? 0 : 1500 %>
+                                            <td>₹ <%= discountAmount.toFixed(2) %></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2"><hr style="border: 1px solid black;"></td>
                                         </tr>
                                         <tr class="tm-checkout-total">
-                                            <td>Total</td>
-                                            <td>$190.00</td>
+                                            <td>Net Payable </td>
+                                            <% let cartTotal = subTotal + shippingCharge - discountAmount %>
+                                            <td>₹ <%= (cartTotal).toFixed(2) %></td>
                                         </tr>
                                     </tfoot>
+
                                 </table>
                             </div>
+
                             <div class="tm-checkout-payment">
                                 <h4>Select Payment Method</h4>
                                 <div class="tm-form-inner">
                                     <div class="tm-form-field">
-                                        <input type="radio" name="checkout-payment-method"
-                                            id="checkout-payment-banktransfer" />
+                                        <input type="radio" name="checkout-payment-method" id="checkout-payment-banktransfer" />
                                         <label for="checkout-payment-banktransfer">Direct Bank Transfer</label>
                                         <div class="tm-checkout-payment-content">
-                                            <p>
-                                                Make your payment directly into our bank account.
-                                            </p>
+                                            <p> Make your payment directly into our bank account. </p>
                                         </div>
                                     </div>
                                     <div class="tm-form-field">
-                                        <input type="radio" name="checkout-payment-method"
-                                            id="checkout-payment-checkpayment" checked="checked" />
+                                        <input type="radio" name="checkout-payment-method" id="checkout-payment-checkpayment" checked="checked" />
                                         <label for="checkout-payment-checkpayment">Check Payments</label>
                                         <div class="tm-checkout-payment-content">
                                             <p>
@@ -187,24 +307,21 @@
                                         </div>
                                     </div>
                                     <div class="tm-form-field">
-                                        <input type="radio" name="checkout-payment-method"
-                                            id="checkout-payment-cashondelivery" />
+                                        <input type="radio" name="checkout-payment-method" id="checkout-payment-cashondelivery" />
                                         <label for="checkout-payment-cashondelivery">Cash On Delivery</label>
                                         <div class="tm-checkout-payment-content">
                                             <p>Pay with cash upon delivery.</p>
                                         </div>
                                     </div>
                                     <div class="tm-form-field">
-                                        <input type="radio" name="checkout-payment-method"
-                                            id="checkout-payment-paypal" />
+                                        <input type="radio" name="checkout-payment-method" id="checkout-payment-paypal" />
                                         <label for="checkout-payment-paypal">PayPal</label>
                                         <div class="tm-checkout-payment-content">
                                             <p>Pay via PayPal.</p>
                                         </div>
                                     </div>
                                     <div class="tm-form-field">
-                                        <input type="radio" name="checkout-payment-method"
-                                            id="checkout-payment-creditcard" />
+                                        <input type="radio" name="checkout-payment-method" id="checkout-payment-creditcard" />
                                         <label for="checkout-payment-creditcard">Credit Card</label>
                                         <div class="tm-checkout-payment-content">
                                             <p>Pay with your credit card via Stripe.</p>
@@ -221,20 +338,18 @@
                                 <div class="tm-form-inner">
                                     <div class="tm-form-field">
                                         <input type="checkbox" name="checkout-read-terms" id="checkout-read-terms" />
-                                        <label for="checkout-read-terms">I have read and agree to the website terms and
-                                            conditions</label>
+                                        <label for="checkout-read-terms">I have read and agree to the website terms and conditions</label>
                                     </div>
                                     <div class="tm-form-field">
-                                        <button type="submit" class="tm-button ml-auto">
-                                            Place Order
-                                        </button>
+                                        <button type="submit" class="tm-button ml-auto" onclick="placeOrder('<%= sessionData._id %>')"> Place Order </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </form>
+
+            </div>
         </div>
     </div>
 </main>
@@ -242,4 +357,394 @@
 
 
 
+<!-- Choose Address List Modal Starts-->
+<div class="modal fade" id="chooseAddressModal" tabindex="-1" role="dialog" aria-labelledby="chooseAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="chooseAddressModalLabel">Choose Another Address</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="address-list">
+                    <!-- Address List-->
+                    <% if(userAddress && userAddress.address){ %>
+                        <% for(i = 0; i < userAddress.address.length; i++){ %>
+                            <div class="row mb-3">
+                                <div class="col-lg-12">
+                                    <div class="tm-myaccount-address-billing bg-grey">
+                                        <div class="text-right">
+                                            <a href="#" class="btn add-button btn-danger text-white" onclick="deleteAddress('<%= userAddress.address[i]._id %>')">Delete</a>
+                                        </div>
+                                        <h5> Address <%= i + 1 %></h5>
+                                        <address>
+                                            <b> <%= (userAddress.address[i].firstname).toUpperCase() %> </b>
+                                            <b> <%= (userAddress.address[i].lastname).toUpperCase() %> </b> <br>
+                                            <%= userAddress.address[i].street %> <br>
+                                            <%= userAddress.address[i].city %> <br>
+                                            <%= userAddress.address[i].state %>
+                                            <%= userAddress.address[i].pincode %> <br>
+                                            Phone: <%= userAddress.address[i].contact %> <br>
+                                        </address>
+                                    </div>
+                                </div>
+                            </div>
+                        <% } %>
+                    <% } %>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Choose Address List Modal Ends-->
+
+
+
+
+
+<!-- Add Address Modal Starts-->
+<div class="modal fade" id="addAddressModal" tabindex="-1" role="dialog" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="small-title"><b>ADD BILLING INFORMATION</b></h4>
+                <button type="button" class="close bg-black text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="#" class="tm-form tm-checkout-form">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="tm-checkout-billingform">
+                                <div class="tm-form-inner">
+                                    <div class="tm-form-field tm-form-fieldhalf">
+                                        <label for="add-firstname">First name<span class="red-asterisk">*</span></label>
+                                        <input type="text" id="add-firstname"/>
+                                        <span id="firstname-error" style="color: red; display: none;"></span>
+                                    </div>
+                                    <div class="tm-form-field tm-form-fieldhalf">
+                                        <label for="add-lastname">Last name<span class="red-asterisk">*</label>
+                                        <input type="text" id="add-lastname"/>
+                                        <span id="lastname-error" style="color: red; display: none;"></span>
+                                    </div>
+                                    <div class="tm-form-field">
+                                        <label for="add-address">Address<span class="red-asterisk">*</label>
+                                        <input type="text" id="add-address" placeholder="Apartment, Area and Street"/>
+                                        <span id="address-error" style="color: red; display: none;"></span>
+                                    </div>
+                                    <div class="tm-form-field tm-form-fieldhalf">
+                                        <label for="add-city">City<span class="red-asterisk">*</label>
+                                        <input type="text" id="add-city" placeholder="City / Town / District"/>
+                                        <span id="city-error" style="color: red; display: none;"></span>
+                                    </div>
+                                    <div class="tm-form-field tm-form-fieldhalf">
+                                        <label for="add-pincode">Zip / Postcode<span class="red-asterisk">*</label>
+                                        <input type="text" id="add-pincode"/>
+                                        <span id="pincode-error" style="color: red; display: none;"></span>
+                                    </div>
+                                    <div class="tm-form-field tm-form-fieldhalf dropdown">
+                                        <label for="add-state">State<span class="red-asterisk">*</label><br>
+                                        <div class="dropdown-selector">
+                                            <input type="text" id="state-input" placeholder="Type to filter states">
+                                            <ul class="dropdown-list" id="add-state">
+                                                <li data-value="Andhra Pradesh">Andhra Pradesh</li>
+                                                <li data-value="Arunachal Pradesh">Arunachal Pradesh</li>
+                                                <li data-value="Assam">Assam</li>
+                                                <li data-value="Bihar">Bihar</li>
+                                                <li data-value="Chhattisgarh">Chhattisgarh</li>
+                                                <li data-value="Goa">Goa</li>
+                                                <li data-value="Gujarat">Gujarat</li>
+                                                <li data-value="Haryana">Haryana</li>
+                                                <li data-value="Himachal Pradesh">Himachal Pradesh</li>
+                                                <li data-value="Jharkhand">Jharkhand</li>
+                                                <li data-value="Karnataka">Karnataka</li>
+                                                <li data-value="Kerala">Kerala</li>
+                                                <li data-value="Madhya Pradesh">Madhya Pradesh</li>
+                                                <li data-value="Maharashtra">Maharashtra</li>
+                                                <li data-value="Manipur">Manipur</li>
+                                                <li data-value="Meghalaya">Meghalaya</li>
+                                                <li data-value="Mizoram">Mizoram</li>
+                                                <li data-value="Nagaland">Nagaland</li>
+                                                <li data-value="Odisha">Odisha</li>
+                                                <li data-value="Punjab">Punjab</li>
+                                                <li data-value="Rajasthan">Rajasthan</li>
+                                                <li data-value="Sikkim">Sikkim</li>
+                                                <li data-value="Tamil Nadu">Tamil Nadu</li>
+                                                <li data-value="Telangana">Telangana</li>
+                                                <li data-value="Tripura">Tripura</li>
+                                                <li data-value="Uttar Pradesh">Uttar Pradesh</li>
+                                                <li data-value="Uttarakhand">Uttarakhand</li>
+                                                <li data-value="West Bengal">West Bengal</li>
+                                                <li data-value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</li>
+                                                <li data-value="Chandigarh">Chandigarh</li>
+                                                <li data-value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</li>
+                                                <li data-value="Delhi">Delhi</li>
+                                                <li data-value="Lakshadweep">Lakshadweep</li>
+                                                <li data-value="Puducherry">Puducherry</li>
+                                                <li data-value="Ladakh">Ladakh</li>
+                                                <li data-value="Jammu and Kashmir">Jammu and Kashmir</li>
+                                            </ul>
+                                        </div>
+                                        <span id="state-error" style="color: red; display: none;"></span>
+                                    </div>
+                                    
+                                    <div class="tm-form-field tm-form-fieldhalf">
+                                        <label for="add-phone">Contact No<span class="red-asterisk">*</label>
+                                        <input type="text" id="add-phone"/>
+                                        <span id="phone-error" style="color: red; display: none;"></span>
+                                    </div>
+                                    <div class="tm-form-field">
+                                        <input type="checkbox" name="billform-dirrentswitch" id="billform-dirrentswitch"/>
+                                        <label for="billform-dirrentswitch"><b>Ship to another address</b></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal"> Close </button>
+                <button type="button" class="btn btn-primary" id="saveChanges"> Save changes </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Add Address Modal Ends -->
+
+
+
+
+
+<!-- Edit Address Modal Starts-->
+<div class="modal fade" id="editAddressModal" tabindex="-1" role="dialog" aria-labelledby="editAddressModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="small-title"><b>EDIT BILLING INFORMATION</b></h4>
+                <button type="button" class="close bg-black text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="#" class="tm-form tm-checkout-form">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="tm-checkout-billingform">
+                                <div class="tm-form-inner">
+                                    <div class="tm-form-field tm-form-fieldhalf">
+                                        <label for="edit-firstname">First name<span class="red-asterisk">*</span></label>
+                                        <input type="text" id="edit-firstname"/>
+                                        <span id="edit-firstname-error" style="color: red; display: none;"></span>
+                                    </div>
+                                    <div class="tm-form-field tm-form-fieldhalf">
+                                        <label for="edit-lastname">Last name<span class="red-asterisk">*</label>
+                                        <input type="text" id="edit-lastname"/>
+                                        <span id="edit-lastname-error" style="color: red; display: none;"></span>
+                                    </div>
+                                    <div class="tm-form-field">
+                                        <label for="edit-address">Address<span class="red-asterisk">*</label>
+                                        <input type="text" id="edit-address" placeholder="Apartment, Area and Street"/>
+                                        <span id="edit-address-error" style="color: red; display: none;"></span>
+                                    </div>
+                                    <div class="tm-form-field tm-form-fieldhalf">
+                                        <label for="edit-city">City<span class="red-asterisk">*</label>
+                                        <input type="text" id="edit-city" placeholder="City / Town / District"/>
+                                        <span id="edit-city-error" style="color: red; display: none;"></span>
+                                    </div>
+                                    <div class="tm-form-field tm-form-fieldhalf">
+                                        <label for="edit-pincode">Zip / Postcode<span class="red-asterisk">*</label>
+                                        <input type="text" id="edit-pincode"/>
+                                        <span id="edit-pincode-error" style="color: red; display: none;"></span>
+                                    </div>
+                                    <div class="tm-form-field tm-form-fieldhalf dropdown">
+                                        <label for="edit-state">State<span class="red-asterisk">*</label><br>
+                                        <div class="dropdown-selector">
+                                            <input type="text" id="edit-state-input" placeholder="Type to filter states">
+                                            <ul class="dropdown-list" id="edit-state">
+                                                <li data-value="Andhra Pradesh">Andhra Pradesh</li>
+                                                <li data-value="Arunachal Pradesh">Arunachal Pradesh</li>
+                                                <li data-value="Assam">Assam</li>
+                                                <li data-value="Bihar">Bihar</li>
+                                                <li data-value="Chhattisgarh">Chhattisgarh</li>
+                                                <li data-value="Goa">Goa</li>
+                                                <li data-value="Gujarat">Gujarat</li>
+                                                <li data-value="Haryana">Haryana</li>
+                                                <li data-value="Himachal Pradesh">Himachal Pradesh</li>
+                                                <li data-value="Jharkhand">Jharkhand</li>
+                                                <li data-value="Karnataka">Karnataka</li>
+                                                <li data-value="Kerala">Kerala</li>
+                                                <li data-value="Madhya Pradesh">Madhya Pradesh</li>
+                                                <li data-value="Maharashtra">Maharashtra</li>
+                                                <li data-value="Manipur">Manipur</li>
+                                                <li data-value="Meghalaya">Meghalaya</li>
+                                                <li data-value="Mizoram">Mizoram</li>
+                                                <li data-value="Nagaland">Nagaland</li>
+                                                <li data-value="Odisha">Odisha</li>
+                                                <li data-value="Punjab">Punjab</li>
+                                                <li data-value="Rajasthan">Rajasthan</li>
+                                                <li data-value="Sikkim">Sikkim</li>
+                                                <li data-value="Tamil Nadu">Tamil Nadu</li>
+                                                <li data-value="Telangana">Telangana</li>
+                                                <li data-value="Tripura">Tripura</li>
+                                                <li data-value="Uttar Pradesh">Uttar Pradesh</li>
+                                                <li data-value="Uttarakhand">Uttarakhand</li>
+                                                <li data-value="West Bengal">West Bengal</li>
+                                                <li data-value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</li>
+                                                <li data-value="Chandigarh">Chandigarh</li>
+                                                <li data-value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</li>
+                                                <li data-value="Delhi">Delhi</li>
+                                                <li data-value="Lakshadweep">Lakshadweep</li>
+                                                <li data-value="Puducherry">Puducherry</li>
+                                                <li data-value="Ladakh">Ladakh</li>
+                                                <li data-value="Jammu and Kashmir">Jammu and Kashmir</li>
+                                            </ul>
+                                        </div>
+                                        <span id="edit-state-error" style="color: red; display: none;"></span>
+                                    </div>
+                                    
+                                    <div class="tm-form-field tm-form-fieldhalf">
+                                        <label for="edit-phone">Contact No<span class="red-asterisk">*</label>
+                                        <input type="text" id="edit-phone"/>
+                                        <span id="edit-phone-error" style="color: red; display: none;"></span>
+                                    </div>
+                                    <div class="tm-form-field">
+                                        <input type="checkbox" name="billform-dirrentswitch" id="edit-billform-dirrentswitch"/>
+                                        <label for="edit-billform-dirrentswitch"><b>Ship to another address</b></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal"> Close </button>
+                <button type="button" class="btn btn-primary" id="updateChanges"> Update </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Edit Address Modal Ends -->
+
+
+
+
 <%- include('../layouts/userLayouts/user-footer.ejs') %>
+
+
+
+
+<!-- --------------------------------------------------- -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- importing the script for add address modal form -->
+<script src="/assets/scripts/userScripts/add-address-modal-script.js"></script>
+<script src="/assets/scripts/userScripts/edit-address-modal-script.js"></script>
+
+
+<!-- importing the script for carted items (UPDATE CART QUANTITY, REMOVE FROM CART & CHECKOUT, REMOVE OUTOFSTOCK CART ITEMS etc) -->
+<script src="/assets/scripts/userScripts/cart-and-checkout-scripts.js"></script>
+
+
+
+<!-- style for address modal -->
+<style>
+    .red-asterisk {
+        color: red;
+    }
+    
+    .dropdown {
+        position: relative;
+        width: 100%;
+    }
+    
+    .dropdown-selector {
+        width: 100%;
+    }
+    
+    #state-input {
+        width: calc(100% - 10px);
+        padding: 8px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+    }
+    
+    .dropdown-list {
+        position: absolute;
+        z-index: 1000;
+        top: 100%;
+        left: 0;
+        width: calc(100% + 2px);
+        max-height: 200px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        background-color: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        display: none;
+    }
+    
+    .dropdown-list li {
+        list-style-type: none;
+        padding: 8px 12px;
+        cursor: pointer;
+    }
+    
+    .dropdown-list li:hover {
+        background-color: #f0f0f0;
+    }
+    
+</style>
+
+
+<script>
+function placeOrder() {
+
+    checkoutDetails = 'This is the Ordered Products'
+
+    Swal.fire({
+        title: "Are you sure?",
+        // text: "Item will be removed from your cart and you won't be able to revert this!",
+        // icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "green",
+        confirmButtonText: "Confirm"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: '/place-order',
+                method: 'post',
+                data: {
+                    checkoutDetails
+                },
+                success: function(response) {
+                    if(response.successful) {
+                        Swal.fire({
+                            title: "Order Placed",
+                            text: "Your order has been successfully placed.",
+                            icon: "success",
+                            showConfirmButton: false,
+                            timer: 1500,
+                        }).then(() => {
+                            window.location.href = '/thankyou'; // Proceed to the thank you page after completed ordering.
+                        });
+                    } else {
+                        console.log('Failed to remove product from cart');
+                    }
+                },
+                error: function(error) {
+                    console.error('Error in removing from cart:', error);
+                }
+            });
+        }
+    });
+}
+</script>

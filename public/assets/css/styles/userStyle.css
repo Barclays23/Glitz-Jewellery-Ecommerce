@@ -6677,8 +6677,8 @@ button.tm-videobutton img {
 .tm-cart-table .tm-wishlist-col-image,
 .tm-wishlist-table .tm-cart-col-image,
 .tm-wishlist-table .tm-wishlist-col-image {
-    width: 180px;
-    min-width: 180px
+    width: 250px;
+    min-width: 250px;
 }
 
 .tm-wishlist-table .tm-cart-col-remove,
@@ -6697,7 +6697,7 @@ button.tm-videobutton img {
 .tm-cart-table .tm-wishlist-col-productname,
 .tm-wishlist-table .tm-cart-col-productname,
 .tm-wishlist-table .tm-wishlist-col-productname {
-    min-width: 250px
+    min-width: 280px;
 }
 
 .tm-cart-table .tm-cart-col-price,
@@ -7011,11 +7011,13 @@ button.tm-videobutton img {
     color: #f2ba59
 }
 
-.tm-checkout-payment {
+.tm-checkout-payment,
+.tm-checkout-address {
     margin-top: 20px
 }
 
-.tm-checkout-payment label {
+.tm-checkout-payment label,
+.tm-checkout-address label {
     margin-bottom: 0;
     display: block;
     color: #000;
@@ -7023,12 +7025,18 @@ button.tm-videobutton img {
 }
 
 .tm-checkout-payment-content {
-    display: none;
+    display: none;  /* payment-content not displaying */
+    padding-left: 25px;
+    padding-top: 10px
+}
+.tm-checkout-address-content {
+    display: block; /* address-content displaying */
     padding-left: 25px;
     padding-top: 10px
 }
 
-.tm-checkout-payment-content p {
+.tm-checkout-payment-content p,
+.tm-checkout-address-content p {
     margin-bottom: 0
 }
 
@@ -7058,6 +7066,13 @@ button.tm-videobutton img {
 .tm-myaccount-dashboard {
     border: 1px solid #ebebeb;
     padding: 30px
+}
+
+
+.checkout-border-row {
+    border: 1px solid #ebebeb;
+    margin-bottom: 10px;
+    /* padding: 30px */
 }
 
 .tm-myaccount-dashboard p a {

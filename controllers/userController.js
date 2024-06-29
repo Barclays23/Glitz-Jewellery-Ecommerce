@@ -1033,72 +1033,6 @@ const updateUserPassword = async (req, res)=>{
 
 
 
-// load user-order page----------------------------------------
-const loadCheckout = async (req, res)=>{
-    try {
-        const sessionData = await User.findById(req.session.userId);
-        console.log('session data in user profile page : ' , sessionData);
-
-        const goldPriceData = await GoldPrice.findOne({});
-        const userCart = await Cart.findOne({ userRef: req.session.userId });
-
-        let cartCount = 0;
-
-        if (sessionData && userCart){
-            console.log("Cart Documents for User:", userCart);
-            userCart.product.forEach((product) => {
-                cartCount += product.quantity;
-            });
-            console.log("Total Quantity of Carted Items in checkout page :", cartCount);
-        }
-
-        res.render('checkout', { sessionData, cartCount, goldPriceData });
-
-    } catch (error) {
-        console.log('error in loading user profile', error.message);
-    }
-}
-
-
-
-
-// load user-order page----------------------------------------
-const loadUserOrders = async (req, res)=>{
-    try {
-        const sessionData = await User.findById(req.session.userId);
-        console.log('session data in user profile page : ' , sessionData);
-
-        const goldPriceData = await GoldPrice.findOne({});
-        const userCart = await Cart.findOne({ userRef: req.session.userId });
-
-        let cartCount = 0;
-
-        if (sessionData && userCart){
-            console.log("Cart Documents for User:", userCart);
-            userCart.product.forEach((product) => {
-                cartCount += product.quantity;
-            });
-            console.log("Total Quantity of Carted Items:", cartCount);
-        }
-
-
-        res.render('userOrders', { sessionData, cartCount, goldPriceData });
-
-    } catch (error) {
-        console.log('error in loading user profile', error.message);
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1124,6 +1058,4 @@ module.exports = {
     loadEditUserProfile,
     updateUserProfile,
     updateUserPassword,
-    loadCheckout,
-    loadUserOrders,
 }

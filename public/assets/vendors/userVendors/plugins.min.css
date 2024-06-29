@@ -215,7 +215,7 @@ figure {
 
 img {
   vertical-align: middle;
-  border-style: none
+  border-style: none;
 }
 
 svg {
@@ -1787,7 +1787,7 @@ pre code {
 
 .table thead th {
   vertical-align: bottom;
-  border-bottom: 2px solid #dee2e6
+  border-bottom: 2px solid #dee2e6;
 }
 
 .table tbody+tbody {
@@ -1808,9 +1808,13 @@ pre code {
   border: 1px solid #dee2e6
 }
 
+.table-bordered tr {
+  border: 1.5px solid #464646
+}
+
 .table-bordered thead td,
 .table-bordered thead th {
-  border-bottom-width: 2px
+  border-bottom-width: 1px;
 }
 
 .table-borderless tbody+tbody,
@@ -2087,7 +2091,7 @@ pre code {
     display: block;
     width: 100%;
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch
+    -webkit-overflow-scrolling: touch;
   }
 
   .table-responsive-lg>.table-bordered {

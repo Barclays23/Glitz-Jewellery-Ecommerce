@@ -1,4 +1,4 @@
-// <!-- script for add address modal -->
+// <!-- script for edit address modal -->
 
 $(document).ready(function() {
     // Toggle dropdown list visibility when clicking selector or typing
@@ -14,9 +14,9 @@ $(document).ready(function() {
 
 
     // Filter dropdown list based on input
-    $('#state-input').on('input', function() {
-        const inputValue = $(this).val().toLowerCase();
-        $('#add-state li').each(function() {
+    $('#edit-state-input').on('input', function() {
+        const inputValue = $(this).val().toLowerCase().trim();
+        $('#edit-state li').each(function() {
             const state = $(this).data('value').toLowerCase();
             if (state.includes(inputValue)) {
                 $(this).show();
@@ -29,23 +29,50 @@ $(document).ready(function() {
 
     
     // Handle selection of state from dropdown list
-    $('#add-state li').on('click', function() {
+    $('#edit-state').on('click', 'li', function() {
         const selectedState = $(this).data('value');
-        $('#state-input').val(selectedState);
+        $('#edit-state-input').val(selectedState);
         $('.dropdown-list').hide(); // Hide the dropdown list after selection
     });
 
 
-    $('#saveChanges').on('click', function(event) {
+
+    // Handle edit address link click to populate modal fields
+    $('.edit-address-link').on('click', function(event) {
+        event.preventDefault();
+        const addressId = $(this).data('address-id');
+        const index = $(this).data('index');
+        const firstname = $(this).data('firstname');
+        const lastname = $(this).data('lastname');
+        const street = $(this).data('street');
+        const city = $(this).data('city');
+        const state = $(this).data('state');
+        const pincode = $(this).data('pincode');
+        const contact = $(this).data('contact');
+
+        // Populate modal form fields with default values
+        $('#edit-firstname').val(firstname);
+        $('#edit-lastname').val(lastname);
+        $('#edit-address').val(street);
+        $('#edit-city').val(city);
+        $('#edit-pincode').val(pincode);
+        $('#edit-state-input').val(state);
+        $('#edit-phone').val(contact);
+        $('#editAddressModal').attr('data-address-id', addressId); // Store address ID in a hidden field or data attribute in modal
+    });
+
+
+    $('#updateChanges').on('click', function() {
         event.preventDefault();
 
-        const firstname = $('#add-firstname').val()
-        const lastname = $('#add-lastname').val()
-        const address = $('#add-address').val()
-        const city = $('#add-city').val()
-        const zipcode = $('#add-pincode').val()
-        const state = $('#state-input').val().trim()
-        const phone = $('#add-phone').val()
+        const firstname = $('#edit-firstname').val()
+        const lastname = $('#edit-lastname').val()
+        const address = $('#edit-address').val()
+        const city = $('#edit-city').val()
+        const zipcode = $('#edit-pincode').val()
+        const state = $('#edit-state-input').val().trim()
+        const phone = $('#edit-phone').val()
+        const addressId = $('#editAddressModal').data('address-id')
 
         console.log("Firstname: ", firstname);
         console.log("Lastname: ", lastname);
@@ -54,87 +81,89 @@ $(document).ready(function() {
         console.log("Pincode: ", zipcode);
         console.log("State: ", state);
         console.log("Phone: ", phone);
+        console.log("addressId: ", addressId);
 
         let isValid = true;
 
 
         if (firstname === '') {
-            $('#firstname-error').text('Please enter your first name.').show();
+            $('#edit-firstname-error').text('Please enter your first name.').show();
             isValid = false;
         } else if (!/^[a-zA-Z\s.-]+$/.test(firstname)) {
-            $('#firstname-error').text('Avoid invalid characters in the first name').show();
+            $('#edit-firstname-error').text('Avoid invalid characters in the first name').show();
             isValid = false;
         } else {
-            $('#firstname-error').hide();
+            $('#edit-firstname-error').hide();
         }
 
         if (lastname === '') {
-            $('#lastname-error').text('Please enter your last name.').show();
+            $('#edit-lastname-error').text('Please enter your last name.').show();
             isValid = false;
         } else if (!/^[a-zA-Z\s.-]+$/.test(lastname)) {
-            $('#lastname-error').text('Avoid invalid characters in the last name').show();
+            $('#edit-lastname-error').text('Avoid invalid characters in the last name').show();
             isValid = false;
         } else {
-            $('#lastname-error').hide();
+            $('#edit-lastname-error').hide();
         }
 
 
         if (address === '') {
-            $('#address-error').text('Address is required.').show();
+            $('#edit-address-error').text('Address is required.').show();
             isValid = false;
         } else {
-            $('#address-error').hide();
+            $('#edit-address-error').hide();
         }
 
         if (city === '') {
-            $('#city-error').text('City is required.').show();
+            $('#edit-city-error').text('City is required.').show();
             isValid = false;
         } else {
-            $('#city-error').hide();
+            $('#edit-city-error').hide();
         }
 
         if (zipcode === '') {
-            $('#pincode-error').text('Zipcode is required.').show();
+            $('#edit-pincode-error').text('Zipcode is required.').show();
             isValid = false;
         } else if (!/^\d{6}$/.test(zipcode)) {
-            $('#pincode-error').text('Enter a valid 6-digit zipcode.').show();
+            $('#edit-pincode-error').text('Enter a valid 6-digit zipcode.').show();
             isValid = false;
         } else {
-            $('#pincode-error').hide();
+            $('#edit-pincode-error').hide();
         }
 
 
         if (phone === '') {
-            $('#phone-error').text('Phone number is required.').show();
+            $('#edit-phone-error').text('Phone number is required.').show();
             isValid = false;
         } else if (!/^\d{10}$/.test(phone)) {
-            $('#phone-error').text('Enter a valid 10-digit phone number.').show();
+            $('#edit-phone-error').text('Enter a valid 10-digit phone number.').show();
             isValid = false;
         } else {
-            $('#phone-error').hide();
+            $('#edit-phone-error').hide();
         }
 
 
         // Check if the selected state matches exactly (spelling mistakes in state name)
         let stateExists = false;
-        $('#add-state li').each(function() {
+        $('#edit-state li').each(function() {
             if (state.toLowerCase() === $(this).data('value').toLowerCase()) {
                 stateExists = true;
-                $('.dropdown-list').hide();
                 return false; // break the loop
+                $('.dropdown-list').hide();
             }
         });
 
         if (!stateExists) {
-            $('#state-error').text('Select a valid state from the list.').show();
+            $('#edit-state-error').text('Select a valid state from the list.').show();
             isValid = false;
         } else {
-            $('#state-error').hide();
+            $('#edit-state-error').hide();
         }
 
 
         if (isValid) { 
             const formData = {
+                addressId,
                 firstname,
                 lastname,
                 address,
@@ -145,16 +174,19 @@ $(document).ready(function() {
                 // ship_to_another_address: $('#billform-dirrentswitch').is(':checked')
             };
 
+
+
+            // AJAX request for EDITING address
             $.ajax({
-                type: 'POST',
-                url: '/add-address',
+                type: 'PATCH',
+                url: '/edit-address',
                 data: formData,
                 dataType: 'json',
                 success: function(response) {
                     console.log('Response after sending address:', response);
                     if(response.success){
                         Swal.fire({
-                            text: "New address has been added.",
+                            text: "Address has been modified.",
                             icon: 'success',
                             showConfirmButton: false,
                             timer: 1500

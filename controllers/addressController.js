@@ -37,7 +37,7 @@ const loadUserAddress = async (req, res)=>{
 
 
 
-// add new address for users -------------------------------
+// add new address -------------------------------
 const addNewAddress = async (req, res)=>{
     try {
         const addressData = {
@@ -74,41 +74,84 @@ const addNewAddress = async (req, res)=>{
 
 
 
-// add new address for users -------------------------------
+// edit user address -------------------------------
 const editAddress = async (req, res)=>{
     try {
-        const addressData = {
-            firstname : req.body.firstname, 
-            lastname : req.body.lastname, 
-            street : req.body.address,
-            city : req.body.city,
-            pincode : req.body.zipcode,
-            state : req.body.state,
-            contact : req.body.phone,
-        }
-
-        console.log('body recieved for edit address :', req.body);
-
         const userId = req.session.userId;
 
-        // const updatedUserAddress = await Address.findOneAndUpdate(
-        //   { userRef: userId },
-        //   { $set: { userRef: userId }, $push: { address: addressData } },
-        //   { upsert: true, new: true }
-        // );
+        const {
+            addressId,
+            firstname,
+            lastname,
+            address,
+            city,
+            zipcode,
+            state,
+            phone,
+        } = req.body;
 
-        // console.log('added user address :', updatedUserAddress);
+        console.log('addressId :', addressId);
+        console.log('firstname :', firstname);
+        console.log('lastname :', lastname);
+        console.log('address :', address);
+        console.log('city :', city);
+        console.log('zipcode :', zipcode);
+        console.log('state :', state);
+        console.log('phone :', phone);
 
-        // return res.json({success: true});
+        const updatedUserAddress = await Address.findOneAndUpdate(
+            { userRef: userId, 'address._id': addressId },
+            { $set: {
+                    'address.$.firstname': firstname,
+                    'address.$.lastname': lastname,
+                    'address.$.street': address,
+                    'address.$.city': city,
+                    'address.$.pincode': zipcode,
+                    'address.$.state': state,
+                    'address.$.contact': phone
+                }
+            },
+            { new: true }
+        );
 
+        console.log('user address updated:');
+
+        return res.json({success: true});
 
     } catch (error) {
-        console.log('error while adding new address :', error.message);
+        console.log('error while editing address :', error.message);
         return res.status(500).res.json({error: true});
     }
 }
 
 
+
+
+// delete user address -------------------------------
+const deleteAddress = async (req, res)=>{
+    try {
+        const userId = req.session.userId;
+
+        const {
+            addressId,
+        } = req.body;
+
+        console.log('addressId :', addressId);
+        const updatedUserAddress = await Address.findOneAndUpdate(
+            {userRef: userId},
+            {$pull: {address: {_id: addressId}}},
+        );
+
+        console.log('user address deleted');
+
+        return res.json({deleted: true});
+
+
+    } catch (error) {
+        console.log('error while deleting address :', error.message);
+        return res.status(500).res.json({error: true});
+    }
+}
 
 
 
@@ -117,4 +160,5 @@ module.exports = {
     loadUserAddress,
     addNewAddress,
     editAddress,
+    deleteAddress
 }

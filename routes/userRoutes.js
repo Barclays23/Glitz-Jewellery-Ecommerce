@@ -35,6 +35,7 @@ const userController = require ('../controllers/userController');
 const cartController = require ('../controllers/cartController');
 const wishlistController = require ('../controllers/wishlistController');
 const addressController = require ('../controllers/addressController');
+const orderController = require ('../controllers/orderController');
 
 const userAuth = require('../middlewares/userAuth');
 const googleAuth = require('../middlewares/googleAuth');
@@ -86,6 +87,8 @@ userRoute.get('/cart', userAuth.isLogin, cartController.loadUserCart);
 userRoute.post('/add-to-cart', cartController.addToCart);
 userRoute.post('/update-cart-quantity', userAuth.isLogin, cartController.updateCartQuantity);
 userRoute.delete('/remove-from-cart', userAuth.isLogin, cartController.removeFromCart);
+// userRoute.post('/save-for-later', userAuth.isLogin, cartController.removeFromCart); // change fn to addToWishlist once the wishlist created. currently it's removing. method post
+userRoute.post('/proceed-to-checkout', userAuth.isLogin, cartController.proceedToCheckout);
 
 // WISHLIST ROUTES
 userRoute.get('/wishlist', userAuth.isLogin, wishlistController.loadUserWishlist);
@@ -95,12 +98,16 @@ userRoute.get('/wishlist', userAuth.isLogin, wishlistController.loadUserWishlist
 userRoute.get('/address', userAuth.isLogin, addressController.loadUserAddress);
 userRoute.post('/add-address', userAuth.isLogin, addressController.addNewAddress);
 userRoute.patch('/edit-address', userAuth.isLogin, addressController.editAddress);
+userRoute.delete('/delete-address', userAuth.isLogin, addressController.deleteAddress);
 
 
-// CHECKOUT ROUTES
-userRoute.get('/checkout', userAuth.isLogin, userController.loadCheckout);
+// ORDER ROUTES
+userRoute.get('/checkout', userAuth.isLogin, orderController.loadCheckout);
+userRoute.get('/orders', userAuth.isLogin, orderController.loadUserOrders);
 
-userRoute.get('/orders', userAuth.isLogin, userController.loadUserOrders);
+
+userRoute.post('/place-order', cartController.placeOrder);
+userRoute.get('/thankyou', cartController.loadThankyou);
 
 
 

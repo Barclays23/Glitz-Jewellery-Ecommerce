@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #fff;
+        }
+        .container {
+            text-align: center;
+        }
+        .checkmark {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+        }
+        .checkmark circle {
+            fill: #b2e0a3;
+        }
+        .checkmark path {
+            fill: none;
+            stroke: #4CAF50;
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-miterlimit: 10;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin: 0;
+        }
+        p {
+            font-size: 1.2em;
+            color: #666;
+        }
+        .buttons {
+            margin-top: 20px;
+        }
+        .buttons button {
+            background-color: #f0ad4e;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .buttons button:hover {
+            background-color: #ec971f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <svg class="checkmark" viewBox="0 0 52 52">
+            <circle cx="26" cy="26" r="25" fill="none"/>
+            <path d="M16 26l7 7 13-13"/>
+        </svg>
+        <h1>Thank you!</h1>
+        <p>Your order placed successfully.</p>
+        <div class="buttons">
+            <a href="/shopping"> <button> Continue Shopping </button> </a>
+            <a href="/"> <button> Back to Home </button> </a>
+        </div>
+    </div>
+</body>
+</html>

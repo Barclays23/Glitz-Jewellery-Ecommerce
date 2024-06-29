@@ -55,7 +55,7 @@ const updateGoldRateManually = async(req, res)=>{
                         { new : true }
                     );
                     
-                    console.log('updated the price of ',productData[0].code);
+                    console.log('updated the price details of ',productData[i].code);
     
                 }
     
@@ -113,13 +113,13 @@ const updateGoldRateWithAPIs = async(req, res)=>{
             
                 // updating each products price details based on API updated gold rate
                 for(i=0; i < productData.length; i++){
-                    const productId = productData[0]._id;
+                    const productId = productData[i]._id;
                     
-                    const metalPrice = productData[0].netWeight * updatedAPIGoldPriceData.price;
+                    const metalPrice = productData[i].netWeight * updatedAPIGoldPriceData.price;
                     // console.log('metalPrice : ', metalPrice);
-                    const makingCharge = metalPrice * productData[0].VA /100;
+                    const makingCharge = metalPrice * productData[i].VA /100;
                     // console.log('makingCharge : ', makingCharge);
-                    const stoneCharge = productData[0].stoneCharge;
+                    const stoneCharge = productData[i].stoneCharge;
                     // console.log('stoneCharge : ', stoneCharge);
                     const GST = (metalPrice + makingCharge + stoneCharge) * 3/100;
                     // console.log('GST : ', GST);
@@ -139,7 +139,7 @@ const updateGoldRateWithAPIs = async(req, res)=>{
                     { new : true }
                     );
 
-                    console.log('updated the price of ',productData[0].code);
+                    console.log('updated the price details of ',productData[i].code);
     
                 }
     
