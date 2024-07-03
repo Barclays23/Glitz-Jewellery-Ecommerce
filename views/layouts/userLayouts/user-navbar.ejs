@@ -56,9 +56,9 @@
                     </div>
                     <div class="col-lg-9 col-6 order-4 order-lg-4">
                         <ul class="tm-header-icons">
-                            <% if(sessionData){ %>
+                            <% if (sessionData){ %>
                                 <li><a href="/my-account"><img src="assets/images/icons/user2.png" width="22px" height="22px" alt="user"></a></li>
-                                <li><a href="/wishlist"><i class="ion-android-favorite-outline"></i><span>0</span></a></li>
+                                <li id="wishlist-count"><a href="/wishlist"><i class="ion-android-favorite-outline"></i><span><%= wishlistCount %></span></a></li>
                                 <li id="cart-count"><a href="/cart"><i class="ion-bag"></i><span><%= cartCount %></span></a></li>
                             <% } else { %>
                                 <li><a href="/login"><img src="assets/images/icons/enter.png" width="23px" height="23px" alt="login"></a></li>

@@ -1,6 +1,7 @@
 const Address = require('../models/addressModel');
 const Cart = require('../models/cartModel');
 const User = require('../models/userModel');
+const Wishlist = require('../models/wishlistModel');
 const GoldPrice = require('../models/goldPriceModel');
 
 
@@ -16,21 +17,27 @@ const loadCheckout = async (req, res)=>{
         const goldPriceData = await GoldPrice.findOne({});
         const userCart = await Cart.findOne({ userRef: userId }).populate('product.productRef');
         const userAddress = await Address.findOne({userRef: userId});
+        const userWishlist = await Wishlist.findOne({ userRef: userId});
 
         let cartCount = 0;
+        let wishlistCount = 0;
 
-        if (sessionData && userCart){
-            console.log("Cart Documents for User:", userCart);
+        if (userCart){
             userCart.product.forEach((product) => {
                 cartCount += product.quantity;
             });
-            console.log("Total Quantity of Carted Items in checkout page :", cartCount);
         }
 
-        res.render('checkout', { sessionData, userAddress, userCart, cartCount, goldPriceData });
+        if (userWishlist){
+            userWishlist.product.forEach((product) => {
+                wishlistCount += product.quantity;
+            });
+        }
+
+        res.render('checkout', { sessionData, userAddress, userCart, cartCount, wishlistCount, goldPriceData });
 
     } catch (error) {
-        console.log('error in loading checkout page', error.message);
+        console.log('error in loading checkout page :', error.message);
     }
 }
 

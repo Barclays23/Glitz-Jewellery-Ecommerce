@@ -18,15 +18,6 @@ const wishlistSchema = new mongoose.Schema({
             default : 1
         },
     }],
-
-    // price : {
-    //     type : Number,
-    //     default : 0
-    // },
-    // totalPrice : {
-    //     type : Number,
-    //     default : 0
-    // }
 });
 
 

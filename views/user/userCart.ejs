@@ -156,7 +156,7 @@
                                                     <% subTotal = subTotal + (userCart.product[i].productRef.totalPrice * userCart.product[i].quantity) %>
                                                 </td>
                                                 <td class="bg-light">
-                                                    <button class="tm-button tm-button-small">Save for Later</button>
+                                                    <button class="tm-button tm-button-small" onclick="saveForLater('<%= userCart.product[i]._id %>')">Save for Later</button>
                                                     <!-- <button class="tm-cart-removeproduct bg-danger"><i class="ion-close"></i></button> -->
                                                     <!-- <a href=""><img src="/assets/images/icons/remove2.png" style="width: 41px; height: auto;" alt="remove-icon"> </a> -->
                                                     <button class="tm-button tm-button-small" onclick="removeFromCart('<%= userCart.product[i]._id, i %>', '<%= i %>')"> Remove </button>
@@ -168,7 +168,7 @@
                                             </tr>
                                         <% } %>
                                     <% } else { %>
-                                        <tr >
+                                        <tr>
                                             <td colspan="6" class="p-5 text-dark bg-light"> YOUR SHOPPING CART IS EMPTY </td>
                                         </tr>
                                     <% } %>
@@ -219,7 +219,6 @@
                                             <!-- <a href="/checkout?id=<%= sessionData._id %>" class="tm-button">Proceed To Checkout</a> -->
                                             <a href="#" onclick="proceedToCheckout('<%= sessionData._id %>')" class="tm-button"> Proceed To Checkout</a>
                                         </div>
-                                        
                                     </div>
                                 </div>
                             </div>
@@ -248,5 +247,10 @@
 
 <!-- importing the script for carted items (UPDATE CART QUANTITY, REMOVE FROM CART & CHECKOUT, REMOVE OUTOFSTOCK CART ITEMS etc) -->
 <script src="/assets/scripts/userScripts/cart-and-checkout-scripts.js"></script>
+
+
+// <!--importing the wishlist script for save for later (MOVE TO WISHLIST and remvoe from the cart / checkout) -->
+<script src="/assets/scripts/userScripts/wishlist-scripts.js"></script>
+
 
 

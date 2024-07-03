@@ -2,6 +2,7 @@ const User = require ('../models/userModel');
 const Product = require ('../models/productModel');
 const Category = require ('../models/categoryModel');
 const Cart = require ('../models/cartModel');
+const Wishlist = require ('../models/wishlistModel');
 const GoldPrice = require('../models/goldPriceModel');
 const UserOtp = require ('../models/otpModel');
 const bcrypt =  require ('bcrypt');
@@ -25,17 +26,28 @@ const loadHome = async(req, res)=>{
         const popularProducts = await Product.find({});
         const newProducts = await Product.find({});
         const userCart = await Cart.findOne({ userRef: userId });
+        const userWishlist = await Wishlist.findOne({userRef : userId});
 
         let cartCount = 0;
+        let wishlistCount = 0;
 
-        if (sessionData && userCart){
+        if (userCart){
             userCart.product.forEach((product) => {
                 cartCount += product.quantity;
             });
-            console.log("Total Quantity of Carted Items in home:", cartCount);
+            console.log("Cart Quantity in home:", cartCount);
         }
 
-        res.render('home', {sessionData, cartCount, goldPriceData, popularProducts, newProducts});
+        if (userWishlist){
+            console.log('wishlist und');
+            userWishlist.product.forEach((product) => {
+                wishlistCount += product.quantity;
+            });
+            console.log("cartCount in home :", cartCount);
+            console.log('wishlistCount in home :', wishlistCount);
+        }
+
+        res.render('home', {sessionData, wishlistCount, cartCount, goldPriceData, popularProducts, newProducts});
 
     } catch (error) {
         console.log(error.message);
@@ -483,20 +495,29 @@ const verifyAccount = async (req, res)=>{
 const loadShopping = async (req, res)=>{
     try {
         const sessionId = req.session.userId;
-        console.log('session id in shopping', sessionId);
+        console.log('session id in shopping : ', sessionId);
         const categoryData = await Category.find({});
         const goldPriceData = await GoldPrice.findOne({});
         const popularProducts = await Product.find({});
-        const userCart = await Cart.findOne({ userRef: req.session.userId });
-        console.log('userCart in shopping :', userCart);
+        const userCart = await Cart.findOne({ userRef: sessionId });
+        const userWishlist = await Wishlist.findOne({ userRef: sessionId});
 
+        const wishlistItems = userWishlist ? userWishlist.product.map((item) => item.productRef) : [];
+
+        
         let cartCount = 0;
-        if (sessionId && userCart){
-            console.log("Cart Documents for User:", userCart);
+        let wishlistCount = 0;
+
+        if (userCart){
             userCart.product.forEach((product) => {
                 cartCount += product.quantity;
             });
-            console.log("Total Quantity of Carted Items:", cartCount);
+        }
+
+        if (userWishlist){
+            userWishlist.product.forEach((product) => {
+                wishlistCount += product.quantity;
+            });
         }
 
 
@@ -529,15 +550,6 @@ const loadShopping = async (req, res)=>{
         .limit(limit)
         .exec();
 
-        // console.log("product dataaaaaaaaaaa 1 : ", productData[0]);
-        // const MetalPrice = productData[0].netWeight * goldPriceData.price;
-        // const MakingCharge = MetalPrice * productData[0].VA /100;
-        // const StoneCharge = productData[0].stoneCharge;
-        // const GsT = (MetalPrice + MakingCharge + StoneCharge) * 3/100;
-        // const TotalPrice = MetalPrice + MakingCharge + StoneCharge + GsT;
-
-        // console.log(MetalPrice, MakingCharge, StoneCharge, GsT);
-
         const productCount = await Product.countDocuments(productQuery);
 
         let totalPages = Math.ceil(productCount / limit);
@@ -549,6 +561,8 @@ const loadShopping = async (req, res)=>{
             res.render('shopping', {
                 sessionData : sessionData, 
                 cartCount,
+                wishlistCount,
+                wishlistItems,
                 goldPriceData,
                 productData, 
                 categoryData, 
@@ -564,7 +578,6 @@ const loadShopping = async (req, res)=>{
             console.log('no session data in shopping page');
             res.render('shopping', {
                 sessionData : null, 
-                cartCount,
                 goldPriceData,
                 productData, 
                 categoryData, 
@@ -591,23 +604,38 @@ const productDetals = async(req, res)=>{
     try {
         const sessionId = req.session.userId;
         console.log('sessionId', sessionId);
-        const sessionData = await User.findOne({_id: req.session.userId});
+
+        const sessionData = await User.findOne({_id: sessionId});
         const productData = await Product.findOne({_id: req.query.id}).populate('categoryRef');
         const categoryData = await Category.find({});
         const goldPriceData = await GoldPrice.findOne({});
         const similarProducts = await Product.find({categoryRef: productData.categoryRef._id});
         const popularProducts = await Product.find({});
-        const userCart = await Cart.find({ userRef: req.session.userId });
+        const userCart = await Cart.findOne({ userRef: sessionId });
+        const userWishlist = await Wishlist.findOne({ userRef: sessionId});
+
+        const wishlistItems = userWishlist ? userWishlist.product.map((item) => item.productRef) : [];
+
         
         let cartCount = 0;
+        let wishlistCount = 0;
 
-        if (sessionData) {
-            userCart[0].product.forEach((product) => {
+        
+        if (userCart){
+            userCart.product.forEach((product) => {
                 cartCount += product.quantity;
             });
-            console.log("Total Quantity of Carted Items:", cartCount);
+        }
 
-            res.render('productDetails', {sessionData, cartCount, productData, categoryData, goldPriceData, similarProducts, popularProducts});
+        if (userWishlist){
+            userWishlist.product.forEach((product) => {
+                wishlistCount += product.quantity;
+            });
+        }
+
+
+        if (sessionData) {
+            res.render('productDetails', {sessionData, cartCount, wishlistCount, wishlistItems, productData, categoryData, goldPriceData, similarProducts, popularProducts});
 
         } else{
             res.render('productDetails', {sessionData: null, productData, categoryData, goldPriceData, similarProducts, popularProducts });

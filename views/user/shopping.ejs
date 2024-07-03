@@ -95,7 +95,7 @@
                             </select>
                         </form>
 
-                        <div class="tm-shop-products">
+                        <div class="tm-shop-products" id="shop-products">
                             <div class="row mt-30-reverse">
                                 <% for(i=0; i < limit; i++){ %>
                                     <% if (productData[i]){ %>
@@ -105,16 +105,21 @@
                                                 <div class="tm-product-images">
                                                     <img src="assets/images/productImages/<%= productData[i].images.image1 %>" alt="product image">
                                                     <img src="assets/images/productImages/<%= productData[i].images.image2 %>" alt="product image">
-                                                    <!-- <img src="assets/images/products/product-image-1.jpg" alt="product image"> -->
-                                                    <!-- <img src="assets/images/products/product-image-2.jpg" alt="product image"> -->
                                                 </div>
-                                                <ul class="tm-product-actions">
-                                                    <li> <a href="#" onclick="addToCart('<%= productData[i]._id %>')"><i class="ion-android-cart"></i> Add to cart </a> </li>
-                                                    <li> <button data-fancybox data-src="assets/images/productImages/<%= productData[i].images.image1 %>"><i class="ion-eye"></i> </button> </li>
-                                                    <li> <a href="#"><i class="ion-android-favorite-outline"></i> </a> </li>
-                                                    <!-- <li> <a href="#"><i class="ion-heart"></i> </a> </li> -->
-                                                    <li> <a href="#"><i class="ion-android-favorite"></i> </a> </li>
-                                                </ul>
+                                                <div id="product-actions_<%= productData[i]._id %>">
+                                                    <ul class="tm-product-actions">
+                                                        <li> <a href="#" onclick="addToCart('<%= productData[i]._id %>')"><i class="ion-android-cart"></i> Add to cart </a> </li>
+                                                        <li> <a href="#" data-fancybox data-src="assets/images/productImages/<%= productData[i].images.image1 %>"><i class="ion-eye"></i> </a> </li>
+                                                        <% if (sessionData && wishlistItems) { %>
+                                                            <% console.log('productData[i]._id :', productData[i]._id.toString()) %>
+                                                            <% console.log('wishlistItems :', wishlistItems.map(item => item.toString())) %>
+                                                            
+                                                            <li><a href="#" onclick="addToWishlist('<%= productData[i]._id %>')"><i class="<%= wishlistItems.map(item => item.toString()).includes(productData[i]._id.toString()) ? 'ion-android-favorite' : 'ion-android-favorite-outline' %>"></i></a></li>
+                                                        <% } else { %>
+                                                            <li><a href="#" onclick="addToWishlist('<%= productData[i]._id %>')"><i class="ion-android-favorite-outline"></i></a></li>
+                                                        <% } %>
+                                                    </ul>
+                                                </div>
                                                 <div class="tm-product-badges">
                                                     <!-- <span class="tm-product-badges-new">New</span> -->
                                                     <% if(productData[i].quantity === 0){ %>
@@ -202,11 +207,6 @@
                                                             <td style="text-align: right;"><b>₹</b></td>
                                                             <td style="text-align: right;"><b> <%= (totalPrice).toFixed(2) %></b></td>
                                                         </tr>
-                                                        <!-- <tr>
-                                                            <td style="text-align: right;"><b>₹</b></td>
-                                                            <td><b>TOTAL</b></td>
-                                                            <td style="text-align: right;"><b> <%= (totalPrice).toFixed(2) %></b></td>
-                                                        </tr> -->
                                                     </table>
 
                                                     <ul class="tm-product-actions">
@@ -340,131 +340,14 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
-<!-- script for add to cart -->
-<script>
-    const signInButtonId = 'signInSwalButton';
-    const registerButtonId = 'registerSwalButton';
-
-    // Function to show the authentication SweetAlert
-    // function showAuthSwal() {
-    //     Swal.fire({
-    //         title: 'Authentication Required',
-    //         text: "You need to sign in to add products to your cart.",
-    //         icon: 'warning',
-    //         showCloseButton: true, // Show close button
-    //         showCancelButton: true,
-    //         confirmButtonText: '<span id="'+signInButtonId+'">Sign In</span>',
-    //         cancelButtonText: '<span id="'+registerButtonId+'">Register</span>',
-    //         allowOutsideClick: true,
-    //     }).then((result) => {
-    //         // const currentUrl = window.location.href;
-    //         const currentUrl = '/shopping';
-    //         if (result.isConfirmed) {
-    //             const signInUrl = `/login?redirect=${encodeURIComponent(currentUrl)}`;
-    //             window.location.href = signInUrl;
-    //         } else if (result.dismiss === Swal.DismissReason.cancel) {
-    //             const currentUrl = window.location.href;
-    //             const registerUrl = `/register?redirect=${encodeURIComponent(currentUrl)}`;
-    //             window.location.href = registerUrl;
-    //         }
-    //     });
-
-    //     // Add event listeners to the buttons in the SweetAlert
-    //     document.getElementById(signInButtonId).onclick = function() {
-    //         const currentUrl = window.location.href;
-    //         const signInUrl = `/login-in?redirect=${encodeURIComponent(currentUrl)}`;
-    //         window.location.href = signInUrl;
-    //     };
-
-    //     document.getElementById(registerButtonId).onclick = function() {
-    //         const currentUrl = window.location.href;
-    //         const registerUrl = `/register?redirect=${encodeURIComponent(currentUrl)}`;
-    //         window.location.href = registerUrl;
-    //     };
-    // }
-
-
-    // Function to show the authentication SweetAlert
-    function showAuthSwal() {
-        Swal.fire({
-            text: "You need to sign in to add products to your cart.",
-            // icon: 'warning',
-            showCloseButton: true,
-            showCancelButton: true,
-            confirmButtonText: '<span id="'+signInButtonId+'">Sign In</span>',
-            cancelButtonText: '<span id="'+registerButtonId+'">Register</span>',
-            allowOutsideClick: true,
-        }).then((result) => {
-            const currentUrl = window.location.href;
-            if (result.isConfirmed) {
-                const signInUrl = `/login?redirect=${encodeURIComponent(currentUrl)}`;
-                window.location.href = signInUrl;
-            } else if (result.dismiss === Swal.DismissReason.cancel) {
-                const registerUrl = `/register?redirect=${encodeURIComponent(currentUrl)}`;
-                window.location.href = registerUrl;
-            }
-        });
-    }
+<!-- importing the script for carted items (ADD TO CART, UPDATE CART QUANTITY, REMOVE FROM CART & CHECKOUT, REMOVE OUTOFSTOCK CART ITEMS etc) -->
+<script src="/assets/scripts/userScripts/cart-and-checkout-scripts.js"></script>
 
 
 
-    // to add the product to the cart (send data to backend)
-    function addToCart(productId) {
-        console.log('product id for adding to cart: ', productId);
+<!-- script for add to wishlist and remove from wishlist -->
+<script src="/assets/scripts/userScripts/wishlist-scripts.js"></script>
 
-        $.ajax ({
-            url : '/add-to-cart',
-            type : 'POST',
-            contentType : 'application/JSON',
-            data : JSON.stringify({productId}),
-            success: function(response) {
-                console.log('response from add to cart :', response);
-                if (response.success){
-                    Swal.fire({
-                        text: "Added to your cart.",
-                        icon: 'success',
-                        showConfirmButton: false,
-                        timer: 1500
-                    });
-                    $("#cart-count").load("/shopping #cart-count");
-                } else if (response.outofstock){
-                    Swal.fire({
-                        // text: "Unfortunately, this item is out of stock and cannot be added to your cart.",
-                        text: "We are sorry, but this product is currently unavailable for purchase.",
-                        showConfirmButton: false,
-                        timer: 2000,
-                        customClass: {
-                            popup: 'error-swal-background',
-                            // htmlContainer: 'error-swal-text',
-                            // popup: 'bg-danger',
-                            htmlContainer: 'text-white'
-                        }
-                    })
-                } else if (response.nosession){
-                    showAuthSwal();
-                } else if (response.existProduct){
-                    Swal.fire({
-                        text: "Product already added to your cart!",
-                        showConfirmButton: false,
-                        timer: 1500
-                    })
-                }
-            },
-            error: function(xhr, status, error) {
-                console.log('Error in adding to cart :', error);
-                if (xhr.status === 401) {
-                    showAuthSwal();
-                } else {
-                    Swal.fire({
-                        text: "An error occurred while adding to the cart.",
-                        icon: 'error',
-                        showConfirmButton: true
-                    });
-                }
-            }
-        })
-    }
-</script>
 
 
 

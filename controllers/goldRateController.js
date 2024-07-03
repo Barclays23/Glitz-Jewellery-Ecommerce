@@ -81,10 +81,10 @@ const getGoldRateFromAPI = async(req, res)=>{
     // updateGoldRateWithAPIs();
 
     // to get the price from API at cron job specified time.
-    console.log('getGoldRateFromAPI(); will execute at 10:30 am india.');
+    console.log('getGoldRateFromAPI(); will execute at 10:15 am india.');
 
-    cron.schedule('0 30 10 * * *', () => {
-        console.log('Running a job at 10:30 AM IST');
+    cron.schedule('0 15 10 * * *', () => {
+        console.log('Started Running a job at 10:15 AM IST');
         updateGoldRateWithAPIs();
     }, {
         scheduled: true,
@@ -102,6 +102,7 @@ const updateGoldRateWithAPIs = async(req, res)=>{
         // const gramRate = 7000; // for testing
         // const gramRate = await rapidApiGoldRate1(); // Method 1 - gold rate from rapidApiGoldRate1
         const gramRate = await rapidApiGoldRate2(); // Method 2 - gold rate from rapidApiGoldRate2
+
         console.log('gold rate from API : ', gramRate);
         
         if(gramRate){
@@ -124,7 +125,7 @@ const updateGoldRateWithAPIs = async(req, res)=>{
                     const GST = (metalPrice + makingCharge + stoneCharge) * 3/100;
                     // console.log('GST : ', GST);
                     const totalPrice = metalPrice + makingCharge + stoneCharge + GST;
-                    console.log('totalPrice : ', totalPrice);
+                    // console.log('totalPrice : ', totalPrice);
                     
                     const updatedProductPriceData = await Product.findByIdAndUpdate(
                     { _id: productId },
@@ -139,7 +140,7 @@ const updateGoldRateWithAPIs = async(req, res)=>{
                     { new : true }
                     );
 
-                    console.log('updated the price details of ',productData[i].code);
+                    console.log('updated the price details of ', productData[i].code, '=', totalPrice);
     
                 }
     
@@ -162,7 +163,7 @@ const rapidApiGoldRate1 = async()=>{
     try {
         const options = {
             method: 'GET',
-            url: 'https://gold-rates-india.p.rapidapi.com/api/gold-rates', //Link 1 - Limit 20/month
+            // url: 'https://gold-rates-india.p.rapidapi.com/api/gold-rates', //Link 1 - Limit 20/month
             // url: 'https://gold-rates-india.p.rapidapi.com/api/state-gold-rates', //Link 2 - Limit 300/month
             headers: {
               'X-RapidAPI-Key': '42b6aa1f64mshce6165021e64bdep1239ccjsnd8cc0d341067',
@@ -228,7 +229,7 @@ const rapidApiGoldRate2 = async() => {
         return marketPrice;
 
     } catch (error) {
-        console.log(error);
+        console.log('error in rapidApiGoldRate2 :' , error.message);
     }
 }
 

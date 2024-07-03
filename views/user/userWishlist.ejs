@@ -80,124 +80,54 @@
                     <!-- account tabs ends -->
                     
                     <!-- account tab-content starts -->
-                    <!-- Section 3: My Wishlist -->
                     <h4>My Wishlists</h4>
-                    <!-- FROM MY ACCOUNT HTML
-                    <div class="tab-content" id="account-ontent">
-                        <div class="tab-pane fade show active" id="account-wishlist" role="tabpanel" aria-labelledby="account-wishlist-tab">
-                            <div class="tm-myaccount-wishlist">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th class="tm-myaccount-wishlist-col-image">IMAGE</th>
-                                                <th class="tm-myaccount-wishlist-col-product">PRODUCT</th>
-                                                <th class="tm-myaccount-wishlist-col-price">PRICE</th>
-                                                <th class="tm-myaccount-wishlist-col-add-to-cart">ADD TO CART</th>
-                                                <th class="tm-myaccount-wishlist-col-remove">REMOVE</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td><img src="path/to/product/image1.jpg" alt="Product Image 1"></td>
-                                                <td>Product 1</td>
-                                                <td>$50.00</td>
-                                                <td>
-                                                    <button class="tm-button tm-button-small">Add to Cart</button>
-                                                </td>
-                                                <td>
-                                                    <button class="tm-button tm-button-small">Remove</button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td><img src="path/to/product/image2.jpg" alt="Product Image 2"></td>
-                                                <td>Product 2</td>
-                                                <td>$70.00</td>
-                                                <td>
-                                                    <button class="tm-button tm-button-small">Add to Cart</button>
-                                                </td>
-                                                <td>
-                                                    <button class="tm-button tm-button-small">Remove</button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div> -->
-                    <!-- account tab-content ends -->
-
                     <div>
-                        <div class="tm-wishlist-table table-responsive">
+                        <div class="tm-wishlist-table table-responsive" id="wishlist-table">
                             <table class="table table-bordered mb-0">
                                 <thead>
                                     <tr>
-                                        <th class="tm-wishlist-col-image" scope="col">Image</th>
-                                        <th class="tm-wishlist-col-productname" scope="col">Product</th>
-                                        <th class="tm-wishlist-col-price" scope="col">Price</th>
+                                        <th class="tm-wishlist-col-slno bg-light">No</th>
+                                        <th class="tm-wishlist-col-image bg-light" scope="col">Image</th>
+                                        <th class="tm-wishlist-col-productname bg-light" scope="col">Product</th>
+                                        <th class="tm-wishlist-col-price bg-light" scope="col">Price</th>
                                         <!-- <th class="tm-wishlist-col-quantity" scope="col">Quantity</th> -->
-                                        <th class="tm-wishlist-col-addcart" scope="col">Add to Cart</th>
-                                        <th class="tm-wishlist-col-remove" scope="col">Remove</th>
+                                        <!-- <th class="tm-wishlist-col-addcart" scope="col">Add to Cart</th>
+                                        <th class="tm-wishlist-col-remove" scope="col">Remove</th> -->
+                                        <th class="tm-wishlist-col-actions bg-light" scope="col">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>
-                                            <a href="product-details.html" class="tm-wishlist-productimage">
-                                                <img src="assets/images/products/product-image-1-thumb.jpg" alt="product image">
-                                            </a>
-                                        </td>
-                                        <td>
-                                            <a href="product-details.html" class="tm-cart-productname">Stylist daimond earring</a>
-                                        </td>
-                                        <td class="tm-wishlist-price">$75.00</td>
-                                        <td>
-                                            <button class="tm-button tm-button-small">Add to Cart</button>
-                                            <!-- <button class="tm-button tm-button-small">Remove</button> -->
-                                        </td>
-                                        <td>
-                                            <!-- <button class="tm-button tm-button-small">Remove</button> -->
-                                            <button> <img src="/assets/images/icons/remove1.png" style="width: 25px; height: auto;" alt="remove-icon"> </button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <a href="product-details.html" class="tm-wishlist-productimage">
-                                                <img src="assets/images/products/product-image-2-thumb.jpg" alt="product image">
-                                            </a>
-                                        </td>
-                                        <td>
-                                            <a href="product-details.html" class="tm-wishlist-productname">Stylist daimond earring</a>
-                                        </td>
-                                        <td class="tm-wishlist-price">$75.00</td>
-                                        <td>
-                                            <button class="tm-button tm-button-small">Add to Cart</button>
-                                            <!-- <button class="tm-button tm-button-small">Remove</button> -->
-                                        </td>
-                                        <td>
-                                            <!-- <button class="tm-button tm-button-small">Remove</button> -->
-                                            <button> <img src="/assets/images/icons/remove1.png" style="width: 25px; height: auto;" alt="remove-icon"> </button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <a href="product-details.html" class="tm-wishlist-productimage">
-                                                <img src="assets/images/products/product-image-3-thumb.jpg" alt="product image">
-                                            </a>
-                                        </td>
-                                        <td>
-                                            <a href="product-details.html" class="tm-wishlist-productname">Stylist daimond earring</a>
-                                        </td>
-                                        <td class="tm-wishlist-price">$78.00</td>
-                                        <td>
-                                            <a href="#" class="tm-button tm-button-small">Add to Cart</a>
-                                        </td>
-                                        <td>
-                                            <!-- <button class="tm-wishlist-removeproduct"><i class="ion-close"></i></button> -->
-                                            <button> <img src="/assets/images/icons/remove1.png" style="width: 25px; height: auto;" alt="remove-icon"> </button>
-                                        </td>
-                                    </tr>
+                                    <% if (userWishlist && userWishlist.product.length > 0){ %>
+                                        <% console.log('wishlist length :', userWishlist.product.length) %>
+                                        <% userWishlist.product.forEach((items, index)=>{ %>
+                                            <% console.log('items are :', items.productRef.name) %>
+                                            <tr>
+                                                <td class="bg-light"> <%= index + 1 %> </td>
+                                                <td class="bg-light">
+                                                    <a href="/product-details?id=<%= items.productRef._id %>" class="tm-wishlist-productimage">
+                                                        <img src="assets/images/productImages/<%= items.productRef.images.image1 %>" alt="product image">
+                                                    </a>
+                                                </td>
+                                                <td class="text-left bg-light">
+                                                    <a href="/product-details?id=<%= items.productRef._id %>" class="tm-cart-productname"><h5> <%= items.productRef.name %> </h5></a>
+                                                    <a href="/product-details?id=<%= items.productRef._id %>" class="tm-cart-product-code"> <h6> <%= items.productRef.code %></h6> </a>
+                                                </td>
+                                                <td class="tm-wishlist-price bg-light"> <h6> ₹ <%= (items.productRef.totalPrice).toFixed(2) %> </h6></td>
+                                                <td class="bg-light">
+                                                    <button class="tm-button tm-button-small" onclick="addToCart('<%= items.productRef._id %>')"> Add to Cart </button>
+                                                    <button class="tm-button tm-button-small" onclick="addToWishlist('<%= items.productRef._id %>')"> Remove </button>
+                                                    <!-- <button> <img src="/assets/images/icons/remove1.png" style="width: 25px; height: auto;" alt="remove-icon"> </button> -->
+                                                    <% if(items.productRef.quantity === 0){ %>
+                                                        <h6 class="mt-3" style="color: red; display: block;"> Currently Unavailable </h6>
+                                                    <% } %>
+                                                </td>
+                                            </tr>
+                                        <% }) %>
+                                    <% } else{ %>
+                                        <tr>
+                                            <td colspan="4"> YOUR WISHLIST IS EMPTY </td>
+                                        </tr>
+                                    <% } %>
                                 </tbody>
                             </table>
                         </div>
@@ -212,3 +142,26 @@
 </div>
 
 <%- include('../layouts/userLayouts/user-footer.ejs') %>
+
+
+
+
+
+
+<!-- ---------------------------------------------------------------------------- -->
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+
+<!-- importing the script for carted items (ADD TO CART, UPDATE CART QUANTITY, REMOVE FROM CART & CHECKOUT, REMOVE OUTOFSTOCK CART ITEMS etc) -->
+<script src="/assets/scripts/userScripts/cart-and-checkout-scripts.js"></script>
+
+
+
+
+<!-- script for add to wishlist and remove from wishlist -->
+<script src="/assets/scripts/userScripts/wishlist-scripts.js"></script>

@@ -1,8 +1,5 @@
 const express = require ('express');
 const nocache = require ('nocache');
-// const session = require('express-session');
-// const passport = require('passport');
-
 
 
 const cron = require('node-cron');
@@ -20,20 +17,6 @@ app.use(nocache());
 app.use(express.static('public'));
 
 getGoldRateFromAPI();
-
-// app.use(session({
-//     secret: process.env.sessionSecret,
-//     saveUninitialized: true,
-//     resave: false,
-//     cookie: { secure: false } // Note: In production (google Auth), set secure: true if using HTTPS
-// }));
-
-
-// require('./middlewares/googleAuth');
-// Initialize Passport and restore authentication state, if any, from the session
-// app.use(passport.initialize());
-// app.use(passport.session());
-
 
 
 // for user routes

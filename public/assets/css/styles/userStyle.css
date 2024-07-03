@@ -3926,13 +3926,23 @@ button.tm-videobutton img {
     border-radius: 4px;
     /* background: #ffffff; */
     background: #f2ba59;
+    /* background: #9a0056; */
+    /* background: black; */
     outline: 0;
     text-align: center;
-    color: white;
+    /* color: white; */
     /* color: #9a0056; */
+    color: black;
     font-size: 15px;
     vertical-align: middle;
     /* border: 1px solid #9a0056; */
+}
+
+.tm-product-actions li :hover {
+    /* background-color: #9A0056; */
+    background-color: black;
+    color: white;
+    text-decoration: none;
 }
 
 .tm-product-actions li a i,
@@ -4022,11 +4032,6 @@ button.tm-videobutton img {
     -webkit-transform: translateY(0);
     -ms-transform: translateY(0);
     transform: translateY(0)
-}
-
-.tm-product-actions li :hover {
-    background-color: #9A0056;
-    text-decoration: none;
 }
 
 .list-view [class^=col] {

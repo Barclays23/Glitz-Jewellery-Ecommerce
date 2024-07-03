@@ -1,6 +1,7 @@
 const GoldPrice = require ('../models/goldPriceModel');
 const User = require ('../models/userModel');
 const Cart = require ('../models/cartModel');
+const Wishlist = require ('../models/wishlistModel');
 const Product = require ('../models/productModel');
 const Address = require('../models/addressModel');
 const categoryModel = require('../models/categoryModel');
@@ -12,14 +13,18 @@ const categoryModel = require('../models/categoryModel');
 // load user-cart page ----------------------------------------
 const loadUserCart = async (req, res)=>{
     try {
+        const sessionId = req.session.userId;
         const goldPriceData = await GoldPrice.findOne({});
-        const sessionData = await User.findById(req.session.userId);
+        const sessionData = await User.findById(sessionId);
 
-        const userCart = await Cart.findOne({ userRef: req.session.userId }).populate('product.productRef').exec();
+        const userCart = await Cart.findOne({ userRef: sessionId }).populate('product.productRef').exec();
+        const userWishlist = await Wishlist.findOne({ userRef: sessionId }).populate('product.productRef').exec();
+        
         
         let cartCount = 0;
+        let wishlistCount = 0;
         
-        if (sessionData && userCart && userCart.product){
+        if (userCart && userCart.product){
             const productLength = userCart.product.length;
             console.log(`The length of the product array is: ${productLength}`);
 
@@ -29,7 +34,13 @@ const loadUserCart = async (req, res)=>{
             console.log("Total Quantity of Carted Items:", cartCount);
         }
 
-        res.render('userCart', { sessionData, cartCount, userCart, goldPriceData });
+        if (userWishlist){
+            userWishlist.product.forEach((product) => {
+                wishlistCount += product.quantity;
+            });
+        }
+
+        res.render('userCart', { sessionData, cartCount, wishlistCount, userCart, goldPriceData });
 
     } catch (error) {
         console.log('error in loading user cart', error.message);
@@ -65,7 +76,7 @@ const addToCart = async (req, res)=>{
                         productRef : productId,
                         quantity : 1
                     }]
-                })
+                });
     
                 const cartCreated = await userCart.save();
                 console.log('new cart created : ', cartCreated);
@@ -143,25 +154,23 @@ const updateCartQuantity = async (req, res)=>{
 const removeFromCart = async(req, res)=>{
     try {
         const userId = req.session.userId;
-        const {index, productId, outOfStockItems } = req.body;
+        const {productId, outOfStockItems } = req.body;
 
         console.log('recieved productId for single product removing :', productId);
-        console.log('recieved index of single product for removing :', index);
-
 
         // for removing the selected product from cart / checkout (single)
-        if(productId){
+        if (productId){
             const updatedUserCart = await Cart.findOneAndUpdate(
                 {userRef: userId},
                 {$pull: {product: {_id: productId}}}
             )
 
-            console.log('produt removed from cart');
+            console.log('product removed from cart');
             return res.status(200).json({ removedProduct: true });
         }
 
 
-        // for removing the out of items products from cart / checkout (may be multiple items)
+        // for removing the out of stock items from cart / checkout (may be multiple items)
         if (outOfStockItems && outOfStockItems.length > 0) {
 
             for (const products of outOfStockItems) {
@@ -180,10 +189,6 @@ const removeFromCart = async(req, res)=>{
             console.log('produt removed from cart');
             return res.status(200).json({ removedOutOfStock: true });
         }
-
-
-        // console.log('produt removed from cart');
-        // return res.status(200).json({ removedProduct: true });
 
 
     } catch (error) {
@@ -224,15 +229,6 @@ const proceedToCheckout = async(req, res)=>{
 
         return res.json({proceed: true});
 
-        // let cartCount = 0;
-        // if (sessionData && userCart){
-        //     console.log("Cart Documents for User:", userCart);
-        //     userCart.product.forEach((product) => {
-        //         cartCount += product.quantity;
-        //     });
-        // }
-
-        // res.render('checkout', { sessionData, userAddress, userCart, cartCount, goldPriceData });
 
     } catch (error) {
         console.log('error in loading checkout page: ', error.message);

@@ -87,12 +87,14 @@ userRoute.get('/cart', userAuth.isLogin, cartController.loadUserCart);
 userRoute.post('/add-to-cart', cartController.addToCart);
 userRoute.post('/update-cart-quantity', userAuth.isLogin, cartController.updateCartQuantity);
 userRoute.delete('/remove-from-cart', userAuth.isLogin, cartController.removeFromCart);
-// userRoute.post('/save-for-later', userAuth.isLogin, cartController.removeFromCart); // change fn to addToWishlist once the wishlist created. currently it's removing. method post
 userRoute.post('/proceed-to-checkout', userAuth.isLogin, cartController.proceedToCheckout);
 
 // WISHLIST ROUTES
 userRoute.get('/wishlist', userAuth.isLogin, wishlistController.loadUserWishlist);
-// userRoute.post('add-to-wishlist', userAuth.isLogin, wishlistController.addToWishlist);
+userRoute.post('/add-to-wishlist', wishlistController.addToWishlist);
+// change fn to addToWishlist once the wishlist created. currently it's removing. method post/patch now
+userRoute.delete('/save-for-later', userAuth.isLogin, wishlistController.saveForLater); // change fn to addToWishlist once the wishlist created. currently it's removing. method post/patch now
+
 
 // ADDRESS ROUTES
 userRoute.get('/address', userAuth.isLogin, addressController.loadUserAddress);

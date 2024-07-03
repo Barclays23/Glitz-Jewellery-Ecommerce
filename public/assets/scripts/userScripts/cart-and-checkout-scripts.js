@@ -1,5 +1,93 @@
 
 
+// to add the product to the cart (send data to backend)
+function addToCart(productId) {
+    console.log('product id for adding to cart: ', productId);
+
+    $.ajax ({
+        url : '/add-to-cart',
+        type : 'POST',
+        contentType : 'application/JSON',
+        data : JSON.stringify({productId}),
+        success: function(response) {
+            console.log('response from add to cart :', response);
+            if (response.success){
+                Swal.fire({
+                    text: "Added to your cart.",
+                    icon: 'success',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                $("#cart-count").load("/shopping #cart-count");
+            } else if (response.outofstock){
+                Swal.fire({
+                    // text: "Unfortunately, this item is out of stock and cannot be added to your cart.",
+                    text: "We are sorry, but this product is currently unavailable for purchase.",
+                    showConfirmButton: false,
+                    timer: 2000,
+                    customClass: {
+                        popup: 'error-swal-background',
+                        // htmlContainer: 'error-swal-text',
+                        // popup: 'bg-danger',
+                        htmlContainer: 'text-white'
+                    }
+                })
+            } else if (response.nosession){
+                showAuthSwal();
+            } else if (response.existProduct){
+                Swal.fire({
+                    text: "Product already added to your cart!",
+                    showConfirmButton: false,
+                    timer: 1500
+                })
+            }
+        },
+        error: function(xhr, status, error) {
+            console.log('Error in adding to cart :', error);
+            if (xhr.status === 401) {
+                showAuthSwal();
+            } else {
+                Swal.fire({
+                    text: "An error occurred while adding to the cart.",
+                    icon: 'error',
+                    showConfirmButton: true
+                });
+            }
+        }
+    });
+}
+
+
+// Function to show the authentication SweetAlert
+function showAuthSwal() {
+    const signInButtonId = 'signInSwalButton';
+    const registerButtonId = 'registerSwalButton';
+    
+    Swal.fire({
+        text: "You need to sign in to add products to your cart.",
+        // icon: 'warning',
+        showCloseButton: true,
+        showCancelButton: true,
+        confirmButtonText: '<span id="'+signInButtonId+'">Sign In</span>',
+        cancelButtonText: '<span id="'+registerButtonId+'">Register</span>',
+        allowOutsideClick: true,
+    }).then((result) => {
+        const currentUrl = window.location.href;
+        if (result.isConfirmed) {
+            const signInUrl = `/login?redirect=${encodeURIComponent(currentUrl)}`;
+            window.location.href = signInUrl;
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+            const registerUrl = `/register?redirect=${encodeURIComponent(currentUrl)}`;
+            window.location.href = registerUrl;
+        }
+    });
+}
+
+
+
+
+
+
 // <!-- to update cart product quantity -->
 $(document).ready(function(){
     $('.quantity-input').on('change', function() {
@@ -150,11 +238,12 @@ function proceedToCheckout(userId) {
                     if (result.isConfirmed) { // if clicked Remove & Proceed button
                         removeOutOfStockItems(response.outOfStockItems);
                         
-                    } else if (result.isDenied) {  // if clicked save for later
-                        Swal.fire("Saved & Cart Updated", "Unavailable items are saved to your wishlist", "success")
-                        .then(()=>{
-                            window.location.href = '/checkout'; // Proceed to the checkout page after items saved to wishlist.
-                        });
+                    } else if (result.isDenied) {  // if clicked Save for later button
+                        saveOutOfStockItems(response.outOfStockItems);
+                        // Swal.fire("Saved & Cart Updated", "Unavailable items are saved to your wishlist", "success")
+                        // .then(()=>{
+                        //     window.location.href = '/checkout'; // Proceed to the checkout page after items saved to wishlist.
+                        // });
                     }
                 });
 
@@ -173,7 +262,7 @@ function proceedToCheckout(userId) {
 
 
 
-// <!-- to manage the out of stock items from cart. -->
+// <!-- to remove out of stock items from cart. -->
 function removeOutOfStockItems(outOfStockItems) {
     $.ajax({
         url: '/remove-from-cart',
@@ -206,9 +295,45 @@ function removeOutOfStockItems(outOfStockItems) {
 
 
 
-// url: '/save-for-later', add (to move the products to wishlist)
-// method: 'POST',  /DELETE
+// <!-- to save/move the out of stock items to wishlist -->
+function saveOutOfStockItems(outOfStockItems) {
+    $.ajax({
+        url: '/save-for-later',
+        method: 'DELETE',
+        data: JSON.stringify({ outOfStockItems }),
+        contentType: 'application/json',
+        success: function(response) {
+            console.log('response from saveForLater : ', response);
+            if (response.movedOutOfStocks){
+                Swal.fire({
+                    title: "Items Saved",
+                    text: "Unavailable items have been saved to wishlist for your future reference.",
+                    icon: "success",
+                    showConfirmButton: false,
+                    timer: 1500,
+                }).then(() => {
+                    $("#wishlist-count").load("/cart #wishlist-count");
+                    $("#cart-count").load("/cart #cart-count");
+                    $("#cart-table").load("/cart #cart-table");
+                    $("#cart-summary").load("/cart #cart-summary");
+                    $("#checkout-summary").load("/checkout #checkout-summary");
+                })
+                // .then(()=>{
+                //     window.location.href = '/checkout';  // Proceed to the checkout page after removed from cart.
+                // });
+            }
+        },
+        error: function(xhr) {
+            Swal.fire({
+            title: 'Error while shifting the outofstock items.',
+            text: xhr.responseText,
+            icon: 'error',
+            confirmButtonText: 'OK'
+            });
+        }
+    });
 
+}
 
 
 
