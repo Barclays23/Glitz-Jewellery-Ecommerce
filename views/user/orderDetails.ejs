@@ -1,0 +1,421 @@
+<%- include('../layouts/userLayouts/user-header.ejs') %>
+
+<%- include('../layouts/userLayouts/user-preloader.ejs') %>
+
+<%- include('../layouts/userLayouts/user-navbar.ejs') %>
+
+
+
+
+<div id="wrapper" class="wrapper">
+
+    <!-- Breadcrumbs area starts -->
+    <div class="tm-breadcrumb-area tm-padding-section bg-grey" data-bgimage="assets/images/breadcrumb-bg.jpg">
+        <div class="container">
+            <div class="tm-breadcrumb">
+                <h2 style="color: black;">Order Details</h2>
+                <ul>
+                    <li><a href="/my-account" style="color: black;">My Account</a></li>
+                    <li><a href="/orders" style="color: black;">Orders</a></li>
+                    <li style="color: black;"><%= orderData._id %></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumbs area ends -->
+    
+    <main class="page-content">
+        <div class="tm-product-details-area tm-section tm-padding-section bg-white">
+            <div class="container">
+                <div class="order-details">
+                    <div class="order-info">
+                        <div>
+                            <p><strong>Order No</strong><br> 402-6505499-6104359</p>
+                        </div>
+                        <div>
+                            <p><strong>Ordered On</strong><br> <%= formatDate(orderData.orderDate) %></p>
+                        </div>
+                        <div>
+                            <p class="text-right"><strong>Invoice</strong><br> 402-6505499-6104359</p>
+                        </div>
+                    </div>
+                    <div class="order-info">
+                        <div>
+                            <p><strong>Shipped To</strong></p>
+                            <p><%= orderData.shippingAddress.firstname %> <%= orderData.shippingAddress.lastname %></p>
+                            <p><%= orderData.shippingAddress.street %></p>
+                            <p><%= orderData.shippingAddress.city %></p>
+                            <p><%= orderData.shippingAddress.state %>-<%= orderData.shippingAddress.pincode %></p>
+                            <p><%= orderData.shippingAddress.contact %></p>
+                        </div>
+                        <div>
+                            <p><strong>Payment Mode</strong></p>
+                            <% switch (orderData.paymentMethod) { 
+                                case 'Card Payment': %>
+                                    <p><img src="/assets/images/icons/payment-cards-mastro.png" alt="Visa"><span class="color-theme">Card Payment</span></p>
+                                    <% break; 
+                                case 'RazorPay': %>
+                                    <p><span>RazorPay</span></p>
+                                    <% break; 
+                                case 'PayPal': %>
+                                    <p><span>PayPal</span></p>
+                                    <% break; 
+                                case 'Online Payment': %>
+                                    <p><span>Online Payment</span></p>
+                                    <% break; 
+                                case 'Cash On Delivery': %>
+                                    <p><span>Cash On Delivery</span></p>
+                                    <% break; 
+                                case 'Wallet': %>
+                                    <p><span>Wallet</span></p>
+                                    <% break; 
+                                default: %>
+                                    <p><span>Unknown</span></p>
+                            <% } %>
+                            <br>
+                            <p><strong>Payment Status</strong></p>
+                            <% switch (orderData.paymentStatus) { 
+                                case 'Pending': %>
+                                    <p><span class="color-theme text-white bg-warning">Pending</span></p>
+                                    <% break; 
+                                case 'Processing': %>
+                                    <p><span class="color-theme text-white bg-info">Processing</span></p>
+                                    <% break; 
+                                case 'Completed': %>
+                                    <p><span class="color-theme text-white bg-success">Completed</span></p>
+                                    <% break; 
+                                case 'Failed': %>
+                                    <p><span class="color-theme text-white bg-danger">Failed</span></p>
+                                    <% break; 
+                                case 'Refunded': %>
+                                    <p><span class="color-theme text-white bg-secondary">Refunded</span></p>
+                                    <% break; 
+                                default: %>
+                                    <p><span class="color-theme text-white bg-dark">Unknown</span></p>
+                            <% } %>
+
+                        </div>
+                        <div class="row order-summary">
+                            <p><strong>Order Summary</strong></p>
+                            <div class="col-6 text-left">
+                                <p>Item(s) Subtotal</p>
+                                <p>Shipping Charge</p>
+                                <p>Total Amount</p>
+                                <p>Discount</p>
+                                <hr style="height: 1px; background-color: red; border: none;">
+                                <h6><strong>Net Amount</strong></h6>
+                            </div>
+                            <div class="col-2 text-left">
+                                <p>: ₹</p>
+                                <p>: ₹</p>
+                                <p>: ₹</p>
+                                <p>: ₹</p>
+                                <hr style="height: 1px; border: none;">
+                                <h6><strong>: ₹</strong></h6>
+                            </div>
+                            <div class="col-4 text-right">
+                                <p><%= (orderData.subTotal).toFixed(2) %></p>
+                                <p><%= (orderData.deliveryCharge).toFixed(2) %></p>
+                                <p><%= (orderData.subTotal + orderData.deliveryCharge).toFixed(2) %></p>
+                                <p class="text-success">- <%= (orderData.discountAmount).toFixed(2) %></p>
+                                <hr style="height: 1px; background-color: red; border: none;">
+                                <h6><strong><%= (orderData.netAmount).toFixed(2) %></strong></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container">
+                        <% for (i=0; i< orderData.orderedItems.length; i++){ %>
+                            <div class="row product-details bg-dange">
+                                <!-- Product Overview -->
+                                <div class="product-info">
+                                    <div class="info-container mb-3">
+                                        <img src="/assets/images/productImages/<%= orderData.orderedItems[i].image %>" alt="product-image" class="product-image">
+                                        <div class="info-container-text">
+                                            <h6><strong><%= orderData.orderedItems[i].code %></strong></h6>
+                                            <h5><%= orderData.orderedItems[i].name %></h5>
+                                            <p class="price">₹<%= (orderData.orderedItems[i].totalPrice).toFixed(0) %></p>
+                                        </div>
+                                    </div>
+                                    <table style="border-collapse: collapse;">
+                                        <tr style="text-align: center;">
+                                            <th style="border: 1px solid black; padding: 0 17px;">Purity</th>
+                                            <th style="border: 1px solid black; padding: 0 17px;">Gross Weight</th>
+                                            <th style="border: 1px solid black; padding: 0 17px;">Stone Weight</th>
+                                            <th style="border: 1px solid black; padding: 0 17px;">Net Weight</th>
+                                        </tr>
+                                        <tr style="text-align: center;">
+                                            <td style="border: 1px solid black; padding: 8px;"><%= orderData.orderedItems[i].purity %></td>
+                                            <td style="border: 1px solid black; padding: 8px;"><%= (orderData.orderedItems[i].grossWeight).toFixed(3) %></td>
+                                            <td style="border: 1px solid black; padding: 8px;"><%= (orderData.orderedItems[i].stoneWeight).toFixed(3) %></td>
+                                            <td style="border: 1px solid black; padding: 8px;"><%= (orderData.orderedItems[i].netWeight).toFixed(3) %></td>
+                                        </tr>
+                                    </table>
+                                    <div>
+                                        <p><strong>Sold by:</strong> MD Continental</p>
+                                        <p><strong>Return window closed on 07-Dec-2017</strong></p>
+                                    </div>
+                                    <div class="order-actions">
+                                        <a> <p>Buy it again</p></a>
+                                        <a> <p>Write a product review</p></a>
+                                        <a> <p>Cancel Order</p></a>
+                                    </div>
+                                </div>
+                                <!-- Detailed Information -->
+                                <div class="product-info detailed-information">
+                                    <div class="info-container detailed-info">
+                                        <table border="0" cellpadding="5">
+                                            <th style="width: 120px"></th>
+                                            <th></th>
+                                            <th></th>
+                                            <tr>
+                                                <td><b>Order Status :</b></td>
+                                                <% switch (orderData.orderedItems[i].orderStatus) { 
+                                                    case 'Pending': %>
+                                                        <td><span class="color-theme text-white bg-warning">Pending</span></td>
+                                                        <% break; 
+                                                    case 'Processing': %>
+                                                        <td><span class="color-theme text-white bg-info">Processing</span></td>
+                                                        <% break; 
+                                                    case 'Shipped': %>
+                                                        <td><span class="color-theme text-white bg-primary">Shipped</span></td>
+                                                        <% break; 
+                                                    case 'Delivered': %>
+                                                        <td><span class="color-theme text-white bg-success">Delivered</span></td>
+                                                        <% break; 
+                                                    case 'Cancelled': %>
+                                                        <td><span class="color-theme text-white bg-danger">Cancelled</span></td>
+                                                        <% break; 
+                                                    case 'Returned': %>
+                                                        <td><span class="color-theme text-white bg-dark">Returned</span></td>
+                                                        <% break; 
+                                                    default: %>
+                                                        <td><span class="color-theme text-white bg-secondary">Unknown</span></td>
+                                                <% } %>
+                                            </tr>                                                                                                                                  
+                                        </table>
+                                        <table cellpadding="5">
+                                            <tr>
+                                                <td><b>Price Breakup :</b></td>
+                                                <td style="width: 70px;"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Metal Price</td>
+                                                <td style="text-align: right;"> ₹ </td>
+                                                <td style="text-align: right;"> <%= (orderData.orderedItems[i].metalPrice).toFixed(2) %> </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Making Charge (<%= orderData.orderedItems[i].VA %> %)</td>
+                                                <td style="text-align: right;"> ₹ </td>
+                                                <td style="text-align: right;"> <%= (orderData.orderedItems[i].makingCharge).toFixed(2) %> </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Stone Charge</td>
+                                                <td style="text-align: right;"> ₹ </td>
+                                                <td style="text-align: right;"> <%= (orderData.orderedItems[i].stoneCharge).toFixed(2) %> </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Tax</td>
+                                                <td style="text-align: right;"> ₹ </td>
+                                                <td style="text-align: right;"> <%= (orderData.orderedItems[i].GST).toFixed(2) %> </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3"> <hr style="border: 1px solid black;"></td>
+                                            </tr>
+                                            <tr style="color: #9A0056; font-size: 18px;">
+                                                <td><b>TOTAL</b></td>
+                                                <td style="text-align: right;"><b>₹</b></td>
+                                                <td style="text-align: right;"><b> <%= (orderData.orderedItems[i].totalPrice).toFixed(2) %></b></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr style="height: 2px; background-color: red; border: none;">
+                            <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <button id="back-top-top"><i class="ion-arrow-up-c"></i></button>
+</div>
+
+
+<!-- script for date & time format -->
+<% function formatDate(dateString) {
+    const date = new Date(dateString);
+    const options = {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric'
+    };
+    return date.toLocaleDateString('en-US', options);
+} %>
+
+
+<%- include('../layouts/userLayouts/user-footer.ejs') %>
+
+
+
+<!-- -------------------------------------------------------------------------------- -->
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+<!-- script for add to wishlist and remove from wishlist -->
+<script src="/assets/scripts/userScripts/wishlist-scripts.js"></script>
+
+
+<!-- importing the script for carted items (ADD TO CART, UPDATE CART QUANTITY, REMOVE FROM CART & CHECKOUT, REMOVE OUTOFSTOCK CART ITEMS etc) -->
+<script src="/assets/scripts/userScripts/cart-and-checkout-scripts.js"></script>
+
+
+
+
+
+
+
+
+
+<!-- style for product details -->
+<style>
+.color-theme {
+    padding: 2px 30px;
+}
+.order-details {
+    width: 100%;
+    margin: auto;
+    border: 1px solid #f61b1b;
+    padding: 15px;
+    border-radius: 5px;
+}
+.order-details p {
+    margin-bottom: 0.15rem;
+}
+.order-header {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+.order-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #b41313;
+}
+.order-info div {
+    width: 45%;
+}
+.order-summary {
+    text-align: right;
+}
+.order-summary p {
+    font-weight: 500;
+}
+.product-details {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+.info-container {
+    display: flex;
+    align-items: center;
+}
+.product-image {
+    width: 100%;
+    max-width: 130px;
+    height: auto;
+    margin-right: 20px;
+}
+.product-info {
+    flex: 1;
+}
+.product-info .price {
+    color: #B12704;
+    font-size: 25px;
+    margin: 10px 0;
+}
+.detailed-info {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    /* padding: 15px; */
+    padding: 0px;
+}
+.order-actions {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.order-actions a {
+    font-weight: 600;
+    background-color: #cfcfcf;
+    border: 1px solid lightgrey;
+    border-radius: 5px;
+    /* margin-right: 10px; */
+    margin: 5px;
+    padding: 7px 13px;
+    cursor: pointer;
+    font-size: 16px;
+}
+.order-actions a:hover p {
+    color: white;
+}
+.order-actions a:hover {
+    background-color: #9a0056;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .order-info div {
+        flex: 1 1 100%;
+        text-align: left;
+    }
+    .summary-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .summary-row div {
+        text-align: left;
+    }
+    .product-details {
+        flex-direction: column;
+        /* align-items: center; */
+    }
+    .product-info,
+    .product-detailed-info {
+        width: 100%;
+    }
+    .product-image {
+        margin-bottom: 20px;
+    }
+    .order-info {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #b41313;
+    }
+}
+@media (max-width: 576px) {
+    .order-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    .order-actions a {
+        width: 100%;
+        text-align: center;
+    }
+    .order-info {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #b41313;
+    }
+}
+</style>

@@ -6,52 +6,104 @@ const orderSchema = new mongoose.Schema({
         ref : 'User',
         required : true
     },
-    products : [{
-        productId : {
-            type : mongoose.Schema.Types.ObjectId,
-            ref : 'Product',
-            required : true
-        },
-        price : {
-            type : Number,
-            required : true
-        },
-        quantity : {
-            type : Number,
-            required : true
-        },
-        totalPrice : {
-            type : Number,
-            required : true,
-            // default : 0
-        },
-        productStatus : {    //what product status
-            type : String,
-            required : true
-        }
-    }],
+    orderedItems : {
+        required : true,
+        type : [{
+            // product : {
+                productRef : {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: 'Product',
+                    required: true
+                },
+                image : {
+                    type: String,
+                    required: false
+                },
+                code : {
+                    type: String,
+                    required: true,
+                    unique : false
+                },
+                purity : {
+                    type: String,
+                    required: true
+                },
+                name : {
+                    type: String,
+                    required : true
+                },
+                grossWeight: {
+                    type : Number,
+                    required: true
+                },
+                stoneWeight: {
+                    type : Number,
+                    required: true
+                },
+                netWeight: {
+                    type : Number,
+                    required: true
+                },
+                VA: {
+                    type : Number,
+                    required: true
+                },
+                metalPrice : {
+                    type : Number,
+                    required: true
+                },
+                makingCharge : {
+                    type : Number,
+                    required: true
+                },
+                stoneCharge: {
+                    type : Number,
+                    required: true
+                },
+                GST : {
+                    type : Number,
+                    required: true
+                },
+                totalPrice: {
+                    type : Number,
+                    required: true
+                },
+                quantity : {
+                    type : Number,
+                    required : true
+                },
+                orderStatus : {
+                    type : String,
+                    default : 'Pending',
+                    enum : ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned']
+                },
+                deliveryDate : {
+                    type: Date,
+                    // required : true
+                },
+                returnDate : {
+                    type: Date,
+                    // required : true
+                },
+                cancelReason : {
+                    type: String
+                },
+                returnReason : {
+                    type: String
+                },
+            // },
+        }]
+    },
 
-    purchaseDate : {
+    shippingAddress : {
+        type : Object,
+        required : true
+    },
+    orderDate : {
         type: Date,
-        required: true
+        default : Date.now
     },
-    deliveredDate : {
-        type: Date,
-        // required : true
-    },
-    returnedDate : {
-        type: Date,
-        // required : true
-    },
-
-    cancelReason : {
-        type: String
-    },
-    returnReason : {
-        type: String
-    },
-
-    subtotal : {
+    subTotal : {
         type : Number,
         required : true
     },
@@ -63,18 +115,19 @@ const orderSchema = new mongoose.Schema({
         type : Number,
         required : true
     },
-    totalAmount : {
+    netAmount : {
         type : Number,
         required : true,
     },
-    paymentMethod: {
-        type: String,
-        required: true,
-    },
-
-    status : {               //what status ? payment or order ?
+    paymentMethod : {
         type : String,
-        type : true
+        required : true,
+        enum : ['Card Payment', 'RazorPay', 'PayPal', 'Online Payment', 'Cash On Delivery', 'Wallet'],
+    },
+    paymentStatus : {
+        type : String,
+        enum : ['Pending', 'Processing', 'Completed', 'Failed', 'Refunded'],
+        default : 'Pending'
     },
 
 });
@@ -83,3 +136,4 @@ const orderSchema = new mongoose.Schema({
 
 
 module.exports = mongoose.model('Order', orderSchema);
+

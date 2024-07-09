@@ -19,7 +19,7 @@
             </div>
         </div>
     </div>
-    <!-- Breadcrumbs area starts -->
+    <!-- Breadcrumbs area ends -->
     
     <main class="page-content">
         <div class="tm-product-details-area tm-section tm-padding-section bg-white">
@@ -34,27 +34,16 @@
                                             <% for(let i = 1; i <= Object.keys(productData.images).length; i++){ %>
                                                 <div class="tm-prodetails-largeimage">
                                                     <a data-fancybox="tm-prodetails-imagegallery"
-                                                        href="assets/images/productImages/<%= productData.images[`image${i}`] %>"
-                                                        data-caption="Product Zoom Image <%= i %>">
-                                                        <img src="assets/images/productImages/<%= productData.images[`image${i}`] %>"
-                                                            alt="product image">
+                                                        href="assets/images/productImages/<%= productData.images[`image${i}`] %>" data-caption="Product Zoom Image <%= i %>">
+                                                        <img src="assets/images/productImages/<%= productData.images[`image${i}`] %>" alt="product image">
                                                     </a>
                                                 </div>
-                                            <% } %>                                            
-                                            <!-- <div class="tm-prodetails-largeimage">
-                                                <a data-fancybox="tm-prodetails-imagegallery"
-                                                    href="assets/images/productImages/<%= productData.images.image1 %>"
-                                                    data-caption="Product Zoom Image 1">
-                                                    <img src="assets/images/productImages/<%= productData.images.image1 %>"
-                                                        alt="product image">
-                                                </a>
-                                            </div> -->
+                                            <% } %>
                                         </div>
                                         <div class="tm-prodetails-thumbnails">
                                             <% for(let i = 1; i <= Object.keys(productData.images).length; i++){ %>
-                                                <div class="tm-prodetails-thumbnail">
-                                                    <img src="assets/images/productImages/<%= productData.images[`image${i}`] %>"
-                                                        alt="product image">
+                                                <div class="tm-prodetails-thumbnail" style="border: 1px solid #9A0056;">
+                                                    <img src="assets/images/productImages/<%= productData.images[`image${i}`] %>" alt="product image">
                                                 </div>
                                             <% } %>
 

@@ -82,6 +82,7 @@ userRoute.get('/edit-profile', userAuth.isLogin, userController.loadEditUserProf
 userRoute.post('/update-profile', userAuth.isLogin, multer.uploadUserImages, userController.updateUserProfile);
 userRoute.post('/change-password', userAuth.isLogin, userController.updateUserPassword);
 
+
 // CART ROUTES
 userRoute.get('/cart', userAuth.isLogin, cartController.loadUserCart);
 userRoute.post('/add-to-cart', cartController.addToCart);
@@ -89,11 +90,11 @@ userRoute.post('/update-cart-quantity', userAuth.isLogin, cartController.updateC
 userRoute.delete('/remove-from-cart', userAuth.isLogin, cartController.removeFromCart);
 userRoute.post('/proceed-to-checkout', userAuth.isLogin, cartController.proceedToCheckout);
 
+
 // WISHLIST ROUTES
 userRoute.get('/wishlist', userAuth.isLogin, wishlistController.loadUserWishlist);
 userRoute.post('/add-to-wishlist', wishlistController.addToWishlist);
-// change fn to addToWishlist once the wishlist created. currently it's removing. method post/patch now
-userRoute.delete('/save-for-later', userAuth.isLogin, wishlistController.saveForLater); // change fn to addToWishlist once the wishlist created. currently it's removing. method post/patch now
+userRoute.delete('/save-for-later', userAuth.isLogin, wishlistController.saveForLater);
 
 
 // ADDRESS ROUTES
@@ -104,12 +105,11 @@ userRoute.delete('/delete-address', userAuth.isLogin, addressController.deleteAd
 
 
 // ORDER ROUTES
-userRoute.get('/checkout', userAuth.isLogin, orderController.loadCheckout);
+userRoute.get('/checkout',  orderController.loadCheckout);    // userAuth.isLogin,
+userRoute.post('/place-order',  orderController.placeOrder); // userAuth.isLogin,
+userRoute.get('/thankyou', userAuth.isLogin, orderController.loadThankyou);
 userRoute.get('/orders', userAuth.isLogin, orderController.loadUserOrders);
-
-
-userRoute.post('/place-order', cartController.placeOrder);
-userRoute.get('/thankyou', cartController.loadThankyou);
+userRoute.get('/order-details',  orderController.loadOrderDetails); // userAuth.isLogin,
 
 
 

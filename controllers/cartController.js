@@ -210,8 +210,10 @@ const proceedToCheckout = async(req, res)=>{
         const userAddress = await Address.findOne({userRef: userId});
 
         if (userCart && userCart.product){
-            // Check the stock for each product in the cart
+
             let outOfStockItems = [];
+
+            // Check the inventory stock for each product in the cart
             userCart.product.forEach((cartItem) => {
                 if (cartItem.productRef.quantity === 0) {
                 outOfStockItems.push(cartItem);
@@ -241,39 +243,6 @@ const proceedToCheckout = async(req, res)=>{
 
 
 
-// load thank you page.
-const loadThankyou = async(req, res)=>{
-    try {
-        res.render('thankYou');
-    } catch (error) {
-        console.log('error while loading the thank you page.', error.message);
-    }
-}
-
-
-
-// load thank you page.
-const placeOrder = async(req, res)=>{
-    try {
-        const userId = req.session.useId;
-        const data = req.body
-        
-        console.log('data received in backend : ', data);
-
-        if(data){
-            return res.json({successful: true});
-        }
-
-        // res.render('thankYou');
-
-    } catch (error) {
-        console.log('error while loading the thank you page.', error.message);
-    }
-}
-
-
-
-
 
 
 module.exports = {
@@ -282,6 +251,4 @@ module.exports = {
     updateCartQuantity,
     removeFromCart,
     proceedToCheckout,
-    placeOrder,
-    loadThankyou
 }

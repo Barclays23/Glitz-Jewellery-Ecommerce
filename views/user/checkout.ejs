@@ -95,7 +95,7 @@
                                     <tr>
                                         <td class="bg-light">
                                             <!-- http://localhost:3000/product-details?id=6659b86610faf8b255d2de86 -->
-    
+
                                             <a href="/product-details?id=<%= userCart.product[i].productRef._id %>" class="tm-cart-productimage">
                                                 <img src="assets/images/productImages/<%= userCart.product[i].productRef.images.image1 %>" alt="product image">
                                             </a>
@@ -162,12 +162,10 @@
                         <!-- can give the address details here if needed (and if not given at top of this page) -->
                         <div>
                             <h4 class="small-title">Shipping Address</h4>
-
                             <% if(userAddress && userAddress.address){ %>
                                 <p><b>The following address will be used for shipping by default.</b></p>
                                 <a href="#" class="btn add-button btn-success text-white" data-toggle="modal" data-target="#addAddressModal"> Add Address </a>
                                 <a href="#" class="btn add-button btn-primary text-white" data-toggle="modal" data-target="#chooseAddressModal">Choose Another Address</a> <br><br>
-    
                                 <% for(i=0; i< userAddress.address.length; i++){ %>
                                     <div class="row">
                                         <div class="tm-checkout-address bg-grey pb-4">
@@ -193,14 +191,11 @@
                                                         <b> <%= (userAddress.address[i].firstname).toUpperCase() %> </b>
                                                         <b> <%= (userAddress.address[i].lastname).toUpperCase() %> </b> <br>
                                                     </label>
-
                                                     <div class="tm-checkout-address-content">
                                                         <p class="text-left">
-                                                            <%= userAddress.address[i].firstname %>
-                                                            <%= userAddress.address[i].lastname %> <br>
                                                             <%= userAddress.address[i].street %> <br>
-                                                            <%= userAddress.address[i].city %> <br>
-                                                            <%= userAddress.address[i].state %>
+                                                            <%= userAddress.address[i].city %>,
+                                                            <%= userAddress.address[i].state %> -
                                                             <%= userAddress.address[i].pincode %> <br>
                                                             Phone: <%= userAddress.address[i].contact %> <br>
                                                         </p>
@@ -210,8 +205,6 @@
                                         </div>
                                     </div>
                                 <% } %>
-                                
-
                             <% }else{ %>
                                 <p><b>"Hello! <br>
                                     It seems there is no saved address in your profile. <br>
@@ -226,7 +219,6 @@
                     <!-- checkout summary starts -->
                     <div class="col-lg-6">
                         <div class="tm-checkout-orderinfo">
-                            <!-- remove id="cart-summary" -->
                             <div class="table-responsive" id="checkout-summary">
                                 <h3>Checkout Summary</h3>
                                 <table class="table table-borderless tm-checkout-ordertable">
@@ -260,45 +252,46 @@
                                         </tr>
                                         <tr class="tm-checkout-subtotal">
                                             <td>TOTAL</td>
-                                            <td>₹ <%= (subTotal).toFixed(2) %></td>
-                                            <% console.log('subTotal is : ', subTotal) %>
+                                            <td id="<%= subTotal %>">₹ <%= (subTotal).toFixed(2) %></td>
+                                            <% console.log('subTotal in front end is : ', subTotal) %>
                                         </tr>
                                         <tr class="tm-checkout-shipping">
                                             <td> Shipping Charge (+) </td>
                                             <% let shippingCharge = subTotal >= 100000 ? 0 : 300 %>
-                                            <td>₹ <%= shippingCharge.toFixed(2) %></td>
+                                            <td id="<%= shippingCharge %>">₹ <%= shippingCharge.toFixed(2) %></td>
                                         </tr>
                                         <tr class="tm-checkout-discount">
                                             <td> Discount (-) </td>
-                                            <% let discountAmount = subTotal >= 10000000 ? 0 : 1500 %>
-                                            <td>₹ <%= discountAmount.toFixed(2) %></td>
+                                            <% let discountAmount = subTotal * 1.5 /100 %>
+                                            <td id="<%= discountAmount %>">₹ <%= discountAmount.toFixed(2) %></td>
                                         </tr>
                                         <tr>
                                             <td colspan="2"><hr style="border: 1px solid black;"></td>
                                         </tr>
                                         <tr class="tm-checkout-total">
                                             <td>Net Payable </td>
-                                            <% let cartTotal = subTotal + shippingCharge - discountAmount %>
-                                            <td>₹ <%= (cartTotal).toFixed(2) %></td>
+                                            <% let netAmount = subTotal + shippingCharge - discountAmount %>
+                                            <td id="<%= netAmount %>"> <h4 style="color: #9a0056;"> <b> ₹ <%= (netAmount).toFixed(2) %> </b> </h4></td>
                                         </tr>
                                     </tfoot>
 
                                 </table>
                             </div>
 
+                            <!-- checkout payment methods -->
                             <div class="tm-checkout-payment">
                                 <h4>Select Payment Method</h4>
                                 <div class="tm-form-inner">
                                     <div class="tm-form-field">
-                                        <input type="radio" name="checkout-payment-method" id="checkout-payment-banktransfer" />
-                                        <label for="checkout-payment-banktransfer">Direct Bank Transfer</label>
+                                        <input type="radio" name="checkout-payment-method" id="checkout-payment-online" value="Online Payment" />
+                                        <label for="checkout-payment-online"> Online Payment </label>
                                         <div class="tm-checkout-payment-content">
                                             <p> Make your payment directly into our bank account. </p>
                                         </div>
                                     </div>
                                     <div class="tm-form-field">
-                                        <input type="radio" name="checkout-payment-method" id="checkout-payment-checkpayment" checked="checked" />
-                                        <label for="checkout-payment-checkpayment">Check Payments</label>
+                                        <input type="radio" name="checkout-payment-method" id="checkout-payment-wallet" value="Wallet" checked="checked" />
+                                        <label for="checkout-payment-wallet"> Wallet </label>
                                         <div class="tm-checkout-payment-content">
                                             <p>
                                                 Please send a check to Store Name, Store Street,
@@ -307,28 +300,23 @@
                                         </div>
                                     </div>
                                     <div class="tm-form-field">
-                                        <input type="radio" name="checkout-payment-method" id="checkout-payment-cashondelivery" />
+                                        <input type="radio" name="checkout-payment-method" id="checkout-payment-cashondelivery" value="Cash On Delivery"/>
                                         <label for="checkout-payment-cashondelivery">Cash On Delivery</label>
                                         <div class="tm-checkout-payment-content">
                                             <p>Pay with cash upon delivery.</p>
                                         </div>
                                     </div>
                                     <div class="tm-form-field">
-                                        <input type="radio" name="checkout-payment-method" id="checkout-payment-paypal" />
-                                        <label for="checkout-payment-paypal">PayPal</label>
+                                        <input type="radio" name="checkout-payment-method" id="checkout-payment-creditcard" value="Card Payment"/>
+                                        <label for="checkout-payment-creditcard">Credit / Debit Card</label>
                                         <div class="tm-checkout-payment-content">
-                                            <p>Pay via PayPal.</p>
-                                        </div>
-                                    </div>
-                                    <div class="tm-form-field">
-                                        <input type="radio" name="checkout-payment-method" id="checkout-payment-creditcard" />
-                                        <label for="checkout-payment-creditcard">Credit Card</label>
-                                        <div class="tm-checkout-payment-content">
-                                            <p>Pay with your credit card via Stripe.</p>
+                                            <p>Pay with your credit card or debit card via Stripe.</p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- checkout submit -->
                             <div class="tm-checkout-submit">
                                 <p>
                                     Your personal data will be used to process your order,
@@ -337,11 +325,11 @@
                                 </p>
                                 <div class="tm-form-inner">
                                     <div class="tm-form-field">
-                                        <input type="checkbox" name="checkout-read-terms" id="checkout-read-terms" />
+                                        <input type="checkbox" name="checkout-read-terms" id="checkout-read-terms"/>
                                         <label for="checkout-read-terms">I have read and agree to the website terms and conditions</label>
                                     </div>
                                     <div class="tm-form-field">
-                                        <button type="submit" class="tm-button ml-auto" onclick="placeOrder('<%= sessionData._id %>')"> Place Order </button>
+                                        <button type="submit" class="tm-button ml-auto" onclick="placeOrder()"> Place Order </button>
                                     </div>
                                 </div>
                             </div>
@@ -705,46 +693,57 @@
 </style>
 
 
+
+<!-- script for place order -->
 <script>
-function placeOrder() {
+    function placeOrder() {
 
-    checkoutDetails = 'This is the Ordered Products'
-
-    Swal.fire({
-        title: "Are you sure?",
-        // text: "Item will be removed from your cart and you won't be able to revert this!",
-        // icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "green",
-        confirmButtonText: "Confirm"
-    }).then((result) => {
-        if (result.isConfirmed) {
-            $.ajax({
-                url: '/place-order',
-                method: 'post',
-                data: {
-                    checkoutDetails
-                },
-                success: function(response) {
-                    if(response.successful) {
+        let selectedAddressId = document.querySelector('input[name="checkout-address"]:checked').value;
+        let selectedPaymentMethod = document.querySelector('input[name="checkout-payment-method"]:checked').value;
+        
+        Swal.fire({
+            title: "Are you sure?",
+            // text: "Item will be removed from your cart and you won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "green",
+            confirmButtonText: "Confirm"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/place-order',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({selectedAddressId, selectedPaymentMethod}),
+                    success: function(response) {
+                        if(response.successful) {
+                            Swal.fire({
+                                title: "Order Placed",
+                                text: "Your order has been placed successfully.",
+                                icon: "success",
+                                showConfirmButton: false,
+                                timer: 1500,
+                            }).then(() => {
+                                window.location.href = '/thankyou'; // Proceed to the thank you page after completed ordering.
+                            });
+                        } else {
+                            console.log('Failed to remove product from cart');
+                        }
+                    },
+                    error: function(error) {
+                        console.error('Error in placing order :', error);
                         Swal.fire({
-                            title: "Order Placed",
-                            text: "Your order has been successfully placed.",
-                            icon: "success",
+                            title: "Order Failed",
+                            text: "Error placing order. Please try again.",
+                            icon: "error",
                             showConfirmButton: false,
                             timer: 1500,
-                        }).then(() => {
-                            window.location.href = '/thankyou'; // Proceed to the thank you page after completed ordering.
                         });
-                    } else {
-                        console.log('Failed to remove product from cart');
                     }
-                },
-                error: function(error) {
-                    console.error('Error in removing from cart:', error);
-                }
-            });
-        }
-    });
-}
+
+                });
+            }
+        });
+    }
+
 </script>

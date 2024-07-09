@@ -2,6 +2,8 @@ const Address = require ('../models/addressModel');
 const User = require ('../models/userModel');
 const GoldPrice = require ('../models/goldPriceModel');
 const Cart = require ('../models/cartModel');
+const Wishlist = require ('../models/wishlistModel');
+
 
 
 
@@ -14,23 +16,30 @@ const loadUserAddress = async (req, res)=>{
         const sessionData = await User.findById(userId);
 
         const goldPriceData = await GoldPrice.findOne({});
-
         const userCart = await Cart.findOne({ userRef: userId });
+        const userWishlist = await Wishlist.findOne({userRef : userId});
 
-        // to show the cart count in navbar
         let cartCount = 0;
+        let wishlistCount = 0;
+
         if (sessionData && userCart){
             userCart.product.forEach((product) => {
                 cartCount += product.quantity;
             });
         }
 
+        if (userWishlist){
+            userWishlist.product.forEach((product) => {
+                wishlistCount += product.quantity;
+            });
+        }
+
         const userAddress = await Address.findOne({userRef: userId});
 
-        res.render('userAddress', { sessionData, userAddress, cartCount, goldPriceData });
+        res.render('userAddress', { sessionData, userAddress, cartCount, wishlistCount, goldPriceData });
 
     } catch (error) {
-        console.log('error in loading user profile', error.message);
+        console.log('error in loading user address page', error.message);
     }
 }
 

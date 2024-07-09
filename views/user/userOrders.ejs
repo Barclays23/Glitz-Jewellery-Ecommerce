@@ -1,8 +1,10 @@
+
 <%- include('../layouts/userLayouts/user-header.ejs') %>
 
 <%- include('../layouts/userLayouts/user-preloader.ejs') %>
 
 <%- include('../layouts/userLayouts/user-navbar.ejs') %>
+
 
 
 <div id="wrapper" class="wrapper">
@@ -83,46 +85,52 @@
 
                     
                     <!-- account tab-content starts -->
-                    <!-- Section 5: My Orders -->
-                    <h4>Ordered Items</h4>
-                    <div class="tab-content col" id="account-ontent">
-                        <div class="tab-pane fade show active" id="account-orders" role="tabpanel"
-                            aria-labelledby="account-orders-tab">
+                    <h4>My Orders (6)</h4>
+                    <div class="tab-content col" id="account-content">
+                        <div class="tab-pane fade show active" id="account-orders" role="tabpanel" aria-labelledby="account-orders-tab">
                             <div class="tm-myaccount-orders">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th class="tm-myaccount-orders-col-id">ORDER ID</th>
-                                                <th class="tm-myaccount-orders-col-image">IMAGE</th>
-                                                <th class="tm-myaccount-orders-col-date">DATE</th>
-                                                <th class="tm-myaccount-orders-col-status">STATUS</th>
-                                                <th class="tm-myaccount-orders-col-total">TOTAL</th>
-                                                <th class="tm-myaccount-orders-col-view">VIEW</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>#12345</td>
-                                                <td><img src="path/to/product/image1.jpg" alt="Product Image 1"></td>
-                                                <td>30 December 2018</td>
-                                                <td>On Hold</td>
-                                                <td>$132.00 for 2 items xxxxxxxxxxxxx</td>
-                                                <td><a href="#" class="tm-button tm-button-small">View</a>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>#12346</td>
-                                                <td><img src="path/to/product/image1.jpg" alt="Product Image 1"></td>
-                                                <td>30 December 2018</td>
-                                                <td>On Hold</td>
-                                                <td>$220.00 for 3 items</td>
-                                                <td><a href="#" class="tm-button tm-button-small">View</a>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+                                <% for(i=0; i< userOrders.length; i++){ %>
+                                    <div class="order-item">
+                                        <div class="order-header">
+                                            <div>
+                                                <div><b>ORDER # 402-6505499-6104359</b></div>
+                                                <div>23 November 2017</div>
+                                            </div>
+                                            <div class="ship-to">
+                                                <div><b>SHIP TO</b></div>
+                                                <div class="full-name"><%= userOrders[i].shippingAddress.firstname %> <%= userOrders[i].shippingAddress.lastname %><i class="fa fa-angle-down ml-3"></i></div>
+                                                <div class="full-address">
+                                                    <%= userOrders[i].shippingAddress.street %>,
+                                                    <%= userOrders[i].shippingAddress.city %>-
+                                                    <%= userOrders[i].shippingAddress.pincode %>,
+                                                    <%= userOrders[i].shippingAddress.state %>
+                                                    <%= userOrders[i].shippingAddress.contact %>
+                                                </div>
+                                            </div>
+                                            <div class="order-options">
+                                                <div class="text-success text-right"><b>ORDER PLACED</b></div>
+                                                <a href="/order-details?id=<%= userOrders[i]._id %>">View Order Details</a> | <a href="#">Invoice</a>
+                                            </div>
+                                        </div>
+                                        <!-- ordered items list -->
+                                        <div class="order-details">
+                                            <% for(j=0; j< userOrders[i].orderedItems.length; j++){ %></3>
+                                                <div class="each-item bg-danger">
+                                                    <div class="col-md-2 col-2 each-item-image">
+                                                        <% if(userOrders[i].orderedItems[j]){ %>
+                                                            <img src="assets/images/productImages/<%= userOrders[i].orderedItems[j].image %>" alt="product image">
+                                                        <% } %>
+                                                    </div>
+                                                    <div class="col-md-10 col-10 each-item-text bg-success">
+                                                        <h5 class="item-price">₹ <%= (userOrders[i].orderedItems[j].totalPrice).toFixed(2) %></h5>
+                                                        <h6 class="item-name"><%= userOrders[i].orderedItems[j].name %></h6>
+                                                        <p class="item-name"><%= userOrders[i].orderedItems[j].code %></p>
+                                                    </div>
+                                                </div>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                <% } %>
                             </div>
                         </div>
                     </div>
@@ -137,3 +145,122 @@
 </div>
 
 <%- include('../layouts/userLayouts/user-footer.ejs') %>
+
+
+
+
+
+<!-- --------------------------------------------------------------------- -->
+
+
+
+<!-- stlyles for user order list -->
+<style>
+.tm-myaccount-orders {
+    margin-top: 10px;
+}
+.order-item {
+    border: 2px solid #9a0056;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #f7f6f6;
+    border-radius: 10px;
+}
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    background-color: rgb(225, 224, 224);
+    padding: 5px;
+}
+.order-header a {
+    font-weight: 500;
+}
+.order-header a:hover {
+    color: #9a0056;
+}
+.ship-to {
+    position: relative;
+    cursor: pointer;
+}
+.ship-to:hover .full-address {
+    display: block;
+}
+.full-name {
+    font-weight: 500;
+}
+.full-name:hover {
+    color: #9a0056;
+}
+.full-address {
+    display: none;
+    position: absolute;
+    width: 200px;
+    top: 50px;
+    left: -30px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    padding: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.26);
+    z-index: 10;
+}
+
+
+
+.order-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 5px;
+}
+.each-item {
+    display: flex;
+    /* flex-wrap: wrap; */
+    align-items: center;
+    width: 100%;
+    margin-bottom: 5px;
+}
+.each-item-image {
+    padding: 0.5%;
+    max-width: 100px;
+    border: 1px solid black;
+}
+.each-item-image img {
+    width: 100%;
+    height: auto;
+    border: 1px solid lightgrey;
+}
+.item-price {
+    color: #9a0056;
+}
+.each-item-text {
+    align-items: center;
+    padding: 5px;
+    font-size: 1rem !important;
+    line-height: 0.1 !important;
+}
+
+
+
+
+
+/* Responsive font sizes */
+@media (max-width: 768px) {
+    .each-item-text {
+        font-size: 0.9rem; /* Slightly smaller font for tablets */
+    }
+}
+
+@media (max-width: 576px) {
+    .each-item-text {
+        font-size: 0.8rem; /* Smaller font for mobile devices */
+    }
+}
+
+@media (max-width: 400px) {
+    .each-item-text {
+        font-size: 0.7rem; /* Even smaller font for very small screens */
+    }
+}
+</style>

@@ -88,11 +88,17 @@ h1,
 h2,
 h3,
 h4,
-h5,
+/* h5, */
 h6 {
   margin-top: 0;
   margin-bottom: .5rem
 }
+
+h5 {
+  margin-top: 0;
+  margin-bottom: 0.0rem
+}
+
 
 p {
   margin-top: 0;
@@ -389,11 +395,16 @@ h1,
 h2,
 h3,
 h4,
-h5,
+/* h5, in line 398*/
 h6 {
   margin-bottom: .5rem;
   font-weight: 500;
   line-height: 1.2
+}
+.h5 {
+  margin-bottom: .5rem;
+  font-weight: 500;
+  line-height: 1.0
 }
 
 .h1,
@@ -418,7 +429,7 @@ h4 {
 
 .h5,
 h5 {
-  font-size: 1.25rem
+  font-size: 1.2rem
 }
 
 .h6,

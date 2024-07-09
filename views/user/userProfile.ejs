@@ -31,14 +31,14 @@
                         <!-- tab 1: dashboard -->
                         <li class="nav-item">
                             <a class="nav-link" id="account-dashboard-tab"
-                                href="my-account" 
+                                href="/my-account" 
                                 role="tab" aria-controls="account-dashboard" aria-selected="true">Dashboard
                             </a>
                         </li>
 
                         <!-- tab 2: profile information-->
                         <li class="nav-item">
-                            <a class="nav-link active" id="account-acdetails-tab" href="/profile"
+                            <a class="nav-link active" id="account-acdetails-tab" href="#account-acdetails-tab"
                                 role="tab" aria-controls="account-acdetails" aria-selected="true">My Profile
                             </a>
                         </li>
@@ -66,7 +66,7 @@
 
                         <!-- tab 6: -->
                         <li class="nav-item">
-                            <a class="nav-link" id="account-address-tab" href="#account-address"
+                            <a class="nav-link" id="account-address-tab" href="/address"
                                 role="tab" aria-controls="account-address" aria-selected="false">Address
                             </a>
                         </li>
@@ -105,7 +105,7 @@
                                             </div>
                                             <div class="col-12 name-container">
                                                 <h1><%= userData.firstname %> <%= userData.lastname %></h1>
-                                                <a href="/edit-profile"><i class="fa-solid fa-edit"></i></a>
+                                                <a href="/edit-profile#account-ontent"><i class="fa-solid fa-edit"></i></a>
                                             </div>
                                             <div class="col-6 actions-container">
                                                 <button class="change-password-btn" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
@@ -419,7 +419,7 @@
 
 
 
-<!-- Scripts Change Password Modal ------------------------------------------- -->
+<!-- Scripts for Change Password Modal and change password ------------------------------ -->
 <!-- for sweet alert -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

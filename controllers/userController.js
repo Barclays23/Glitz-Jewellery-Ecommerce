@@ -35,16 +35,12 @@ const loadHome = async(req, res)=>{
             userCart.product.forEach((product) => {
                 cartCount += product.quantity;
             });
-            console.log("Cart Quantity in home:", cartCount);
         }
 
         if (userWishlist){
-            console.log('wishlist und');
             userWishlist.product.forEach((product) => {
                 wishlistCount += product.quantity;
             });
-            console.log("cartCount in home :", cartCount);
-            console.log('wishlistCount in home :', wishlistCount);
         }
 
         res.render('home', {sessionData, wishlistCount, cartCount, goldPriceData, popularProducts, newProducts});
@@ -899,22 +895,27 @@ const loadUserAccount = async (req, res)=>{
 
         const goldPriceData = await GoldPrice.findOne({});
         const userCart = await Cart.findOne({ userRef: req.session.userId });
+        const userWishlist = await Wishlist.findOne({ userRef: req.session.userId});
 
         let cartCount = 0;
+        let wishlistCount = 0;
 
-        if (sessionData && userCart){
-            console.log("Cart Documents for User:", userCart);
+        if (userCart){
             userCart.product.forEach((product) => {
                 cartCount += product.quantity;
             });
-            console.log("Total Quantity of Carted Items:", cartCount);
         }
 
-        // res.render('userProfile', { sessionData, cartCount, goldPriceData });
-        res.render('userAccount', { sessionData, cartCount, goldPriceData });
+        if (userWishlist){
+            userWishlist.product.forEach((product) => {
+                wishlistCount += product.quantity;
+            });
+        }
+
+        res.render('userAccount', { sessionData, cartCount, wishlistCount, goldPriceData });
 
     } catch (error) {
-        console.log('error in loading user profile', error.message);
+        console.log('error in loading user account dashboard', error.message);
     }
 }
 
@@ -927,16 +928,25 @@ const loadUserProfile = async (req, res)=>{
         const sessionData = await User.findById(req.session.userId); //need either userData or sessionData (and edit in all front end pages)
         const goldPriceData = await GoldPrice.findOne({});
         const userCart = await Cart.findOne({ userRef: req.session.userId });
+        const userWishlist = await Wishlist.findOne({ userRef: req.session.userId});
 
         let cartCount = 0;
+        let wishlistCount = 0;
 
-        if (sessionData && userCart){
+
+        if (userCart){
             userCart.product.forEach((product) => {
                 cartCount += product.quantity;
             });
         }
 
-        res.render('userProfile', { userData, sessionData, cartCount, goldPriceData });
+        if (userWishlist){
+            userWishlist.product.forEach((product) => {
+                wishlistCount += product.quantity;
+            });
+        }
+
+        res.render('userProfile', { userData, sessionData, cartCount, wishlistCount, goldPriceData });
 
     } catch (error) {
         console.log('error in loading user profile', error.message);
@@ -953,8 +963,12 @@ const loadEditUserProfile = async (req, res)=>{
 
         const goldPriceData = await GoldPrice.findOne({});
         const userCart = await Cart.findOne({ userRef: req.session.userId });
+        const userWishlist = await Wishlist.findOne({ userRef: req.session.userId});
+
 
         let cartCount = 0;
+        let wishlistCount = 0;
+
 
         if (sessionData && userCart){
             userCart.product.forEach((product) => {
@@ -962,10 +976,16 @@ const loadEditUserProfile = async (req, res)=>{
             });
         }
 
-        res.render('editUserProfile', { userData, cartCount, sessionData, goldPriceData });
+        if (userWishlist){
+            userWishlist.product.forEach((product) => {
+                wishlistCount += product.quantity;
+            });
+        }
+
+        res.render('editUserProfile', { userData, cartCount, wishlistCount, sessionData, goldPriceData });
 
     } catch (error) {
-        console.log('error in loading user profile', error.message);
+        console.log('error in loading edit user profile', error.message);
     }
 }
 
@@ -1019,7 +1039,7 @@ const updateUserProfile = async (req, res)=>{
 
         
     } catch (error) {
-        console.log('error in loading user profile :', error.message);
+        console.log('error in loading updated user profile :', error.message);
     }
 }
 
