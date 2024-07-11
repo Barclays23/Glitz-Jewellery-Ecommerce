@@ -83,12 +83,11 @@ userRoute.post('/update-profile', userAuth.isLogin, multer.uploadUserImages, use
 userRoute.post('/change-password', userAuth.isLogin, userController.updateUserPassword);
 
 
-// CART ROUTES
-userRoute.get('/cart', userAuth.isLogin, cartController.loadUserCart);
-userRoute.post('/add-to-cart', cartController.addToCart);
-userRoute.post('/update-cart-quantity', userAuth.isLogin, cartController.updateCartQuantity);
-userRoute.delete('/remove-from-cart', userAuth.isLogin, cartController.removeFromCart);
-userRoute.post('/proceed-to-checkout', userAuth.isLogin, cartController.proceedToCheckout);
+// ADDRESS ROUTES
+userRoute.get('/address', userAuth.isLogin, addressController.loadUserAddress);
+userRoute.post('/add-address', userAuth.isLogin, addressController.addNewAddress);
+userRoute.patch('/edit-address', userAuth.isLogin, addressController.editAddress);
+userRoute.delete('/delete-address', userAuth.isLogin, addressController.deleteAddress);
 
 
 // WISHLIST ROUTES
@@ -97,19 +96,19 @@ userRoute.post('/add-to-wishlist', wishlistController.addToWishlist);
 userRoute.delete('/save-for-later', userAuth.isLogin, wishlistController.saveForLater);
 
 
-// ADDRESS ROUTES
-userRoute.get('/address', userAuth.isLogin, addressController.loadUserAddress);
-userRoute.post('/add-address', userAuth.isLogin, addressController.addNewAddress);
-userRoute.patch('/edit-address', userAuth.isLogin, addressController.editAddress);
-userRoute.delete('/delete-address', userAuth.isLogin, addressController.deleteAddress);
+// CART ROUTES
+userRoute.get('/cart', userAuth.isLogin, cartController.loadUserCart);
+userRoute.post('/add-to-cart', cartController.addToCart);
+userRoute.post('/update-cart-quantity', userAuth.isLogin, cartController.updateCartQuantity);
+userRoute.delete('/remove-from-cart', userAuth.isLogin, cartController.removeFromCart);
+userRoute.post('/proceed-to-checkout', userAuth.isLogin, cartController.proceedToCheckout);
 
-
-// ORDER ROUTES
-userRoute.get('/checkout',  orderController.loadCheckout);    // userAuth.isLogin,
-userRoute.post('/place-order',  orderController.placeOrder); // userAuth.isLogin,
-userRoute.get('/thankyou', userAuth.isLogin, orderController.loadThankyou);
-userRoute.get('/orders', userAuth.isLogin, orderController.loadUserOrders);
-userRoute.get('/order-details',  orderController.loadOrderDetails); // userAuth.isLogin,
+// ORDER ROUTES FOR USER
+userRoute.get('/checkout', userAuth.isLogin, cartController.loadCheckout);
+userRoute.post('/place-order', userAuth.isLogin, cartController.placeOrder);
+userRoute.get('/orders', userAuth.isLogin, cartController.loadUserOrders);
+userRoute.get('/order-details', userAuth.isLogin, cartController.loadOrderDetails);
+userRoute.get('/thankyou', userAuth.isLogin, cartController.loadThankyou);
 
 
 

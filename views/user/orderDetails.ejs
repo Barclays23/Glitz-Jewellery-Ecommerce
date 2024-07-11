@@ -132,8 +132,9 @@
                                         <img src="/assets/images/productImages/<%= orderData.orderedItems[i].image %>" alt="product-image" class="product-image">
                                         <div class="info-container-text">
                                             <h6><strong><%= orderData.orderedItems[i].code %></strong></h6>
-                                            <h5><%= orderData.orderedItems[i].name %></h5>
-                                            <p class="price">₹<%= (orderData.orderedItems[i].totalPrice).toFixed(0) %></p>
+                                            <a href="/product-details?id=<%= orderData.orderedItems[i].productRef %>"><h5 style="color: #9A0056;"><%= orderData.orderedItems[i].name %></h5></a>
+                                            <h6>Quantity : <%= orderData.orderedItems[i].quantity %></h6>
+                                            <p class="price">₹<%= (orderData.orderedItems[i].totalPrice * orderData.orderedItems[i].quantity).toFixed(0) %></p>
                                         </div>
                                     </div>
                                     <table style="border-collapse: collapse;">
@@ -151,7 +152,7 @@
                                         </tr>
                                     </table>
                                     <div>
-                                        <p><strong>Sold by:</strong> MD Continental</p>
+                                        <p><strong>Sold by:</strong> Glits Boutique Manufacturers</p>
                                         <p><strong>Return window closed on 07-Dec-2017</strong></p>
                                     </div>
                                     <div class="order-actions">
@@ -176,8 +177,14 @@
                                                     case 'Processing': %>
                                                         <td><span class="color-theme text-white bg-info">Processing</span></td>
                                                         <% break; 
+                                                    case 'Order Confirmed': %>
+                                                        <td><span class="color-theme text-white bg-info">Order Confirmed</span></td>
+                                                        <% break; 
                                                     case 'Shipped': %>
                                                         <td><span class="color-theme text-white bg-primary">Shipped</span></td>
+                                                        <% break; 
+                                                    case 'Out for Delivery': %>
+                                                        <td><span class="color-theme text-white bg-info">Out for Delivery</span></td>
                                                         <% break; 
                                                     case 'Delivered': %>
                                                         <td><span class="color-theme text-white bg-success">Delivered</span></td>

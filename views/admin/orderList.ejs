@@ -1,0 +1,104 @@
+<%- include('../layouts/adminLayouts/adminDashboardHeader.ejs') %>
+<%- include('../layouts/adminLayouts/adminSidebarAndNavbar.ejs') %>
+
+
+
+<!-- Product List Starts -->
+<div class="row ">
+    <div class="col-12 grid-margin">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title" style="text-align: center">ORDER LIST</h3>
+                <div style="text-align: right;">
+                    <button type="button" class="btn btn-success add-product" data-toggle="modal" data-target="#addProductModal">Add Product</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr class="text-center">
+                                <th> No </th>
+                                <th> Order ID </th>
+                                <th> Order Date </th>
+                                <th> Customer </th>
+                                <th> Total Amount </th>
+                                <th> No of Items </th>
+                                <th> Payment Method </th>
+                                <th> Payment Status </th>
+                                <th> Actions </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <% if (orderData.length > 0){
+                                for(let i=0; i < orderData.length; i++){ %>
+                                    <tr>
+                                        <td> <%= (currentPage - 1) * limit + i + 1 %></td>
+                                        <td> <%= orderData[i]._id %> </td>
+                                        <td><% 
+                                            const orderDate = new Date(orderData[i].orderDate);
+                                            const options = { day: '2-digit', month: 'long', year: 'numeric' };
+                                            const formattedDate = orderDate.toLocaleDateString('en-GB', options);
+                                            %>
+                                            <%= formattedDate %>
+                                        </td>
+                                        <td> <%= orderData[i].shippingAddress.contact %> </td>
+                                        <td class="text-end"> <%= (orderData[i].netAmount).toFixed(2) %> </td>
+                                        <td class="text-center"> <%= orderData[i].orderedItems.length %> </td>
+                                        <td> <%= orderData[i].paymentMethod %> </td>
+                                        <td class="text-center
+                                            <% if (orderData[i].paymentStatus === 'Pending'){ %> text-warning
+                                            <% } else if (orderData[i].paymentStatus === 'Processing'){ %> text-info
+                                            <% } else if (orderData[i].paymentStatus === 'Completed'){ %> text-success
+                                            <% } else if (orderData[i].paymentStatus === 'Failed'){ %> text-danger
+                                            <% } else if (orderData[i].paymentStatus === 'Refunded'){ %> text-secondary
+                                            <% } %>">
+                                            <%= orderData[i].paymentStatus %>
+                                        </td>
+                                        <td><a href="/admin/order-items?id=<%= orderData[i]._id %>" class="badge badge-danger" id="view-order-items" style="text-decoration: none">View Orders</a></td>
+                                    </tr>
+                                <% }
+                            }
+                            else{ %>
+                                <tr>
+                                    <td colspan="9" class="text-danger" style="text-align: center"> No Orders Found </td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+
+                    </table>
+
+                    <br>
+
+                    <div class="list-pagination text-center">
+
+                        <% for(let j=1; j <= totalPages; j++){ %>
+                            <% if (j === currentPage) { %>
+                                <span class="active"><%= j %></span>
+                            <% } else { %>
+                                <a href="?page=<%= j %>&search=<%= search %>"><%= j %></a>
+                            <% } %>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Product List Ends -->
+
+<!-- ------------------------------------------------ -->
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- for modals -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+
+
+
+<%- include('../layouts/adminLayouts/adminDashboardFooter.ejs') %>

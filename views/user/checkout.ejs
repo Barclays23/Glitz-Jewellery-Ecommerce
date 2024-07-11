@@ -698,16 +698,100 @@
 <script>
     function placeOrder() {
 
+        // Gather the selected address ID and payment method
         let selectedAddressId = document.querySelector('input[name="checkout-address"]:checked').value;
         let selectedPaymentMethod = document.querySelector('input[name="checkout-payment-method"]:checked').value;
+
+        // Gather product names and quantities
+        let products = [];
+        document.querySelectorAll('.tm-cart-productname').forEach(product => {
+            products.push(product.textContent);
+        });
+
+
+        let subTotal = document.querySelector('.tm-checkout-subtotal td:nth-child(2)').textContent.trim();
+        let shippingCharge = document.querySelector('.tm-checkout-shipping td:nth-child(2)').textContent.trim();
+        let discountAmount = document.querySelector('.tm-checkout-discount td:nth-child(2)').textContent.trim();
+        let netAmount = document.querySelector('.tm-checkout-total td:nth-child(2) h4').textContent.trim();
+
+
+        // Gather the shipping address
+        let selectedAddressElement = document.querySelector('input[name="checkout-address"]:checked').parentElement;
+        let firstName = selectedAddressElement.querySelector('b:nth-of-type(1)').textContent.trim();
+        let lastName = selectedAddressElement.querySelector('b:nth-of-type(2)').textContent.trim();
+        let street = selectedAddressElement.querySelector('.tm-checkout-address-content p').childNodes[0].textContent.trim();
+        let cityStatePincode = selectedAddressElement.querySelector('.tm-checkout-address-content p').childNodes[2].textContent.trim();
+        let [city, statePincode] = cityStatePincode.split(',');
+        let [state, pincode] = statePincode.trim().split('-');
+        let pincodeTrimmed = pincode.trim();
+        let contact = selectedAddressElement.querySelector('.tm-checkout-address-content p').childNodes[4].textContent.trim().split(':')[1].trim();
+        let fullAddress = `${street}, ${city.trim()}, ${state.trim()} - ${pincodeTrimmed}, Phone: ${contact}`;
+
+        let shippingName = `${firstName} ${lastName}`;
+        
+        // Format the product list
+        let productList = products.map(product => `<li>${product}</li>`).join('');
+
         
         Swal.fire({
-            title: "Are you sure?",
-            // text: "Item will be removed from your cart and you won't be able to revert this!",
-            icon: "warning",
+            title: 'Confirm Your Order',
+            html: `
+                <p>Please review your order details below before proceeding:</p>
+
+                <table style="width:100%; text-align:left;">
+                    <tr>
+                        <td><strong>Billing To</strong></td>
+                        <td><strong>:</strong></td>
+                        <td style="vertical-align: top;" class="p-2">${shippingName}</td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align: top;"><strong>Shipping To</strong></td>
+                        <td style="vertical-align: top;"><strong>:</strong></td>
+                        <td style="vertical-align: top;" class="p-2">${shippingName}</td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align: top;"><strong></strong></td>
+                        <td style="vertical-align: top;"><strong></strong></td>
+                        <td style="vertical-align: top;" class="p-2">${street}<br>${city}<br>${state} - ${pincode}<br>Phone: ${contact}</td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align: top;"><strong>Items Ordered</strong></td>
+                        <td style="vertical-align: top;"><strong>:</strong></td>
+                        <td style="vertical-align: top;"><ul>${productList}</ul></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Subtotal</strong></td>
+                        <td><strong>:</strong></td>
+                        <td class="text-right">${subTotal}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Shipping Charge</strong></td>
+                        <td><strong>:</strong></td>
+                        <td class="text-right">${shippingCharge}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Discount Amount</strong></td>
+                        <td><strong>:</strong></td>
+                        <td class="text-right">${discountAmount}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Net Amount</strong></td>
+                        <td><strong>:</strong></td>
+                        <td class="text-right"><strong>${netAmount}</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Payment Method</strong></td>
+                        <td><strong>:</strong></td>
+                        <td class="p-2">${selectedPaymentMethod}</td>
+                    </tr>
+                </table>
+                <p>By clicking "Place Order," you agree to our <a href="#">Terms and Conditions</a> and <a href="#">Return Policy</a>.</p>
+            `,
+            icon: 'info',
             showCancelButton: true,
+            confirmButtonText: 'Place Order',
             confirmButtonColor: "green",
-            confirmButtonText: "Confirm"
+            cancelButtonText: 'Go Back'
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
@@ -726,8 +810,6 @@
                             }).then(() => {
                                 window.location.href = '/thankyou'; // Proceed to the thank you page after completed ordering.
                             });
-                        } else {
-                            console.log('Failed to remove product from cart');
                         }
                     },
                     error: function(error) {

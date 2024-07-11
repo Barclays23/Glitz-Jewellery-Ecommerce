@@ -23,6 +23,7 @@ const multer = require('../middlewares/multer');
 const adminController = require('../controllers/adminController');
 const categoryController = require('../controllers/categoryController');
 const productController = require('../controllers/productController');
+const orderController = require('../controllers/orderController');
 const goldRateController = require('../controllers/goldRateController');
 
 
@@ -61,6 +62,12 @@ adminRoute.post('/add-product', adminAuth.isLogin, multer.uploadProductImages, p
 adminRoute.put('/edit-product', adminAuth.isLogin, multer.modifyProductImages, productController.updateProduct);
 adminRoute.patch('/manage-product', adminAuth.isLogin, productController.manageProduct);
 
+
+
+// ORDER CONTROLLER ROUTES
+adminRoute.get('/orders', adminAuth.isLogin, orderController.loadOrderList);
+adminRoute.get('/order-items', adminAuth.isLogin, orderController.loadOrderItems);
+adminRoute.patch('/update-order-status', adminAuth.isLogin, orderController.updateOrderStatus);
 
 
 // GOLD RATE CONTROLLER ROUTES

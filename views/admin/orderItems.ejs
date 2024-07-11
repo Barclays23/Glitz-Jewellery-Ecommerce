@@ -1,0 +1,249 @@
+<%- include('../layouts/adminLayouts/adminDashboardHeader.ejs') %>
+<%- include('../layouts/adminLayouts/adminSidebarAndNavbar.ejs') %>
+
+
+
+<div class="row ">
+    <div class="col-12 grid-margin">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title" style="text-align: center">ORDER DETAIL</h3>
+                <table class="mb-4">
+                    <tr><th class="text-success">Order ID</th></tr>
+                    <tr><td><%= orderData._id %></td></tr>
+                </table>
+                <div class="order-info">
+                    <div class="customer-info">
+                        <table>
+                            <tr>
+                                <th class="text-success">Customer</th>
+                            </tr>
+                            <tr>
+                                <% if(orderData.userRef.photo){ %>
+                                    <td><img src="assets/images/userImages/<%= orderData.userRef.photo %>" alt="profile-pic" class="profile-pic"></td>
+                                <% } else if(orderData.userRef.googleAccount.googlePhoto){ %>
+                                    <td><img src="<%= orderData.userRef.googleAccount.googlePhoto %>" alt="profile-pic" class="profile-pic"></td>
+                                <% } else { %>
+                                    <td><img src="assets/images/icons/dummy-profile-pic1.png %>" alt="profile-pic" class="profile-pic"></td>
+                                <% } %>
+                                <td>
+                                    <li><%= orderData.userRef.firstname %> <%= orderData.userRef.lastname %></li>
+                                    <li><%= orderData.userRef.email %></li>
+                                    <li><%= orderData.userRef.mobile %></li>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="payment-info">
+                        <table>
+                            <tr>
+                                <th class="text-success">Order Information</th>
+                            </tr>
+                            <tr>
+                                <td>Total Amount :</td>
+                                <td></td>
+                                <td><%= (orderData.netAmount).toFixed(2) %></td>
+                            </tr>
+                            <tr>
+                                <td>No of Items :</td>
+                                <td></td>
+                                <td><%= orderData.orderedItems.length %></td>
+                            </tr>
+                            <tr>
+                                <td>Payment Mode :</td>
+                                <td></td>
+                                <td><%= orderData.paymentMethod %></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="shipping-info">
+                        <table>
+                            <tr>
+                                <th class="text-success">Shipping Information</th>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <li><%= orderData.shippingAddress.firstname %> <%= orderData.shippingAddress.lastname %></li>
+                                    <li><%= orderData.shippingAddress.street %></li>
+                                    <li><%= orderData.shippingAddress.city %></li>
+                                    <li><%= orderData.shippingAddress.state %>-<%= orderData.shippingAddress.pincode %></li>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr class="text-center">
+                                <th> No </th>
+                                <th> Image </th>
+                                <th> Product Code </th>
+                                <th> Product Name </th>
+                                <th> Unit Price </th>
+                                <th> Qty </th>
+                                <th> Total Price </th>
+                                <th> Order Status </th>
+                                <th> Actions </th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="abcd">
+                            <% for(i=0; i < orderData.orderedItems.length; i++){ %>
+                                <tr>
+                                    <td> <%= i + 1 %></td>
+
+                                    <td> <img src="assets/images/productImages/<%= orderData.orderedItems[i].image %>" alt="Product Image"> </td>
+
+                                    <td> <%= orderData.orderedItems[i].code %> </td>
+
+                                    <td> <%= orderData.orderedItems[i].name %> </td>
+
+                                    <td class="text-end"> <%= (orderData.orderedItems[i].totalPrice).toFixed(2) %> </td>
+                                    
+                                    <td class="text-center"> <%= orderData.orderedItems[i].quantity %> </td>
+                                    
+                                    <td class="text-end"> <%= (orderData.orderedItems[i].totalPrice * orderData.orderedItems[i].quantity).toFixed(2) %> </td>
+
+                                    <% switch (orderData.orderedItems[i].orderStatus) { 
+                                        case 'Pending': %>
+                                            <td class="text-center color-theme text-warning" id="order-status">Pending</td>
+                                            <% break; 
+                                        case 'Processing': %>
+                                            <td class="text-center color-theme text-info" id="order-status">Processing</td>
+                                            <% break; 
+                                        case 'Order Confirmed': %>
+                                            <td class="text-center color-theme text-info" id="order-status">Order Confirmed</td>
+                                            <% break; 
+                                        case 'Shipped': %>
+                                            <td class="text-center color-theme text-primary" id="order-status">Shipped</td>
+                                            <% break; 
+                                        case 'Out for Delivery': %>
+                                            <td class="text-center color-theme text-info" id="order-status">Out for Delivery</td>
+                                            <% break; 
+                                        case 'Delivered': %>
+                                            <td class="text-center color-theme text-success" id="order-status">Delivered</td>
+                                            <% break; 
+                                        case 'Cancelled': %>
+                                            <td class="text-center color-theme text-danger" id="order-status">Cancelled</td>
+                                            <% break; 
+                                        case 'Returned': %>
+                                            <td class="text-center color-theme text-danger" id="order-status">Returned</td>
+                                            <% break; 
+                                        default: %>
+                                            <td class="text-center color-theme text-secondary" id="order-status">Unknown</td>
+                                    <% } %>
+
+                                    <td class="text-center">
+                                        <select class="form-select order-status" data-order-id="<%= orderData._id %>" data-item-id="<%= orderData.orderedItems[i]._id %>">
+                                            <option value="Pending" <% if(orderData.orderedItems[i].orderStatus === 'Pending') { %> selected <% } %>>Pending</option>
+                                            <option value="Processing" <% if(orderData.orderedItems[i].orderStatus === 'Processing') { %> selected <% } %>>Processing</option>
+                                            <option value="Order Confirmed" <% if(orderData.orderedItems[i].orderStatus === 'Order Confirmed') { %> selected <% } %>>Order Confirmed</option>
+                                            <option value="Shipped" <% if(orderData.orderedItems[i].orderStatus === 'Shipped') { %> selected <% } %>>Shipped</option>
+                                            <option value="Out for Delivery" <% if(orderData.orderedItems[i].orderStatus === 'Out for Delivery') { %> selected <% } %>>Out for Delivery</option>
+                                            <option value="Delivered" <% if(orderData.orderedItems[i].orderStatus === 'Delivered') { %> selected <% } %>>Delivered</option>
+                                            <option value="Cancelled" <% if(orderData.orderedItems[i].orderStatus === 'Cancelled') { %> selected <% } %>>Cancelled</option>
+                                            <option value="Returned" <% if(orderData.orderedItems[i].orderStatus === 'Returned') { %> selected <% } %>>Returned</option>
+                                        </select>
+                                    </td>
+
+                                    <td>
+                                        <a href="<%= `/admin/edit-order?id=${orderData.orderedItems[i]._id}` %>" 
+                                        data-toggle="modal" 
+                                        data-target="#editOrderModal"
+                                        data-id="<%= orderData.orderedItems[i]._id %>" 
+                                        data-code="<%= orderData.orderedItems[i].code %>" 
+                                        data-name="<%= orderData.orderedItems[i].name %>" 
+                                        data-islisted="<%= orderData.orderedItems[i].isBlocked %>">
+                                        <img src="/assets/images/icons/edit6.png" style="width: 35px; height: auto;" alt="edit-icon">
+                                        </a>
+                                    </td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                    <br>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ------------------------------------------------ -->
+
+
+<%- include('../layouts/adminLayouts/adminDashboardFooter.ejs') %>
+
+
+<!-- ------------------------------------------------ -->
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- for modals -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+<!-- script for edit order status -->
+<script>
+    $(document).ready(function () {
+        $('.order-status').change(function () {
+            const orderId = $(this).data('order-id');
+            const itemId = $(this).data('item-id');
+            const newStatus = $(this).val();
+            
+            $.ajax({
+                url: '/admin/update-order-status',
+                method: 'PATCH',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    orderId,
+                    itemId,
+                    newStatus
+                }),
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire({
+                            title: `Order ${newStatus}`,
+                            icon: "success",
+                            showConfirmButton: false,
+                            timer: 1000
+                        }).then(() => {
+                            location.reload();
+                        });
+                    }
+                },
+                error: function (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while updating the order status.');
+                }
+            });
+        });
+    });
+</script>
+
+
+
+
+<!-- script for order items page -->
+<style>
+.order-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #b41313;
+}
+.customer-info td {
+    vertical-align: top;
+}
+.order-info li {
+    list-style: none;
+}
+.profile-pic {
+    width: 60px;
+    height: 60px;
+    border-radius: 100%;
+    /* margin: 10px; */
+}
+</style>
