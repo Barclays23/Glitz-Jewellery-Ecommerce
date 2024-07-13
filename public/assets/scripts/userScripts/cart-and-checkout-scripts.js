@@ -248,7 +248,7 @@ function proceedToCheckout(userId) {
                 });
 
             } else if(response.proceed){
-                window.location.href = '/checkout'; // Proceed to the checkout page if all items are in stock
+                window.location.href = `/checkout?cartId=${response.cartId}`; // Proceed to the checkout page if all items are in stock
             }
         },
         error: function (xhr) {

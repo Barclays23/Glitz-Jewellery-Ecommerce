@@ -30,16 +30,24 @@ const loadOrderList = async(req, res)=>{
 
         const limit = 3;
 
-        const orderQuery = {
-            _id: {$exists: true},
-            $or: [
-                // { '_id': search }, // Directly search by _id if expecting a specific ObjectId
-                { 'shippingAddress.contact': { $regex: '.*' + search + '.*', $options: 'i' } } // Search by contact number
-            ]
-        };
+        let orderQuery = {};
+
+        if (search) {
+            orderQuery = {
+                $or: [
+                    { 'shippingAddress.contact': { $regex: '.*' + search + '.*', $options: 'i' } }
+                ]
+            };
+
+            // If search can be a valid ObjectId, add it to the query
+            if (/^[0-9a-fA-F]{24}$/.test(search)) {
+                orderQuery.$or.push({ _id: search });
+            }
+        }
 
 
-        const orderData = await Order.find(orderQuery)
+        let orderData = await Order.find(orderQuery)
+        .populate('userRef')
         // .populate('productRef')
         .sort({ orderDate: -1 }) // Sort by orderDate in descending order
         .skip((pageNo - 1) * limit)
@@ -63,7 +71,7 @@ const loadOrderList = async(req, res)=>{
         });
 
     } catch (error) {
-        console.log('failed loading product page: ', error);
+        console.log('failed loading order list : ', error);
     }
 }
 

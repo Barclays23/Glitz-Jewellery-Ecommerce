@@ -203,9 +203,12 @@
                                                         <% console.log('subTotal is : ', subTotal) %>
                                                     </tr>
                                                     <tr class="tm-cart-pricebox-shipping">
-                                                        <td>(+) Shipping Charge</td>
-                                                        <% let shippingCharge = subTotal >= 100000 ? 0 : 300 %>
-                                                        <td>₹ <%= (shippingCharge) %></td>
+                                                        <% let shippingCharge = 0 %>
+                                                        <% if (subTotal > 0){ %>
+                                                            <% shippingCharge = subTotal >= 100000 ? 0 : 300 %>
+                                                            <td>+ Shipping Charge</td>
+                                                            <td>₹ <%= (shippingCharge).toFixed(2) %></td>
+                                                        <% } %>
                                                     </tr>
                                                     <tr class="tm-cart-pricebox-total">
                                                         <td>Total</td>

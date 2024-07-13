@@ -41,7 +41,8 @@
                                             %>
                                             <%= formattedDate %>
                                         </td>
-                                        <td> <%= orderData[i].shippingAddress.contact %> </td>
+                                        <!-- <td> <%= orderData[i].shippingAddress.contact %> </td> -->
+                                        <td> <%= orderData[i].userRef.email %> </td>
                                         <td class="text-end"> <%= (orderData[i].netAmount).toFixed(2) %> </td>
                                         <td class="text-center"> <%= orderData[i].orderedItems.length %> </td>
                                         <td> <%= orderData[i].paymentMethod %> </td>

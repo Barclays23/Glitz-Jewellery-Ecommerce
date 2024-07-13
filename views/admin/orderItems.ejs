@@ -76,15 +76,15 @@
                     <table class="table">
                         <thead>
                             <tr class="text-center">
-                                <th> No </th>
-                                <th> Image </th>
-                                <th> Product Code </th>
-                                <th> Product Name </th>
-                                <th> Unit Price </th>
-                                <th> Qty </th>
-                                <th> Total Price </th>
-                                <th> Order Status </th>
-                                <th> Actions </th>
+                                <th class="text-success"> No </th>
+                                <th class="text-success"> Image </th>
+                                <th class="text-success"> Product Code </th>
+                                <th class="text-success"> Product Name </th>
+                                <th class="text-success"> Unit Price </th>
+                                <th class="text-success"> Qty </th>
+                                <th class="text-success"> Total Price </th>
+                                <th class="text-success"> Order Status </th>
+                                <th class="text-success"> Actions </th>
                             </tr>
                         </thead>
 
@@ -109,14 +109,14 @@
                                         case 'Pending': %>
                                             <td class="text-center color-theme text-warning" id="order-status">Pending</td>
                                             <% break; 
-                                        case 'Processing': %>
-                                            <td class="text-center color-theme text-info" id="order-status">Processing</td>
+                                        case 'Placed': %>
+                                            <td class="text-center color-theme text-info" id="order-status">Order Placed</td>
                                             <% break; 
-                                        case 'Order Confirmed': %>
+                                        case 'Confirmed': %>
                                             <td class="text-center color-theme text-info" id="order-status">Order Confirmed</td>
                                             <% break; 
                                         case 'Shipped': %>
-                                            <td class="text-center color-theme text-primary" id="order-status">Shipped</td>
+                                            <td class="text-center color-theme text-primary" id="order-status">Item Shipped</td>
                                             <% break; 
                                         case 'Out for Delivery': %>
                                             <td class="text-center color-theme text-info" id="order-status">Out for Delivery</td>
@@ -134,19 +134,6 @@
                                             <td class="text-center color-theme text-secondary" id="order-status">Unknown</td>
                                     <% } %>
 
-                                    <td class="text-center">
-                                        <select class="form-select order-status" data-order-id="<%= orderData._id %>" data-item-id="<%= orderData.orderedItems[i]._id %>">
-                                            <option value="Pending" <% if(orderData.orderedItems[i].orderStatus === 'Pending') { %> selected <% } %>>Pending</option>
-                                            <option value="Processing" <% if(orderData.orderedItems[i].orderStatus === 'Processing') { %> selected <% } %>>Processing</option>
-                                            <option value="Order Confirmed" <% if(orderData.orderedItems[i].orderStatus === 'Order Confirmed') { %> selected <% } %>>Order Confirmed</option>
-                                            <option value="Shipped" <% if(orderData.orderedItems[i].orderStatus === 'Shipped') { %> selected <% } %>>Shipped</option>
-                                            <option value="Out for Delivery" <% if(orderData.orderedItems[i].orderStatus === 'Out for Delivery') { %> selected <% } %>>Out for Delivery</option>
-                                            <option value="Delivered" <% if(orderData.orderedItems[i].orderStatus === 'Delivered') { %> selected <% } %>>Delivered</option>
-                                            <option value="Cancelled" <% if(orderData.orderedItems[i].orderStatus === 'Cancelled') { %> selected <% } %>>Cancelled</option>
-                                            <option value="Returned" <% if(orderData.orderedItems[i].orderStatus === 'Returned') { %> selected <% } %>>Returned</option>
-                                        </select>
-                                    </td>
-
                                     <td>
                                         <a href="<%= `/admin/edit-order?id=${orderData.orderedItems[i]._id}` %>" 
                                         data-toggle="modal" 
@@ -157,6 +144,19 @@
                                         data-islisted="<%= orderData.orderedItems[i].isBlocked %>">
                                         <img src="/assets/images/icons/edit6.png" style="width: 35px; height: auto;" alt="edit-icon">
                                         </a>
+                                    </td>
+
+                                    <td class="text-center">
+                                        <select class="form-select order-status" data-order-id="<%= orderData._id %>" data-item-id="<%= orderData.orderedItems[i]._id %>" data-current-status="<%= orderData.orderedItems[i].orderStatus %>">
+                                            <option value="Pending">Pending</option>
+                                            <option value="Placed">Order Placed</option>
+                                            <option value="Confirmed">Order Confirmed</option>
+                                            <option value="Shipped">Shipped</option>
+                                            <option value="Out for Delivery">Out for Delivery</option>
+                                            <option value="Delivered">Delivered</option>
+                                            <option value="Cancelled">Cancelled</option>
+                                            <option value="Returned">Returned</option>
+                                        </select>
                                     </td>
                                 </tr>
                             <% } %>
@@ -188,39 +188,75 @@
 <!-- script for edit order status -->
 <script>
     $(document).ready(function () {
+        const statusOrder = ['Pending', 'Placed', 'Confirmed', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled', 'Returned'];
+
+        // order status validation based on their index order.
+        $('.order-status').each(function () {
+            const currentStatus = $(this).data('current-status');
+            const currentIndex = statusOrder.indexOf(currentStatus);
+
+            $(this).addClass('select-enabled');
+
+            $(this).find('option').each(function () {
+                const optionValue = $(this).val();
+                const optionIndex = statusOrder.indexOf(optionValue);
+
+                if (optionIndex < currentIndex) {
+                    $(this).attr('disabled', true);
+                }
+            });
+
+            $(this).val(currentStatus);
+        });
+
+
         $('.order-status').change(function () {
+            const selectElement = $(this);
             const orderId = $(this).data('order-id');
             const itemId = $(this).data('item-id');
             const newStatus = $(this).val();
-            
-            $.ajax({
-                url: '/admin/update-order-status',
-                method: 'PATCH',
-                contentType: 'application/json',
-                data: JSON.stringify({
-                    orderId,
-                    itemId,
-                    newStatus
-                }),
-                success: function (response) {
-                    if (response.success) {
-                        Swal.fire({
-                            title: `Order ${newStatus}`,
-                            icon: "success",
-                            showConfirmButton: false,
-                            timer: 1000
-                        }).then(() => {
-                            location.reload();
-                        });
-                    }
-                },
-                error: function (error) {
-                    console.error('Error:', error);
-                    alert('An error occurred while updating the order status.');
-                }
+
+            Swal.fire({
+                title: `Do you want to change the order status to <b class="text-black">${newStatus}</b>?`,
+                html: `<p class="text-danger">Note: This action cannot be undone or changed back once selected. </p>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Confirm',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/admin/update-order-status',
+                        method: 'PATCH',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            orderId,
+                            itemId,
+                            newStatus
+                        }),
+                        success: function (response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    title: `Order ${newStatus}`,
+                                    icon: "success",
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            }
+                        },
+                        error: function (error) {
+                            console.error('Error:', error);
+                            alert('An error occurred while updating the order status.');
+                        }
+                    });
+
+                } 
             });
         });
     });
+
 </script>
 
 
@@ -228,10 +264,19 @@
 
 <!-- script for order items page -->
 <style>
+
+.select-enabled option:not([disabled]) {   /* Apply styles to enabled options */
+    color: rgb(0, 209, 0); /* Color for enabled options */
+}
+
+.select-enabled option[disabled] {   /* Apply styles to disabled options */
+    color: rgba(255, 255, 0, 0.463); /* Color for disabled options */
+}
+
 .order-info {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 20px;
+    margin-bottom: 70px;
     border-bottom: 1px solid #b41313;
 }
 .customer-info td {

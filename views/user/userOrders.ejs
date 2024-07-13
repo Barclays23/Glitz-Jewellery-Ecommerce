@@ -93,7 +93,7 @@
                                     <div class="order-item">
                                         <div class="order-header">
                                             <div>
-                                                <div><b>ORDER # 402-6505499-6104359</b></div>
+                                                <div><b>ORDER DATE</b></div>
                                                 <div><%= formatDate(userOrders[i].orderDate) %></div>
                                             </div>
                                             <div class="ship-to">
@@ -112,7 +112,8 @@
                                                 <div><h5 class="item-price"><%= (userOrders[i].netAmount).toFixed(2) %></h5></div>
                                             </div>
                                             <div class="order-options">
-                                                <div class="text-success text-right"><b>ORDER PLACED</b></div>
+                                                <div class="text-success text-right"><b><%= userOrders[i]._id %></b></div>
+                                                <!-- <div class="text-success text-right"><b><%= userOrders[i].orderNo %></b></div> -->
                                                 <a href="/order-details?id=<%= userOrders[i]._id %>">View Order Details</a> | <a href="#">Invoice</a>
                                             </div>
                                         </div>

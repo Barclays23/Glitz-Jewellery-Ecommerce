@@ -5,7 +5,10 @@ const Product = require ('../models/productModel');
 const Wishlist = require ('../models/wishlistModel');
 const Cart = require ('../models/cartModel');
 const Order = require('../models/orderModel');
+const SerialNumber = require('../models/SerialNumberModel');
+
 const categoryModel = require('../models/categoryModel');
+
 
 
 
@@ -233,7 +236,7 @@ const proceedToCheckout = async(req, res)=>{
             return res.json({nocartItems: true});
         }
 
-        return res.json({proceed: true});
+        return res.json({proceed: true, cartId: userCart._id});
 
 
     } catch (error) {
@@ -249,11 +252,13 @@ const loadCheckout = async (req, res)=>{
     try {
         const userId = req.session.userId;
         const sessionData = await User.findById(userId);
+        const cartId = req.query.cartId;
 
         const goldPriceData = await GoldPrice.findOne({});
-        const userCart = await Cart.findOne({ userRef: userId }).populate('product.productRef');
         const userAddress = await Address.findOne({userRef: userId});
         const userWishlist = await Wishlist.findOne({ userRef: userId});
+
+        const userCart = await Cart.findOne({ _id: cartId }).populate('product.productRef');
 
         let cartCount = 0;
         let wishlistCount = 0;
@@ -270,7 +275,14 @@ const loadCheckout = async (req, res)=>{
             });
         }
 
-        res.render('checkout', { sessionData, userAddress, userCart, cartCount, wishlistCount, goldPriceData });
+        if(cartId && cartCount > 0){   
+            res.render('checkout', { sessionData, userAddress, userCart, cartCount, wishlistCount, goldPriceData });
+
+        } else{
+            res.redirect('/cart');
+        }
+
+
 
     } catch (error) {
         console.log('error in loading checkout page :', error.message);
@@ -316,11 +328,32 @@ const placeOrder = async(req, res)=>{
         // <% let discountAmount = subTotal * 1.5 /100 %>  // dummy discount amount given in front end also.
         // can be provide the discount on makingCharge (later)
 
+
+        //FOR ORDER NUMBER / INVOICE NUMBER
+        // Get the current date components
+        const currentDate = new Date();
+        const year = currentDate.getFullYear().toString().slice(-2);
+        const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+        const day = currentDate.getDate().toString().padStart(2, '0');
+
+        // Get the last serial number and increment it
+        const serialData = await SerialNumber.findOneAndUpdate(
+            { year: currentDate.getFullYear() },
+            { $inc: { serial: 1 } },
+            { new: true, upsert: true }
+        );
+
+        const serialNumber = serialData.serial.toString().padStart(4, '0');
+
+        // Generate the invoice number
+        const invoiceNumber = `GL 2425/${year}${month}${day}${serialNumber}`;
+        console.log('Generated Invoice Number: ', invoiceNumber);
         
         const userOrders = new Order ({
             userRef : userId,
             orderDate : Date.now(),
             orderedItems : [],     // initially empty items array
+            orderNo : invoiceNumber,
             shippingAddress : userAddress,
             subTotal : cartSubTotal,
             deliveryCharge : shippingCharge,
@@ -355,16 +388,25 @@ const placeOrder = async(req, res)=>{
                 quantity : CartQuantity,
                 productSum : cartProductRef.totalPrice * CartQuantity,
 
-                orderStatus : 'Pending',
+                orderStatus : 'Placed',  // if the payment failed, the initial order status should be 'Pending'
                 deliveryDate : Date.now() + 5,
             });
 
             await userOrders.save();
             console.log('pushed product details into userOrders.orderedItems');
+
+            userCheckout.product.pull({productRef: cartProductRef._id});
+            await userCheckout.save();
+            console.log('removed item from cart and updated UserCart');
+
+
+            await Product.findOneAndUpdate(
+                { _id: cartProductRef },
+                { $inc: { quantity: -CartQuantity } },
+                { new: true }
+            );
+            console.log('updated the inventory stock of the ordered product.');
         }
-
-
-        // remove items from the cart after ordering
 
         return res.json({successful: true});
 
@@ -388,7 +430,7 @@ const loadUserOrders = async (req, res)=>{
         const userCart = await Cart.findOne({ userRef: sessionId });
         const userWishlist = await Wishlist.findOne({ userRef: sessionId});
 
-        const userOrders = await Order.find({userRef: sessionId});
+        const userOrders = await Order.find({userRef: sessionId}).sort({ orderDate: -1 });
 
         let cartCount = 0;
         let wishlistCount = 0;

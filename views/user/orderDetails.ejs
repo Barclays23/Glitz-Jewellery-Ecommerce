@@ -30,7 +30,7 @@
                 <div class="order-details">
                     <div class="order-info">
                         <div>
-                            <p><strong>Order No</strong><br> 402-6505499-6104359</p>
+                            <p><strong>Order No</strong><br> <%= orderData._id %></p>
                         </div>
                         <div>
                             <p><strong>Ordered On</strong><br> <%= formatDate(orderData.orderDate) %></p>
@@ -156,7 +156,7 @@
                                         <p><strong>Return window closed on 07-Dec-2017</strong></p>
                                     </div>
                                     <div class="order-actions">
-                                        <a> <p>Buy it again</p></a>
+                                        <a href="/product-details?id=<%= orderData.orderedItems[i].productRef %>"> <p>Buy it again</p></a>
                                         <a> <p>Write a product review</p></a>
                                         <a> <p>Cancel Order</p></a>
                                     </div>
@@ -174,14 +174,14 @@
                                                     case 'Pending': %>
                                                         <td><span class="color-theme text-white bg-warning">Pending</span></td>
                                                         <% break; 
-                                                    case 'Processing': %>
-                                                        <td><span class="color-theme text-white bg-info">Processing</span></td>
+                                                    case 'Placed': %>
+                                                        <td><span class="color-theme text-white bg-info">Order Placed</span></td>
                                                         <% break; 
                                                     case 'Order Confirmed': %>
                                                         <td><span class="color-theme text-white bg-info">Order Confirmed</span></td>
                                                         <% break; 
                                                     case 'Shipped': %>
-                                                        <td><span class="color-theme text-white bg-primary">Shipped</span></td>
+                                                        <td><span class="color-theme text-white bg-primary">Item Shipped</span></td>
                                                         <% break; 
                                                     case 'Out for Delivery': %>
                                                         <td><span class="color-theme text-white bg-info">Out for Delivery</span></td>

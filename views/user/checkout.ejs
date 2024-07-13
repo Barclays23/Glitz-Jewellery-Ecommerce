@@ -290,7 +290,8 @@
                                         </div>
                                     </div>
                                     <div class="tm-form-field">
-                                        <input type="radio" name="checkout-payment-method" id="checkout-payment-wallet" value="Wallet" checked="checked" />
+                                        <!--removed checked="checked" -->
+                                        <input type="radio" name="checkout-payment-method" id="checkout-payment-wallet" value="Wallet" />
                                         <label for="checkout-payment-wallet"> Wallet </label>
                                         <div class="tm-checkout-payment-content">
                                             <p>
@@ -487,10 +488,10 @@
                                         <input type="text" id="add-phone"/>
                                         <span id="phone-error" style="color: red; display: none;"></span>
                                     </div>
-                                    <div class="tm-form-field">
+                                    <!-- <div class="tm-form-field">
                                         <input type="checkbox" name="billform-dirrentswitch" id="billform-dirrentswitch"/>
                                         <label for="billform-dirrentswitch"><b>Ship to another address</b></label>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                         </div>
@@ -498,8 +499,8 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal"> Close </button>
                 <button type="button" class="btn btn-primary" id="saveChanges"> Save changes </button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal"> Close </button>
             </div>
         </div>
     </div>
@@ -697,10 +698,59 @@
 <!-- script for place order -->
 <script>
     function placeOrder() {
+        // Check if the terms and conditions checkbox is ticked
+        let termsChecked = document.querySelector('input[name="checkout-read-terms"]').checked;
+        if (!termsChecked) {
+            Swal.fire({
+                html: `<p class="text-center text-danger"> You must agree to the terms and conditions before placing the order. </p>`,
+                showConfirmButton: false,
+            });
+            return;
+        }
+
+
+        // Check if a shipping address is selected
+        // let selectedAddressElement = document.querySelector('input[name="checkout-address"]:checked');
+        // if (!selectedAddressElement) {
+        //     Swal.fire({
+        //         title: "No Shipping Address",
+        //         html: `<h6 class="text-danger"> Please select a shipping address or add new one to place your order. </h6>`,
+        //         showConfirmButton: false,
+        //     });
+        //     return;
+        // }
+
+
+        // Check if a shipping address is selected or no address.
+        let selectedAddressId = document.querySelector('input[name="checkout-address"]:checked');
+        if (!selectedAddressId) {
+            Swal.fire({
+                title: "No Shipping Address",
+                html: `<h6 class="text-danger"> Please select a shipping address or add new one to place your order. </h6>`,
+                showConfirmButton: false,
+            });
+            return;
+        }
+
+
+        // Check if the payment method is selected.
+        let selectedPaymentMethod = document.querySelector('input[name="checkout-payment-method"]:checked');
+        if (!selectedPaymentMethod) {
+            Swal.fire({
+                // title: "No Shipping Address",
+                html: `<h6 class="text-danger"> Please choose a payment method to place your order. </h6>`,
+                showConfirmButton: false,
+            });
+            return;
+        }
+
 
         // Gather the selected address ID and payment method
-        let selectedAddressId = document.querySelector('input[name="checkout-address"]:checked').value;
-        let selectedPaymentMethod = document.querySelector('input[name="checkout-payment-method"]:checked').value;
+        selectedAddressId = document.querySelector('input[name="checkout-address"]:checked').value;
+        selectedPaymentMethod = document.querySelector('input[name="checkout-payment-method"]:checked').value;
+
+        console.log('selectedAddressId for order : ', selectedAddressId);
+        console.log('selectedPaymentMethod for order : ', selectedPaymentMethod);
 
         // Gather product names and quantities
         let products = [];
