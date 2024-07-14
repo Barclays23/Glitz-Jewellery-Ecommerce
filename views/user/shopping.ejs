@@ -84,160 +84,168 @@
                                 <!-- <button><i class="ion-android-search"></i></button> -->
                                 <input type="submit" class="text-white bg-success m-1 w-50" style="height: 40px;" value="Search">
                             </div>
-                            <select>
-                                <option value="value">Default Sorting</option>
-                                <option value="value">Name: A-Z</option>
-                                <option value="value">Name: Z-A</option>
-                                <option value="value">Date</option>
-                                <option value="value">Best Sellers</option>
-                                <option value="value">Price: Lowest first </option>
-                                <option value="value">Price: Highest first </option>
+                            <select name="sort" onchange="this.form.submit()">
+                                <option value="none" <%= sortQuery === 'none' ? 'selected' : '' %>>Default Sorting</option>
+                                <option value="a-z" <%= sortQuery === 'a-z' ? 'selected' : '' %>>Name : A-Z</option>
+                                <option value="z-a" <%= sortQuery === 'z-a' ? 'selected' : '' %>>Name : Z-A</option>
+                                <option value="low-to-high" <%= sortQuery === 'low-to-high' ? 'selected' : '' %>>Price : Lowest first</option>
+                                <option value="high-to-low" <%= sortQuery === 'high-to-low' ? 'selected' : '' %>>Price : Highest first</option>
                             </select>
                         </form>
 
                         <div class="tm-shop-products" id="shop-products">
                             <div class="row mt-30-reverse">
-                                <% for(i=0; i < limit; i++){ %>
+                                <% for(let i = 0; i < productData.length; i++) { %>
+                                <!-- <% for(i=0; i < limit; i++){ %> -->
                                     <% if (productData[i]){ %>
-                                    <div class="col-xl-4 col-lg-6 col-md-6 col-sm-6 col-12 mt-50" style="border: 1px solid darkgray;">
-                                        <div class="tm-product tm-scrollanim">
-                                            <div class="tm-product-topside">
-                                                <div class="tm-product-images">
-                                                    <img src="assets/images/productImages/<%= productData[i].images.image1 %>" alt="product image">
-                                                    <img src="assets/images/productImages/<%= productData[i].images.image2 %>" alt="product image">
-                                                </div>
-                                                <div id="product-actions_<%= productData[i]._id %>">
-                                                    <ul class="tm-product-actions">
-                                                        <li> <a href="#" onclick="addToCart('<%= productData[i]._id %>')"><i class="ion-android-cart"></i> Add to cart </a> </li>
-                                                        <li> <a href="#" data-fancybox data-src="assets/images/productImages/<%= productData[i].images.image1 %>"><i class="ion-eye"></i> </a> </li>
-                                                        <% if (sessionData && wishlistItems) { %>
-                                                            <% console.log('productData[i]._id :', productData[i]._id.toString()) %>
-                                                            <% console.log('wishlistItems :', wishlistItems.map(item => item.toString())) %>
-                                                            
-                                                            <li><a href="#" onclick="addToWishlist('<%= productData[i]._id %>')"><i class="<%= wishlistItems.map(item => item.toString()).includes(productData[i]._id.toString()) ? 'ion-android-favorite' : 'ion-android-favorite-outline' %>"></i></a></li>
-                                                        <% } else { %>
-                                                            <li><a href="#" onclick="addToWishlist('<%= productData[i]._id %>')"><i class="ion-android-favorite-outline"></i></a></li>
+                                        <div class="col-xl-4 col-lg-6 col-md-6 col-sm-6 col-12 mt-50" style="border: 1px solid darkgray;">
+                                            <div class="tm-product tm-scrollanim">
+                                                <div class="tm-product-topside">
+                                                    <div class="tm-product-images">
+                                                        <img src="assets/images/productImages/<%= productData[i].images.image1 %>" alt="product image">
+                                                        <img src="assets/images/productImages/<%= productData[i].images.image2 %>" alt="product image">
+                                                    </div>
+                                                    <div id="product-actions_<%= productData[i]._id %>">
+                                                        <ul class="tm-product-actions">
+                                                            <li> <a href="#" onclick="addToCart('<%= productData[i]._id %>')"><i class="ion-android-cart"></i> Add to cart </a> </li>
+                                                            <li> <a href="#" data-fancybox data-src="assets/images/productImages/<%= productData[i].images.image1 %>"><i class="ion-eye"></i> </a> </li>
+                                                            <% if (sessionData && wishlistItems) { %>
+                                                                <li><a href="#" onclick="addToWishlist('<%= productData[i]._id %>')"><i class="<%= wishlistItems.map(item => item.toString()).includes(productData[i]._id.toString()) ? 'ion-android-favorite' : 'ion-android-favorite-outline' %>"></i></a></li>
+                                                            <% } else { %>
+                                                                <li><a href="#" onclick="addToWishlist('<%= productData[i]._id %>')"><i class="ion-android-favorite-outline"></i></a></li>
+                                                            <% } %>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="tm-product-badges">
+                                                        <!-- <span class="tm-product-badges-new">New</span> -->
+                                                        <% if(productData[i].quantity === 0){ %>
+                                                            <span class="tm-product-badges-outofstock">Out of Stock</span>
+                                                        <% } else if (productData[i].quantity <= 3){ %>
+                                                            <span class="tm-product-badges-lowquantity">Only <%= productData[i].quantity %> items left</span>
                                                         <% } %>
-                                                    </ul>
+                                                    </div>
                                                 </div>
-                                                <div class="tm-product-badges">
-                                                    <!-- <span class="tm-product-badges-new">New</span> -->
-                                                    <% if(productData[i].quantity === 0){ %>
-                                                        <span class="tm-product-badges-outofstock">Out of Stock</span>
-                                                    <% } else if (productData[i].quantity <= 3){ %>
-                                                        <span class="tm-product-badges-lowquantity">Only <%= productData[i].quantity %> items left</span>
-                                                    <% } %>
-                                                </div>
-                                            </div>
-                                            <div class="tm-product-bottomside">
-                                                <br>
-                                                <!-- <h6 class="tm-product-title"><a href="product-details.html">Stylist daimond earring</a></h6> -->
-                                                <h6 class="tm-product-title"><a href="product-details?id=<%= productData[i]._id %>"><%= productData[i].code %></a></h6>
-                                                <h6 class="tm-product-title"><a href="product-details?id=<%= productData[i]._id %>"><%= productData[i].name %></a></h6>
-                                                <div class="tm-ratingbox">
-                                                    <span class="is-active"><i class="ion-android-star-outline"></i></span>
-                                                    <span class="is-active"><i class="ion-android-star-outline"></i></span>
-                                                    <span class="is-active"><i class="ion-android-star-outline"></i></span>
-                                                    <span class="is-active"><i class="ion-android-star-outline"></i></span>
-                                                    <span><i class="ion-android-star-outline"></i></span>
-                                                </div>
-                                                <% const netWeight = Number(productData[i].netWeight)%>
-                                                <% const metalCost = goldPriceData.price * productData[i].netWeight %>
-                                                <% const makingCharge = metalCost * productData[i].VA/100 %>
-                                                <% const stoneCharge = productData[i].stoneCharge %>
-                                                <% const GST = (metalCost + makingCharge + stoneCharge) * (3/100) %>
-                                                <% const totalPrice = metalCost + makingCharge + stoneCharge + GST %>
-                                                <span class="tm-product-price">₹ <%= Math.round(totalPrice).toFixed(2) %></span>
-                                                <div class="tm-product-content">
-                                                    
-                                                    <table border="0" cellpadding="5">
-                                                        <th style="width: 120px"></th>
-                                                        <th></th>
-                                                        <th></th>
-                                                        <tr style="vertical-align: top;">
-                                                          <td><b>Description</b></td>
-                                                          <td> <b> : </b></td>
-                                                          <td>  <%= productData[i].description %> Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the when an unknown printer took a galley of type and scrambled it to make a type specimen book.</td>
-                                                        </tr>
-                                                    </table>
-
-                                                    <table style="border-collapse: collapse;">
-                                                        <tr>
-                                                            <th style="border: 1px solid black; padding: 8px;">Gross Weight</th>
-                                                            <th style="border: 1px solid black; padding: 8px;">Stone Weight</th>
-                                                            <th style="border: 1px solid black; padding: 8px;">Net Weight</th>
-                                                        </tr>
-                                                        <tr style="text-align: right;">
-                                                            <td style="border: 1px solid black; padding: 8px;"><%= (productData[i].grossWeight).toFixed(3) %></td>
-                                                            <td style="border: 1px solid black; padding: 8px;"><%= (productData[i].stoneWeight).toFixed(3) %></td>
-                                                            <td style="border: 1px solid black; padding: 8px;"><%= (productData[i].netWeight).toFixed(3) %></td>
-                                                        </tr>
-                                                    </table>
-
-                                                    <table cellpadding="5">
-                                                        <tr>
-                                                          <td><b>Price Breakup : </b></td>
-                                                          <td style="width: 100px;"></td>
-                                                        </tr>
-                                                        <tr>
-                                                          <td>Metal Price</td>
-                                                          <td style="text-align: right;"> ₹ </td>
-                                                          <td style="text-align: right;"> <%= (metalCost).toFixed(2) %> </td>
-                                                        </tr>
-                                                        <tr>
-                                                          <td>Making Charge (<%= productData[i].VA %> %)</td>
-                                                          <td style="text-align: right;"> ₹ </td>
-                                                          <td style="text-align: right;"> <%= (makingCharge).toFixed(2) %> </td>
-                                                        </tr>
-                                                        <tr>
-                                                          <td>Stone Charge</td>
-                                                          <td style="text-align: right;"> ₹ </td>
-                                                          <td style="text-align: right;"> <%= (stoneCharge).toFixed(2) %> </td>
-                                                        </tr>
-                                                        <tr>
-                                                          <td>Tax</td>
-                                                          <td style="text-align: right;"> ₹ </td>
-                                                          <td style="text-align: right;"> <%= (GST).toFixed(2) %> </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td colspan="3"> <hr style="border: 1px solid black;"></td>
-                                                        </tr>
-                                                        <tr style="color: #9A0056; font-size: 18px;">
-                                                            <td><b>TOTAL</b></td>
-                                                            <td style="text-align: right;"><b>₹</b></td>
-                                                            <td style="text-align: right;"><b> <%= (totalPrice).toFixed(2) %></b></td>
-                                                        </tr>
-                                                    </table>
-
-                                                    <ul class="tm-product-actions">
-                                                        <li><a href="#" onclick="addToCart('<%= productData[i]._id %>')"><i class="ion-android-cart"></i> Add to cart</a></li>
-                                                        <li><button data-fancybox data-src="assets/images/productImages/<%= productData[i].images.image1 %>"><i class="ion-eye"></i></button></li>
-                                                        <li><a href="#"><i class="ion-heart"></i></a></li>
-                                                    </ul>
+                                                <div class="tm-product-bottomside">
                                                     <br>
+                                                    <!-- <h6 class="tm-product-title"><a href="product-details.html">Stylist daimond earring</a></h6> -->
+                                                    <h6 class="tm-product-title"><a href="product-details?id=<%= productData[i]._id %>"><%= productData[i].code %></a></h6>
+                                                    <h6 class="tm-product-title"><a href="product-details?id=<%= productData[i]._id %>"><%= productData[i].name %></a></h6>
+                                                    <div class="tm-ratingbox">
+                                                        <span class="is-active"><i class="ion-android-star-outline"></i></span>
+                                                        <span class="is-active"><i class="ion-android-star-outline"></i></span>
+                                                        <span class="is-active"><i class="ion-android-star-outline"></i></span>
+                                                        <span class="is-active"><i class="ion-android-star-outline"></i></span>
+                                                        <span><i class="ion-android-star-outline"></i></span>
+                                                    </div>
+                                                    <% const netWeight = Number(productData[i].netWeight)%>
+                                                    <% const metalCost = goldPriceData.price * productData[i].netWeight %>
+                                                    <% const makingCharge = metalCost * productData[i].VA/100 %>
+                                                    <% const stoneCharge = productData[i].stoneCharge %>
+                                                    <% const GST = (metalCost + makingCharge + stoneCharge) * (3/100) %>
+                                                    <% const totalPrice = metalCost + makingCharge + stoneCharge + GST %>
+                                                    <span class="tm-product-price">₹ <%= Math.round(totalPrice).toFixed(2) %></span>
+                                                    <div class="tm-product-content">
+                                                        
+                                                        <table border="0" cellpadding="5">
+                                                            <th style="width: 120px"></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <tr style="vertical-align: top;">
+                                                            <td><b>Description</b></td>
+                                                            <td> <b> : </b></td>
+                                                            <td>  <%= productData[i].description %> Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the when an unknown printer took a galley of type and scrambled it to make a type specimen book.</td>
+                                                            </tr>
+                                                        </table>
+
+                                                        <table style="border-collapse: collapse;">
+                                                            <tr>
+                                                                <th style="border: 1px solid black; padding: 8px;">Gross Weight</th>
+                                                                <th style="border: 1px solid black; padding: 8px;">Stone Weight</th>
+                                                                <th style="border: 1px solid black; padding: 8px;">Net Weight</th>
+                                                            </tr>
+                                                            <tr style="text-align: right;">
+                                                                <td style="border: 1px solid black; padding: 8px;"><%= (productData[i].grossWeight).toFixed(3) %></td>
+                                                                <td style="border: 1px solid black; padding: 8px;"><%= (productData[i].stoneWeight).toFixed(3) %></td>
+                                                                <td style="border: 1px solid black; padding: 8px;"><%= (productData[i].netWeight).toFixed(3) %></td>
+                                                            </tr>
+                                                        </table>
+
+                                                        <table cellpadding="5">
+                                                            <tr>
+                                                            <td><b>Price Breakup : </b></td>
+                                                            <td style="width: 100px;"></td>
+                                                            </tr>
+                                                            <tr>
+                                                            <td>Metal Price</td>
+                                                            <td style="text-align: right;"> ₹ </td>
+                                                            <td style="text-align: right;"> <%= (metalCost).toFixed(2) %> </td>
+                                                            </tr>
+                                                            <tr>
+                                                            <td>Making Charge (<%= productData[i].VA %> %)</td>
+                                                            <td style="text-align: right;"> ₹ </td>
+                                                            <td style="text-align: right;"> <%= (makingCharge).toFixed(2) %> </td>
+                                                            </tr>
+                                                            <tr>
+                                                            <td>Stone Charge</td>
+                                                            <td style="text-align: right;"> ₹ </td>
+                                                            <td style="text-align: right;"> <%= (stoneCharge).toFixed(2) %> </td>
+                                                            </tr>
+                                                            <tr>
+                                                            <td>Tax</td>
+                                                            <td style="text-align: right;"> ₹ </td>
+                                                            <td style="text-align: right;"> <%= (GST).toFixed(2) %> </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td colspan="3"> <hr style="border: 1px solid black;"></td>
+                                                            </tr>
+                                                            <tr style="color: #9A0056; font-size: 18px;">
+                                                                <td><b>TOTAL</b></td>
+                                                                <td style="text-align: right;"><b>₹</b></td>
+                                                                <td style="text-align: right;"><b> <%= (totalPrice).toFixed(2) %></b></td>
+                                                            </tr>
+                                                        </table>
+
+                                                        <ul class="tm-product-actions">
+                                                            <li><a href="#" onclick="addToCart('<%= productData[i]._id %>')"><i class="ion-android-cart"></i> Add to cart</a></li>
+                                                            <li><button data-fancybox data-src="assets/images/productImages/<%= productData[i].images.image1 %>"><i class="ion-eye"></i></button></li>
+                                                            <li><a href="#"><i class="ion-heart"></i></a></li>
+                                                        </ul>
+                                                        <br>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
                                     <% } %>
+                                <!-- <% } %> -->
+                                <% } %>
+
+                                <% if(productData.length === 0){ %>
+                                    <div class="mt-5 text-center">
+                                        <h5 class="text-danger">No Products Available</h5>
+                                    </div>
                                 <% } %>
                             </div>
                         </div>
 
                         <div class="tm-pagination mt-50">
-                            <h6> Pages : </h6>
-                            <ul>
-                                <% if (totalPages > 0){ %>
-                                    <% for(let j=1; j <= totalPages; j++){ %>
-                                        <% if (currentPage === j) { %>
-                                            <li class="m-3"><%= j %></li>
-                                        <% } else { %>
-                                            <li class="is-active"><a href="?page=<%= j %>&search=<%= search %>"><%= j %></a></li>
-                                        <% } %>
+                            <% if (totalPages > 0){ %>
+                                <h6> Pages : </h6>
+
+
+                                <ul>
+                                    <% if(currentPage > 1) { %>
+                                        <li><a href="?page=<%= currentPage - 1 %>&search=<%= searchQuery %>&categoryId=<%= categoryQuery %>&sort=<%= sortQuery %>"><i class="ion-chevron-left"></i></a></li>
+                                        <li><a href="?page=<%= currentPage - 1 %>&search=<%= searchQuery %>&categoryId=<%= categoryQuery %>&sort=<%= sortQuery %>">Prev</a></li>
                                     <% } %>
-                                    <li><a href="products.html"><i class="ion-chevron-right"></i></a></li>
-                                <% } %>
-                            </ul>
+                                    <% for(let j=1; j <= totalPages; j++) { %>
+                                        <li class="<%= currentPage === j ? 'active' : '' %> is-active"><a href="?page=<%= j %>&search=<%= searchQuery %>&categoryId=<%= categoryQuery %>&sort=<%= sortQuery %>"><%= j %></a></li>
+                                    <% } %>
+                                    <% if(currentPage < totalPages) { %>
+                                        <li><a href="?page=<%= currentPage + 1 %>&search=<%= searchQuery %>&categoryId=<%= categoryQuery %>&sort=<%= sortQuery %>">Next</a></li>
+                                        <li><a href="?page=<%= currentPage + 1 %>&search=<%= searchQuery %>&categoryId=<%= categoryQuery %>&sort=<%= sortQuery %>"><i class="ion-chevron-right"></i></a></li>
+                                    <% } %>
+                                </ul>
+                            <% } %>
                         </div>
                     </div>
                     <div class="col-lg-3 col-12">
@@ -247,7 +255,7 @@
                                 <ul>
                                     <% if(categoryData){ %>
                                         <% for(let i=0; i< categoryData.length; i++){ %>
-                                            <li><a href="products.html"> <%= categoryData[i].name %> </a></li>
+                                            <li><a href="/shopping?categoryId=<%= categoryData[i]._id %>"> <%= categoryData[i].name %> </a></li>
                                         <% } %>
                                     <% } %>
                                 </ul>

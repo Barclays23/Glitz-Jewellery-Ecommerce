@@ -7,7 +7,7 @@ const goldPriceModel = require('../models/goldPriceModel');
 
 
 
-//load product page ----------------------------------------
+//load products list for admin ----------------------------------------
 const loadProductList = async(req, res)=>{
     try {
         const adminData = await User.findOne({_id: req.session.adminId});
@@ -32,7 +32,6 @@ const loadProductList = async(req, res)=>{
                 {name: {$regex: '.*' + search + '.*', $options: 'i'}},
                 {category: {$regex: '.*' + search + '.*', $options: 'i'}},
                 {code: {$regex: '.*' + search + '.*', $options: 'i'}},
-                // {price: {$regex:'.*'+search+'.*', $options: 'i'}},
             ]
         };
 
@@ -41,6 +40,7 @@ const loadProductList = async(req, res)=>{
         .populate('categoryRef')
         .skip((pageNo - 1) * limit)
         .limit(limit)
+        .sort({_id: -1})
         .exec();
 
         const count = await Product.countDocuments(productQuery);
@@ -65,6 +65,7 @@ const loadProductList = async(req, res)=>{
         console.log('failed loading product page: ', error);
     }
 }
+
 
 
 

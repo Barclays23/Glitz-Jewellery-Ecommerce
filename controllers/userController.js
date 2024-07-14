@@ -27,6 +27,8 @@ const loadHome = async(req, res)=>{
         const newProducts = await Product.find({});
         const userCart = await Cart.findOne({ userRef: userId });
         const userWishlist = await Wishlist.findOne({userRef : userId});
+        const offerBannerProduct = await Product.findOne({_id: '669354be843722a03a04dbf6'});
+        console.log('offerBannerProduct is : ', offerBannerProduct);
 
         let cartCount = 0;
         let wishlistCount = 0;
@@ -43,7 +45,7 @@ const loadHome = async(req, res)=>{
             });
         }
 
-        res.render('home', {sessionData, wishlistCount, cartCount, goldPriceData, popularProducts, newProducts});
+        res.render('home', {sessionData, wishlistCount, cartCount, goldPriceData, offerBannerProduct, popularProducts, newProducts});
 
     } catch (error) {
         console.log(error.message);
@@ -517,38 +519,85 @@ const loadShopping = async (req, res)=>{
         }
 
 
-        let search = '';
-        if(req.query.search){
-            search = req.query.search;
-        }
+
+        const categoryQuery = req.query.categoryId;
+        console.log('categoryQuery : ', categoryQuery);
+
+        const searchQuery = req.query.search || '';
+        console.log('searchQuery : ', searchQuery);
+
+        const sortQuery = req.query.sort || 'none';
+        console.log('sortQuery : ', sortQuery);
 
         let pageNo = parseInt(req.query.page) || 1;
-        // let pageNo = parseInt(req.query.page, 10) || 1;
-        if(req.query.page){
-            pageNo = req.query.page;
+
+        let query = {isBlocked: false};
+
+        if (categoryQuery) {
+            query.categoryRef = categoryQuery;
         }
 
+        if (searchQuery) {
+            query.$or = [
+                { name: { $regex: '.*' + searchQuery + '.*', $options: 'i' } },
+                { category: { $regex: '.*' + searchQuery + '.*', $options: 'i' } },
+                { code: { $regex: '.*' + searchQuery + '.*', $options: 'i' } },
+            ];
+        }
+
+
+        // Fetch all matching products
+        let productData = await Product.find(query)
+        .populate('categoryRef').exec(); // need this ?
+
+
+        // sorting
+        if (sortQuery != 'none') {
+            switch (sortQuery) {
+                case 'low-to-high':
+                    productData.sort((a, b) => a.totalPrice - b.totalPrice);
+                    break;
+                case 'high-to-low':
+                    productData.sort((a, b) => b.totalPrice - a.totalPrice);
+                    break;
+                case 'a-z':
+                    productData.sort((a, b) => a.name.localeCompare(b.name));
+                    break;
+                case 'z-a':
+                    productData.sort((a, b) => b.name.localeCompare(a.name));
+                    break;
+                default:
+                    break;
+            }
+        }
+        
+        
         const limit = 3;
 
-        const productQuery = {
-            _id: {$exists: true},
-            $or: [
-                {name: {$regex: '.*' + search + '.*', $options: 'i'}},
-                {category: {$regex: '.*' + search + '.*', $options: 'i'}},
-                {code: {$regex: '.*' + search + '.*', $options: 'i'}},
-                // {price: {$regex:'.*'+search+'.*', $options: 'i'}},
-            ]
-        };
+        // productData = await Product.find(query)
+        // .populate('categoryRef')   //need this here?
+        // .skip((pageNo - 1) * limit)
+        // .limit(limit)
+        // .exec();
 
-        const productData = await Product.find(productQuery)
-        .populate('categoryRef')
-        .skip((pageNo - 1) * limit)
-        .limit(limit)
-        .exec();
+        // if (productData.length === 0) {
+        //     totalPages = 'No products available in this category'
+        // }
 
-        const productCount = await Product.countDocuments(productQuery);
+
+        const productCount = await Product.countDocuments(query);
+        console.log('count of productData :', productCount);
+        
+        productData.forEach((item)=>{
+            // console.log('sort by totalPrice :', item.totalPrice);
+            console.log('sort by name :', item.name);
+        })
+
 
         let totalPages = Math.ceil(productCount / limit);
+
+        // Paginate the sorted data
+        productData = productData.slice((pageNo - 1) * limit, pageNo * limit);
 
 
         if(sessionId){
@@ -562,7 +611,10 @@ const loadShopping = async (req, res)=>{
                 goldPriceData,
                 productData, 
                 categoryData, 
-                search, 
+                searchQuery,
+                // search, 
+                sortQuery,
+                categoryQuery,
                 productCount, 
                 limit,
                 totalPages,
@@ -577,7 +629,10 @@ const loadShopping = async (req, res)=>{
                 goldPriceData,
                 productData, 
                 categoryData, 
-                search, 
+                categoryQuery,
+                searchQuery,
+                // search, 
+                sortQuery,
                 productCount, 
                 limit,
                 totalPages,

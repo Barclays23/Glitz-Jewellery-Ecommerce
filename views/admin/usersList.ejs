@@ -13,13 +13,6 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <!-- <th>
-                                    <div class="form-check form-check-muted m-0">
-                                        <label class="form-check-label">
-                                            <input type="checkbox" class="form-check-input" id="check-all">
-                                        </label>
-                                    </div>
-                                </th> -->
                                 <th> No </th>
                                 <th> User Name </th>
                                 <!-- <th> Photo </th> -->
@@ -37,17 +30,8 @@
                             <% if (userData.length > 0){
                                 for(let i=0; i<userData.length; i++){ %>
                                     <tr>
-
-                                        <!-- <td>
-                                            <div class="form-check form-check-muted m-0">
-                                                <label class="form-check-label">
-                                                    <input type="checkbox" class="form-check-input">
-                                                </label>
-                                            </div>
-                                        </td> -->
-
                                         <td> <%= i+1 %></td>
-
+                                        
                                         <td>
                                             <!-- <img src="../assets/images/userImages/faces/face1.jpg" alt="image" /> -->
                                             <img src="<%= imagePath + (i + 1) %>.jpg" alt="image" />
