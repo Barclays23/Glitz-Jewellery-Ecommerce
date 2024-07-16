@@ -15,7 +15,7 @@
                 <ul>
                     <li><a href="/" style="color: black;">Home</a></li>
                     <li><a href="#" style="color: black;">My Account</a></li>
-                    <li style="color: black;"> Dashboard </li>
+                    <li style="color: black;"> Wallet </li>
                 </ul>
             </div>
         </div>
@@ -31,7 +31,7 @@
                         <!-- tab 1: dashboard -->
                         <li class="nav-item">
                             <a class="nav-link active" id="account-dashboard-tab" href="my-account" 
-                                role="tab" aria-controls="account-dashboard" aria-selected="true">Dashboard
+                                role="tab" aria-controls="account-dashboard" aria-selected="false">Dashboard
                             </a>
                         </li>
                         <!-- tab 2: profile information-->
@@ -71,8 +71,8 @@
 
                         <!-- tab 7: -->
                         <li class="nav-item">
-                            <a class="nav-link" id="account-wallet-tab" href="/wallet"
-                                role="tab" aria-controls="account-wallet" aria-selected="false">Wallet
+                            <a class="nav-link" id="account-wallet-tab" href="#"
+                                role="tab" aria-controls="account-wallet" aria-selected="true">Wallet
                             </a>
                         </li>
 
@@ -86,21 +86,47 @@
                     <!-- account tabs ends -->
 
                     <!-- account tab-content starts -->
-                    <div class="tab-content" id="account-ontent">
-                        <!-- section 1: Dashboard -->
-                        <div class="tab-pane fade show active" id="account-dashboard" role="tabpanel"
-                            aria-labelledby="account-dashboard-tab">
-                            <div class="tm-myaccount-dashboard">
-                                <p>Hello
-                                    <% if (sessionData) { %>
-                                        <b> <%= sessionData.firstname %> <%= sessionData.lastname %> </b>
-                                    <% } %>
-                                </p>
-                                <p>From your account dashboard you can view your recent orders, manage your
-                                    shipping and billing addresses, and edit your password and account details.</p>
-                            </div>
-                        </div>
+                    <div class="tab-pane fade" id="account-wallet" role="tabpanel"
+                    aria-labelledby="account-wallet-tab">
+                    <div class="tm-myaccount-wallet">
+                        <h3>Wallet Balance</h3>
+                        <p>Your current wallet balance is: 
+                            <% if (walletData) { %>
+                                <b>$<%= walletData.balance %></b>
+                            <% } else { %>
+                                <b>$0.00</b>
+                            <% } %>
+                        </p>
+                        
+                        <h4>Recent Transactions</h4>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (walletData && walletData.transactions.length > 0) { %>
+                                    <% walletData.transactions.forEach(function(transaction) { %>
+                                        <tr>
+                                            <td><%= new Date(transaction.date).toLocaleDateString() %></td>
+                                            <td><%= transaction.description %></td>
+                                            <td>$<%= transaction.amount.toFixed(2) %></td>
+                                            <td><%= transaction.status %></td>
+                                        </tr>
+                                    <% }); %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="4">No transactions found</td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
                     </div>
+                </div>
                     <!-- account tab-content ends -->
                 </div>
             </div>

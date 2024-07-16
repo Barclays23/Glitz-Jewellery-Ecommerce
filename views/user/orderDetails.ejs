@@ -17,7 +17,7 @@
                 <ul>
                     <li><a href="/my-account" style="color: black;">My Account</a></li>
                     <li><a href="/orders" style="color: black;">Orders</a></li>
-                    <li style="color: black;"><%= orderData._id %></li>
+                    <li style="color: black;"><%= orderData.orderNo %></li>
                 </ul>
             </div>
         </div>
@@ -30,10 +30,13 @@
                 <div class="order-details">
                     <div class="order-info">
                         <div>
-                            <p><strong>Order No</strong><br> <%= orderData._id %></p>
+                            <p><strong>Order No</strong><br> <%= orderData.orderNo %></p>
                         </div>
                         <div>
                             <p><strong>Ordered On</strong><br> <%= formatDate(orderData.orderDate) %></p>
+                        </div>
+                        <div>
+                            <p><strong>Billing Rate</strong><br> ₹ <%= orderData.billingRate %> / Gram</p>
                         </div>
                         <div>
                             <p class="text-right"><strong>Invoice</strong><br> 402-6505499-6104359</p>
@@ -152,13 +155,17 @@
                                         </tr>
                                     </table>
                                     <div>
-                                        <p><strong>Sold by:</strong> Glits Boutique Manufacturers</p>
-                                        <p><strong>Return window closed on 07-Dec-2017</strong></p>
+                                        <p><strong>Sold by : </strong> Glits Boutique Manufacturers</p>
+                                        <% if(orderData.orderedItems[i].orderStatus != 'Pending' && orderData.orderedItems[i].orderStatus != 'Placed' && orderData.orderedItems[i].orderStatus != 'Confirmed'){ %>
+                                            <p><strong>Return window closed</strong></p>
+                                        <% } %>
                                     </div>
                                     <div class="order-actions">
                                         <a href="/product-details?id=<%= orderData.orderedItems[i].productRef %>"> <p>Buy it again</p></a>
                                         <a> <p>Write a product review</p></a>
-                                        <a> <p>Cancel Order</p></a>
+                                        <% if(orderData.orderedItems[i].orderStatus === 'Pending' || orderData.orderedItems[i].orderStatus === 'Placed' || orderData.orderedItems[i].orderStatus === 'Confirmed'){ %>
+                                            <a> <p>Cancel Order</p></a>
+                                        <% } %>
                                     </div>
                                 </div>
                                 <!-- Detailed Information -->
@@ -177,7 +184,7 @@
                                                     case 'Placed': %>
                                                         <td><span class="color-theme text-white bg-info">Order Placed</span></td>
                                                         <% break; 
-                                                    case 'Order Confirmed': %>
+                                                    case 'Confirmed': %>
                                                         <td><span class="color-theme text-white bg-info">Order Confirmed</span></td>
                                                         <% break; 
                                                     case 'Shipped': %>
@@ -187,7 +194,7 @@
                                                         <td><span class="color-theme text-white bg-info">Out for Delivery</span></td>
                                                         <% break; 
                                                     case 'Delivered': %>
-                                                        <td><span class="color-theme text-white bg-success">Delivered</span></td>
+                                                        <td><span class="color-theme text-white bg-success">Item Delivered</span></td>
                                                         <% break; 
                                                     case 'Cancelled': %>
                                                         <td><span class="color-theme text-white bg-danger">Cancelled</span></td>

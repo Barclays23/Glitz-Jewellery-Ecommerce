@@ -85,7 +85,7 @@
 
                     
                     <!-- account tab-content starts -->
-                    <h4>My Orders (6)</h4>
+                    <h4>My Orders (<%= userOrders.length %>)</h4>
                     <div class="tab-content col" id="account-content">
                         <div class="tab-pane fade show active" id="account-orders" role="tabpanel" aria-labelledby="account-orders-tab">
                             <div class="tm-myaccount-orders">
@@ -108,11 +108,15 @@
                                                 </div>
                                             </div>
                                             <div>
+                                                <div><b>BILLING RATE</b></div>
+                                                <div class="billing-rate">₹ <%= userOrders[i].billingRate %> / Gram</div>
+                                            </div>
+                                            <div>
                                                 <div><b>TOTAL AMOUNT</b></div>
                                                 <div><h5 class="item-price"><%= (userOrders[i].netAmount).toFixed(2) %></h5></div>
                                             </div>
                                             <div class="order-options">
-                                                <div class="text-success text-right"><b><%= userOrders[i]._id %></b></div>
+                                                <div class="text-success text-right"><b><%= userOrders[i].orderNo %></b></div>
                                                 <!-- <div class="text-success text-right"><b><%= userOrders[i].orderNo %></b></div> -->
                                                 <a href="/order-details?id=<%= userOrders[i]._id %>">View Order Details</a> | <a href="#">Invoice</a>
                                             </div>
@@ -128,8 +132,9 @@
                                                     </div>
                                                     <div class="col-md-10 col-10 each-item-text">
                                                         <p class="item-name"><%= userOrders[i].orderedItems[j].code %></p>
-                                                        <h6 class="item-name"><%= userOrders[i].orderedItems[j].name %> (Quantity: <%= userOrders[i].orderedItems[j].quantity %>)</h6>
-                                                        <h6 class="item-price">₹ <%= (userOrders[i].orderedItems[j].totalPrice).toFixed(2) %></h6>
+                                                        <h6 class="item-name mb-3"><%= userOrders[i].orderedItems[j].name %></h6>
+                                                        <!-- <h6 class="item-price">₹ <%= (userOrders[i].orderedItems[j].totalPrice).toFixed(2) %></h6> -->
+                                                        <p class="item-quantity">Quantity: <%= userOrders[i].orderedItems[j].quantity %></p>
                                                     </div>
                                                 </div>
                                             <% } %>

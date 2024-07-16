@@ -11,6 +11,9 @@
                 <table class="mb-4">
                     <tr><th class="text-success">Order ID</th></tr>
                     <tr><td><%= orderData._id %></td></tr>
+
+                    <tr><th class="text-success">Order No</th></tr>
+                    <tr><td><%= orderData.orderNo %></td></tr>
                 </table>
                 <div class="order-info">
                     <div class="customer-info">
@@ -38,6 +41,11 @@
                         <table>
                             <tr>
                                 <th class="text-success">Order Information</th>
+                            </tr>
+                            <tr>
+                                <td> Billing Rate :</td>
+                                <td></td>
+                                <td><%= orderData.billingRate %></td>
                             </tr>
                             <tr>
                                 <td>Total Amount :</td>

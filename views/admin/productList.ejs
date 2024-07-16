@@ -119,6 +119,23 @@
                                         <% } %>
 
                                         <td>
+                                            <!-- if (productData[i].categoryRef.isListed === true){
+                                                <% if (productData[i].isBlocked === true){ %>
+                                                    <a href="#" class="badge badge-secondary" id="blocked-product" style="text-decoration: none; color: black;" onclick="manageProduct('<%= productData[i]._id %>')">Unblock</a>
+                                                <% } else { %>
+                                                    <a href="#" class="badge badge-danger" id="unblocked-product" style="text-decoration: none" onclick="manageProduct('<%= productData[i]._id %>')">Block</a>
+                                                <% } %>
+                                            } else {
+
+                                            } -->
+                                            
+                                            <% if (productData[i].isBlocked === true){ %>
+                                                <a href="#" class="badge badge-secondary" id="blocked-product" style="text-decoration: none; color: black;" onclick="manageProduct('<%= productData[i]._id %>')">List</a>
+                                            <% } else { %>
+                                                <a href="#" class="badge badge-danger" id="unblocked-product" style="text-decoration: none" onclick="manageProduct('<%= productData[i]._id %>')">Unlist</a>
+                                            <% } %>
+
+                                            
                                             <!-- (use 1st line if using the "EDIT" text, use 2nd line if using the "edit-icon") -->
                                             <!-- <a href="<%= `/admin/edit-product?id=${productData[i]._id}` %>" class="badge badge-light" style="color: black; text-decoration: none;" data-toggle="modal" data-target="#editProductModal" -->
                                             <a href="<%= `/admin/edit-product?id=${productData[i]._id}` %>" 
@@ -143,22 +160,6 @@
                                             <img src="/assets/images/icons/edit5.png" style="width: 35px; height: auto;" alt="edit-icon">
                                             <!-- add "Edit" text if needed and add first commented line -->
                                             </a>
-
-                                            <!-- if (productData[i].categoryRef.isListed === true){
-                                                <% if (productData[i].isBlocked === true){ %>
-                                                    <a href="#" class="badge badge-secondary" id="blocked-product" style="text-decoration: none; color: black;" onclick="manageProduct('<%= productData[i]._id %>')">Unblock</a>
-                                                <% } else { %>
-                                                    <a href="#" class="badge badge-danger" id="unblocked-product" style="text-decoration: none" onclick="manageProduct('<%= productData[i]._id %>')">Block</a>
-                                                <% } %>
-                                            } else {
-
-                                            } -->
-                                            
-                                            <% if (productData[i].isBlocked === true){ %>
-                                                <a href="#" class="badge badge-secondary" id="blocked-product" style="text-decoration: none; color: black;" onclick="manageProduct('<%= productData[i]._id %>')">List</a>
-                                            <% } else { %>
-                                                <a href="#" class="badge badge-danger" id="unblocked-product" style="text-decoration: none" onclick="manageProduct('<%= productData[i]._id %>')">Unlist</a>
-                                            <% } %>
                                         </td>
                                     </tr>
                                 <% }
@@ -718,12 +719,20 @@
                 editProductNameError.textContent = "Product name is required.";
                 editProductNameError.style.display = "block";
                 isValid = false;
+            } else if (!/[a-zA-Z0-9]/.test(productName)){
+                editProductNameError.textContent = "Name cannot be blank.";
+                editProductNameError.style.display = "block";
+                isValid = false;
             } else {
                 editProductNameError.style.display = "none";
             }
 
             if (productDescription === "") {
                 editProductDescriptionError.textContent = "Product description is required.";
+                editProductDescriptionError.style.display = "block";
+                isValid = false;
+            } else if (!/[a-zA-Z0-9]/.test(productDescription)){
+                editProductDescriptionError.textContent = "Description cannot be blank.";
                 editProductDescriptionError.style.display = "block";
                 isValid = false;
             } else {

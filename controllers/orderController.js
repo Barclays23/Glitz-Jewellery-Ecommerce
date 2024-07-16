@@ -18,56 +18,122 @@ const loadOrderList = async(req, res)=>{
         const goldPriceData = await GoldPrice.findOne({});
 
 
-        let search = '';
-        if(req.query.search){
-            search = req.query.search;
-        }
+        const searchQuery = req.query.search || '';
+        console.log('searchQuery : ', searchQuery);
+
+        const statusQuery = req.query['filter-status'] || 'all';
+        console.log('statusQuery : ', statusQuery);
+
+        const methodQuery = req.query['filter-method'] || 'all';
+        console.log('methodQuery : ', methodQuery);
+
+        const sortQuery = req.query.sort || 'none';
+        console.log('sortQuery : ', sortQuery);
+
+
 
         let pageNo = parseInt(req.query.page) || 1;
-        if(req.query.page){
-            pageNo = req.query.page;
+
+        const limit = 4;
+        
+        let matchQuery = {};
+
+        if (searchQuery) {
+            matchQuery.$or = [
+                { orderNo: { $regex: '.*' + searchQuery + '.*', $options: 'i' } },
+                { 'userRef.email': { $regex: '.*' + searchQuery + '.*', $options: 'i' } },
+                { 'userRef.mobile': { $regex: '.*' + searchQuery + '.*', $options: 'i' } }
+            ];
         }
 
-        const limit = 3;
+        // Log the query
+        // console.log('matchQuery :', matchQuery);
 
-        let orderQuery = {};
+        if (statusQuery != 'all') {
+            matchQuery.paymentStatus = statusQuery;
+        }
 
-        if (search) {
-            orderQuery = {
-                $or: [
-                    { 'shippingAddress.contact': { $regex: '.*' + search + '.*', $options: 'i' } }
-                ]
-            };
-
-            // If search can be a valid ObjectId, add it to the query
-            if (/^[0-9a-fA-F]{24}$/.test(search)) {
-                orderQuery.$or.push({ _id: search });
-            }
+        if (methodQuery != 'all') {
+            matchQuery.paymentMethod = methodQuery;
         }
 
 
-        let orderData = await Order.find(orderQuery)
-        .populate('userRef')
-        // .populate('productRef')
-        .sort({ orderDate: -1 }) // Sort by orderDate in descending order
-        .skip((pageNo - 1) * limit)
-        .limit(limit)
-        .exec();
+        // sorting
+        const sortOptions = {};
+        if (sortQuery === 'orderNo-asc') {
+            sortOptions.orderNo = 1;
+        } else if (sortQuery === 'orderNo-desc') {
+            sortOptions.orderNo = -1;
+        } else {
+            sortOptions.orderDate = -1; // Default sorting by order date descending
+        }
 
-        const count = await Order.countDocuments(orderQuery);
+
+        const ordersAggregate = Order.aggregate([
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'userRef',
+                    foreignField: '_id',
+                    as: 'userRef'
+                }
+            },
+            { $unwind: '$userRef' },
+            { $match: matchQuery },
+            { $sort: sortOptions },
+            { $skip: (pageNo - 1) * limit },
+            { $limit: limit }
+        ]);
+
+        // Fetch all matching orders
+        const orderData = await ordersAggregate.exec();
+
+
+        // Log the aggregated data
+        // orderData.forEach((item) => {
+        //     console.log('orderData[0].orderNo :', item.orderNo);
+        //     console.log('orderData[0].userRef.email :', item.userRef.email);
+        //     console.log('orderData[0].userRef.mobile :', item.userRef.mobile);
+        // });
+
+
+        const countAggregate = Order.aggregate([
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'userRef',
+                    foreignField: '_id',
+                    as: 'userRef'
+                }
+            },
+            { $unwind: '$userRef' },
+            { $match: matchQuery },
+            { $count: 'count' }
+        ]);
+
+        const countResult = await countAggregate.exec();
+        const count = countResult.length > 0 ? countResult[0].count : 0;
+        console.log('count of order result :', count);
 
         let totalPages = Math.ceil(count / limit);
+
+        const startIndex = (pageNo - 1) * limit + 1;
+        const endIndex = Math.min(pageNo * limit, count)
 
         res.render('orderList', {
             adminData,
             goldPriceData,
             orderData,
-            // categoryData,
-            search,
+            searchQuery,
+            statusQuery,
+            methodQuery,
+            sortQuery,
             count,
             limit,
             totalPages,
             currentPage: pageNo,
+            startIndex,
+            endIndex,
         });
 
     } catch (error) {

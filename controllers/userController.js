@@ -519,7 +519,6 @@ const loadShopping = async (req, res)=>{
         }
 
 
-
         const categoryQuery = req.query.categoryId;
         console.log('categoryQuery : ', categoryQuery);
 
@@ -545,64 +544,57 @@ const loadShopping = async (req, res)=>{
             ];
         }
 
-
-        // Fetch all matching products
-        let productData = await Product.find(query)
-        .populate('categoryRef').exec(); // need this ?
-
+        // console the query
+        // console.log('Final query :', query);
 
         // sorting
-        if (sortQuery != 'none') {
-            switch (sortQuery) {
-                case 'low-to-high':
-                    productData.sort((a, b) => a.totalPrice - b.totalPrice);
-                    break;
-                case 'high-to-low':
-                    productData.sort((a, b) => b.totalPrice - a.totalPrice);
-                    break;
-                case 'a-z':
-                    productData.sort((a, b) => a.name.localeCompare(b.name));
-                    break;
-                case 'z-a':
-                    productData.sort((a, b) => b.name.localeCompare(a.name));
-                    break;
-                default:
-                    break;
-            }
+        const sortOptions = {};
+        switch (sortQuery) {
+            case 'low-to-high':
+                sortOptions.totalPrice = 1;  //ascending order
+                break;
+            case 'high-to-low':
+                sortOptions.totalPrice = -1;  //descending order
+                break;
+            case 'a-z':
+                sortOptions.name = 1;  //ascending order
+                break;
+            case 'z-a':
+                sortOptions.name = -1;  //descending order
+                break;
+            default:
+                break;
         }
-        
-        
+
+        // console sort options
+        // console.log('Sort options:', sortOptions);
+
+        // Fetch all matching products
         const limit = 3;
+        const skip = (pageNo - 1) * limit;
 
-        // productData = await Product.find(query)
-        // .populate('categoryRef')   //need this here?
-        // .skip((pageNo - 1) * limit)
-        // .limit(limit)
-        // .exec();
-
-        // if (productData.length === 0) {
-        //     totalPages = 'No products available in this category'
-        // }
+        const productData = await Product.find(query)
+        .populate('categoryRef')
+        .sort(sortOptions)
+        .skip(skip)
+        .limit(limit)
+        .exec();
 
 
         const productCount = await Product.countDocuments(query);
         console.log('count of productData :', productCount);
         
-        productData.forEach((item)=>{
-            // console.log('sort by totalPrice :', item.totalPrice);
-            console.log('sort by name :', item.name);
-        })
+        // productData.forEach((item)=>{
+        //     console.log('sort by totalPrice :', item.totalPrice);
+        //     console.log('sort by name :', item.name);
+        // })
 
 
         let totalPages = Math.ceil(productCount / limit);
 
-        // Paginate the sorted data
-        productData = productData.slice((pageNo - 1) * limit, pageNo * limit);
-
-
         if(sessionId){
             const sessionData = await User.findById({_id: req.session.userId});
-            console.log('session user name in shopping page :', sessionData.email);
+            console.log('session user information for shopping :', sessionData.email);
             res.render('shopping', {
                 sessionData : sessionData, 
                 cartCount,
@@ -612,7 +604,6 @@ const loadShopping = async (req, res)=>{
                 productData, 
                 categoryData, 
                 searchQuery,
-                // search, 
                 sortQuery,
                 categoryQuery,
                 productCount, 
@@ -623,7 +614,7 @@ const loadShopping = async (req, res)=>{
             });
 
         } else{
-            console.log('no session data in shopping page');
+            console.log('no session data for shopping');
             res.render('shopping', {
                 sessionData : null, 
                 goldPriceData,
@@ -631,7 +622,6 @@ const loadShopping = async (req, res)=>{
                 categoryData, 
                 categoryQuery,
                 searchQuery,
-                // search, 
                 sortQuery,
                 productCount, 
                 limit,

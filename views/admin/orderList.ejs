@@ -3,27 +3,59 @@
 
 
 
-<!-- Product List Starts -->
 <div class="row ">
     <div class="col-12 grid-margin">
         <div class="card">
             <div class="card-body">
                 <h3 class="card-title" style="text-align: center">ORDER LIST</h3>
-                <div style="text-align: right;">
-                    <button type="button" class="btn btn-success add-product" data-toggle="modal" data-target="#addProductModal">Add Product</button>
-                </div>
+
+                <form action="#" class="order-header">
+                    <div class="count-view flex-item text-success">
+                        <p>Showing <%= startIndex %> to <%= endIndex %> of <%= count %></p>
+                    </div>
+                    <div class="order-search flex-item">
+                        <input type="text" class="form-control" name="search" placeholder="Search Order">
+                        <input type="submit" class="text-white bg-success" value="Search">
+                    </div>
+                </form>
+
                 <div class="table-responsive">
                     <table class="table">
                         <thead>
                             <tr class="text-center">
                                 <th> No </th>
-                                <th> Order ID </th>
+                                <th>
+                                    <select name="sort" onchange="location.href='?sort=' + this.value + '&filter-status=<%= statusQuery %>&filter-method=<%= methodQuery %>'">
+                                        <option value="none" <%= sortQuery === 'none' ? 'selected' : '' %>>Order ID</option>
+                                        <option value="orderNo-asc" <%= sortQuery === 'orderNo-asc' ? 'selected' : '' %>>Ascending</option>
+                                        <option value="orderNo-desc" <%= sortQuery === 'orderNo-desc' ? 'selected' : '' %>>Descending</option>
+                                    </select>
+                                </th>
                                 <th> Order Date </th>
                                 <th> Customer </th>
                                 <th> Total Amount </th>
                                 <th> No of Items </th>
-                                <th> Payment Method </th>
-                                <th> Payment Status </th>
+                                <th>
+                                    <select name="filter-method" onchange="location.href='?filter-method=' + this.value + '&sort=<%= sortQuery %>&filter-status=<%= statusQuery %>'">
+                                        <option value="all" <%= methodQuery === 'all' ? 'selected' : '' %>>Payment Method</option>
+                                        <option value="Card Payment" <%= methodQuery === 'Card Payment' ? 'selected' : '' %>>Card Payment</option>
+                                        <option value="RazorPay" <%= methodQuery === 'RazorPay' ? 'selected' : '' %>>RazorPay</option>
+                                        <option value="PayPal" <%= methodQuery === 'PayPal' ? 'selected' : '' %>>PayPal</option>
+                                        <option value="Online Payment" <%= methodQuery === 'Online Payment' ? 'selected' : '' %>>Online Payment</option>
+                                        <option value="Cash On Delivery" <%= methodQuery === 'Cash On Delivery' ? 'selected' : '' %>>Cash On Delivery</option>
+                                        <option value="Wallet" <%= methodQuery === 'Wallet' ? 'selected' : '' %>>Wallet</option>
+                                    </select>
+                                </th>
+                                <th>
+                                    <select name="filter-status" onchange="location.href='?filter-status=' + this.value + '&sort=<%= sortQuery %>&filter-method=<%= methodQuery %>'">
+                                        <option value="all" <%= statusQuery === 'all' ? 'selected' : '' %>>Payment Status</option>
+                                        <option value="Pending" <%= statusQuery === 'Pending' ? 'selected' : '' %>>Pending</option>
+                                        <option value="Processing" <%= statusQuery === 'Processing' ? 'selected' : '' %>>Processing</option>
+                                        <option value="Completed" <%= statusQuery === 'Completed' ? 'selected' : '' %>>Completed</option>
+                                        <option value="Failed" <%= statusQuery === 'Failed' ? 'selected' : '' %>>Failed</option>
+                                        <option value="Refunded" <%= statusQuery === 'Refunded' ? 'selected' : '' %>>Refunded</option>
+                                    </select>
+                                </th>
                                 <th> Actions </th>
                             </tr>
                         </thead>
@@ -33,7 +65,7 @@
                                 for(let i=0; i < orderData.length; i++){ %>
                                     <tr>
                                         <td> <%= (currentPage - 1) * limit + i + 1 %></td>
-                                        <td> <%= orderData[i]._id %> </td>
+                                        <td> <%= orderData[i].orderNo %> </td>
                                         <td><% 
                                             const orderDate = new Date(orderData[i].orderDate);
                                             const options = { day: '2-digit', month: 'long', year: 'numeric' };
@@ -41,7 +73,6 @@
                                             %>
                                             <%= formattedDate %>
                                         </td>
-                                        <!-- <td> <%= orderData[i].shippingAddress.contact %> </td> -->
                                         <td> <%= orderData[i].userRef.email %> </td>
                                         <td class="text-end"> <%= (orderData[i].netAmount).toFixed(2) %> </td>
                                         <td class="text-center"> <%= orderData[i].orderedItems.length %> </td>
@@ -76,7 +107,7 @@
                             <% if (j === currentPage) { %>
                                 <span class="active"><%= j %></span>
                             <% } else { %>
-                                <a href="?page=<%= j %>&search=<%= search %>"><%= j %></a>
+                                <a href="?page=<%= j %>&search=<%= searchQuery %>"><%= j %></a>
                             <% } %>
                         <% } %>
                     </div>
@@ -85,7 +116,6 @@
         </div>
     </div>
 </div>
-<!-- Product List Ends -->
 
 <!-- ------------------------------------------------ -->
 
@@ -103,3 +133,52 @@
 
 
 <%- include('../layouts/adminLayouts/adminDashboardFooter.ejs') %>
+
+
+
+
+<style>
+    .order-header {
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
+
+    .count-view p {
+        font-size: medium;
+    }
+    
+    .order-sort {
+        height: 43px;
+    }
+
+    .flex-item {
+        flex: 1;
+        padding: 0 10px;
+    }
+
+    .order-search {
+        display: flex;
+        align-items: center;
+    }
+
+    .order-search .form-control {
+        width: 100%;
+        margin-right: 5px;
+    }
+
+    .order-search input[type="submit"] {
+        height: 43px;
+        flex-shrink: 0;
+    }
+
+    /* select[name="filter"] {
+        height: 43px;
+        width: 100%;
+    } */
+
+    /* select[name="sort"] {
+        height: 43px;
+        width: 100%;
+    } */
+</style>

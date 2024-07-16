@@ -296,6 +296,7 @@ const loadCheckout = async (req, res)=>{
 const placeOrder = async(req, res)=>{
     try {
         const userId = req.session.userId;
+        const goldPriceData = await GoldPrice.findOne({});
         
         const {
             selectedAddressId,
@@ -352,6 +353,7 @@ const placeOrder = async(req, res)=>{
         const userOrders = new Order ({
             userRef : userId,
             orderDate : Date.now(),
+            billingRate : goldPriceData.price,
             orderedItems : [],     // initially empty items array
             orderNo : invoiceNumber,
             shippingAddress : userAddress,

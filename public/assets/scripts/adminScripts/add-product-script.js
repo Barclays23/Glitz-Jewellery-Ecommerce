@@ -177,12 +177,20 @@ $(document).ready(function() {
             addProductNameError.textContent = "Product name is required.";
             addProductNameError.style.display = "block";
             isValid = false;
+        } else if (!/[a-zA-Z0-9]/.test(productName)){
+            addProductNameError.textContent = "Name cannot be blank.";
+            addProductNameError.style.display = "block";
+            isValid = false;
         } else {
             addProductNameError.style.display = "none";
         }
 
         if (productDescription === "") {
-            addProductDescriptionError.textContent = "Product description is required.";
+            addProductDescriptionError.textContent = "Description is required.";
+            addProductDescriptionError.style.display = "block";
+            isValid = false;
+        } else if (!/[a-zA-Z0-9]/.test(productDescription)){
+            addProductDescriptionError.textContent = "Description cannot be blank.";
             addProductDescriptionError.style.display = "block";
             isValid = false;
         } else {

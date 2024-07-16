@@ -78,13 +78,12 @@
                             <% const endProductIndex = Math.min(currentPage * limit, productCount) %>
 
                             <p class="tm-shop-countview">Showing <%= startProductIndex %> to <%= endProductIndex %> of <%= productCount %> </p>
-                            <!-- <p class="tm-shop-countview"> Showing 1 to 3 of 150 </p> -->
                             <div class="tm-product-search d-flex" style="align-items: center;">
                                 <input type="text" class="form-control" name="search" placeholder="Search product...">
-                                <!-- <button><i class="ion-android-search"></i></button> -->
                                 <input type="submit" class="text-white bg-success m-1 w-50" style="height: 40px;" value="Search">
                             </div>
-                            <select name="sort" onchange="this.form.submit()">
+                               
+                            <select name="sort" onchange="location.href='?sort=' + this.value + '&categoryId=<%= categoryQuery %>'">
                                 <option value="none" <%= sortQuery === 'none' ? 'selected' : '' %>>Default Sorting</option>
                                 <option value="a-z" <%= sortQuery === 'a-z' ? 'selected' : '' %>>Name : A-Z</option>
                                 <option value="z-a" <%= sortQuery === 'z-a' ? 'selected' : '' %>>Name : Z-A</option>
@@ -96,7 +95,6 @@
                         <div class="tm-shop-products" id="shop-products">
                             <div class="row mt-30-reverse">
                                 <% for(let i = 0; i < productData.length; i++) { %>
-                                <!-- <% for(i=0; i < limit; i++){ %> -->
                                     <% if (productData[i]){ %>
                                         <div class="col-xl-4 col-lg-6 col-md-6 col-sm-6 col-12 mt-50" style="border: 1px solid darkgray;">
                                             <div class="tm-product tm-scrollanim">
@@ -127,8 +125,7 @@
                                                 </div>
                                                 <div class="tm-product-bottomside">
                                                     <br>
-                                                    <!-- <h6 class="tm-product-title"><a href="product-details.html">Stylist daimond earring</a></h6> -->
-                                                    <h6 class="tm-product-title"><a href="product-details?id=<%= productData[i]._id %>"><%= productData[i].code %></a></h6>
+                                                    <h6 class="tm-product-title"><a><%= productData[i].code %></a></h6>
                                                     <h6 class="tm-product-title"><a href="product-details?id=<%= productData[i]._id %>"><%= productData[i].name %></a></h6>
                                                     <div class="tm-ratingbox">
                                                         <span class="is-active"><i class="ion-android-star-outline"></i></span>
@@ -216,7 +213,6 @@
                                             </div>
                                         </div>
                                     <% } %>
-                                <!-- <% } %> -->
                                 <% } %>
 
                                 <% if(productData.length === 0){ %>
@@ -230,8 +226,6 @@
                         <div class="tm-pagination mt-50">
                             <% if (totalPages > 0){ %>
                                 <h6> Pages : </h6>
-
-
                                 <ul>
                                     <% if(currentPage > 1) { %>
                                         <li><a href="?page=<%= currentPage - 1 %>&search=<%= searchQuery %>&categoryId=<%= categoryQuery %>&sort=<%= sortQuery %>"><i class="ion-chevron-left"></i></a></li>
@@ -255,7 +249,7 @@
                                 <ul>
                                     <% if(categoryData){ %>
                                         <% for(let i=0; i< categoryData.length; i++){ %>
-                                            <li><a href="/shopping?categoryId=<%= categoryData[i]._id %>"> <%= categoryData[i].name %> </a></li>
+                                            <li><a href="/shopping?categoryId=<%= categoryData[i]._id %>&sort=<%= sortQuery %>"> <%= categoryData[i].name %> </a></li>
                                         <% } %>
                                     <% } %>
                                 </ul>
@@ -304,26 +298,6 @@
                                         </li>
                                         <% } %>
                                     <% } %>
-                                    <!-- <li>
-                                        <a href="product-details.html" class="widget-popularproduct-image">
-                                            <img src="assets/images/products/product-image-2-thumb.jpg"
-                                                alt="product thumbnail">
-                                        </a>
-                                        <div class="widget-popularproduct-content">
-                                            <h6><a href="product-details.html">Top of amber bottle</a></h6>
-                                            <span>$35.99</span>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <a href="product-details.html" class="widget-popularproduct-image">
-                                            <img src="assets/images/products/product-image-3-thumb.jpg"
-                                                alt="product thumbnail">
-                                        </a>
-                                        <div class="widget-popularproduct-content">
-                                            <h6><a href="product-details.html">Mario badescu bottle</a></h6>
-                                            <span>$99.99</span>
-                                        </div>
-                                    </li> -->
                                 </ul>
                             </div>
                         </div>

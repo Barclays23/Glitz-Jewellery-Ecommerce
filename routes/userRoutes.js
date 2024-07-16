@@ -103,12 +103,17 @@ userRoute.post('/update-cart-quantity', userAuth.isLogin, cartController.updateC
 userRoute.delete('/remove-from-cart', userAuth.isLogin, cartController.removeFromCart);
 userRoute.post('/proceed-to-checkout', userAuth.isLogin, cartController.proceedToCheckout);
 
+
 // ORDER ROUTES FOR USER
 userRoute.get('/checkout', userAuth.isLogin, cartController.loadCheckout);
 userRoute.post('/place-order', userAuth.isLogin, cartController.placeOrder);
 userRoute.get('/orders', userAuth.isLogin, cartController.loadUserOrders);
 userRoute.get('/order-details', userAuth.isLogin, cartController.loadOrderDetails);
 userRoute.get('/thankyou', userAuth.isLogin, cartController.loadThankyou);
+
+
+// WALLET ROUTES
+// userRoute.get('/wallet', userAuth.isLogin, userController.loadWallet);
 
 
 
