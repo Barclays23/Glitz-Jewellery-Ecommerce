@@ -107,7 +107,7 @@
                                                         <ul class="tm-product-actions">
                                                             <li> <a href="#" onclick="addToCart('<%= productData[i]._id %>')"><i class="ion-android-cart"></i> Add to cart </a> </li>
                                                             <li> <a href="#" data-fancybox data-src="assets/images/productImages/<%= productData[i].images.image1 %>"><i class="ion-eye"></i> </a> </li>
-                                                            <% if (sessionData && wishlistItems) { %>
+                                                            <% if (userData && wishlistItems) { %>
                                                                 <li><a href="#" onclick="addToWishlist('<%= productData[i]._id %>')"><i class="<%= wishlistItems.map(item => item.toString()).includes(productData[i]._id.toString()) ? 'ion-android-favorite' : 'ion-android-favorite-outline' %>"></i></a></li>
                                                             <% } else { %>
                                                                 <li><a href="#" onclick="addToWishlist('<%= productData[i]._id %>')"><i class="ion-android-favorite-outline"></i></a></li>

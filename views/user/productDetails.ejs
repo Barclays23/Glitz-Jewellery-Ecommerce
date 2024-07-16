@@ -12,8 +12,8 @@
             <div class="tm-breadcrumb">
                 <h2 style="color: black;">Product Details</h2>
                 <ul>
-                    <li><a href="index.html" style="color: black;">Home</a></li>
-                    <li><a href="products.html" style="color: black;">Products</a></li>
+                    <li><a href="/" style="color: black;">Home</a></li>
+                    <li><a href="/shopping" style="color: black;">Products</a></li>
                     <li style="color: black;"><%= productData.code %></li>
                 </ul>
             </div>
@@ -316,7 +316,7 @@
                                                     <ul class="tm-product-actions">
                                                         <li><a href="#" onclick="addToCart('<%= similarProducts[i]._id %>')"><i class="ion-android-cart"></i> Add to cart</a></li>
                                                         <li><button data-fancybox data-src="#tm-product-quickview"><i class="ion-eye"></i></button></li>
-                                                        <% if (sessionData && wishlistItems) { %>
+                                                        <% if (userData && wishlistItems) { %>
                                                             <% console.log('similarProducts[i]._id :', similarProducts[i]._id.toString()) %>
                                                             <% console.log('wishlistItems :', wishlistItems.map(item => item.toString())) %>
                                                             

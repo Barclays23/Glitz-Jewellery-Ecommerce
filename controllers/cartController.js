@@ -19,7 +19,7 @@ const loadUserCart = async (req, res)=>{
     try {
         const sessionId = req.session.userId;
         const goldPriceData = await GoldPrice.findOne({});
-        const sessionData = await User.findById(sessionId);
+        const userData = await User.findById(sessionId);
 
         const userCart = await Cart.findOne({ userRef: sessionId }).populate('product.productRef').exec();
         const userWishlist = await Wishlist.findOne({ userRef: sessionId }).populate('product.productRef').exec();
@@ -44,7 +44,7 @@ const loadUserCart = async (req, res)=>{
             });
         }
 
-        res.render('userCart', { sessionData, cartCount, wishlistCount, userCart, goldPriceData });
+        res.render('userCart', { userData, cartCount, wishlistCount, userCart, goldPriceData });
 
     } catch (error) {
         console.log('error in loading user cart', error.message);
@@ -250,13 +250,13 @@ const proceedToCheckout = async(req, res)=>{
 // load checkout page----------------------------------------
 const loadCheckout = async (req, res)=>{
     try {
-        const userId = req.session.userId;
-        const sessionData = await User.findById(userId);
+        const sessionId = req.session.userId;
+        const userData = await User.findById(sessionId);
         const cartId = req.query.cartId;
 
         const goldPriceData = await GoldPrice.findOne({});
-        const userAddress = await Address.findOne({userRef: userId});
-        const userWishlist = await Wishlist.findOne({ userRef: userId});
+        const userAddress = await Address.findOne({userRef: sessionId});
+        const userWishlist = await Wishlist.findOne({ userRef: sessionId});
 
         const userCart = await Cart.findOne({ _id: cartId }).populate('product.productRef');
 
@@ -276,7 +276,7 @@ const loadCheckout = async (req, res)=>{
         }
 
         if(cartId && cartCount > 0){   
-            res.render('checkout', { sessionData, userAddress, userCart, cartCount, wishlistCount, goldPriceData });
+            res.render('checkout', { userData, userAddress, userCart, cartCount, wishlistCount, goldPriceData });
 
         } else{
             res.redirect('/cart');
@@ -426,7 +426,7 @@ const placeOrder = async(req, res)=>{
 const loadUserOrders = async (req, res)=>{
     try {
         const sessionId = req.session.userId;
-        const sessionData = await User.findById(sessionId);
+        const userData = await User.findById(sessionId);
         
         const goldPriceData = await GoldPrice.findOne({});
         const userCart = await Cart.findOne({ userRef: sessionId });
@@ -450,7 +450,7 @@ const loadUserOrders = async (req, res)=>{
         }
 
 
-        res.render('userOrders', { sessionData, cartCount, wishlistCount, goldPriceData, userOrders });
+        res.render('userOrders', { userData, cartCount, wishlistCount, goldPriceData, userOrders });
 
     } catch (error) {
         console.log('error in loading user order page', error.message);
@@ -463,14 +463,13 @@ const loadUserOrders = async (req, res)=>{
 // load order details page for user -------------------------------------
 const loadOrderDetails = async(req, res)=>{
     try {
-        const userId = req.session.userId;
-        const sessionData = await User.findById(userId);
+        const sessionId = req.session.userId;
         const orderId = req.query.id;
-
+        
+        const userData = await User.findById(sessionId);
         const goldPriceData = await GoldPrice.findOne({});
-        const userCart = await Cart.findOne({ userRef: userId });
-        const userAddress = await Address.findOne({userRef: userId});
-        const userWishlist = await Wishlist.findOne({ userRef: userId});
+        const userCart = await Cart.findOne({ userRef: sessionId });
+        const userWishlist = await Wishlist.findOne({ userRef: sessionId});
         const orderData = await Order.findOne({_id : orderId});
 
 
@@ -490,7 +489,7 @@ const loadOrderDetails = async(req, res)=>{
         }
 
 
-        res.render('orderDetails', {userId, sessionData, orderData, cartCount, wishlistCount, goldPriceData });
+        res.render('orderDetails', { userData, orderData, cartCount, wishlistCount, goldPriceData });
         
     } catch (error) {
         console.log('error while loading the order details page :', error.message);

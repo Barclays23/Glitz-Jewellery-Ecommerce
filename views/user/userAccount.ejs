@@ -92,8 +92,8 @@
                             aria-labelledby="account-dashboard-tab">
                             <div class="tm-myaccount-dashboard">
                                 <p>Hello
-                                    <% if (sessionData) { %>
-                                        <b> <%= sessionData.firstname %> <%= sessionData.lastname %> </b>
+                                    <% if (userData) { %>
+                                        <b> <%= userData.firstname %> <%= userData.lastname %> </b>
                                     <% } %>
                                 </p>
                                 <p>From your account dashboard you can view your recent orders, manage your

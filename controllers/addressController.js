@@ -12,17 +12,17 @@ const Wishlist = require ('../models/wishlistModel');
 // load user address page ---------------------------------
 const loadUserAddress = async (req, res)=>{
     try {
-        const userId = req.session.userId
-        const sessionData = await User.findById(userId);
+        const sessionId = req.session.userId
+        const userData = await User.findById(sessionId);
 
         const goldPriceData = await GoldPrice.findOne({});
-        const userCart = await Cart.findOne({ userRef: userId });
-        const userWishlist = await Wishlist.findOne({userRef : userId});
+        const userCart = await Cart.findOne({ userRef: sessionId });
+        const userWishlist = await Wishlist.findOne({userRef : sessionId});
 
         let cartCount = 0;
         let wishlistCount = 0;
 
-        if (sessionData && userCart){
+        if (userCart){
             userCart.product.forEach((product) => {
                 cartCount += product.quantity;
             });
@@ -34,9 +34,9 @@ const loadUserAddress = async (req, res)=>{
             });
         }
 
-        const userAddress = await Address.findOne({userRef: userId});
+        const userAddress = await Address.findOne({userRef: sessionId});
 
-        res.render('userAddress', { sessionData, userAddress, cartCount, wishlistCount, goldPriceData });
+        res.render('userAddress', { userData, userAddress, cartCount, wishlistCount, goldPriceData });
 
     } catch (error) {
         console.log('error in loading user address page', error.message);
@@ -61,11 +61,11 @@ const addNewAddress = async (req, res)=>{
 
         console.log('body recieved for add address :', req.body);
 
-        const userId = req.session.userId;
+        const sessionId = req.session.userId;
 
         const userAddress = await Address.findOneAndUpdate(
-          { userRef: userId },
-          { $set: { userRef: userId }, $push: { address: addressData } },
+          { userRef: sessionId },
+          { $set: { userRef: sessionId }, $push: { address: addressData } },
           { upsert: true, new: true }
         );
 
@@ -86,7 +86,7 @@ const addNewAddress = async (req, res)=>{
 // edit user address -------------------------------
 const editAddress = async (req, res)=>{
     try {
-        const userId = req.session.userId;
+        const sessionId = req.session.userId;
 
         const {
             addressId,
@@ -109,7 +109,7 @@ const editAddress = async (req, res)=>{
         console.log('phone :', phone);
 
         const updatedUserAddress = await Address.findOneAndUpdate(
-            { userRef: userId, 'address._id': addressId },
+            { userRef: sessionId, 'address._id': addressId },
             { $set: {
                     'address.$.firstname': firstname,
                     'address.$.lastname': lastname,
@@ -139,7 +139,7 @@ const editAddress = async (req, res)=>{
 // delete user address -------------------------------
 const deleteAddress = async (req, res)=>{
     try {
-        const userId = req.session.userId;
+        const sessionId = req.session.userId;
 
         const {
             addressId,
@@ -147,7 +147,7 @@ const deleteAddress = async (req, res)=>{
 
         console.log('addressId :', addressId);
         const updatedUserAddress = await Address.findOneAndUpdate(
-            {userRef: userId},
+            {userRef: sessionId},
             {$pull: {address: {_id: addressId}}},
         );
 

@@ -6,23 +6,23 @@ const userSchema = new mongoose.Schema({
     googleAccount: {   // for google auth
         googleId : {
             type : String,
-            required : true
+            // required : true
         },
         googlePhoto : {
             type : String,
-            required : false
+            // required : false
         },
         displayName : {
             type : String,
-            required : true
+            // required : true
         },
         firstname : {
             type : String,
-            required : true
+            // required : true
         },
         lastname : {
             type : String,
-            required : true
+            // required : true
         }
     },
 

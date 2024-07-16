@@ -32,7 +32,7 @@
                     <!-- <p>OTP Expires in : <span id="otp-timer" style="color: red;"></span></p> -->
                     <span id="otp-timer" style="color: red;"></span>
                     <p class="form-bottom-msg">Didn't receive the verification code yet? 
-                        <button type="button" onclick="resendCode()"><b>Resend Code</b></a>
+                        <button type="button" style="color: #9a0056;" onclick="resendCode()"><b>Resend Code</b>
                     </p>
                 </div>
                 <div class="tm-checkout-submit">
@@ -154,8 +154,7 @@ function formSubmit() {
                 text: 'Your account verification is success.',
                 icon: 'success',
                 showConfirmButton: false,
-                // timer: 2000 // Close alert after 2 seconds
-
+                timer: 2000 // Close alert after 2 seconds
             }).then(() => {
                 window.location.href = '/'; // Redirect to homepage or login page
         });
@@ -191,7 +190,7 @@ function resendCode(){
         },
         // body: JSON.stringify({ userID }) // ?? sending anything from body? how id is sending to backend?
     })
-    .then(response => response.json()) //what is mean by this line?
+    .then(response => response.json())
     .then(data => {
         console.log('response data from resend-otp page', data);
         if (data.success) {

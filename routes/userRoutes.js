@@ -113,7 +113,7 @@ userRoute.get('/thankyou', userAuth.isLogin, cartController.loadThankyou);
 
 
 // WALLET ROUTES
-// userRoute.get('/wallet', userAuth.isLogin, userController.loadWallet);
+userRoute.get('/wallet', userAuth.isLogin, userController.loadWallet);
 
 
 

@@ -14,11 +14,12 @@ const Cart = require ('../models/cartModel');
 // load user-wishlist page -------------------------------------
 const loadUserWishlist = async (req, res)=>{
     try {
-        const sessionData = await User.findById(req.session.userId);
+        const sessionId = req.session.userId;
+        const userData = await User.findById(sessionId);
 
         const goldPriceData = await GoldPrice.findOne({});
-        const userCart = await Cart.findOne({userRef: req.session.userId});
-        const userWishlist = await Wishlist.findOne({ userRef: req.session.userId }).populate('product.productRef');
+        const userCart = await Cart.findOne({userRef: sessionId});
+        const userWishlist = await Wishlist.findOne({ userRef: sessionId}).populate('product.productRef');
 
         let cartCount = 0;
         let wishlistCount = 0;
@@ -36,7 +37,7 @@ const loadUserWishlist = async (req, res)=>{
             });
         }
         
-        res.render('userWishlist', { sessionData, cartCount, wishlistCount, userWishlist, goldPriceData });
+        res.render('userWishlist', { userData, cartCount, wishlistCount, userWishlist, goldPriceData });
 
     } catch (error) {
         console.log('error in loading wishlist', error.message);

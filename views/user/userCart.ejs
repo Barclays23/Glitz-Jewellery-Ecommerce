@@ -71,6 +71,13 @@
                             </a>
                         </li>
 
+                        <!-- tab 7: -->
+                        <li class="nav-item">
+                            <a class="nav-link" id="account-wallet-tab" href="/wallet"
+                                role="tab" aria-controls="account-wallet" aria-selected="true">Wallet
+                            </a>
+                        </li>
+                        
                         <!-- tab 8: -->
                         <li class="nav-item">
                             <a class="nav-link" id="account-logout-tab" href="/logout" 
@@ -219,7 +226,7 @@
                                             </table>
                                         </div>
                                         <div class="text-center">
-                                            <a href="" onclick="proceedToCheckout('<%= sessionData._id %>')" class="tm-button"> Proceed To Checkout</a>
+                                            <a href="" onclick="proceedToCheckout('<%= userData._id %>')" class="tm-button"> Proceed To Checkout</a>
                                         </div>
                                     </div>
                                 </div>

@@ -30,7 +30,7 @@
                     <ul class="nav tm-tabgroup" id="account" role="tablist">
                         <!-- tab 1: dashboard -->
                         <li class="nav-item">
-                            <a class="nav-link active" id="account-dashboard-tab" href="my-account" 
+                            <a class="nav-link" id="account-dashboard-tab" href="my-account" 
                                 role="tab" aria-controls="account-dashboard" aria-selected="false">Dashboard
                             </a>
                         </li>
@@ -71,7 +71,7 @@
 
                         <!-- tab 7: -->
                         <li class="nav-item">
-                            <a class="nav-link" id="account-wallet-tab" href="#"
+                            <a class="nav-link active" id="account-wallet-tab" href="#"
                                 role="tab" aria-controls="account-wallet" aria-selected="true">Wallet
                             </a>
                         </li>
@@ -85,23 +85,17 @@
                     </ul>
                     <!-- account tabs ends -->
 
+                    <h3 class="mb-5">Your Wallet</h3>
                     <!-- account tab-content starts -->
-                    <div class="tab-pane fade" id="account-wallet" role="tabpanel"
-                    aria-labelledby="account-wallet-tab">
+                    <div class="tab-pane" id="account-wallet" role="tabpanel" aria-labelledby="account-wallet-tab">
                     <div class="tm-myaccount-wallet">
-                        <h3>Wallet Balance</h3>
-                        <p>Your current wallet balance is: 
-                            <% if (walletData) { %>
-                                <b>$<%= walletData.balance %></b>
-                            <% } else { %>
-                                <b>$0.00</b>
-                            <% } %>
-                        </p>
+                        <h5>Your current wallet balance is : <b style="color: #9a0056;">₹ <%= (userData.walletBalance).toFixed(2) %></b></h5>
+                        <p><b><h5></h5></b></p>
                         
                         <h4>Recent Transactions</h4>
                         <table class="table table-bordered">
                             <thead>
-                                <tr>
+                                <tr class="text-center">
                                     <th>Date</th>
                                     <th>Description</th>
                                     <th>Amount</th>
@@ -109,8 +103,8 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <% if (walletData && walletData.transactions.length > 0) { %>
-                                    <% walletData.transactions.forEach(function(transaction) { %>
+                                <% if (userData && userData.walletHistory.length > 0) { %>
+                                    <% userData.walletHistory.forEach((transaction)=> { %>
                                         <tr>
                                             <td><%= new Date(transaction.date).toLocaleDateString() %></td>
                                             <td><%= transaction.description %></td>
@@ -120,7 +114,7 @@
                                     <% }); %>
                                 <% } else { %>
                                     <tr>
-                                        <td colspan="4">No transactions found</td>
+                                        <td colspan="4" class="text-center">No transactions found</td>
                                     </tr>
                                 <% } %>
                             </tbody>

@@ -2396,7 +2396,8 @@ button.tm-videobutton img {
     height: 50px;
     line-height: 48px;
     /* min-width: 170px; original */
-    min-width: 156px; /* adjust according to if added more tabs */
+    /* min-width: 156px; 156px for 7 tabs adjust according to if added more tabs */
+    min-width: 125px; /* 125px for 8 tabs adjust according to if added more tabs */
     text-align: center;
     padding: 0 35px; /* adjust according to if added more tabs */
     color: #333;
@@ -2419,7 +2420,7 @@ button.tm-videobutton img {
 
 @media only screen and (min-width:768px) and (max-width:991px) {
     .tm-tabgroup li a {
-        padding: 0 25px;
+        padding: 0 13px;
         font-size: 16px;
         background: #f7f7f7;
         min-width: inherit

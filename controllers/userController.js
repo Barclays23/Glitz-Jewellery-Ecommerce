@@ -18,17 +18,17 @@ const randomString = require('randomstring');
 // load user home page----------------------------------------------
 const loadHome = async(req, res)=>{
     try {
-        const userId = req.session.userId;
-        console.log("User ID in home page:", userId);
+        const sessionId = req.session.userId;
+        console.log("User ID in home page:", sessionId);
 
-        const sessionData = await User.findOne({_id : userId});
+        const userData = await User.findOne({_id : sessionId});
         const goldPriceData = await GoldPrice.findOne({});
         const popularProducts = await Product.find({});
         const newProducts = await Product.find({});
-        const userCart = await Cart.findOne({ userRef: userId });
-        const userWishlist = await Wishlist.findOne({userRef : userId});
+        const userCart = await Cart.findOne({ userRef: sessionId });
+        const userWishlist = await Wishlist.findOne({userRef : sessionId});
         const offerBannerProduct = await Product.findOne({_id: '669354be843722a03a04dbf6'});
-        console.log('offerBannerProduct is : ', offerBannerProduct);
+        console.log('offerBannerProduct is : ', offerBannerProduct.code);
 
         let cartCount = 0;
         let wishlistCount = 0;
@@ -45,7 +45,7 @@ const loadHome = async(req, res)=>{
             });
         }
 
-        res.render('home', {sessionData, wishlistCount, cartCount, goldPriceData, offerBannerProduct, popularProducts, newProducts});
+        res.render('home', {userData, wishlistCount, cartCount, goldPriceData, offerBannerProduct, popularProducts, newProducts});
 
     } catch (error) {
         console.log(error.message);
@@ -57,14 +57,15 @@ const loadHome = async(req, res)=>{
 // load user-login page----------------------------------------
 const loadLogin = async (req, res)=>{
     try {
+        const sessionId = req.session.userId;
         const verificationSuccess = req.query.verification === 'success';
         const passwordResetSuccess = req.query.passwordReset === 'success';
         const goldPriceData = await GoldPrice.findOne({});
 
-        const sessionData = await User.findById(req.session.userId);
-        console.log('session data in login page is : ' , sessionData);
+        const userData = await User.findById(sessionId);
+        console.log('session data in login page is : ' , userData);
 
-        res.render('login', { sessionData, verificationSuccess, passwordResetSuccess, goldPriceData });
+        res.render('login', { userData, verificationSuccess, passwordResetSuccess, goldPriceData });
 
     } catch (error) {
         console.log('error in loading the login page', error.message);
@@ -126,12 +127,12 @@ const verifyLogin = async (req, res) => {
 // load user-registration page---------------------------------
 const loadRegister = async (req, res)=>{
     try {
-
-        const sessionData = await User.findById(req.session.userId);
-        console.log('session data in register page is : ' , sessionData);
+        const sessionId = req.session.userId;
+        const userData = await User.findById(sessionId);
+        console.log('session data in register page is : ' , userData);
         const goldPriceData = await GoldPrice.findOne({});
 
-        res.render('registration', {sessionData, goldPriceData});
+        res.render('registration', {userData, goldPriceData});
 
     } catch (error) {
         console.log(error.message);
@@ -163,16 +164,15 @@ const insertUser = async(req, res)=>{
         console.log('req.body is: ', req.body);
         const existEmail = await User.findOne({email: req.body.userEmail});
         const existMobile = await User.findOne({mobile: req.body.userMobile});
-        if(existEmail && existMobile){
+
+        if (existEmail && existMobile){
             return res.status(409).json({emailExists: true, mobileExists: true})
-        }else if (existEmail) {
+        } else if (existEmail) {
             console.log('Email is exist...');
             return res.status(409).json({emailExists: true})
-            // return res.render('registration', {message: 'Email Already Exists.!'});
         } else if (existMobile){
             console.log('Mobile is exist...');
            return res.status(409).json({mobileExists: true})
-            // res.render('registration', {message: 'Mobile Number Already Exists.!'});
         } else {
             const securedPass = await securePassword(req.body.userPassword);
             const user = new User ({
@@ -186,17 +186,13 @@ const insertUser = async(req, res)=>{
             });
 
             const userData = await user.save();
-            // const redirectPath = `/verify-account?id=${userData._id}`;
+            console.log('created new user data');
 
             if (userData) {
-                sendOtpVerificationMail(userData, res);
-                // res.redirect(`/verify-account?id=${userData._id}`);
                 console.log('User ID:', userData._id);
-                // return res.status(200).json({success: true, userId: userData._id, expirationTime: expirationTime.getTime()});
-                // res.status(200).json({success: true, userId : userData._id});
+                sendOtpVerificationMail(userData, res);
             } else {
                 return res.status(400).json({failed: true, message: "Registration Failed !"})
-                // res.render('registration', {message: "Registration Failed !"});
             }
         }
     } catch (error) {
@@ -425,16 +421,35 @@ const resendOtp = async(req, res)=>{
 // load otp verification / account verification page ----------
 const loadVerifyAccount = async(req, res)=>{
     try {
-        const userId = req.query.id;
+        const userQueryId = req.query.id;
         const exp = req.query.expire;
-        console.log("query received in register-otp page :", userId, exp);
+        console.log("query received in register-otp page :", userQueryId, exp);
 
-        const sessionData = await User.findOne({_id: userId});
+        const sessionId = req.session.userId;
 
-        res.render('register-otp', {userId, exp, sessionData});
-        console.log("loaded verify account page");
+        const userData = await User.findOne({_id: sessionId});
 
-        console.log("query after loading register-otp page :", userId, exp);
+        const userCart = await Cart.findOne({ userRef: sessionId });
+        const userWishlist = await Wishlist.findOne({ userRef: sessionId});
+
+        let cartCount = 0;
+        let wishlistCount = 0;
+
+        if (userCart){
+            userCart.product.forEach((product) => {
+                cartCount += product.quantity;
+            });
+        }
+
+        if (userWishlist){
+            userWishlist.product.forEach((product) => {
+                wishlistCount += product.quantity;
+            });
+        }
+
+        // res.render('register-otp', {userId, exp, userData, cartCount, wishlistCount});
+        res.render('register-otp', { exp, userData });
+        console.log("loaded verify account (otp) page");
 
     } catch (error) {
         console.log('Register otp page loading failed');
@@ -593,10 +608,10 @@ const loadShopping = async (req, res)=>{
         let totalPages = Math.ceil(productCount / limit);
 
         if(sessionId){
-            const sessionData = await User.findById({_id: req.session.userId});
-            console.log('session user information for shopping :', sessionData.email);
+            const userData = await User.findById({_id: sessionId});
+            console.log('session user information for shopping :', userData.email);
             res.render('shopping', {
-                sessionData : sessionData, 
+                userData : userData, 
                 cartCount,
                 wishlistCount,
                 wishlistItems,
@@ -616,7 +631,7 @@ const loadShopping = async (req, res)=>{
         } else{
             console.log('no session data for shopping');
             res.render('shopping', {
-                sessionData : null, 
+                userData : null, 
                 goldPriceData,
                 productData, 
                 categoryData, 
@@ -644,9 +659,8 @@ const loadShopping = async (req, res)=>{
 const productDetals = async(req, res)=>{
     try {
         const sessionId = req.session.userId;
-        console.log('sessionId', sessionId);
 
-        const sessionData = await User.findOne({_id: sessionId});
+        const userData = await User.findOne({_id: sessionId});
         const productData = await Product.findOne({_id: req.query.id}).populate('categoryRef');
         const categoryData = await Category.find({});
         const goldPriceData = await GoldPrice.findOne({});
@@ -675,19 +689,17 @@ const productDetals = async(req, res)=>{
         }
 
 
-        if (sessionData) {
-            res.render('productDetails', {sessionData, cartCount, wishlistCount, wishlistItems, productData, categoryData, goldPriceData, similarProducts, popularProducts});
+        if (sessionId) {
+            res.render('productDetails', {userData, cartCount, wishlistCount, wishlistItems, productData, categoryData, goldPriceData, similarProducts, popularProducts});
 
         } else{
-            res.render('productDetails', {sessionData: null, productData, categoryData, goldPriceData, similarProducts, popularProducts });
+            res.render('productDetails', {userData: null, productData, categoryData, goldPriceData, similarProducts, popularProducts });
         }
 
     } catch (error) {
         console.log('failed to load product details page :', error.message);
     }
 }
-
-
 
 
 
@@ -897,8 +909,10 @@ const loadResetPassword = async (req, res)=>{
             res.render('404', {invalidToken: 'Token is expired or not valid anymore to reset the password !'});
             return;
         } else{
-            const sessionData = await User.findById(req.session.userId);
-            res.render('resetPassword', {tokenUserData, sessionData});
+            const sessionId = req.session.userId;
+            const userData = await User.findById(sessionId);
+
+            res.render('resetPassword', {tokenUserData, userData});
             return;
         }
 
@@ -935,12 +949,13 @@ const resetPassword = async(req, res)=>{
 // load user-account page----------------------------------------
 const loadUserAccount = async (req, res)=>{
     try {
-        const sessionData = await User.findById(req.session.userId);
-        console.log('session data in user profile page : ' , sessionData);
+        const sessionId = req.session.userId;
+        const userData = await User.findById(sessionId);
+        console.log('userData in user account page : ' , userData);
 
         const goldPriceData = await GoldPrice.findOne({});
-        const userCart = await Cart.findOne({ userRef: req.session.userId });
-        const userWishlist = await Wishlist.findOne({ userRef: req.session.userId});
+        const userCart = await Cart.findOne({ userRef: sessionId });
+        const userWishlist = await Wishlist.findOne({ userRef: sessionId});
 
         let cartCount = 0;
         let wishlistCount = 0;
@@ -957,7 +972,7 @@ const loadUserAccount = async (req, res)=>{
             });
         }
 
-        res.render('userAccount', { sessionData, cartCount, wishlistCount, goldPriceData });
+        res.render('userAccount', { userData, cartCount, wishlistCount, goldPriceData });
 
     } catch (error) {
         console.log('error in loading user account dashboard', error.message);
@@ -969,11 +984,11 @@ const loadUserAccount = async (req, res)=>{
 // load user-profile page----------------------------------------
 const loadUserProfile = async (req, res)=>{
     try {
-        const userData = await User.findById(req.session.userId);
-        const sessionData = await User.findById(req.session.userId); //need either userData or sessionData (and edit in all front end pages)
+        const sessionId = req.session.userId;
+        const userData = await User.findById(sessionId);
         const goldPriceData = await GoldPrice.findOne({});
-        const userCart = await Cart.findOne({ userRef: req.session.userId });
-        const userWishlist = await Wishlist.findOne({ userRef: req.session.userId});
+        const userCart = await Cart.findOne({ userRef: sessionId });
+        const userWishlist = await Wishlist.findOne({ userRef: sessionId});
 
         let cartCount = 0;
         let wishlistCount = 0;
@@ -991,7 +1006,7 @@ const loadUserProfile = async (req, res)=>{
             });
         }
 
-        res.render('userProfile', { userData, sessionData, cartCount, wishlistCount, goldPriceData });
+        res.render('userProfile', { userData, cartCount, wishlistCount, goldPriceData });
 
     } catch (error) {
         console.log('error in loading user profile', error.message);
@@ -1003,19 +1018,19 @@ const loadUserProfile = async (req, res)=>{
 // load user-profile page----------------------------------------
 const loadEditUserProfile = async (req, res)=>{
     try {
-        const userData = await User.findById(req.session.userId);
-        const sessionData = await User.findById(req.session.userId); //need either userData or sessionData (and edit in all front end pages)
+        const sessionId = req.session.userId;
+        const userData = await User.findById(sessionId);
 
         const goldPriceData = await GoldPrice.findOne({});
-        const userCart = await Cart.findOne({ userRef: req.session.userId });
-        const userWishlist = await Wishlist.findOne({ userRef: req.session.userId});
+        const userCart = await Cart.findOne({ userRef: sessionId });
+        const userWishlist = await Wishlist.findOne({ userRef: sessionId });
 
 
         let cartCount = 0;
         let wishlistCount = 0;
 
 
-        if (sessionData && userCart){
+        if (userData && userCart){
             userCart.product.forEach((product) => {
                 cartCount += product.quantity;
             });
@@ -1027,7 +1042,7 @@ const loadEditUserProfile = async (req, res)=>{
             });
         }
 
-        res.render('editUserProfile', { userData, cartCount, wishlistCount, sessionData, goldPriceData });
+        res.render('editUserProfile', { userData, cartCount, wishlistCount, goldPriceData });
 
     } catch (error) {
         console.log('error in loading edit user profile', error.message);
@@ -1091,7 +1106,7 @@ const updateUserProfile = async (req, res)=>{
 
 
 
-// update user-password ------------------------------------------
+// update user-password -----------------------------------------
 const updateUserPassword = async (req, res)=>{
     try {
         const {oldPassword, newPassword} = req.body;
@@ -1125,6 +1140,38 @@ const updateUserPassword = async (req, res)=>{
 
 
 
+// load user wallet ---------------------------------------------
+const loadWallet = async (req, res)=>{
+    try {
+        const sessionId = req.session.userId;
+        const userData = await User.findById(sessionId);
+        const goldPriceData = await GoldPrice.findOne({});
+        const userCart = await Cart.findOne({ userRef: sessionId });
+        const userWishlist = await Wishlist.findOne({ userRef: sessionId});
+
+        let cartCount = 0;
+        let wishlistCount = 0;
+
+
+        if (userCart){
+            userCart.product.forEach((product) => {
+                cartCount += product.quantity;
+            });
+        }
+
+        if (userWishlist){
+            userWishlist.product.forEach((product) => {
+                wishlistCount += product.quantity;
+            });
+        }
+        res.render('userWallet', { userData, cartCount, wishlistCount, goldPriceData });
+
+    } catch (error) {
+        console.log('failed to load the user wallet :', error.message);
+        res.render('404'); // Render a 500 page for internal server error
+
+    }
+}
 
 
 
@@ -1151,4 +1198,5 @@ module.exports = {
     loadEditUserProfile,
     updateUserProfile,
     updateUserPassword,
+    loadWallet,
 }

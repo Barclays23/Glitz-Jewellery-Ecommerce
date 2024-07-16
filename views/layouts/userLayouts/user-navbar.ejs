@@ -17,21 +17,21 @@
                             
                             <div class="tm-dropdown tm-header-links">
                                 <button>
-                                    <% if(sessionData){ %>
-                                        <a href="#"><%= sessionData.firstname %> <%= sessionData.lastname %></a>
+                                    <% if(userData){ %>
+                                        <a href="#"><%= userData.firstname %> <%= userData.lastname %></a>
                                     <% } else { %>
                                         <a href="/login">Login</a>
                                     <% } %>
                                 </button>
 
                                 <ul>
-                                    <% if(sessionData){ %>
+                                    <% if(userData){ %>
                                         <li><a href="/profile">My Profile</a></li>
                                         <li><a href="/wishlist">Wishlist</a></li>
                                         <li><a href="/cart">Cart</a></li>
                                         <li><a href="/orders">Orders</a></li>
                                         <li><a href="/address">Address</a></li>
-                                        <li><a href="wishlist.html">Wallet</a></li>
+                                        <li><a href="wallet">Wallet</a></li>
                                         <li><a href="/logout">Logout</a></li>
 
                                     <% } else { %>
@@ -56,7 +56,7 @@
                     </div>
                     <div class="col-lg-9 col-6 order-4 order-lg-4">
                         <ul class="tm-header-icons">
-                            <% if (sessionData){ %>
+                            <% if (userData){ %>
                                 <li><a href="/my-account"><img src="assets/images/icons/user2.png" width="22px" height="22px" alt="user"></a></li>
                                 <li id="wishlist-count"><a href="/wishlist"><i class="ion-android-favorite-outline"></i><span><%= wishlistCount %></span></a></li>
                                 <li id="cart-count"><a href="/cart"><i class="ion-bag"></i><span><%= cartCount %></span></a></li>
@@ -100,7 +100,7 @@
             <div class="container">
                 <nav class="tm-header-nav">
                     <ul>
-                        <% if(sessionData){ %>
+                        <% if(userData){ %>
                         <li class="tm-header-nav-dropdown"><a href="/my-account">My Account</a>
                             <ul>
                                 <li><a href="/profile">My Profile</a></li>
@@ -108,7 +108,7 @@
                                 <li><a href="/cart">Cart</a></li>
                                 <li><a href="/orders">Orders</a></li>
                                 <li><a href="/address">Address</a></li>
-                                <li><a href="#">Wallet</a></li>
+                                <li><a href="wallet">Wallet</a></li>
                                 <li><a href="/logout">Logout</a></li>
                             </ul>
                         </li>
