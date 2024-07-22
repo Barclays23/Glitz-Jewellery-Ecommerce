@@ -128,7 +128,7 @@
                     </div>
                     <div class="container">
                         <% for (i=0; i< orderData.orderedItems.length; i++){ %>
-                            <div class="row product-details bg-dange">
+                            <div class="row product-details bg-grey">
                                 <!-- Product Overview -->
                                 <div class="product-info">
                                     <div class="info-container mb-3">
@@ -164,7 +164,14 @@
                                         <a href="/product-details?id=<%= orderData.orderedItems[i].productRef %>"> <p>Buy it again</p></a>
                                         <a> <p>Write a product review</p></a>
                                         <% if(orderData.orderedItems[i].orderStatus === 'Pending' || orderData.orderedItems[i].orderStatus === 'Placed' || orderData.orderedItems[i].orderStatus === 'Confirmed'){ %>
-                                            <a> <p>Cancel Order</p></a>
+
+                                            <!-- <a class="cancel-order-link" data-order='<%= JSON.stringify(orderData.orderedItems[i]) %>'> <p>Cancel Order</p></a> -->
+                                            
+                                            <a class="cancel-order-link" data-toggle="modal" data-target="#cancelOrderModal" 
+                                                data-order-id="<%= encodeURIComponent(JSON.stringify(orderData._id)) %>"
+                                                data-order-item="<%= encodeURIComponent(JSON.stringify(orderData.orderedItems[i])) %>">
+                                                <p>Cancel Order</p>
+                                            </a>
                                         <% } %>
                                     </div>
                                 </div>
@@ -245,7 +252,7 @@
                                 </div>
                             </div>
                             <hr style="height: 2px; background-color: red; border: none;">
-                            <% } %>
+                        <% } %>
                     </div>
                 </div>
             </div>
@@ -253,6 +260,81 @@
     </main>
     <button id="back-top-top"><i class="ion-arrow-up-c"></i></button>
 </div>
+
+
+
+
+
+
+<!-- Cancel Order Modal Starts -->
+<div class="modal fade" id="cancelOrderModal" tabindex="-1" role="dialog" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="small-title"><b>CANCEL ORDER</b></h4>
+                <button type="button" class="close bg-black text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="#" class="tm-form tm-checkout-form">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="tm-checkout-billingform">
+                                <div class="tm-form-inner">
+                                    <div class="tm-form-field">
+                                        <h5 class="mb-2">Are you sure you want to cancel this order?</h5>
+                                        <input type="hidden" id="cancel-order-id"/>
+                                        <input type="hidden" id="cancel-product-ref"/>
+                                        <div id="order-item-details" class="d-flex align-items-center mb-3">
+                                            <div class="item-image mr-3" style="border: 1px solid #ccc;  padding: 5px;">
+                                                <img id="cancel-product-image" src="" alt="product-image" class="product-image">
+                                            </div>
+                                            <div class="item-text" style="line-height: 15px;">
+                                                <p id="cancel-product-name"></p>
+                                                <p id="cancel-product-code"></p>
+                                                <p id="cancel-product-totalPrice"></p>
+                                                <p id="cancel-product-quantity"></p>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group d-flex" style="align-items: baseline;">
+                                            <label for="cancel-reason-select"><h6 style="margin-right: 15px;">Reason for Cancellation: </h6></label>
+                                            <select id="cancel-reason-select">
+                                                <option value="" selected disabled>Select a reason</option>
+                                                <option value="Ordered by Mistake">Ordered by Mistake</option>
+                                                <option value="Found a Better Price Elsewhere">Found a Better Price Elsewhere</option>
+                                                <option value="Change of Mind">Change of Mind</option>
+                                                <option value="Delivery Time Too Long">Delivery Time Too Long</option>
+                                                <option value="Item Not Needed Anymore">Item Not Needed Anymore</option>
+                                                <option value="Incorrect Item Ordered">Incorrect Item Ordered</option>
+                                                <option value="Financial Reasons">Financial Reasons</option>
+                                                <option value="Duplicate Order">Duplicate Order</option>
+                                                <option value="Better Alternative Found">Better Alternative Found</option>
+                                                <option value="Product Description Mismatch">Product Description Mismatch</option>
+                                                <option value="Poor Customer Reviews">Poor Customer Reviews</option>
+                                                <option value="Negative Experience with the Seller">Negative Experience with the Seller</option>
+                                            </select>
+                                        </div>
+                                        <textarea id="cancel-reason" class="cancel-reason" placeholder="Enter additional details here"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" id="confirmCancelOrder">Cancel Order</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Cancel Order Modal Ends -->
+
+
+
 
 
 <!-- script for date & time format -->
@@ -277,14 +359,114 @@
 <!-- -------------------------------------------------------------------------------- -->
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 
-<!-- script for add to wishlist and remove from wishlist -->
-<script src="/assets/scripts/userScripts/wishlist-scripts.js"></script>
+<!-- script for cancel order -->
+<script>
+    $(document).ready(function() {
+        $('.cancel-order-link').on('click', function() {
+
+            // parcing the order id (from cancel order link)
+            var orderId = JSON.parse(decodeURIComponent($(this).data('order-id')));
+
+            // parcing all the details of the selected order item (from cancel order link)
+            var orderItem = JSON.parse(decodeURIComponent($(this).data('order-item')));
+            
+            $('#cancel-order-id').val(orderId);
+            $('#cancel-product-ref').val(orderItem.productRef);
+            $('#cancel-product-image').attr('src', '/assets/images/productImages/' + orderItem.image);
+            $('#cancel-product-name').text('Name: ' + orderItem.name);
+            $('#cancel-product-code').text('Code: ' + orderItem.code);
+            $('#cancel-product-totalPrice').text('Total Price: ₹' + (orderItem.totalPrice * orderItem.quantity).toFixed(2));
+            $('#cancel-product-quantity').text('Quantity: ' + orderItem.quantity);
+
+            // $('#cancelOrderModal').modal('show');
+        });
+
+        $('#confirmCancelOrder').click(function() {
+            var cancelOrderId = $('#cancel-order-id').val();
+            var cancelProductRef = $('#cancel-product-ref').val();
+            var cancelReasonSelect = $('#cancel-reason-select').val();
+            var cancelReasonComment = $('#cancel-reason').val();
+
+            console.log('cancelOrderId for cancel :', cancelOrderId);
+            console.log('cancelProductRef for cancel :', cancelProductRef);
+            console.log('cancelReasonSelect for cancel :', cancelReasonSelect);
+            console.log('cancelReasonComment for cancel :', cancelReasonComment);
+            
+            let cancelReason = `${cancelReasonSelect}: "${cancelReasonComment}"`;
+            console.log('cancelReason :', cancelReason);
 
 
-<!-- importing the script for carted items (ADD TO CART, UPDATE CART QUANTITY, REMOVE FROM CART & CHECKOUT, REMOVE OUTOFSTOCK CART ITEMS etc) -->
-<script src="/assets/scripts/userScripts/cart-and-checkout-scripts.js"></script>
+
+
+            // Validate the cancel reason
+            if (!cancelReasonSelect) {
+                Swal.fire({
+                    text: 'Please choose a valid reason for order cancellation',
+                    showConfirmButton: false
+                });
+                return;
+            }
+
+            var words = cancelReasonComment.trim().split(/\s+/);
+            if (!cancelReasonComment) {
+                Swal.fire({
+                    text: 'Additional details required.',
+                    showConfirmButton: false
+                });
+            } else if (words.length < 5) {
+                Swal.fire({
+                    text: 'The additional details must contain at least 5 words.',
+                    showConfirmButton: false
+                });
+                return;
+            }
+
+            $.ajax({
+                url: '/cancel-order',
+                method: 'POST',
+                data: {
+                    cancelOrderId,
+                    cancelProductRef,
+                    cancelReason
+                },
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Order Canceled',
+                            text: 'Your order has been canceled successfully.',
+                            showConfirmButton: false
+                        }).then(()=>{
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Cancellation Failed',
+                            text: 'Failed to cancel the order.'
+                        });
+                    }
+                },
+                error: function(error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Cancellation Failed',
+                        text: 'An error occured while canceling the order.'
+                    });
+                }
+            });
+        });
+
+
+
+
+    });
+</script>
+
+
 
 
 
@@ -432,4 +614,8 @@
         border-bottom: 1px solid #b41313;
     }
 }
+
+
+
+
 </style>

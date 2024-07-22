@@ -24,6 +24,8 @@ const adminController = require('../controllers/adminController');
 const categoryController = require('../controllers/categoryController');
 const productController = require('../controllers/productController');
 const orderController = require('../controllers/orderController');
+const offerController = require('../controllers/offerController');
+const couponController = require('../controllers/couponController');
 const goldRateController = require('../controllers/goldRateController');
 
 
@@ -73,6 +75,23 @@ adminRoute.patch('/update-order-status', adminAuth.isLogin, orderController.upda
 // GOLD RATE CONTROLLER ROUTES
 // adminRoute.get('/gold-rate', adminAuth.isLogin, goldRateController.getGoldRate);
 adminRoute.put('/update-gold-rate', adminAuth.isLogin, goldRateController.updateGoldRateManually);
+
+
+
+// OFFER CONTROLLER ROUTES
+adminRoute.get('/offers', adminAuth.isLogin, offerController.loadOfferList);
+adminRoute.post('/add-offer', adminAuth.isLogin, offerController.addOffer);
+adminRoute.put('/edit-offer', adminAuth.isLogin, offerController.editOffer);
+adminRoute.patch('/manage-offer', adminAuth.isLogin, offerController.manageOffer);
+
+
+
+// COUPON CONTROLLER ROUTES
+adminRoute.get('/coupons', adminAuth.isLogin, couponController.loadCouponList);
+adminRoute.post('/add-coupon', adminAuth.isLogin, couponController.addCoupon);
+adminRoute.put('/edit-coupon', adminAuth.isLogin, couponController.editCoupon);
+adminRoute.patch('/manage-coupon', adminAuth.isLogin, couponController.manageCoupon);
+
 
 
 

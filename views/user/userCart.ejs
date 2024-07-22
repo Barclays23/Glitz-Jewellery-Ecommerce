@@ -113,8 +113,8 @@
                                                     <a href="/product-details?id=<%= userCart.product[i].productRef._id %>" class="tm-cart-productimage">
                                                         <img src="assets/images/productImages/<%= userCart.product[i].productRef.images.image1 %>" alt="product image">
                                                     </a>
-                                                    <h6><a href="/product-details?id=<%= userCart.product[i].productRef._id %>" class="tm-cart-productname"><%= userCart.product[i].productRef.name %></a></h6>
                                                     <p class="tm-cart-productcode"> <%= userCart.product[i].productRef.code %></p>
+                                                    <h6><a href="/product-details?id=<%= userCart.product[i].productRef._id %>" class="tm-cart-productname"><%= userCart.product[i].productRef.name %></a></h6>
                                                     <% if(userCart.product[i].productRef.quantity === 0){ %>
                                                         <h6 id="outofstock-error" style="color: red; display: block;"> Currently Unavailable </h6>
                                                     <% } %>
@@ -131,9 +131,11 @@
                                                             <li> Metal Price </li>
                                                             <li> Making Charge </li>
                                                             <li> Stone Charge </li>
-                                                            <li> Tax </li>
+                                                            <li> GST (3%)</li>
                                                             <hr style="border: 1px solid black;">
-                                                            <li><b> TOTAL </b></li>
+                                                            <li><b> Total </b></li> <!-- totalPrice -->
+                                                            <li><b> Discount (Offer) </b></li> <!-- offerAmount (product / category offer ref amount) -->
+                                                            <li><b> NET AMOUNT </b></li> <!-- totalPrice - offerAmount -->
                                                         </ul>
                                                         <ul class="col text-right" style="list-style-type: none;">
                                                             <li> <%= (userCart.product[i].productRef.grossWeight).toFixed(3) %> </li>
@@ -148,10 +150,11 @@
                                                             <li class="tm-cart-pricebreakup"> <%= (userCart.product[i].productRef.GST).toFixed(2) %></li>
                                                             <hr style="border: 1px solid black;">
                                                             <li class="tm-cart-pricebreakup"> <b><%= (userCart.product[i].productRef.totalPrice).toFixed(2) %></b></li>
+                                                            <li class="tm-cart-pricebreakup"> <b class="text-success">- 500.00</b></li>
+                                                            <li class="tm-cart-pricebreakup"> <b><%= (userCart.product[i].productRef.totalPrice - 500.00).toFixed(2) %></b></li>
                                                         </ul>
                                                     </div>
                                                 </td>
-                                                <!-- <td class="tm-cart-price bg-light">₹<%= (userCart.product[i].productRef.totalPrice).toFixed(2) %></td> -->
                                                 <td class="bg-light">
                                                     <div class="tm-quantitybox bg-white">
                                                         <input type="number" class="quantity-input" value="<%= userCart.product[i].quantity %>" id="quantity_<%= i %>" data-product-id="<%= userCart.product[i]._id %>" data-index="<%= i %>">
@@ -164,8 +167,6 @@
                                                 </td>
                                                 <td class="bg-light">
                                                     <button class="tm-button tm-button-small" onclick="saveForLater('<%= userCart.product[i]._id %>')">Save for Later</button>
-                                                    <!-- <button class="tm-cart-removeproduct bg-danger"><i class="ion-close"></i></button> -->
-                                                    <!-- <a href=""><img src="/assets/images/icons/remove2.png" style="width: 41px; height: auto;" alt="remove-icon"> </a> -->
                                                     <button class="tm-button tm-button-small" onclick="removeFromCart('<%= userCart.product[i]._id, i %>', '<%= i %>')"> Remove </button>
                                                     <br><br>
                                                     <% if(userCart.product[i].productRef.quantity === 0){ %>

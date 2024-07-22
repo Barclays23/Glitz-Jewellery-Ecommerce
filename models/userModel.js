@@ -83,7 +83,10 @@ const userSchema = new mongoose.Schema({
         },
         date : {
             type : Date
-        }
+        },
+        status : {
+            type : String
+        },
     }]
 });
 

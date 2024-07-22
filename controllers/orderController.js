@@ -1,7 +1,4 @@
 const User = require('../models/userModel');
-// const Address = require('../models/addressModel');
-// const Cart = require('../models/cartModel');
-// const Wishlist = require('../models/wishlistModel');
 const Order = require('../models/orderModel');
 
 const GoldPrice = require('../models/goldPriceModel');
@@ -174,6 +171,10 @@ const updateOrderStatus = async(req, res)=>{
 
         const orderProduct = orderData.orderedItems.find(item => item._id.toString() === itemId);
 
+        if (newStatus === 'Delivered'){
+            orderProduct.deliveryDate = Date.now();
+        }
+
         orderProduct.orderStatus = newStatus;
         orderData.save();
         console.log('order status updated');
@@ -189,8 +190,73 @@ const updateOrderStatus = async(req, res)=>{
 
 
 
+
+// cancel order -------------------------------------------
+const cancelOrder = async(req, res)=>{
+    try {
+        const {cancelOrderId, cancelProductRef, cancelReason} = req.body;
+        console.log('received data for cancel order :', req.body);
+
+        // changing the order status to "Cancelled"
+        const canceledOrderData = await Order.findOneAndUpdate(
+            { _id: cancelOrderId, 'orderedItems.productRef': cancelProductRef },
+            { 
+                $set: { 
+                    'orderedItems.$.orderStatus': 'Cancelled',
+                    'orderedItems.$.cancelReason': cancelReason 
+                }
+            },
+            { new: true }
+        );
+        // console.log('canceledOrderData is : ', canceledOrderData);
+
+
+        // transfer the money to user wallet if payment method is not COD
+        if (canceledOrderData.paymentMethod != 'Cash On Delivery'){  //for testing, it's Online Payment
+            let netAmount = canceledOrderData.netAmount;
+            let discountAmount = canceledOrderData.discountAmount; // also add the coupon discount tp discountAmount
+            let dicountPercentage = discountAmount / netAmount * 100;
+
+
+            const canceledItem = canceledOrderData.orderedItems.find(item => item.productRef.toString() === cancelProductRef);
+            console.log('cancelledItem :', canceledItem);
+
+            const itemPrice = canceledItem.totalPrice;  // check whether the product have discountedPrice
+            const itemQuantity = canceledItem.quantity;
+            const itemTotalPrice = itemPrice * itemQuantity;
+
+            const refundAmount = itemTotalPrice * dicountPercentage
+
+
+            await User.findByIdAndUpdate(
+                {_id: req.session.userId},
+                {$inc: {walletBalance: refundAmount}},
+                {$push: {walletHistory}}
+
+            )
+            // what for coupon and other payment methods ?
+        }
+
+
+
+        return res.json({success: true});
+
+
+    } catch (error) {
+        console.log('error while cancel the order :', error);
+        return res.json({error: true});
+    }
+}
+
+
+
+
+
+
+
 module.exports = {
     loadOrderList,
     loadOrderItems,
-    updateOrderStatus
+    updateOrderStatus,
+    cancelOrder,
 }

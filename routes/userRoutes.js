@@ -110,6 +110,7 @@ userRoute.post('/place-order', userAuth.isLogin, cartController.placeOrder);
 userRoute.get('/orders', userAuth.isLogin, cartController.loadUserOrders);
 userRoute.get('/order-details', userAuth.isLogin, cartController.loadOrderDetails);
 userRoute.get('/thankyou', userAuth.isLogin, cartController.loadThankyou);
+userRoute.post('/cancel-order', orderController.cancelOrder); // userAuth.isLogin
 
 
 // WALLET ROUTES

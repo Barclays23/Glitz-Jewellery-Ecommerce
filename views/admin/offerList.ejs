@@ -1,0 +1,757 @@
+<%- include('../layouts/adminLayouts/adminDashboardHeader.ejs') %>
+<%- include('../layouts/adminLayouts/adminSidebarAndNavbar.ejs') %>
+
+
+
+<!-- Offer list area starts -->
+<div class="row ">
+    <div class="col-12 grid-margin">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title" style="text-align: center">GLITTERING OFFERS</h3>
+
+                <div class="table-responsive">
+                    <div style="text-align: right;">
+                        <button type="button" class="btn btn-success add-offer" data-toggle="modal" data-target="#addOfferModal">Add Offer</button>
+                        <!-- <button type="button" class="btn btn-success add-offer" data-toggle="modal" data-target="#addOfferModal">
+                            <img src="/assets/images/icons/add.png" alt="add" width="30px" height="30px">
+                        </button> -->
+                    </div>
+                    
+
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th class="text-center"> No </th>
+                                <th> Offer Name </th>
+                                <th class="text-center"> Offer % </th>
+                                <th class="text-center"> Start Date </th>
+                                <th class="text-center"> Expiry Date </th>
+                                <th class="text-center"> Offer Period </th>
+                                <th class="text-center"> Status </th>
+                                <th class="text-center"> Actions </th>
+                            </tr>
+                        </thead>
+                        <tbody>                            
+                            <% if (offerData.length > 0){
+                                for(let i=0; i< offerData.length; i++){ %>
+                                    <tr>
+                                        <td class="text-center"> <%= i+1 %> </td>
+
+                                        <td> <%= offerData[i].offerName %> </td>
+
+                                        <td class="text-center"> <%= offerData[i].offerPercentage %> </td>
+
+                                        <td class="text-center"> <%= formatDate(offerData[i].activationDate) %> </td>
+                                        
+                                        <td class="text-center"> <%= formatDate(offerData[i].expiryDate) %> </td>
+                                        
+                                        <td class="text-center">
+                                            <%= calculateDateDifference(offerData[i].activationDate, offerData[i].expiryDate) %> days
+                                        </td>
+
+                                        <td class="text-center">
+                                            <% if (offerData[i].isListed === false){ %>
+                                                <div class="badge badge-outline-warning">Blocked</div>
+                                            <% } else if (offerData[i].activationDate > Date.now() ) { %>
+                                                <div class="badge badge-outline-primary">Upcoming</div>
+                                            <% } else if (offerData[i].expiryDate < Date.now()) { %>
+                                                <div class="badge badge-outline-danger">Expired</div>
+                                            <% } else { %>
+                                                <div class="badge badge-outline-success">Active</div>
+                                            <% } %>
+                                        </td>
+                                        <td class="text-center">
+                                            <% if (offerData[i].isListed == true){ %>
+                                                <a href="" class="badge badge-danger" id="blocked-user" style="text-decoration: none; color: black;" onclick="manageOffer('<%= offerData[i]._id %>')">Block</a>
+                                            <% }
+                                            else{ %>
+                                                <a href="" class="badge badge-secondary text-dark" id="active-user" style="text-decoration: none" onclick="manageOffer('<%= offerData[i]._id %>')">Unblock</a>
+                                            <% } %>
+                                            <a href="#" 
+                                                class="badge badge-light" 
+                                                style="color: black; text-decoration: none;" 
+                                                data-toggle="modal" 
+                                                data-target="#editOfferModal"
+                                                data-id="<%= offerData[i]._id %>" 
+                                                data-name="<%= offerData[i].offerName %>" 
+                                                data-percentage="<%= offerData[i].offerPercentage %>" 
+                                                data-start-date="<%= offerData[i].activationDate %>" 
+                                                data-expiry-date="<%= offerData[i].expiryDate %>" 
+                                                data-status="<%= offerData[i].isListed %>">
+                                                Edit
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <% }
+                            }
+                            else{ %>
+                                <tr>
+                                    <td colspan="8" style="text-align: center"><h4> No Offers Found </h4></td>
+                                </tr>
+                            <% } %>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Offer list area ends -->
+
+
+
+
+<!-- Add New Offer Modal Starts-->
+<div class="modal fade" id="addOfferModal" tabindex="-1" role="dialog" aria-labelledby="addOfferModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addOfferModalLabel">ADD NEW OFFER</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="add-offer-form">
+                    <div class="row">
+                        <div class="col form-group">
+                            <label for="offerName">Offer Name:</label>
+                            <div class="input-group" style="height: 40px;">
+                                <select class="custom-select" id="offerNameSelect" name="offerNameSelect" onchange="toggleOtherOffer(this);" required>
+                                    <option value="">Select an offer...</option>
+                                    <option value="Akshaya Tritiya">Akshaya Tritiya</option>
+                                    <option value="Diwali">Diwali</option>
+                                    <option value="Dhanteras">Dhanteras</option>
+                                    <option value="Bangle Fest">Bangle Fest</option>
+                                    <option value="Bridal Bliss">Bridal Bliss</option>
+                                    <option value="Valentine's Day">Valentine's Day</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <span id="offer-name-error" style="color: red; display: none;"></span>
+                            </div>
+                        </div>
+                        <div class="col form-group">
+                            <label for="offerNameOther"></label>
+                            <input type="text" class="form-control" id="offerNameOther" name="offerNameOther" placeholder="Enter offer name" style="display: none;">
+                            <span id="other-offer-error" style="color: red; display: none;"></span>
+                        </div>
+                        <div class="col form-group">
+                            <label for="offerYear">Year:</label>
+                            <select class="form-control" id="offerYear" name="offerYear" required>
+                                <!-- Example years, adjust as needed -->
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026">2026</option>
+                                <!-- Add more years as necessary -->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col form-group">
+                            <label for="startDate">Start Date:</label>
+                            <input type="date" class="form-control" id="startDate" name="startDate" required>
+                            <span id="start-date-error" style="color: red; display: none;"></span>
+                        </div>
+                        <div class="col form-group">
+                            <label for="expiryDate">Expiry Date:</label>
+                            <input type="date" class="form-control" id="expiryDate" name="expiryDate" required>
+                            <span id="expiry-date-error" style="color: red; display: none;"></span>
+                        </div>
+                        <div class="col form-group">
+                            <label for="offerDays">Offer Period:</label>
+                            <input type="text" class="form-control" id="offerDays" name="offerDays" readonly>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col form-group">
+                            <label for="offerPercentage">Offer Percentage:</label>
+                            <input type="number" class="form-control" id="offerPercentage" name="offerPercentage" min="0" max="99.99" step="0.01" required>
+                            <span id="percentage-error" style="color: red; display: none;"></span>
+                        </div>
+                        <div class="col form-group">
+                            <label for="isListed">Status:</label>
+                            <select class="form-control" id="isListed" name="isListed" required>
+                                <option value="true" class="text-success">List</option>
+                                <option value="false" class="text-danger">Unlist</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveOfferBtn">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Add New Offer Modal Ends-->
+
+
+
+
+
+
+<!-- Edit Offer Modal Starts-->
+<div class="modal fade" id="editOfferModal" tabindex="-1" role="dialog" aria-labelledby="editOfferModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editOfferModalLabel">EDIT OFFER</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-offer-form">
+                    <div class="row">
+                        <div class="col form-group">
+                            <label for="editOfferName">Offer Name:</label>
+                            <div class="input-group" style="height: 40px;">
+                                <select class="custom-select" id="editOfferNameSelect" name="editOfferNameSelect" onchange="toggleOtherOffer(this);" required>
+                                    <option value="">Select an offer...</option>
+                                    <option value="Akshaya Tritiya">Akshaya Tritiya</option>
+                                    <option value="Diwali">Diwali</option>
+                                    <option value="Dhanteras">Dhanteras</option>
+                                    <option value="Bangle Fest">Bangle Fest</option>
+                                    <option value="Bridal Bliss">Bridal Bliss</option>
+                                    <option value="Valentine's Day">Valentine's Day</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <span id="edit-offer-name-error" style="color: red; display: none;"></span>
+                            </div>
+                        </div>
+                        <div class="col form-group">
+                            <label for="editOfferNameOther"></label>
+                            <input type="text" class="form-control" id="editOfferNameOther" name="editOfferNameOther" placeholder="Enter offer name" style="display: none;">
+                            <span id="edit-other-offer-error" style="color: red; display: none;"></span>
+                        </div>
+                        <div class="col form-group">
+                            <label for="editOfferYear">Year:</label>
+                            <select class="form-control" id="editOfferYear" name="editOfferYear" required>
+                                <!-- Example years, adjust as needed -->
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026">2026</option>
+                                <!-- Add more years as necessary -->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col form-group">
+                            <label for="editStartDate">Start Date:</label>
+                            <input type="date" class="form-control" id="editStartDate" name="editStartDate" required>
+                            <span id="edit-start-date-error" style="color: red; display: none;"></span>
+                        </div>
+                        <div class="col form-group">
+                            <label for="editExpiryDate">Expiry Date:</label>
+                            <input type="date" class="form-control" id="editExpiryDate" name="editExpiryDate" required>
+                            <span id="edit-expiry-date-error" style="color: red; display: none;"></span>
+                        </div>
+                        <div class="col form-group">
+                            <label for="editOfferDays">Offer Period:</label>
+                            <input type="text" class="form-control" id="editOfferDays" name="editOfferDays" readonly>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col form-group">
+                            <label for="editOfferPercentage">Offer Percentage:</label>
+                            <input type="number" class="form-control" id="editOfferPercentage" name="editOfferPercentage" min="0" max="100" step="0.01" required>
+                            <span id="edit-percentage-error" style="color: red; display: none;"></span>
+                        </div>
+                        <div class="col form-group">
+                            <label for="editIsListed">Status:</label>
+                            <select class="form-control" id="editIsListed" name="editIsListed" required>
+                                <option value="true" class="text-success">List</option>
+                                <option value="false" class="text-danger">Unlist</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="updateOfferBtn">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Edit Offer Modal Ends-->
+
+
+
+<!-- --------------------------------------------------------------------------------- -->
+
+
+<!-- for sweet alert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- for modal -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+
+
+
+<%
+    <!-- function to format date as dd mm yyyy -->
+    function formatDate(date) {
+        const d = new Date(date);
+        const day = d.getDate().toString().padStart(2, '0');
+        const month = (d.getMonth() + 1).toString().padStart(2, '0');
+        const year = d.getFullYear();
+        return `${day}-${month}-${year}`;
+    }
+
+    <!-- function to show the difference between activation date and expiry date in offer table -->
+    function calculateDateDifference(activationDate, expiryDate) {
+        // Convert dates to JavaScript Date objects
+        const activation = new Date(activationDate);
+        const expiry = new Date(expiryDate);
+
+        // Calculate the difference in milliseconds
+        const differenceInMillis = expiry - activation;
+
+        // Convert milliseconds to days
+        const differenceInDays = Math.floor(differenceInMillis / (1000 * 60 * 60 * 24));
+
+        return differenceInDays;
+    }
+ %>
+
+
+
+
+<!-- script for add offer -->
+<script>
+    // to get current date in YYYY-MM-DD format
+    function getCurrentDate() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+        const day = now.getDate().toString().padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    // Set default current date to Start Date & Expiry Date input
+    $('#startDate').val(getCurrentDate());
+    $('#expiryDate').val(getCurrentDate());
+
+    $(document).ready(function() {
+
+        // Function to toggle display of other offer name input
+        function toggleOtherOffer() {
+            var offerNameSelect = $('#offerNameSelect');
+            var offerNameOtherInput = $('#offerNameOther');
+            
+            if (offerNameSelect.val() === 'Other') {
+                offerNameOtherInput.show();
+                offerNameOtherInput.prop('required', true); // Make it required when visible
+            } else {
+                offerNameOtherInput.hide();
+                offerNameOtherInput.prop('required', false); // Make it not required when hidden
+            }
+        }
+
+        // Call toggleOtherOffer on page load
+        toggleOtherOffer();
+
+        // Call toggleOtherOffer on dropdown change
+        $('#offerNameSelect').change(function() {
+            toggleOtherOffer();
+        });
+
+        function calculateDays(startDate, expiryDate) {
+            const start = new Date(startDate);
+            const expiry = new Date(expiryDate);
+            const diffTime = Math.abs(expiry - start);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+            return diffDays;
+        }
+
+        // Function to update the number of days
+        function updateDays() {
+            const startDate = document.getElementById('startDate').value;
+            const expiryDate = document.getElementById('expiryDate').value;
+            if (startDate && expiryDate) {
+                const days = calculateDays(startDate, expiryDate);
+                document.getElementById('offerDays').value = days + ' days';
+            } else {
+                document.getElementById('offerDays').value = '';
+            }
+        }
+
+        // Event listener for date changes
+        document.getElementById('startDate').addEventListener('change', updateDays);
+        document.getElementById('expiryDate').addEventListener('change', updateDays);
+
+        // Event listener for modal shown
+        $('#addOfferModal').on('shown.bs.modal', function () {
+            updateDays();
+        });
+
+        $('#saveOfferBtn').click(function() {
+            let offerName = $('#offerNameSelect').val();
+            let offerYear = $('#offerYear').val();
+            let offerNameOther = $('#offerNameOther').val();
+            let startDate = $('#startDate').val();
+            let expiryDate = $('#expiryDate').val();
+            let offerPercentage = $('#offerPercentage').val();
+            let isListed = $('#isListed').val() === 'true';
+
+            console.log('offerName :', offerName);
+            console.log('offerYear :', offerYear);
+            console.log('startDate :', startDate);
+            console.log('expiryDate :', expiryDate);
+            console.log('offerPercentage :', offerPercentage);
+            console.log('isListed :', isListed);
+
+            let isValid = true;
+            let offerNameError = $('#offer-name-error');
+            let otherOfferError = $('#other-offer-error');
+            let startDateError = $('#start-date-error');
+            let expiryDateError = $('#expiry-date-error');
+            let percentageError = $('#percentage-error');
+            const currentDate = new Date(getCurrentDate());
+            const start = new Date(startDate);
+            const expiry = new Date(expiryDate);
+
+            // validate offer name
+            if (!offerName || offerName === '') {
+                offerNameError.text('Choose an offer.').show();
+                isValid = false;
+            } else if (offerName === 'Other' && offerNameOther.trim() === '') {
+                otherOfferError.text('A valid offer name is required.').show();
+                isValid = false;
+            } else {
+                offerNameError.hide();
+                otherOfferError.hide();
+            }
+
+            // Validate dates
+            if (start < currentDate) {
+                startDateError.text('Start date cannot be earlier than today.').show();
+                isValid = false;
+            } else {
+                startDateError.hide();
+            }
+
+            if (expiry <= start) {
+                expiryDateError.text('Expiry date should be after the start date.').show();
+                isValid = false;
+            } else {
+                expiryDateError.hide();
+            }
+
+            // Validate offerPercentage
+            if (isNaN(offerPercentage)) {
+                percentageError.text('Offer percentage is required.').show();
+                isValid = false;
+            } else if (!offerPercentage) {
+                percentageError.text('Offer percentage is required.').show();
+                isValid = false;
+            } else if (offerPercentage == 0) {
+                percentageError.text('Please enter a value greater than 0 for offer percentage.').show();
+                isValid = false;
+            } else if (offerPercentage < 0) {
+                percentageError.text('Negative value is not allowed for offer percentage.').show();
+                isValid = false;
+            } else if (offerPercentage > 99.99) {
+                percentageError.text('The offer percentage should stay within 100 %.').show();
+                isValid = false;
+            } else {
+                percentageError.hide();
+            }
+
+            if (offerName === 'Other') {
+                offerName = offerNameOther.trim();
+            }
+
+            if (isValid) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/add-offer',
+                    data: JSON.stringify({
+                        offerName: offerName + ' ' + offerYear, // Combine offerName and offerYear
+                        offerPercentage,
+                        startDate,
+                        expiryDate,
+                        isListed,
+                    }),
+                    contentType: 'application/json',
+                    success: function(response) {
+                        console.log('Offer added successfully:', response);
+                        if (response.added) {
+                            Swal.fire({
+                                icon: 'success',
+                                text: 'New Offer added successfully.',
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(function() {
+                                location.reload(); // Reload page after success
+                            });
+                        } else if (response.exist) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: `<b> '${response.offerName}' </b> already exists.`,
+                                html: `<h5 class= "text-danger"> Please check the offer year or choose another offer.</h5>`,
+                                showConfirmButton: false
+                            });
+                        }
+                    },
+                    error: function(error) {
+                        console.error('Error adding offer:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            text: 'Error while adding new offer. Please try again.',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                });
+            }
+        });
+    });
+</script>
+
+
+
+<!-- script for manage offer (block & unblock) -->
+<script>
+    function manageOffer(offerId) {
+        console.log('offerid to send :', offerId);
+        
+        $.ajax({
+            type: 'PATCH',
+            url: '/admin/manage-offer',
+            data: JSON.stringify({ offerId }),
+            contentType: 'application/json',
+            success: function(response) {
+                if (response.done) {
+                    location.reload();
+                }
+            },
+            error: function(error) {
+                console.error('Error managing offer:', error);
+                Swal.fire({
+                    icon: 'error',
+                    text: 'Error while managing the offer. Please try again..',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+    }
+</script>
+
+
+
+<!-- script for edit offer -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // Function to calculate the number of days between two dates
+        function calculateDays(startDate, expiryDate) {
+            const start = new Date(startDate);
+            const expiry = new Date(expiryDate);
+            const diffTime = Math.abs(expiry - start);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+            return diffDays;
+        }
+
+        // Event listener for date changes
+        document.getElementById('editStartDate').addEventListener('change', updateDays);
+        document.getElementById('editExpiryDate').addEventListener('change', updateDays);
+
+
+        function updateDays() {
+            const startDate = document.getElementById('editStartDate').value;
+            const expiryDate = document.getElementById('editExpiryDate').value;
+            if (startDate && expiryDate) {
+                const days = calculateDays(startDate, expiryDate);
+                document.getElementById('editOfferDays').value = days + ' days';
+            } else {
+                document.getElementById('editOfferDays').value = '';
+            }
+        }
+
+        $('#editOfferModal').on('shown.bs.modal', function () {
+            updateDays();
+        });
+
+
+
+
+        
+        $('#editOfferModal').on('show.bs.modal', function (event) {
+            // to get the existing values in the fields
+            let button = $(event.relatedTarget);
+            let offerId = button.data('id');
+            let offerName = button.data('name');
+            let percentage = button.data('percentage');
+            let startDate = button.data('start-date');
+            let expiryDate = button.data('expiry-date');
+            let status = button.data('status');
+
+
+            // Split the offerName to handle 'Other' and 'Year'
+            let offerNameParts = offerName.split(" ");
+            let offerYear = offerNameParts.pop(); // Extract the last part (year)
+            offerName = offerNameParts.join(" "); // Join the remaining parts
+
+            console.log('offerNameParts :', offerNameParts);
+            console.log('offerYear :', offerYear);
+            console.log('offerName :', offerName);
+
+            let modal = $(this);
+            let predefinedOffers = ['Akshaya Tritiya', 'Diwali', 'Dhanteras', 'Bangle Fest', 'Bridal Bliss', 'Valentine\'s Day'];
+            if (!predefinedOffers.includes(offerName)) {
+                modal.find('#editOfferNameSelect').val('Other');
+                modal.find('#editOfferNameOther').val(offerName).show();
+            } else {
+                modal.find('#editOfferNameSelect').val(offerName);
+                modal.find('#editOfferNameOther').hide();
+            }
+
+            modal.find('#editOfferYear').val(offerYear);
+
+            modal.find('#editOfferPercentage').val(percentage);
+            modal.find('#editStartDate').val(new Date(startDate).toISOString().split('T')[0]);
+            modal.find('#editExpiryDate').val(new Date(expiryDate).toISOString().split('T')[0]);
+            modal.find('#editIsListed').val(status.toString());
+
+            // Toggle Other Offer Input
+            function toggleOtherOfferEdit() {
+                let offerNameSelect = $('#editOfferNameSelect');
+                let offerNameOtherInput = $('#editOfferNameOther');
+
+                if (offerNameSelect.val() === 'Other') {
+                    offerNameOtherInput.show().prop('required', true);
+                } else {
+                    offerNameOtherInput.hide().prop('required', false);
+                }
+            }
+
+            $('#editOfferNameSelect').change(function() {
+                toggleOtherOfferEdit();
+            });
+
+            // to update the edit form
+            $('#updateOfferBtn').click(function() {
+                let offerName = $('#editOfferNameSelect').val();
+                let offerYear = $('#editOfferYear').val();
+                let offerNameOther = $('#editOfferNameOther').val();
+                let startDate = $('#editStartDate').val();
+                let expiryDate = $('#editExpiryDate').val();
+                let offerPercentage = parseFloat($('#editOfferPercentage').val());
+                let isListed = $('#editIsListed').val() === 'true';
+
+                let isValid = true;
+
+                let offerNameError = $('#edit-offer-name-error');
+                let otherOfferError = $('#edit-other-offer-error');
+                let startDateError = $('#edit-start-date-error');
+                let expiryDateError = $('#edit-expiry-date-error');
+                let percentageError = $('#edit-percentage-error');
+
+
+                // Validate offer name
+                if (!offerName || offerName === '') {
+                    offerNameError.text('Choose an offer.').show();
+                    isValid = false;
+                } else if (offerName === 'Other' && offerNameOther.trim() === '') {
+                    otherOfferError.text('A valid offer name is required.').show();
+                    isValid = false;
+                } else {
+                    offerNameError.hide();
+                    otherOfferError.hide();
+                }
+
+                // Validate offer dates
+                if (expiryDate <= startDate) {
+                    expiryDateError.text('Expiry date should be after the start date.').show();
+                    isValid = false;
+                } else {
+                    expiryDateError.hide();
+                }
+
+
+                // Validate offerPercentage
+                if (isNaN(offerPercentage)) {
+                    percentageError.text('Offer percentage is required.').show();
+                    isValid = false;
+                } else if (!offerPercentage) {
+                    percentageError.text('Offer percentage is required.').show();
+                    isValid = false;
+                } else if (offerPercentage == 0) {
+                    percentageError.text('Please enter a value greater than 0 for offer percentage.').show();
+                    isValid = false;
+                } else if (offerPercentage < 0) {
+                    percentageError.text('Negative value is not allowed for offer percentage.').show();
+                    isValid = false;
+                } else if (offerPercentage > 99.99) {
+                    percentageError.text('The offer percentage should stay within 100 %.').show();
+                    isValid = false;
+                } else {
+                    percentageError.hide();
+                }
+
+                if (offerName === 'Other') {
+                    offerName = offerNameOther.trim();
+                }
+
+                if (isValid) {
+                    $.ajax({
+                        type: 'PUT',
+                        url: '/admin/edit-offer',
+                        data: JSON.stringify({
+                            offerId,
+                            offerName: offerName + ' ' + offerYear,
+                            offerPercentage,
+                            startDate,
+                            expiryDate,
+                            isListed,
+                        }),
+                        contentType: 'application/json',
+                        success: function(response) {
+                            if (response.updated) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    text: 'Offer updated successfully.',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(function() {
+                                    location.reload();
+                                });
+                            } else if (response.exist) {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: `<b> '${response.offerName}' </b> already exists.`,
+                                    html: `<h5 class= "text-danger"> Please check the offer year or choose another offer.</h5>`,
+                                    showConfirmButton: false
+                                });
+                            }
+                        },
+                        error: function(error) {
+                            console.error('Error editing offer:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                text: 'Error while editing offer. Please try again.',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    });
+</script>
+
+
+
+
+
+
+<%- include('../layouts/adminLayouts/adminDashboardFooter.ejs') %>

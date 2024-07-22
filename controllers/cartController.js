@@ -314,7 +314,7 @@ const placeOrder = async(req, res)=>{
         console.log('userCheckout.product : ', userCheckout.product);
 
         let individualTotal = 0;
-        let cartSubTotal = 0;   //total checkout amount without discount/wallet/
+        let cartSubTotal = 0;   //total checkout amount without discount/wallet/offer
         userCheckout.product.forEach((item)=>{
             individualTotal = (item.productRef.totalPrice * item.quantity);
             cartSubTotal += individualTotal;
@@ -359,8 +359,8 @@ const placeOrder = async(req, res)=>{
             shippingAddress : userAddress,
             subTotal : cartSubTotal,
             deliveryCharge : shippingCharge,
-            discountAmount : discountAmount,
-            netAmount : cartSubTotal + shippingCharge - discountAmount,  //wallet or offer consider if any
+            discountAmount : discountAmount,  // (give this total discount amount including offers & coupons)
+            netAmount : cartSubTotal + shippingCharge - discountAmount,  //wallet or offer or coupon consider if any
             paymentMethod: selectedPaymentMethod,
             paymentStatus : selectedPaymentMethod === 'Cash On Delivery' ? 'Pending' : selectedPaymentMethod === 'Online Payment' ? 'Processing' : selectedPaymentMethod === 'Wallet' ? 'Pending' : 'Pending' // || other if wallet or razorpay ?,
         });

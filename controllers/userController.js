@@ -1168,7 +1168,6 @@ const loadWallet = async (req, res)=>{
 
     } catch (error) {
         console.log('failed to load the user wallet :', error.message);
-        res.render('404'); // Render a 500 page for internal server error
 
     }
 }

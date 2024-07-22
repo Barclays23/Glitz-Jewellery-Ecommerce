@@ -119,11 +119,15 @@ const orderSchema = new mongoose.Schema({
         type : Number,
         required : true
     },
-    discountAmount : {
-        type : Number,
-        required : true
-    },
-    netAmount : {
+    // offerAmount : {   // discountAmount
+    //     type : Number,
+    //     required : true
+    // },
+    // couponAmount : {
+    //     type : Number,
+    //     required : true
+    // },
+    netAmount : {   // after all discounts
         type : Number,
         required : true,
     },

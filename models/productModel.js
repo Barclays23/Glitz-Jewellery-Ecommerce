@@ -59,14 +59,15 @@ const productSchema = new mongoose.Schema({
         type : Number,
         required: true
     },
+    offerRef : {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Offer',
+        // required: true
+    },
     quantity : {
         type: Number,
         required: true
     },
-    // images: {
-    //     type: Object,
-    //     required: true
-    // },
     images : {
         image1 : {
             type: String,

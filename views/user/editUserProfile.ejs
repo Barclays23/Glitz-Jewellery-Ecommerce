@@ -344,6 +344,8 @@
 <!-- Script for userProfiles.ejs -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+
+<!-- script for edit user profile -->
 <script>
     const fileInput = document.getElementById('acdetails-photo');
     const editIcon = document.querySelector('.edit-icon');
@@ -435,7 +437,7 @@
                         showConfirmButton: false,
                         timer: 1500
                     }).then(() => {
-                        location.reload();
+                        window.location.href = '/profile';
                         });
                 } else {
                     Swal.fire({
