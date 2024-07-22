@@ -55,11 +55,11 @@ const updateGoldRateManually = async(req, res)=>{
                         { new : true }
                     );
                     
-                    console.log('updated the price details of ',productData[i].code);
+                    // console.log('updated the price details of ',productData[i].code);
     
                 }
     
-                // console.log('updated the price details of each products');
+                console.log('updated the price details of each products');
                 return res.json({success: true});
             }
             
@@ -140,11 +140,11 @@ const updateGoldRateWithAPIs = async(req, res)=>{
                     { new : true }
                     );
 
-                    console.log('updated the price details of ', productData[i].code, '=', totalPrice);
+                    // console.log('updated the price details of ', productData[i].code, '=', totalPrice);
     
                 }
     
-                // console.log('updated the price details of each products');
+                console.log('updated the price details of each products');
             }
 
         }

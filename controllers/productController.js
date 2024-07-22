@@ -24,7 +24,7 @@ const loadProductList = async(req, res)=>{
             pageNo = req.query.page;
         }
 
-        const limit = 3;
+        const limit = 8;
 
         const productQuery = {
             _id: {$exists: true},

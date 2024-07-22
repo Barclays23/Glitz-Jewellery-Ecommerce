@@ -16,13 +16,6 @@
                     <table class="table">
                         <thead>
                             <tr class="text-center">
-                                <!-- <th>
-                                    <div class="form-check form-check-muted m-0">
-                                        <label class="form-check-label">
-                                            <input type="checkbox" class="form-check-input" id="check-all">
-                                        </label>
-                                    </div>
-                                </th> -->
                                 <th> No </th>
                                 <th> Image </th>
                                 <th> Category </th>
@@ -49,14 +42,6 @@
                                 for(let i=0; i < productData.length; i++){ %>
                                     <tr>
 
-                                        <!-- <td>
-                                            <div class="form-check form-check-muted m-0">
-                                                <label class="form-check-label">
-                                                    <input type="checkbox" class="form-check-input">
-                                                </label>
-                                            </div>
-                                        </td> -->
-
                                         <td> <%= (currentPage - 1) * limit + i + 1 %></td>
 
                                         <% if (productData[i].images.image1){ %>
@@ -77,57 +62,37 @@
 
                                         <td> <%= productData[i].name %> </td>
 
-                                        <% const grossWeight = Number(productData[i].grossWeight) %>
-                                        <td class="gross-weight"> <%= grossWeight.toFixed(3) %> </td>
+                                        <td class="gross-weight"> <%= productData[i].grossWeight.toFixed(3) %> </td>
 
-                                        <% const stoneWeight = Number(productData[i].stoneWeight) %>
-                                        <td class="stone-weight"> <%= stoneWeight.toFixed(3) %> </td>
+                                        <td class="stone-weight"> <%= productData[i].stoneWeight.toFixed(3) %> </td>
 
-                                        <% const netWeight = Number(productData[i].netWeight) %>
-                                        <td class="net-weight"> <%= netWeight.toFixed(3) %> </td>
+                                        <td class="net-weight"> <%= productData[i].netWeight.toFixed(3) %> </td>
 
                                         <td> <%= productData[i].VA %> % </td>
 
-                                        <% const metalCost = goldPriceData.price * productData[i].netWeight %>
-                                        <td class="metal-cost" style="text-align: right;"> <%= metalCost.toFixed(2) %> </td>
+                                        <td class="metal-cost" style="text-align: right;"> <%= productData[i].metalPrice.toFixed(2) %> </td>
 
-                                        <% const makingCharge = metalCost * productData[i].VA/100 %>
-                                        <td class="making-charge"> <%= (makingCharge).toFixed(2) %> </td>
+                                        <td class="making-charge"> <%= productData[i].makingCharge.toFixed(2) %> </td>
 
-                                        <% const stoneCharge = productData[i].stoneCharge %>
-                                        <td class="stone-charge"> <%= (stoneCharge).toFixed(2) %> </td>
+                                        <td class="stone-charge"> <%= productData[i].stoneCharge.toFixed(2) %> </td>
 
-                                        <% const GST = (metalCost + makingCharge + stoneCharge) * (3/100) %>
-                                        <td class="GST" style="text-align: right;"> <%= GST.toFixed(2) %> </td>
+                                        <td class="GST" style="text-align: right;"> <%= productData[i].GST.toFixed(2) %> </td>
 
-                                        <% const totalPrice = metalCost + makingCharge + stoneCharge + GST %>
-                                        <td class="total-price" style="text-align: right;"> <%= totalPrice.toFixed(2) %> </td>
+                                        <td class="total-price" style="text-align: right;"> <%= productData[i].totalPrice.toFixed(2) %> </td>
 
                                         <td class="quantity"> <%= productData[i].quantity %> </td>
 
                                         <% if(productData[i].isBlocked === false){ %>
                                             <td class="text-success">
-                                                <!-- <div class="badge badge-outline-success">Verified</div> -->
-                                                <!-- <div class="mdi badge-check-circle text-success">Verified</div> -->
                                                 Listed <i class="mdi mdi-check-circle text-success"></i>
                                             </td>
                                         <% } else{ %>
                                             <td class="text-danger">
-                                                <!-- <div class="badge badge-outline-danger">Not Verified</div> -->
                                                 Unlisted <i class="mdi mdi-do-not-disturb text-danger"></i>
                                             </td>
                                         <% } %>
 
                                         <td>
-                                            <!-- if (productData[i].categoryRef.isListed === true){
-                                                <% if (productData[i].isBlocked === true){ %>
-                                                    <a href="#" class="badge badge-secondary" id="blocked-product" style="text-decoration: none; color: black;" onclick="manageProduct('<%= productData[i]._id %>')">Unblock</a>
-                                                <% } else { %>
-                                                    <a href="#" class="badge badge-danger" id="unblocked-product" style="text-decoration: none" onclick="manageProduct('<%= productData[i]._id %>')">Block</a>
-                                                <% } %>
-                                            } else {
-
-                                            } -->
                                             
                                             <% if (productData[i].isBlocked === true){ %>
                                                 <a href="#" class="badge badge-secondary" id="blocked-product" style="text-decoration: none; color: black;" onclick="manageProduct('<%= productData[i]._id %>')">List</a>

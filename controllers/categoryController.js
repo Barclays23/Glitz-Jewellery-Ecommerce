@@ -28,7 +28,6 @@ const loadCategoryList = async(req, res)=>{
 const addCategory = async(req, res)=>{
     try {
         const {categoryName, categoryDescription, categoryStatus} = req.body
-        console.log(req.body);
 
         const existCategory = await Category.findOne({name: categoryName});
 
@@ -39,8 +38,8 @@ const addCategory = async(req, res)=>{
             const isListed = categoryStatus === "list";
 
             const category = new Category({
-                name : req.body.categoryName,
-                description : req.body.categoryDescription,
+                name : categoryName,
+                description : categoryDescription,
                 isListed : isListed
             });
 
@@ -113,6 +112,5 @@ const updateCategory = async(req, res)=>{
 module.exports = {
     loadCategoryList,
     addCategory,
-    // loadEditCategory,
     updateCategory
 }

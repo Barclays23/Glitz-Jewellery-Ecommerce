@@ -160,6 +160,7 @@ const loadOrderItems = async(req, res)=>{
 
 
 
+
 // update order status -------------------------------------
 const updateOrderStatus = async(req, res)=>{
     try {
@@ -186,7 +187,6 @@ const updateOrderStatus = async(req, res)=>{
         return res.json({error : true});
     }
 }
-
 
 
 
