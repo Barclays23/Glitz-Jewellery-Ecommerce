@@ -88,8 +88,8 @@ adminRoute.patch('/manage-offer', adminAuth.isLogin, offerController.manageOffer
 
 // COUPON CONTROLLER ROUTES
 adminRoute.get('/coupons', adminAuth.isLogin, couponController.loadCouponList);
-adminRoute.post('/add-coupon', adminAuth.isLogin, couponController.addCoupon);
-adminRoute.put('/edit-coupon', adminAuth.isLogin, couponController.editCoupon);
+adminRoute.post('/add-coupon', adminAuth.isLogin, multer.uploadCouponImage, couponController.addCoupon);
+adminRoute.put('/edit-coupon', adminAuth.isLogin, multer.uploadCouponImage, couponController.editCoupon);
 adminRoute.patch('/manage-coupon', adminAuth.isLogin, couponController.manageCoupon);
 
 

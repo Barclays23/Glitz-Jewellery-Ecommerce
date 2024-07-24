@@ -116,6 +116,8 @@ const editOffer = async (req, res)=>{
 }
 
 
+
+
 // manage offer ----------------------------------
 const manageOffer = async (req, res)=>{
     try {

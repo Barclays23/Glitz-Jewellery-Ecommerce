@@ -13,27 +13,57 @@ const loadProductList = async(req, res)=>{
         const adminData = await User.findOne({_id: req.session.adminId});
         const goldPriceData = await GoldPrice.findOne({_id: {$exists: true}});
 
+        const searchQuery = req.query.search || '';
+        console.log('searchQuery : ', searchQuery);
 
-        let search = '';
-        if(req.query.search){
-            search = req.query.search;
-        }
+        const statusQuery = req.query['filter-status'] || 'all';
+        console.log('statusQuery : ', statusQuery);
+
+        const categoryQuery = req.query['filter-category'] || 'all';
+        console.log('categoryQuery : ', categoryQuery);
+
+        const sortQuery = req.query.sort || 'none';
+        console.log('sortQuery : ', sortQuery);
+
 
         let pageNo = parseInt(req.query.page) || 1;
-        if(req.query.page){
-            pageNo = req.query.page;
+
+        const limit = 5;
+
+        let productQuery = {};
+
+        // searching
+        if(searchQuery){
+            productQuery.$or = [
+                {name: {$regex: '.*' + searchQuery + '.*', $options: 'i'}},
+                {code: {$regex: '.*' + searchQuery + '.*', $options: 'i'}},
+            ];
         }
 
-        const limit = 8;
 
-        const productQuery = {
-            _id: {$exists: true},
-            $or: [
-                {name: {$regex: '.*' + search + '.*', $options: 'i'}},
-                {category: {$regex: '.*' + search + '.*', $options: 'i'}},
-                {code: {$regex: '.*' + search + '.*', $options: 'i'}},
-            ]
-        };
+        // filtering
+        if (statusQuery !== 'all') {
+            productQuery.isBlocked = statusQuery === 'true';
+        }
+        
+
+        if (categoryQuery !== 'all') {
+            const category = await Category.findOne({ name: categoryQuery });
+            if (category) {
+                productQuery.categoryRef = category._id;
+            }
+        }
+
+
+        // sorting
+        const sortOptions = {};    // (need to sort gross wt, net wt, stone wt, VA, tota price, qty)
+        // if (sortQuery === 'orderNo-asc') {
+        //     sortOptions.orderNo = 1;
+        // } else if (sortQuery === 'orderNo-desc') {
+        //     sortOptions.orderNo = -1;
+        // } else {
+        //     sortOptions.orderDate = -1; // Default sorting by order date descending
+        // }
 
 
         const productData = await Product.find(productQuery)
@@ -47,6 +77,9 @@ const loadProductList = async(req, res)=>{
 
         let totalPages = Math.ceil(count / limit);
 
+        const startIndex = (pageNo - 1) * limit + 1;
+        const endIndex = Math.min(pageNo * limit, count)
+
         const categoryData = await Category.find({});
 
         res.render('productList', {
@@ -54,10 +87,15 @@ const loadProductList = async(req, res)=>{
             goldPriceData,
             productData,
             categoryData,
-            search,
+            searchQuery,   // searchQuery
+            categoryQuery,
+            statusQuery,
+            sortQuery,
             count,
             limit,
             totalPages,
+            startIndex,
+            endIndex,
             currentPage: pageNo,
         });
 

@@ -12,13 +12,25 @@
                 <div style="text-align: right;">
                     <button type="button" class="btn btn-success add-product" data-toggle="modal" data-target="#addProductModal">Add Product</button>
                 </div>
+                <div class="count-view flex-item text-success">
+                    <p style="font-size: 16px;">Showing <%= startIndex %> to <%= endIndex %> of <%= count %></p>
+                </div>
                 <div class="table-responsive">
                     <table class="table">
                         <thead>
                             <tr class="text-center">
                                 <th> No </th>
                                 <th> Image </th>
-                                <th> Category </th>
+                                <th>
+                                    <select name="filter-category" onchange="location.href='?filter-category=' + this.value + '&sort=<%= sortQuery %>&filter-status=<%= statusQuery %>'">
+                                        <option value="all" <%= categoryQuery === 'all' ? 'selected' : '' %>>Category</option>
+                                        <% for (let i = 0; i < categoryData.length; i++) { %>
+                                            <option value="<%= categoryData[i].name %>" <%= categoryQuery === categoryData[i].name ? 'selected' : '' %>>
+                                                <%= categoryData[i].name %>
+                                            </option>
+                                        <% } %>
+                                    </select>
+                                </th>                               
                                 <th> Product Code </th>
                                 <th> Purity </th>
                                 <th> Product Name </th>
@@ -50,8 +62,8 @@
                                             <td class="text-danger"> (No Image) </td>
                                         <% } %>
 
-                                        <% if(productData[i].categoryRef.isListed === true){ %>
-                                        <td class="text-success"> <%= productData[i].categoryRef.name %> </td>
+                                        <% if (productData[i].categoryRef.isListed === true){ %>
+                                            <td class="text-success"> <%= productData[i].categoryRef.name %> </td>
                                         <% } else { %>
                                             <td class="text-danger"> <%= productData[i].categoryRef.name %> </td>
                                         <% } %>
@@ -141,15 +153,15 @@
                     <br>
 
                     <div class="list-pagination text-center">
-
                         <% for(let j=1; j <= totalPages; j++){ %>
-                            <% if (j === currentPage) { %>
-                                <span class="active"><%= j %></span>
-                            <% } else { %>
-                                <a href="?page=<%= j %>&search=<%= search %>"><%= j %></a>
+                            <% if (currentPage == j) { %>
+                                <a href="?page=<%= j %>&sort=<%= sortQuery %>&search=<%= searchQuery %>&filter-category=<%= categoryQuery %>&filter-status=<%= statusQuery %>" class="active"><%= j %></a>
+                            <% } else{ %>
+                                <a href="?page=<%= j %>&sort=<%= sortQuery %>&search=<%= searchQuery %>&filter-category=<%= categoryQuery %>&filter-status=<%= statusQuery %>"><%= j %></a>
                             <% } %>
                         <% } %>
                     </div>
+                    
                 </div>
             </div>
         </div>

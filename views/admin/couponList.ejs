@@ -20,6 +20,7 @@
                         <thead>
                             <tr>
                                 <th class="text-center"> No </th>
+                                <th>Image</th>
                                 <th> Coupon Name </th>
                                 <th> Coupon Code </th>
                                 <th class="text-center"> Start Date </th>
@@ -37,6 +38,14 @@
                                 for(let i=0; i< couponData.length; i++){ %>
                                     <tr>
                                         <td class="text-center"> <%= i+1 %> </td>
+
+                                        <% console.log('coupon image in the list :', couponData[i].image) %>
+
+                                        <% if(couponData[i].image){ %>
+                                            <td> <img src="/assets/images/couponImages/<%= couponData[i].image %>" alt="<%= couponData[i].name %>" style="width: 150px; height: auto; border-radius: 0%;"> </td>
+                                        <% } else{ %>
+                                            <td>(NO IMAGE)</td>
+                                        <% } %>
 
                                         <td> <%= couponData[i].name %> </td>
 
@@ -85,6 +94,7 @@
                                                 data-toggle="modal" 
                                                 data-target="#editCouponModal"
                                                 data-id="<%= couponData[i]._id %>" 
+                                                data-image="<%= couponData[i].image %>" 
                                                 data-name="<%= couponData[i].name %>" 
                                                 data-code="<%= couponData[i].code %>" 
                                                 data-count="<%= couponData[i].couponCount %>" 
@@ -129,7 +139,17 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="add-coupon-form">
+                <form id="add-coupon-form" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col">
+                                <input type="file" class="form-control" id="coupon-image" name="coupon-image" accept="image/*" style="display: none;">
+                                <button type="button" class="btn btn-primary mb-2" style="height: min-content;" onclick="document.getElementById('coupon-image').click()">Insert Image</button>
+                                <img id="coupon-image-preview" style="width: 200px; height: auto;"/>
+                            </div>
+                            <span id="coupon-image-error" style="color: red; display: none;"></span>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col form-group">
                             <label for="couponName">Coupon Name:</label>
@@ -207,8 +227,18 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="edit-coupon-form">
+                <form id="edit-coupon-form" enctype="multipart/form-data">
                     <div class="row">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col">
+                                    <input type="file" class="form-control" id="edit-coupon-image" name="coupon-image" accept="image/*" style="display: none;">
+                                    <button type="button" class="btn btn-primary mb-2" style="height: min-content;" onclick="document.getElementById('edit-coupon-image').click()">Change Image</button>
+                                    <img id="edit-coupon-image-preview" style="width: 200px; height: auto;"/>
+                                </div>
+                                <span id="edit-coupon-image-error" style="color: red; display: none;"></span>
+                            </div>
+                        </div>
                         <div class="col form-group">
                             <label for="editCouponName">Coupon Name:</label>
                             <input type="text" class="form-control" id="editCouponName" name="editCouponName" required>
@@ -330,9 +360,24 @@
     $('#startDate').val(getCurrentDate());
     $('#expiryDate').val(getCurrentDate());
 
-    $(document).ready(function() {
 
+    // Show image preview
+    document.getElementById('coupon-image').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('coupon-image-preview').src = e.target.result;
+                document.getElementById('coupon-image-preview').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+
+    $(document).ready(function() {
         $('#saveCouponBtn').click(function() {
+            let couponImage = $('#coupon-image')[0].files[0];
             let couponName = $('#couponName').val().trim();
             let couponCode = $('#couponCode').val().trim();
             let criteriaAmount = parseFloat($('#criteriaAmount').val());
@@ -342,6 +387,7 @@
             let couponCount = parseInt($('#couponCount').val());
             let isActive = $('#isActive').val();
 
+            console.log('couponImage :', couponImage);
             console.log('couponName :', couponName);
             console.log('couponCode :', couponCode);
             console.log('criteriaAmount :', criteriaAmount);
@@ -353,6 +399,7 @@
 
             let isValid = true;
 
+            let couponImageError = $('#coupon-image-error');
             let couponNameError = $('#coupon-name-error');
             let couponCodeError = $('#coupon-code-error');
             let criteriaAmountError = $('#criteria-amount-error');
@@ -360,6 +407,14 @@
             let startDateError = $('#start-date-error');
             let expiryDateError = $('#expiry-date-error');
             let couponCountError = $('#coupon-count-error');
+
+            // Validate coupon image
+            if(!couponImage){
+                couponImageError.text('Coupon image is required.').show();
+                isValid = false;
+            } else {
+                couponImageError.hide();
+            }
 
             // Validate coupon name
             const couponNameRegex = /^[A-Za-z0-9\s]+$/;
@@ -397,27 +452,27 @@
                 isValid = false;
             } else if (criteriaAmount >= 15000 && criteriaAmount < 25000 && couponValue > 300) {
                 // max 300 for criteriaAmount 15000 - 25000
-                couponValueError.text('Maximum ₹300 for criteria amount upto ₹25000.').show();
+                couponValueError.text('Maximum ₹300 for criteria ₹15000 to ₹25000.').show();
                 isValid = false;
-            } else if (criteriaAmount >= 25000 && criteriaAmount <= 50000 && couponValue > 500) {
+            } else if (criteriaAmount >= 25000 && criteriaAmount < 50000 && couponValue > 500) {
                 // max 500 for criteriaAmount 25000 - 50000
-                couponValueError.text('Maximum ₹500 for criteria amount upto ₹50000.').show();
+                couponValueError.text('Maximum ₹500 for criteria ₹25000 to ₹50000.').show();
                 isValid = false;
-            } else if (criteriaAmount > 50000 && criteriaAmount <= 100000 && couponValue > 1000) {
+            } else if (criteriaAmount >= 50000 && criteriaAmount < 100000 && couponValue > 1000) {
                 // max 1000 for criteriaAmount 50000 - 100000
-                couponValueError.text('Maximum ₹1000 for criteria amount upto ₹100000.').show();
+                couponValueError.text('Maximum ₹1000 for criteria ₹50000 to ₹100000.').show();
                 isValid = false;
-            } else if (criteriaAmount > 100000 && criteriaAmount <= 150000 && couponValue > 1500) {
+            } else if (criteriaAmount >= 100000 && criteriaAmount < 150000 && couponValue > 1500) {
                 // max 1500 for criteriaAmount 100000 - 150000
-                couponValueError.text('Maximum ₹1500 for criteria amount upto ₹150000.').show();
+                couponValueError.text('Maximum ₹1500 for criteria ₹100000 to ₹150000.').show();
                 isValid = false;
-            } else if (criteriaAmount > 150000 && criteriaAmount < 200000 && couponValue > 2000) {
-                // max 2000 for criteriaAmount 175000 - 200000
-                couponValueError.text('Maximum ₹2000 for criteria amount upto ₹200000.').show();
+            } else if (criteriaAmount >= 150000 && criteriaAmount < 200000 && couponValue > 2000) {
+                // max 2000 for criteriaAmount 150000 - 200000
+                couponValueError.text('Maximum ₹2000 for criteria ₹150000 to ₹200000.').show();
                 isValid = false;
-            } else if (criteriaAmount >= 200000 && couponValue > criteriaAmount * 1.25 /100) {
+            } else if (criteriaAmount >= 200000 && couponValue > criteriaAmount * 1.75 /100) {
                 // max 1.25% of criteriaAmount above 175000
-                couponValueError.text('Maximum 1.25% of criteria amount ₹200000 & above.').show();
+                couponValueError.text('Maximum 1.5% of criteria amount ₹200000 & above.').show();
                 isValid = false;
             } else if (couponValue > criteriaAmount) {
                 couponValueError.text('Coupon value must be less than criteria amount.').show();
@@ -457,20 +512,23 @@
             }
 
             if (isValid) {
+                let formData = new FormData();
+                formData.append('coupon-image', couponImage);
+                formData.append('couponName', couponName);
+                formData.append('couponCode', couponCode);
+                formData.append('criteriaAmount', criteriaAmount);
+                formData.append('couponValue', couponValue);
+                formData.append('startDate', startDate);
+                formData.append('expiryDate', expiryDate);
+                formData.append('couponCount', couponCount);
+                formData.append('isActive', isActive);
+
                 $.ajax({
                     type: 'POST',
                     url: '/admin/add-coupon',
-                    data: JSON.stringify({
-                        couponName,
-                        couponCode,
-                        criteriaAmount,
-                        couponValue,
-                        startDate,
-                        expiryDate,
-                        couponCount,
-                        isActive
-                    }),
-                    contentType: 'application/json',
+                    data: formData,
+                    processData: false, // Prevent jQuery from automatically transforming the data into a query string
+                    contentType: false, // Prevent jQuery from setting contentType header
                     success: function(response) {
                         if (response.created) {
                             Swal.fire({
@@ -520,6 +578,31 @@
     }
 
 
+    // Show image preview
+    function updateImagePreview(imageUrl) {
+        const preview = document.getElementById('edit-coupon-image-preview');
+        if (imageUrl) {
+            preview.src = `/assets/images/couponImages/${imageUrl}`;
+            preview.style.display = 'block';
+        } else {
+            preview.src = '';
+            preview.style.display = 'none';
+        }
+    }
+
+    document.getElementById('edit-coupon-image').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('edit-coupon-image-preview').src = e.target.result;
+                document.getElementById('edit-coupon-image-preview').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+
     $(document).ready(function() {
         // Load coupon data into the form when the modal opens
         $('#editCouponModal').on('show.bs.modal', function(event) {
@@ -527,6 +610,7 @@
 
             // Extract data attributes from the button
             let couponId = button.data('id');
+            let couponImage = button.data('image');
             let couponName = button.data('name');
             let couponCode = button.data('code');
             let criteriaAmount = button.data('used-criteria-amount');
@@ -536,15 +620,17 @@
             let couponCount = button.data('count');
             let status = button.data('is-active');
 
-            console.log('1 couponId :', couponId);
-            console.log('1 couponName :', couponName);
-            console.log('1 couponCode :', couponCode);
-            console.log('1 criteriaAmount :', criteriaAmount);
-            console.log('1 couponValue :', couponValue);
-            console.log('1 startDate :', startDate);
-            console.log('1 expiryDate :', expiryDate);
-            console.log('1 couponCount :', couponCount);
-            console.log('1 status :', status);
+
+            console.log('loaded couponId :', couponId);
+            console.log('loaded couponImage :', couponImage);
+            console.log('loaded couponName :', couponName);
+            console.log('loaded couponCode :', couponCode);
+            console.log('loaded criteriaAmount :', criteriaAmount);
+            console.log('loaded couponValue :', couponValue);
+            console.log('loaded startDate :', startDate);
+            console.log('loaded expiryDate :', expiryDate);
+            console.log('loaded couponCount :', couponCount);
+            console.log('loaded status :', status);
 
             // Set values to the form fields
             $('#editCouponName').val(couponName);
@@ -556,163 +642,190 @@
             $('#editCouponCount').val(couponCount);
             $('#editIsActive').val(status.toString());
 
+            // Show existing image preview
+            updateImagePreview(couponImage);
 
 
             $('#updateCouponBtn').click(function() {
-            let couponName = $('#editCouponName').val().trim();
-            let couponCode = $('#editCouponCode').val().trim();
-            let criteriaAmount = parseFloat($('#editCriteriaAmount').val());
-            let couponValue = parseFloat($('#editCouponValue').val());
-            let startDate = $('#editStartDate').val();
-            let expiryDate = $('#editExpiryDate').val();
-            let couponCount = parseInt($('#editCouponCount').val());
-            let isActive = $('#editIsActive').val();
+                couponImage = $('#edit-coupon-image')[0].files[0]; // Get the file object if it's changed
+                let couponName = $('#editCouponName').val().trim();
+                let couponCode = $('#editCouponCode').val().trim();
+                let criteriaAmount = parseFloat($('#editCriteriaAmount').val());
+                let couponValue = parseFloat($('#editCouponValue').val());
+                let startDate = $('#editStartDate').val();
+                let expiryDate = $('#editExpiryDate').val();
+                let couponCount = parseInt($('#editCouponCount').val());
+                let isActive = $('#editIsActive').val();
 
-            console.log('couponName :', couponName);
-            console.log('couponCode :', couponCode);
-            console.log('criteriaAmount :', criteriaAmount);
-            console.log('couponValue :', couponValue);
-            console.log('startDate :', startDate);
-            console.log('expiryDate :', expiryDate);
-            console.log('couponCount :', couponCount);
-            console.log('isActive :', isActive);
+                console.log('sending couponImage :', couponImage);
+                console.log('sending couponName :', couponName);
+                console.log('sending couponCode :', couponCode);
+                console.log('sending criteriaAmount :', criteriaAmount);
+                console.log('sending couponValue :', couponValue);
+                console.log('sending startDate :', startDate);
+                console.log('sending expiryDate :', expiryDate);
+                console.log('sending couponCount :', couponCount);
+                console.log('sending isActive :', isActive);
 
-            let isValid = true;
+                let isValid = true;
 
-            let couponNameError = $('#edit-coupon-name-error');
-            let couponCodeError = $('#edit-coupon-code-error');
-            let criteriaAmountError = $('#edit-criteria-amount-error');
-            let couponValueError = $('#edit-coupon-value-error');
-            let startDateError = $('#edit-start-date-error');
-            let expiryDateError = $('#edit-expiry-date-error');
-            let couponCountError = $('#edit-coupon-count-error');
-
-            // Validate coupon name
-            const couponNameRegex = /^[A-Za-z0-9\s]+$/;
-            if (!couponName || couponName === '') {
-                couponNameError.text('Coupon name is required.').show();
-                isValid = false;
-            } else if (!couponNameRegex.test(couponName)) {
-                couponNameError.text('Only letters & numbers allowed for coupon name.').show();
-                isValid = false;
-            } else {
-                couponNameError.hide();
-            }
-
-            // Validate criteria amount
-            if(!criteriaAmount){
-                criteriaAmountError.text('Criteria amount is required.').show();
-                isValid = false;
-            } else if (isNaN(criteriaAmount) || criteriaAmount <= 0) {
-                criteriaAmountError.text('Criteria amount should be a positive number.').show();
-                isValid = false;
-            } else if (criteriaAmount < 15000) {
-                criteriaAmountError.text('Minimum criteria amount is 15000.').show();
-                isValid = false;
-            } else {
-                criteriaAmountError.hide();
-            }
-
-            // Validate coupon value
-            if (!couponValue){
-                couponValueError.text('Coupon value is required.').show();
-                isValid = false;
-            } else if (isNaN(couponValue) || couponValue <= 0) {
-                couponValueError.text('Coupon value should be a positive number.').show();
-                isValid = false;
-            } else if (criteriaAmount >= 15000 && criteriaAmount < 25000 && couponValue > 300) {
-                couponValueError.text('Maximum ₹300 for criteria amount upto ₹25000.').show();
-                isValid = false;
-            } else if (criteriaAmount >= 25000 && criteriaAmount <= 50000 && couponValue > 500) {
-                couponValueError.text('Maximum ₹500 for criteria amount upto ₹50000.').show();
-                isValid = false;
-            } else if (criteriaAmount > 50000 && criteriaAmount <= 100000 && couponValue > 1000) {
-                couponValueError.text('Maximum ₹1000 for criteria amount upto ₹100000.').show();
-                isValid = false;
-            } else if (criteriaAmount > 100000 && criteriaAmount <= 150000 && couponValue > 1500) {
-                couponValueError.text('Maximum ₹1500 for criteria amount upto ₹150000.').show();
-                isValid = false;
-            } else if (criteriaAmount > 150000 && criteriaAmount < 200000 && couponValue > 2000) {
-                couponValueError.text('Maximum ₹2000 for criteria amount upto ₹200000.').show();
-                isValid = false;
-            } else if (criteriaAmount >= 200000 && couponValue > criteriaAmount * 1.25 /100) {
-                couponValueError.text('Maximum 1.25% of criteria amount ₹200000 & above.').show();
-                isValid = false;
-            } else if (couponValue > criteriaAmount) {
-                couponValueError.text('Coupon value must be less than criteria amount.').show();
-                isValid = false;
-            } else {
-                couponValueError.hide();
-            }
+                let couponImageError = $('#edit-coupon-image-error');
+                let couponNameError = $('#edit-coupon-name-error');
+                let couponCodeError = $('#edit-coupon-code-error');
+                let criteriaAmountError = $('#edit-criteria-amount-error');
+                let couponValueError = $('#edit-coupon-value-error');
+                let startDateError = $('#edit-start-date-error');
+                let expiryDateError = $('#edit-expiry-date-error');
+                let couponCountError = $('#edit-coupon-count-error');
 
 
-            // Validate coupon count
-            if (!couponCount){
-                couponCountError.text('Coupon count is required.').show();
-                isValid = false;
-            } else if (isNaN(couponCount) || couponCount <= 0) {
-                couponCountError.text('Coupon count should be a positive number.').show();
-                isValid = false;
-            } else {
-                couponCountError.hide();
-            }
+                // // Validate coupon image
+                // if(!couponImage){
+                //     couponImageError.text('Coupon image is required.').show();
+                //     isValid = false;
+                // } else {
+                //     couponImageError.hide();
+                // }
+
+                // Validate coupon name
+                const couponNameRegex = /^[A-Za-z0-9\s]+$/;
+                if (!couponName || couponName === '') {
+                    couponNameError.text('Coupon name is required.').show();
+                    isValid = false;
+                } else if (!couponNameRegex.test(couponName)) {
+                    couponNameError.text('Only letters & numbers allowed for coupon name.').show();
+                    isValid = false;
+                } else {
+                    couponNameError.hide();
+                }
+
+                // Validate criteria amount
+                if(!criteriaAmount){
+                    criteriaAmountError.text('Criteria amount is required.').show();
+                    isValid = false;
+                } else if (isNaN(criteriaAmount) || criteriaAmount <= 0) {
+                    criteriaAmountError.text('Criteria amount should be a positive number.').show();
+                    isValid = false;
+                } else if (criteriaAmount < 15000) {
+                    criteriaAmountError.text('Minimum criteria amount is 15000.').show();
+                    isValid = false;
+                } else {
+                    criteriaAmountError.hide();
+                }
+
             
+                // Validate coupon value
+                if (!couponValue){
+                    couponValueError.text('Coupon value is required.').show();
+                    isValid = false;
+                } else if (isNaN(couponValue) || couponValue <= 0) {
+                    couponValueError.text('Coupon value should be a positive number.').show();
+                    isValid = false;
+                } else if (criteriaAmount >= 15000 && criteriaAmount < 25000 && couponValue > 300) {
+                    // max 300 for criteriaAmount 15000 - 25000
+                    couponValueError.text('Maximum ₹300 for criteria ₹15000 to ₹25000.').show();
+                    isValid = false;
+                } else if (criteriaAmount >= 25000 && criteriaAmount < 50000 && couponValue > 500) {
+                    // max 500 for criteriaAmount 25000 - 50000
+                    couponValueError.text('Maximum ₹500 for criteria ₹25000 to ₹50000.').show();
+                    isValid = false;
+                } else if (criteriaAmount >= 50000 && criteriaAmount < 100000 && couponValue > 1000) {
+                    // max 1000 for criteriaAmount 50000 - 100000
+                    couponValueError.text('Maximum ₹1000 for criteria ₹50000 to ₹100000.').show();
+                    isValid = false;
+                } else if (criteriaAmount >= 100000 && criteriaAmount < 150000 && couponValue > 1500) {
+                    // max 1500 for criteriaAmount 100000 - 150000
+                    couponValueError.text('Maximum ₹1500 for criteria ₹100000 to ₹150000.').show();
+                    isValid = false;
+                } else if (criteriaAmount >= 150000 && criteriaAmount < 200000 && couponValue > 2000) {
+                    // max 2000 for criteriaAmount 150000 - 200000
+                    couponValueError.text('Maximum ₹2000 for criteria ₹150000 to ₹200000.').show();
+                    isValid = false;
+                } else if (criteriaAmount >= 200000 && couponValue > criteriaAmount * 1.75 /100) {
+                    // max 1.25% of criteriaAmount above 175000
+                    couponValueError.text('Maximum 1.5% of criteria amount ₹200000 & above.').show();
+                    isValid = false;
+                } else if (couponValue > criteriaAmount) {
+                    couponValueError.text('Coupon value must be less than criteria amount.').show();
+                    isValid = false;
+                } else {
+                    couponValueError.hide();
+                }
 
-            // Validate coupon dates
-            if (expiryDate <= startDate) {
-                expiryDateError.text('Expiry date should be after the start date.').show();
-                isValid = false;
-            } else {
-                expiryDateError.hide();
-            }
+                // Validate coupon count
+                if (!couponCount){
+                    couponCountError.text('Coupon count is required.').show();
+                    isValid = false;
+                } else if (isNaN(couponCount) || couponCount <= 0) {
+                    couponCountError.text('Coupon count should be a positive number.').show();
+                    isValid = false;
+                } else {
+                    couponCountError.hide();
+                }
+                
 
-            if (isValid) {
-                $.ajax({
-                    type: 'PUT',
-                    url: '/admin/edit-coupon',
-                    data: JSON.stringify({
-                        couponId,
-                        couponName,
-                        couponCode,
-                        criteriaAmount,
-                        couponValue,
-                        startDate,
-                        expiryDate,
-                        couponCount,
-                        isActive
-                    }),
-                    contentType: 'application/json',
-                    success: function(response) {
-                        if (response.updated) {
+                // Validate coupon dates
+                if (expiryDate <= startDate) {
+                    expiryDateError.text('Expiry date should be after the start date.').show();
+                    isValid = false;
+                } else {
+                    expiryDateError.hide();
+                }
+
+                
+
+                if (isValid) {
+                    let formData = new FormData();
+                    formData.append('couponId', couponId);
+                    formData.append('couponName', couponName);
+                    formData.append('couponCode', couponCode);
+                    formData.append('criteriaAmount', criteriaAmount);
+                    formData.append('couponValue', couponValue);
+                    formData.append('startDate', startDate);
+                    formData.append('expiryDate', expiryDate);
+                    formData.append('couponCount', couponCount);
+                    formData.append('isActive', isActive);
+
+                    if (couponImage) {
+                        formData.append('coupon-image', couponImage);
+                    }
+
+                    $.ajax({
+                        type: 'PUT',
+                        url: '/admin/edit-coupon',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            if (response.updated) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    text: 'Coupon has been updated successfully.',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(function() {
+                                    location.reload();
+                                });
+                            } else if (response.exist) {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: `<b> '${response.couponName}' </b> already exists.`,
+                                    html: `<h5 class= "text-danger"> Please check the coupon code or choose another name.</h5>`,
+                                    showConfirmButton: false
+                                });
+                            }
+                        },
+                        error: function(error) {
+                            console.error('Error updating coupon:', error);
                             Swal.fire({
-                                icon: 'success',
-                                text: 'Coupon has been updated successfully.',
-                                timer: 1500,
-                                showConfirmButton: false
-                            }).then(function() {
-                                location.reload();
-                            });
-                        } else if (response.exist) {
-                            Swal.fire({
-                                icon: 'warning',
-                                title: `<b> '${response.couponName}' </b> already exists.`,
-                                html: `<h5 class= "text-danger"> Please check the coupon code or choose another name.</h5>`,
-                                showConfirmButton: false
+                                icon: 'error',
+                                text: 'Error while updating coupon. Please try again.',
+                                confirmButtonText: 'OK'
                             });
                         }
-                    },
-                    error: function(error) {
-                        console.error('Error updating coupon:', error);
-                        Swal.fire({
-                            icon: 'error',
-                            text: 'Error while updating coupon. Please try again.',
-                            confirmButtonText: 'OK'
-                        });
-                    }
-                });
-            }
-        });
-
+                    });
+                }
+            });
 
         });
 

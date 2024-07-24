@@ -47,10 +47,32 @@ const uploadUserImages = multer({ storage: userStorage }).single('profile-pic');
 
 
 
+
+
+// -----------------------------------------------------------
+// Configure multer for coupon image uploads
+const couponStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, path.join(__dirname,'../public/assets/images/couponImages'));
+    },
+    filename: (req, file, cb) => {
+        // const fileName = Date.now()+'-'+file.originalname;
+        cb(null, Date.now() + path.extname(file.originalname)); // Create a unique filename
+    }
+});
+const uploadCouponImage = multer({ storage: couponStorage }).single('coupon-image'); //input type name="" in form
+
+
+
+
+
+
+
 module.exports = {
     uploadUserImages,
     uploadProductImages,
-    modifyProductImages
+    modifyProductImages,
+    uploadCouponImage
 }
 
 

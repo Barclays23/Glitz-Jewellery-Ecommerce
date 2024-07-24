@@ -41,6 +41,10 @@ const addCoupon = async(req, res)=>{
             isActive} = req.body;
         console.log('received data to add coupon :', req.body);
 
+        const couponImage = req.file ? req.file.filename : null;
+        console.log('received image of coupon :', couponImage);
+
+
         existingCoupon = await Coupon.findOne({
             $or: [
               { name: couponName },
@@ -57,6 +61,7 @@ const addCoupon = async(req, res)=>{
                 {
                     name : couponName,
                     code : couponCode,
+                    image : couponImage,
                     criteriaAmount: criteriaAmount,
                     couponValue: couponValue,
                     activationDate: startDate,
@@ -99,28 +104,52 @@ const editCoupon = async (req, res)=>{
 
         console.log('data recieved for editing coupon :', req.body);
 
+        const couponImage = req.file ? req.file.filename : null;
+        console.log('received image of coupon :', couponImage);
+
         const existingCoupon = await Coupon.findOne({name: couponName, code: couponCode, _id: {$ne: couponId}});
 
         if (existingCoupon){
             console.log('coupon name / code already existing');
             return res.json({exist: true, couponName, couponCode});
-        } else{
-           const updatedCouponrData =  await Coupon.findOneAndUpdate(
-                {_id: couponId},
-                {$set: {
-                    name : couponName,
-                    code : couponCode,
-                    criteriaAmount : criteriaAmount,
-                    couponValue : couponValue,
-                    activationDate : startDate,
-                    expiryDate : expiryDate,
-                    couponCount : couponCount,
-                    isActive : isActive                    
+        } else {
+            if (couponImage){
+                const updatedCouponrData =  await Coupon.findOneAndUpdate(
+                    {_id: couponId},
+                    {$set: {
+                        image: couponImage,
+                        name : couponName,
+                        code : couponCode,
+                        criteriaAmount : criteriaAmount,
+                        couponValue : couponValue,
+                        activationDate : startDate,
+                        expiryDate : expiryDate,
+                        couponCount : couponCount,
+                        isActive : isActive                    
+                        }
                     }
-                }
-            )
+                )
+                console.log('coupon edited with new image.');
 
-            console.log('coupon edited.');
+            } else {
+                const updatedCouponrData =  await Coupon.findOneAndUpdate(
+                    {_id: couponId},
+                    {$set: {
+                        name : couponName,
+                        code : couponCode,
+                        criteriaAmount : criteriaAmount,
+                        couponValue : couponValue,
+                        activationDate : startDate,
+                        expiryDate : expiryDate,
+                        couponCount : couponCount,
+                        isActive : isActive                    
+                        }
+                    }
+                )
+
+                console.log('coupon edited without image.');
+            }
+
             return res.json({updated: true});
 
         }

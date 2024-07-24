@@ -15,6 +15,10 @@ const couponSchema = new mongoose.Schema({
         unique: true,
         trim: true
     },
+    image: {
+        type: String,
+        required: true,
+    },
     criteriaAmount: {
         type: Number,
         required: true,
