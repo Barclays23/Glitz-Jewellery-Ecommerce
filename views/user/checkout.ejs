@@ -10,15 +10,33 @@
 <main class="page-content">
     <div class="tm-section tm-checkout-area bg-white tm-padding-section">
         <div class="container">
-            <div class="tm-checkout-coupon">
-                <a href="#checkout-couponform" data-toggle="collapse"><span>Have a coupon code?</span> Click here and enter your code.</a>
-                <div id="checkout-couponform" class="collapse">
-                    <form action="#" class="tm-checkout-couponform">
-                        <input type="text" id="coupon-field" placeholder="Enter coupon code" required="required" />
-                        <button type="submit" class="tm-button">Submit</button>
-                    </form>
-                </div>
-            </div>
+            <!-- can give here or bottom side.  -->
+            <!-- <div class="tm-checkout-coupon" id="coupon-area">
+                <% if (userCart && userCart.couponRef == null) { %>
+                    <a href="#checkout-couponform" data-toggle="collapse">
+                        <span>Have a coupon code?</span> Click here and enter your code.
+                    </a>
+                    <div id="checkout-couponform" class="collapse">
+                        <form action="#" class="tm-checkout-couponform">
+                            <input type="text" id="coupon-field" placeholder="Enter coupon code" required="required" />
+                            <button type="button" class="tm-button" onclick="applyCoupon()">Apply Coupon</button>
+                        </form>
+                    </div>
+                <% } else { %>
+                    <a href="#remove-couponform" data-toggle="collapse">
+                        <span class="text-success">Coupon applied.</span> Click here to cancel the coupon.
+                    </a>
+                    <div id="remove-couponform" class="collapse">
+                        <form action="#" class="tm-checkout-couponform" id="remove-coupon-form">
+                            <input type="text" id="coupon-field" style="font-size: 25px; font-weight: 900; text-align: center;" 
+                             placeholder="<%= userCart.couponRef.code %>" readonly>
+                            <button type="button" class="tm-button" onclick="cancelCoupon()">Cancel Coupon</button>
+                        </form>
+                    </div>
+                <% } %>
+            </div> -->
+
+
 
             <!-- can give the address details here if needed (and if not given at bottom of this page) -->
             <!-- <div class="row checkout-border-row p-2 mb-5">
@@ -90,12 +108,9 @@
                         </thead>
                         <tbody>
                             <% if (userCart && userCart.product.length > 0){ %>
-                                <% console.log('length of user cart : ', userCart.product.length) %>
                                 <% for(i=0; i< userCart.product.length; i++){ %>
                                     <tr>
                                         <td class="bg-light">
-                                            <!-- http://localhost:3000/product-details?id=6659b86610faf8b255d2de86 -->
-
                                             <a href="/product-details?id=<%= userCart.product[i].productRef._id %>" class="tm-cart-productimage">
                                                 <img src="assets/images/productImages/<%= userCart.product[i].productRef.images.image1 %>" alt="product image">
                                             </a>
@@ -110,7 +125,7 @@
                                         <td class="tm-cart-price bg-light"> <h6>₹<%= (userCart.product[i].productRef.totalPrice).toFixed(2) %></h6></td>
                                         <td class="bg-light">
                                             <div class="tm-quantitybox bg-white">
-                                                <input type="number" class="quantity-input" value="<%= userCart.product[i].quantity %>" id="quantity_<%= i %>" data-product-id="<%= userCart.product[i]._id %>" data-index="<%= i %>">
+                                                <input type="number" class="quantity-input" value="<%= userCart.product[i].quantity %>" id="quantity_<%= i %>" data-product-id="<%= userCart.product[i]._id %>" data-index="<%= i %>" data-cart-id="<%= userCart._id %>">
                                             </div>
                                         </td>
                                         <td class="bg-light">
@@ -118,10 +133,7 @@
                                         </td>
                                         <td class="bg-light">
                                             <button class="tm-button tm-button-small">Save for Later</button>
-                                            <!-- <button class="tm-cart-removeproduct bg-danger"><i class="ion-close"></i></button> -->
-                                            <!-- <a href=""><img src="/assets/images/icons/remove2.png" style="width: 41px; height: auto;" alt="remove-icon"> </a> -->
                                             <button class="tm-button tm-button-small" onclick="removeFromCart('<%= userCart.product[i]._id, i %>', '<%= i %>')"> Remove </button>
-    
                                             <% if(userCart.product[i].productRef.quantity === 0){ %>
                                                 <br><br>
                                                 <h6 id="outofstock-error" style="color: red; display: block;"> Currently <br> Unavailable </h6>
@@ -146,14 +158,29 @@
                 <div class="mt-1">
                     <h4 class="small-title">BILLING INFORMATION</h4>
                 </div>
-                <div class="tm-checkout-coupon">
-                    <a href="#checkout-couponform" data-toggle="collapse"><span>Have a coupon code?</span> Click here and enter your code.</a>
-                    <div id="checkout-couponform" class="collapse">
-                        <form action="#" class="tm-checkout-couponform">
-                            <input type="text" id="coupon-field" placeholder="Enter coupon code" required="required" />
-                            <button type="submit" class="tm-button">Submit</button>
-                        </form>
-                    </div>
+                <div class="tm-checkout-coupon" id="coupon-area">
+                    <% if (userCart && userCart.couponRef == null) { %>
+                        <a href="#checkout-couponform" data-toggle="collapse">
+                            <span>Have a coupon code?</span> Click here and enter your code.
+                        </a>
+                        <div id="checkout-couponform" class="collapse">
+                            <form action="#" class="tm-checkout-couponform">
+                                <input type="text" id="coupon-field" placeholder="Enter coupon code" required="required" />
+                                <button type="button" class="tm-button" onclick="applyCoupon()">Apply Coupon</button>
+                            </form>
+                        </div>
+                    <% } else { %>
+                        <a href="#remove-couponform" data-toggle="collapse">
+                            <span class="text-success">You have applied the coupon code <b><%= userCart.couponRef.code %></b> worth <b>₹<%= userCart.couponRef.couponValue %></b>.</span> Click here to change or cancel the coupon.
+                        </a>
+                        <div id="remove-couponform" class="collapse">
+                            <form action="#" class="tm-checkout-couponform" id="remove-coupon-form">
+                                <input type="text" id="coupon-field" style="font-size: 25px; font-weight: 900; text-align: center;" 
+                                 placeholder="<%= userCart.couponRef.code %>" readonly>
+                                <button type="button" class="tm-button" onclick="cancelCoupon()">Cancel Coupon</button>
+                            </form>
+                        </div>
+                    <% } %>
                 </div>
                 <div class="row">
 
@@ -228,53 +255,46 @@
                                             <th>Total</th>
                                         </tr>
                                     </thead>
-
                                     <tbody>
-                                        <% let subTotal = 0 %>
-                                        <% let individualTotal = [] %>
-
                                         <% if (userCart && userCart.product.length > 0){ %>
                                             <% for(i=0; i< userCart.product.length; i++){ %>
                                                 <tr>
                                                     <td style="padding: 0.50rem;"> <%= userCart.product[i].productRef.name %> </td>
-                                                    <% individualTotal.push((userCart.product[i].productRef.totalPrice * userCart.product[i].quantity)) %>
-                                                    <td style="padding: 0.50rem;"> ₹ <%= individualTotal[i].toFixed(2) %> </td>
+                                                    <td style="padding: 0.50rem;"> ₹ <%= (userCart.product[i].productRef.totalPrice * userCart.product[i].quantity).toFixed(2) %> </td>
                                                 </tr>
-                                                <!-- finding the subtotal for cart summary -->
-                                                <% subTotal = individualTotal.reduce((acc, prices)=> acc + prices) %>
                                             <% } %>
                                         <% } %>
                                     </tbody>
-
-                                    <tfoot class="fw-bold">
+                                    <tfoot class="fw-bold" id="abcd">
                                         <tr>
                                             <td colspan="2"><hr style="border: 1px solid black;"></td>
                                         </tr>
                                         <tr class="tm-checkout-subtotal">
                                             <td>TOTAL</td>
-                                            <td id="<%= subTotal %>">₹ <%= (subTotal).toFixed(2) %></td>
-                                            <% console.log('subTotal in front end is : ', subTotal) %>
+                                            <td id="sub-total">₹ <%= subTotal.toFixed(2) %></td>
                                         </tr>
                                         <tr class="tm-checkout-shipping">
                                             <td> Shipping Charge (+) </td>
-                                            <% let shippingCharge = subTotal >= 100000 ? 0 : 300 %>
-                                            <td id="<%= shippingCharge %>">₹ <%= shippingCharge.toFixed(2) %></td>
+                                            <td id="shipping-charge">₹ <%= shippingCharge.toFixed(2) %></td>
                                         </tr>
                                         <tr class="tm-checkout-discount">
                                             <td> Discount (-) </td>
-                                            <% let discountAmount = subTotal * 1.5 /100 %>
-                                            <td id="<%= discountAmount %>">₹ <%= discountAmount.toFixed(2) %></td>
+                                            <td id="offer-discount" class="text-success">₹ <%= offerDiscount.toFixed(2) %></td>
                                         </tr>
+                                        <% if (userCart && userCart.couponRef) { %>
+                                            <tr class="tm-checkout-coupon">
+                                                <td> Coupon Discount (-) </td>
+                                                <td id="coupon-discount" class="text-success">₹ <%= couponDiscount.toFixed(2) %></td>
+                                            </tr>
+                                        <% } %>
                                         <tr>
                                             <td colspan="2"><hr style="border: 1px solid black;"></td>
                                         </tr>
                                         <tr class="tm-checkout-total">
                                             <td>Net Payable </td>
-                                            <% let netAmount = subTotal + shippingCharge - discountAmount %>
-                                            <td id="<%= netAmount %>"> <h4 style="color: #9a0056;"> <b> ₹ <%= (netAmount).toFixed(2) %> </b> </h4></td>
+                                            <td id="net-payable"> <h4 style="color: #9a0056;"> <b> ₹ <%= netPayable.toFixed(2) %> </b> </h4></td>
                                         </tr>
                                     </tfoot>
-
                                 </table>
                             </div>
 
@@ -640,58 +660,18 @@
 <script src="/assets/scripts/userScripts/edit-address-modal-script.js"></script>
 
 
-<!-- importing the script for carted items (UPDATE CART QUANTITY, REMOVE FROM CART & CHECKOUT, REMOVE OUTOFSTOCK CART ITEMS etc) -->
+
+<!-- importing the script for carted items -->
 <script src="/assets/scripts/userScripts/cart-and-checkout-scripts.js"></script>
+ <!-- (UPDATE CART QUANTITY, 
+ REMOVE FROM CART & CHECKOUT, 
+ REMOVE OUTOFSTOCK CART ITEMS,
+ APPLY COUPON,
+ CANCEL COUPON
+ etc) -->
 
 
-
-<!-- style for address modal -->
-<style>
-    .red-asterisk {
-        color: red;
-    }
-    
-    .dropdown {
-        position: relative;
-        width: 100%;
-    }
-    
-    .dropdown-selector {
-        width: 100%;
-    }
-    
-    #state-input {
-        width: calc(100% - 10px);
-        padding: 8px;
-        border: 1px solid #ccc;
-        font-size: 14px;
-    }
-    
-    .dropdown-list {
-        position: absolute;
-        z-index: 1000;
-        top: 100%;
-        left: 0;
-        width: calc(100% + 2px);
-        max-height: 200px;
-        overflow-y: auto;
-        border: 1px solid #ccc;
-        background-color: #fff;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        display: none;
-    }
-    
-    .dropdown-list li {
-        list-style-type: none;
-        padding: 8px 12px;
-        cursor: pointer;
-    }
-    
-    .dropdown-list li:hover {
-        background-color: #f0f0f0;
-    }
-    
-</style>
+ 
 
 
 
@@ -879,3 +859,56 @@
     }
 
 </script>
+
+
+
+
+
+
+<!-- style for address modal -->
+<style>
+    .red-asterisk {
+        color: red;
+    }
+    
+    .dropdown {
+        position: relative;
+        width: 100%;
+    }
+    
+    .dropdown-selector {
+        width: 100%;
+    }
+    
+    #state-input {
+        width: calc(100% - 10px);
+        padding: 8px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+    }
+    
+    .dropdown-list {
+        position: absolute;
+        z-index: 1000;
+        top: 100%;
+        left: 0;
+        width: calc(100% + 2px);
+        max-height: 200px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        background-color: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        display: none;
+    }
+    
+    .dropdown-list li {
+        list-style-type: none;
+        padding: 8px 12px;
+        cursor: pointer;
+    }
+    
+    .dropdown-list li:hover {
+        background-color: #f0f0f0;
+    }
+    
+</style>

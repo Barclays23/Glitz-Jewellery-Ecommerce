@@ -68,6 +68,10 @@ const orderSchema = new mongoose.Schema({
                     type : Number,
                     required: true
                 },
+                // offerDiscount : {   // offerDiscount  (offer discount is for individual products / categories. so should this obj move to each products ??)
+                //     type : Number,
+                //     required : true
+                // },
                 quantity : {
                     type : Number,
                     required : true
@@ -119,11 +123,11 @@ const orderSchema = new mongoose.Schema({
         type : Number,
         required : true
     },
-    // offerAmount : {   // discountAmount
+    // offerDiscount : {   // offerDiscount  (offer discount is for individual products / categories. so should this obj move to each products ??)
     //     type : Number,
     //     required : true
     // },
-    // couponAmount : {
+    // couponDiscount : {   // not for the individual products, but for the cart amount
     //     type : Number,
     //     required : true
     // },

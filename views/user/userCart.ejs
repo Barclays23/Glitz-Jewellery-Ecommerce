@@ -30,58 +30,57 @@
                     <ul class="nav tm-tabgroup" id="account" role="tablist">
                         <!-- tab 1: dashboard -->
                         <li class="nav-item">
-                            <a class="nav-link" id="account-dashboard-tab"
-                                href="/my-account" 
+                            <a class="nav-link" id="account-dashboard-tab" href="/my-account#account" 
                                 role="tab" aria-controls="account-dashboard" aria-selected="true">Dashboard
                             </a>
                         </li>
 
                         <!-- tab 2: profile information-->
                         <li class="nav-item">
-                            <a class="nav-link" id="account-acdetails-tab" href="/profile"
-                                role="tab" aria-controls="account-acdetails" aria-selected="true">My Profile
+                            <a class="nav-link" id="account-acdetails-tab" href="/profile#account"
+                                role="tab" aria-controls="account-acdetails" aria-selected="true">Profile
                             </a>
                         </li>
 
                         <!-- tab 3: wishlist -->
                         <li class="nav-item">
-                            <a class="nav-link" id="account-wishlist-tab" href="/wishlist"
+                            <a class="nav-link" id="account-wishlist-tab" href="/wishlist#account"
                                 role="tab" aria-controls="account-wishlist" aria-selected="false">Wishlist
                             </a>
                         </li>
 
                         <!-- Tab 4: My Cart -->
                         <li class="nav-item">
-                            <a class="nav-link active" id="account-cart-tab" href="#"
-                                role="tab" aria-controls="account-cart" aria-selected="false"> Cart
+                            <a class="nav-link active" id="account-cart-tab" href="/cart#account"
+                                role="tab" aria-controls="account-cart" aria-selected="false">Cart
                             </a>
                         </li>
 
                         <!-- tab 5: -->
                         <li class="nav-item">
-                            <a class="nav-link" id="account-orders-tab" href="/orders"
+                            <a class="nav-link" id="account-orders-tab" href="/orders#account"
                                 role="tab" aria-controls="account-orders" aria-selected="false">Orders
                             </a>
                         </li>
 
                         <!-- tab 6: -->
                         <li class="nav-item">
-                            <a class="nav-link" id="account-address-tab" href="/address"
+                            <a class="nav-link" id="account-address-tab" href="/address#account"
                                 role="tab" aria-controls="account-address" aria-selected="false">Address
                             </a>
                         </li>
-
+                        
                         <!-- tab 7: -->
                         <li class="nav-item">
-                            <a class="nav-link" id="account-wallet-tab" href="/wallet"
-                                role="tab" aria-controls="account-wallet" aria-selected="true">Wallet
+                            <a class="nav-link" id="account-coupon-tab" href="/coupons#account"
+                                role="tab" aria-controls="account-coupon" aria-selected="false">Coupons
                             </a>
                         </li>
-                        
+
                         <!-- tab 8: -->
                         <li class="nav-item">
-                            <a class="nav-link" id="account-logout-tab" href="/logout" 
-                                role="tab" aria-controls="account-address" aria-selected="false">Logout
+                            <a class="nav-link" id="account-wallet-tab" href="/wallet#account"
+                                role="tab" aria-controls="account-wallet" aria-selected="false">Wallet
                             </a>
                         </li>
                     </ul>
@@ -104,7 +103,6 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <% let subTotal = 0 %>
                                     <% if (userCart && userCart.product.length > 0){ %>
                                         <% console.log('length of user cart : ', userCart.product.length) %>
                                         <% for(let i=0; i< userCart.product.length; i++){ %>
@@ -162,8 +160,6 @@
                                                 </td>
                                                 <td class="bg-light">
                                                     <span class="tm-cart-totalprice" id="total_price_<%= i %>">₹<%= (userCart.product[i].productRef.totalPrice * userCart.product[i].quantity).toFixed(2) %></span>
-                                                    <!-- finding the subtotal for cart summary -->
-                                                    <% subTotal = subTotal + (userCart.product[i].productRef.totalPrice * userCart.product[i].quantity) %>
                                                 </td>
                                                 <td class="bg-light">
                                                     <button class="tm-button tm-button-small" onclick="saveForLater('<%= userCart.product[i]._id %>')">Save for Later</button>
@@ -187,19 +183,25 @@
     
                         <div class="tm-cart-bottomarea mt-5">
                             <div class="row">
-                                <div class="col-lg-8 col-md-6">
+                                <div class="col-lg-5 col-md-6">
                                     <div class="tm-buttongroup">
                                         <a href="/shopping" class="tm-button">Continue Shopping</a>
-                                        <a href="#" class="tm-button">Update Cart</a>
+                                        <!-- <a href="#" class="tm-button">Update Cart</a> -->
                                     </div>
-                                    <form action="#" class="tm-cart-coupon">
-                                        <label for="coupon-field">Have a coupon code?</label>
-                                        <input type="text" id="coupon-field" placeholder="Enter coupon code"
-                                            required="required">
-                                        <button type="submit" class="tm-button">Submit</button>
+                                    <form action="#" class="tm-cart-coupon" id="coupon-area">
+                                        <% if (userCart && userCart.couponRef == null) { %>
+                                            <label for="coupon-field">Have a coupon code?</label>
+                                            <input type="text" id="coupon-field" placeholder="Enter coupon code">
+                                            <button type="button" class="tm-button" onclick="applyCoupon()">Apply Coupon</button>
+                                        <% } else { %>
+                                            <label for="coupon-field">Coupon Applied <i class="fa-solid fa-circle-check text-success"></i></label>
+                                            <input type="text" id="coupon-field" style="font-size: 25px; font-weight: 900; text-align: center;" 
+                                                placeholder="<%= userCart.couponRef.code %>" readonly>
+                                            <button type="button" class="tm-button" onclick="cancelCoupon()">Cancel Coupon</button>
+                                        <% } %>
                                     </form>
                                 </div>
-                                <div class="col-lg-4 col-md-6">
+                                <div class="col-lg-5 col-md-6 ml-auto">
                                     <div class="tm-cart-pricebox">
                                         <h2>Cart Summary</h2>
                                         <div class="table-responsive" id="cart-summary">
@@ -207,26 +209,30 @@
                                                 <tbody>
                                                     <tr class="tm-cart-pricebox-subtotal">
                                                         <td>Cart Subtotal</td>
-                                                        <td>₹ <%= (subTotal).toFixed(2) %></td>
-                                                        <% console.log('subTotal is : ', subTotal) %>
+                                                        <td>₹ <%= subTotal.toFixed(2) %></td>
                                                     </tr>
-                                                    <tr class="tm-cart-pricebox-shipping">
-                                                        <% let shippingCharge = 0 %>
-                                                        <% if (subTotal > 0){ %>
-                                                            <% shippingCharge = subTotal >= 100000 ? 0 : 300 %>
-                                                            <td>+ Shipping Charge</td>
-                                                            <td>₹ <%= (shippingCharge).toFixed(2) %></td>
-                                                        <% } %>
+                                                    <tr class="tm-cart-pricebox-shipping-charge">
+                                                        <td>Shipping Charge</td>
+                                                        <td>₹ <%= shippingCharge.toFixed(2) %></td>
                                                     </tr>
+                                                    <tr class="tm-cart-pricebox-offer-discount">
+                                                        <td>Discount Amount</td>
+                                                        <td class="text-success">₹ 50.00</td>
+                                                    </tr>
+                                                    <% if (userCart && userCart.couponRef) { %>
+                                                        <tr class="tm-cart-pricebox-coupon-discount">
+                                                            <td>Coupon Discount</td>
+                                                            <td class="text-success">₹ <%= (userCart.couponRef.couponValue).toFixed(2) %></td>
+                                                        </tr>
+                                                    <% } %>
                                                     <tr class="tm-cart-pricebox-total">
-                                                        <td>Total</td>
-                                                        <% let cartTotal = subTotal + shippingCharge %>
-                                                        <td>₹ <%= (cartTotal).toFixed(2) %></td>
+                                                        <td><h6 style="color: #9a0056; font-size: 20px; font-weight: 600;">NET AMOUNT</h6></td>
+                                                        <td><h6 style="color: #9a0056; font-size: 20px; font-weight: 600;">₹ <%= netPayable.toFixed(2) %></h6></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
                                         </div>
-                                        <div class="text-center">
+                                        <div class="text-right">
                                             <a href="" onclick="proceedToCheckout('<%= userData._id %>')" class="tm-button"> Proceed To Checkout</a>
                                         </div>
                                     </div>
@@ -255,12 +261,21 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 
-<!-- importing the script for carted items (UPDATE CART QUANTITY, REMOVE FROM CART & CHECKOUT, REMOVE OUTOFSTOCK CART ITEMS etc) -->
-<script src="/assets/scripts/userScripts/cart-and-checkout-scripts.js"></script>
 
 
-// <!--importing the wishlist script for save for later (MOVE TO WISHLIST and remvoe from the cart / checkout) -->
+<!-- // importing the wishlist script for save for later (MOVE TO WISHLIST and remvoe from the cart / checkout) -->
 <script src="/assets/scripts/userScripts/wishlist-scripts.js"></script>
+
+
+<!-- importing the script for carted items -->
+<script src="/assets/scripts/userScripts/cart-and-checkout-scripts.js"></script>
+ <!-- (UPDATE CART QUANTITY, 
+ REMOVE FROM CART & CHECKOUT, 
+ REMOVE OUTOFSTOCK CART ITEMS,
+ APPLY COUPON,
+ CANCEL COUPON
+ etc) -->
+
 
 
 

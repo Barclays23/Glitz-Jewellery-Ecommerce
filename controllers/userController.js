@@ -3,6 +3,7 @@ const Product = require ('../models/productModel');
 const Category = require ('../models/categoryModel');
 const Cart = require ('../models/cartModel');
 const Wishlist = require ('../models/wishlistModel');
+const Coupon = require ('../models/couponModel');
 const GoldPrice = require('../models/goldPriceModel');
 const UserOtp = require ('../models/otpModel');
 const bcrypt =  require ('bcrypt');
@@ -1140,6 +1141,50 @@ const updateUserPassword = async (req, res)=>{
 
 
 
+
+// load user wallet ---------------------------------------------
+const loadCoupons = async (req, res)=>{
+    try {
+        const sessionId = req.session.userId;
+        const userData = await User.findById(sessionId);
+        const goldPriceData = await GoldPrice.findOne({});
+        const userCart = await Cart.findOne({ userRef: sessionId });
+        const userWishlist = await Wishlist.findOne({ userRef: sessionId});
+
+        let cartCount = 0;
+        let wishlistCount = 0;
+
+
+        if (userCart){
+            userCart.product.forEach((product) => {
+                cartCount += product.quantity;
+            });
+        }
+
+        if (userWishlist){
+            userWishlist.product.forEach((product) => {
+                wishlistCount += product.quantity;
+            });
+        }
+
+        const couponData = await Coupon.find({
+            isActive: true,
+            expiryDate: { $gte: new Date() },
+        });
+
+        console.log('coupon data for users :', couponData);
+
+        res.render('userCoupons', { userData, couponData, cartCount, wishlistCount, goldPriceData });
+
+    } catch (error) {
+        console.log('failed to load the user coupons page :', error.message);
+
+    }
+}
+
+
+
+
 // load user wallet ---------------------------------------------
 const loadWallet = async (req, res)=>{
     try {
@@ -1175,6 +1220,10 @@ const loadWallet = async (req, res)=>{
 
 
 
+
+
+
+
 module.exports = {
     loadHome,
     loadLogin,
@@ -1197,5 +1246,6 @@ module.exports = {
     loadEditUserProfile,
     updateUserProfile,
     updateUserPassword,
+    loadCoupons,
     loadWallet,
 }

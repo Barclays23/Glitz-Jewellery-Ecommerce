@@ -36,6 +36,7 @@ const cartController = require ('../controllers/cartController');
 const wishlistController = require ('../controllers/wishlistController');
 const addressController = require ('../controllers/addressController');
 const orderController = require ('../controllers/orderController');
+const couponController = require ('../controllers/couponController');
 
 const userAuth = require('../middlewares/userAuth');
 const googleAuth = require('../middlewares/googleAuth');
@@ -110,12 +111,17 @@ userRoute.post('/place-order', userAuth.isLogin, cartController.placeOrder);
 userRoute.get('/orders', userAuth.isLogin, cartController.loadUserOrders);
 userRoute.get('/order-details', userAuth.isLogin, cartController.loadOrderDetails);
 userRoute.get('/thankyou', userAuth.isLogin, cartController.loadThankyou);
-userRoute.post('/cancel-order', orderController.cancelOrder); // userAuth.isLogin
+userRoute.post('/cancel-order', userAuth.isLogin, orderController.cancelOrder);
 
 
 // WALLET ROUTES
 userRoute.get('/wallet', userAuth.isLogin, userController.loadWallet);
 
+
+//COUPON ROUTES FOR USER
+userRoute.get('/coupons', userAuth.isLogin, userController.loadCoupons);
+userRoute.post('/apply-coupon', userAuth.isLogin, couponController.applyCoupon);
+userRoute.patch('/cancel-coupon', userAuth.isLogin, couponController.cancelCoupon);
 
 
 

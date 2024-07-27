@@ -21,30 +21,70 @@ const loadUserCart = async (req, res)=>{
         const goldPriceData = await GoldPrice.findOne({});
         const userData = await User.findById(sessionId);
 
-        const userCart = await Cart.findOne({ userRef: sessionId }).populate('product.productRef').exec();
         const userWishlist = await Wishlist.findOne({ userRef: sessionId }).populate('product.productRef').exec();
+
+        const userCart = await Cart.findOne({ userRef: sessionId })
+        .populate('product.productRef')
+        .populate('couponRef')
+        .exec();
+
         
         
         let cartCount = 0;
         let wishlistCount = 0;
-        
-        if (userCart && userCart.product){
-            const productLength = userCart.product.length;
-            console.log(`The length of the product array is: ${productLength}`);
 
-            userCart.product.forEach((product) => {
-                cartCount += product.quantity;
-            });
-            console.log("Total Quantity of Carted Items:", cartCount);
-        }
+        let subTotal = 0;
+        let shippingCharge = 0;
+        let offerDiscount = 0;
+        let couponDiscount = 0;
+        // let walletAmount
+        let netPayable = 0;
+
 
         if (userWishlist){
             userWishlist.product.forEach((product) => {
                 wishlistCount += product.quantity;
             });
         }
+        
+        if (userCart && userCart.product){
+            const productLength = userCart.product.length;
+            console.log(`product array length : ${productLength}`);
 
-        res.render('userCart', { userData, cartCount, wishlistCount, userCart, goldPriceData });
+            userCart.product.forEach((product) => {
+                cartCount += product.quantity;
+                subTotal += (product.productRef.totalPrice * product.quantity);  // without any discounts
+
+            });
+            console.log("cartCount :", cartCount);
+            console.log('subTotal of cart (totalAmount) : ', subTotal);
+        }
+
+        shippingCharge = subTotal >= 100000 ? 0 : 300;
+        console.log("shippingCharge :", shippingCharge);
+
+        if(userCart && userCart.couponRef){
+            couponDiscount = userCart.couponRef.couponValue;
+            console.log("couponDiscount :", couponDiscount);
+        }
+
+        netPayable = subTotal + shippingCharge - offerDiscount - couponDiscount;  // refferral / wallet amount also consider
+        console.log("netPayable :", netPayable);
+
+
+        res.render('userCart', { 
+            userData, 
+            goldPriceData, 
+            cartCount, 
+            wishlistCount, 
+            userCart, 
+            subTotal, 
+            shippingCharge, 
+            couponDiscount, 
+            offerDiscount, // pending (wallet, referral also pending)
+            // and wallet deduction is needed only after checkout payment method selection and apply ?
+            netPayable
+        });
 
     } catch (error) {
         console.log('error in loading user cart', error.message);
@@ -123,6 +163,7 @@ const updateCartQuantity = async (req, res)=>{
     try {
         // const userCart = await Cart.findOne({userRef: userId, 'product._id': productId});
         let userCart = await Cart.findOne({userRef: userId}).populate('product.productRef').exec();
+        let cartId = userCart._id;
 
         const inventoryQuantity = userCart.product[index].productRef.quantity;
         console.log('inventoryQuantity :', inventoryQuantity);
@@ -147,7 +188,7 @@ const updateCartQuantity = async (req, res)=>{
         console.log('updatedTotalPrice', updatedTotalPrice);
 
         // Send the updated total price back to the client
-        res.json({success: true, index, updatedTotalPrice });
+        res.json({success: true, index, updatedTotalPrice, cartId});
 
     } catch (error) {
         console.log('error while updating cart quantity :', error.message);
@@ -258,16 +299,22 @@ const loadCheckout = async (req, res)=>{
         const userAddress = await Address.findOne({userRef: sessionId});
         const userWishlist = await Wishlist.findOne({ userRef: sessionId});
 
-        const userCart = await Cart.findOne({ _id: cartId }).populate('product.productRef');
+        const userCart = await Cart.findOne({ _id: cartId })
+        .populate('product.productRef')
+        .populate('couponRef')
+        .exec();
 
         let cartCount = 0;
         let wishlistCount = 0;
 
-        if (userCart){
-            userCart.product.forEach((product) => {
-                cartCount += product.quantity;
-            });
-        }
+        let subTotal = 0;
+        let shippingCharge = 0;
+        let offerDiscount = 0;
+        let couponDiscount = 0;
+        // let walletAmount
+        let netPayable = 0;
+
+
 
         if (userWishlist){
             userWishlist.product.forEach((product) => {
@@ -275,8 +322,49 @@ const loadCheckout = async (req, res)=>{
             });
         }
 
+
+        if (userCart && userCart.product){
+            const productLength = userCart.product.length;
+            console.log(`product array length : ${productLength}`);
+
+            userCart.product.forEach((product) => {
+                cartCount += product.quantity;
+                subTotal += (product.productRef.totalPrice * product.quantity);  // without any discounts
+
+            });
+            console.log("cartCount in checkout :", cartCount);
+            console.log('subTotal of checkout (totalAmount) : ', subTotal);
+        }
+
+
+        shippingCharge = subTotal >= 100000 ? 0 : 300;
+        console.log("shippingCharge :", shippingCharge);
+
+        if(userCart && userCart.couponRef){
+            couponDiscount = userCart.couponRef.couponValue;
+            console.log("couponDiscount :", couponDiscount);
+        }
+
+        netPayable = subTotal + shippingCharge - offerDiscount - couponDiscount;  // refferral / wallet amount also consider
+        console.log("netPayable :", netPayable);
+
+
+
         if(cartId && cartCount > 0){   
-            res.render('checkout', { userData, userAddress, userCart, cartCount, wishlistCount, goldPriceData });
+            res.render('checkout', { 
+                goldPriceData,
+                userData, 
+                userAddress, 
+                userCart, 
+                cartCount, 
+                wishlistCount, 
+                subTotal, 
+                shippingCharge, 
+                offerDiscount, 
+                couponDiscount,  // pending (wallet, referral also pending)
+                // and wallet deduction is needed only after checkout payment method selection and apply ?
+                netPayable
+            });
 
         } else{
             res.redirect('/cart');

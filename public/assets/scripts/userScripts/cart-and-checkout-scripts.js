@@ -94,6 +94,9 @@ $(document).ready(function(){
         var newQuantity = $(this).val();
         var productId = $(this).data('product-id');
         var index = $(this).data('index');
+        var cartId = $(this).data('cart-id');
+
+        console.log('cartId in front end to reload :', cartId);
         
         var isValid = true;
 
@@ -121,7 +124,8 @@ $(document).ready(function(){
                 data: {
                     productId,
                     index,
-                    newQuantity
+                    newQuantity,
+                    cartId
                 },
                 success: function(response) {
                     if (response.insufficient) {
@@ -139,12 +143,11 @@ $(document).ready(function(){
                         newQuantity = response.inventoryQuantity;
 
                     } else if(response.success){
-                        // Update the total price for the product (reload the div / id)
                         $("#total_price_"+index).load("/cart #total_price_"+index);
+                        $("#total_price_"+index).load("/checkout #total_price_"+index);
                         $("#cart-summary").load("/cart #cart-summary");
-                        $("#checkout-summary").load("/checkout #checkout-summary");
+                        $("#checkout-summary").load(`/checkout?cartId=${response.cartId} #checkout-summary`);
                         $("#cart-count").load("/cart #cart-count");
-                        // $('#total_price_' + response.index).text('₹' + response.updatedTotalPrice.toFixed(2));
                     }
                     
                 },
@@ -339,8 +342,120 @@ function saveOutOfStockItems(outOfStockItems) {
 
 
 
-// cart & checkout styles
-// <!-- <style>
+// for applying the coupon
+function applyCoupon() {
+    let couponCode = $('#coupon-field').val();
+    console.log('couponCode to send for applying :', couponCode);
+
+    if (couponCode === '') {
+        Swal.fire({
+            text: 'Please enter a coupon code.',
+        });
+        return;
+    }
+
+    $.ajax({
+        url: '/apply-coupon',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ couponCode }),
+        success: function(response) {
+            if (response.applied) {
+                Swal.fire({
+                    icon: 'success',
+                    text: 'Coupon applied successfully!',
+                    showConfirmButton: false,
+                    timer: 1000,
+                });
+                $("#coupon-area").load("/cart #coupon-area");
+                $("#cart-summary").load("/cart #cart-summary");
+                $("#coupon-area").load("/checkout #coupon-area");
+                $("#checkout-summary").load(`/checkout?cartId=${response.cartId} #checkout-summary`);
+
+            } else if (response.notfound) {
+                Swal.fire({
+                    text: response.message,
+                    showConfirmButton: false,
+                });
+            } else if (response.expired) {
+                Swal.fire({
+                    text: response.message,
+                    showConfirmButton: false,
+                });
+            } else if (response.inactive) {
+                Swal.fire({
+                    text: response.message,
+                    showConfirmButton: false,
+                });
+            } else if (response.notEligible) {
+                Swal.fire({
+                    text: response.message,
+                    showConfirmButton: false,
+                });
+            } 
+        },
+        error: function(xhr, status, error) {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An error occurred while applying the coupon.',
+            });
+        }
+    });
+}
+
+
+
+
+
+// for cancelling the coupon
+function cancelCoupon() {
+    let couponCode = $('#coupon-field').val();
+    console.log('couponCode to send for cancelling:', couponCode);
+
+    $.ajax({
+        url: '/cancel-coupon',
+        method: 'PATCH',
+        // contentType: 'application/json',
+        // data: JSON.stringify({ couponCode }),
+        success: function(response) {
+            if (response.cancelled) {
+                Swal.fire({
+                    icon: 'success',
+                    text: 'Coupon cancelled !',
+                    showConfirmButton: false,
+                    timer: 1000,
+                });
+                $("#coupon-area").load("/cart #coupon-area");
+                $("#cart-summary").load("/cart #cart-summary");
+                $("#coupon-area").load("/checkout #coupon-area");
+                $("#checkout-summary").load(`/checkout?cartId=${response.cartId} #checkout-summary`);
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed to cancel coupon',
+                    text: response.message,
+                });
+            }
+        },
+        error: function(error) {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An error occurred while canceling the coupon.',
+            });
+        }
+    });
+}
+
+
+
+
+
+// // cart & checkout styles
+// <style>
 // .warning-swal-text {
 //     color: #ffffff;
 // }
@@ -350,4 +465,4 @@ function saveOutOfStockItems(outOfStockItems) {
 // .success-swal-background {
 //     background-color: #b2ff73;
 // }
-// </style> -->
+// </style>

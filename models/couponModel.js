@@ -48,6 +48,7 @@ const couponSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    usedCustomers: []
 });
 
 

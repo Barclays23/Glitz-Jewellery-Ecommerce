@@ -68,14 +68,18 @@
                                         <% } %>
 
                                         <td class="text-center">
-                                            <% if (couponData[i].isActive === false){ %>
-                                                <div class="badge badge-outline-warning">Blocked</div>
-                                            <% } else if (couponData[i].activationDate > Date.now() ) { %>
+                                            <% if (couponData[i].activationDate > Date.now() ) { %>
                                                 <div class="badge badge-outline-primary">Upcoming</div>
+
                                             <% } else if (couponData[i].expiryDate < Date.now()) { %>
                                                 <div class="badge badge-outline-danger">Expired</div>
-                                            <% } else if ( couponData[i].couponCount === couponData[i].usedCount) { %>
-                                                <div class="badge badge-outline-danger">Redeemed</div>
+
+                                            <% } else if (couponData[i].couponCount === couponData[i].usedCount){ %>
+                                                <div class="badge badge-outline-warning">Redeemed</div>
+
+                                            <% } else if (couponData[i].isActive === false) { %>
+                                                <div class="badge badge-outline-danger">Blocked</div>
+
                                             <% } else { %>
                                                 <div class="badge badge-outline-success">Active</div>
                                             <% } %>
@@ -539,11 +543,11 @@
                             }).then(function() {
                                 location.reload();
                             });
-                        } else if (response.exist) {
+                        } else if (response.codeExist) {
                             Swal.fire({
                                 icon: 'warning',
-                                title: `<b> '${response.couponName}' </b> already exists.`,
-                                html: `<h5 class= "text-danger"> Please check the coupon code or choose another name.</h5>`,
+                                title: `Coupon code already exists.`,
+                                html: `<h5 class= "text-danger"> The coupon code <b>'${response.couponCode}' </b> already exist.</h5>`,
                                 showConfirmButton: false
                             });
                         }
@@ -679,14 +683,6 @@
                 let couponCountError = $('#edit-coupon-count-error');
 
 
-                // // Validate coupon image
-                // if(!couponImage){
-                //     couponImageError.text('Coupon image is required.').show();
-                //     isValid = false;
-                // } else {
-                //     couponImageError.hide();
-                // }
-
                 // Validate coupon name
                 const couponNameRegex = /^[A-Za-z0-9\s]+$/;
                 if (!couponName || couponName === '') {
@@ -809,8 +805,8 @@
                             } else if (response.exist) {
                                 Swal.fire({
                                     icon: 'warning',
-                                    title: `<b> '${response.couponName}' </b> already exists.`,
-                                    html: `<h5 class= "text-danger"> Please check the coupon code or choose another name.</h5>`,
+                                    title: `Coupon code already exists.`,
+                                    html: `<h5 class= "text-danger"> The coupon code <b>'${response.couponCode}' </b> already exist.</h5>`,
                                     showConfirmButton: false
                                 });
                             }
