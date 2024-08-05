@@ -13,22 +13,12 @@
                 <div class="table-responsive">
                     <div style="text-align: right;">
                         <button type="button" class="btn btn-success add-category" data-toggle="modal" data-target="#addCategoryModal">Add Category</button>
-                        <!-- <button type="button" class="btn btn-success add-category" data-toggle="modal" data-target="#addCategoryModal">
-                            <img src="/assets/images/icons/add.png" alt="add" width="30px" height="30px">
-                        </button> -->
                     </div>
                     
 
                     <table class="table">
                         <thead>
                             <tr>
-                                <!-- <th>
-                                    <div class="form-check form-check-muted m-0">
-                                        <label class="form-check-label">
-                                            <input type="checkbox" class="form-check-input" id="check-all">
-                                        </label>
-                                    </div>
-                                </th> -->
                                 <th> No </th>
                                 <th> Category Name </th>
                                 <th> Description </th>
@@ -36,43 +26,34 @@
                                 <th> Actions </th>
                             </tr>
                         </thead>
-                        <tbody>
-
-                            <!-- ------------------------------------- -->
+                        <tbody id="table-body">
                             <% if (categoryData.length > 0){
                                 for(let i=0; i<categoryData.length; i++){ %>
                                     <tr>
-
-                                        <!-- <td>
-                                            <div class="form-check form-check-muted m-0">
-                                                <label class="form-check-label">
-                                                    <input type="checkbox" class="form-check-input">
-                                                </label>
-                                            </div>
-                                        </td> -->
-
                                         <td> <%= i+1 %> </td>
 
                                         <td> <%= categoryData[i].name %> </td>
 
                                         <td> <%= categoryData[i].description %> </td>
 
-                                        <% if(categoryData[i].isListed=== false){ %>
-                                            <td>
-                                                <div class="badge badge-outline-danger">Unlisted</div>
-                                            </td>
-                                        <% } else{ %>
-                                            <td>
+                                        <td id="category-status">
+                                            <% if(categoryData[i].isListed === true){ %>
                                                 <div class="badge badge-outline-success">Listed</div>
-                                            </td>
-                                        <% } %>
-
-
-                                        <td>
-                                            <a href="<%= `/admin/edit-category?id=${categoryData[i]._id}` %>" class="badge badge-secondary" style="color: black; text-decoration: none;" data-toggle="modal" data-target="#editCategoryModal"
-                                            data-id="<%= categoryData[i]._id %>" data-name="<%= categoryData[i].name %>" data-description="<%= categoryData[i].description %>" data-isListed="<%= categoryData[i].isListed %>">Edit</a>
+                                                <% } else{ %>
+                                                    <div class="badge badge-outline-danger">Unlisted</div>
+                                            <% } %>
                                         </td>
 
+                                        <td>
+                                            <a href="<%= `/admin/edit-category?id=${categoryData[i]._id}` %>" class="badge badge-secondary" style="color: black; text-decoration: none;" 
+                                                data-toggle="modal" data-target="#editCategoryModal" 
+                                                data-id="<%= categoryData[i]._id %>" 
+                                                data-name="<%= categoryData[i].name %>" 
+                                                data-description="<%= categoryData[i].description %>" 
+                                                data-islisted="<%= categoryData[i].isListed %>">
+                                                Edit
+                                            </a>
+                                        </td>
                                     </tr>
                                 <% }
                             }
@@ -192,6 +173,8 @@
 
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+
+
 <!-- script for form submission to add new category -->
 <script>
     $(document).ready(function() {
@@ -213,16 +196,28 @@
 
             let isValid = true;
 
-            if (categoryName === "") {
-                addCategoryNameError.textContent = "Enter Category Name.";
+            if (!categoryName) {
+                addCategoryNameError.textContent = "Category name is required!";
+                addCategoryNameError.style.display = "block";
+                isValid = false;
+            } else if (!/^[A-Za-z\s]+$/.test(categoryName)) {
+                addCategoryNameError.textContent = "Enter a valid category name (letters only).";
                 addCategoryNameError.style.display = "block";
                 isValid = false;
             } else {
                 addCategoryNameError.style.display = "none";
             }
             
-            if (categoryDescription === ""){
-                addCategoryDescriptionError.textContent = "Enter Category Description.";
+            if (!categoryDescription){
+                addCategoryDescriptionError.textContent = "Category Description is required.!";
+                addCategoryDescriptionError.style.display = "block";
+                isValid = false;
+             } else if (!/[A-Za-z]/g.test(categoryDescription)){
+                addCategoryDescriptionError.textContent = "Category Description should contain letters.!";
+                addCategoryDescriptionError.style.display = "block";
+                isValid = false;
+             } else if (categoryDescription.split(' ').length < 5 || categoryDescription.split(' ').length > 20) {
+                addCategoryDescriptionError.textContent = "Description must be between 5 and 20 letters.";
                 addCategoryDescriptionError.style.display = "block";
                 isValid = false;
             } else {
@@ -273,24 +268,24 @@
 
 <!-- script for form submission to edit category -->
 <script>
-    // for loading the values in the fields of modal from backend.
     $(document).ready(function() {
 
-        // Event listener for clicking the "Edit" link
         $('a[data-target="#editCategoryModal"]').click(function() {
             
             // Retrieve data attributes
-            var categoryId = $(this).data('id');
-            var categoryName = $(this).data('name');
-            var categoryDescription = $(this).data('description');
-            var categoryStatus = $(this).data('isListed');
+            let categoryId = $(this).data('id');
+            let categoryName = $(this).data('name');
+            let categoryDescription = $(this).data('description');
+            let categoryStatus = $(this).data('islisted');  // use small letter in ajax to get value (not isListed)
+
+            console.log('categoryStatus in default :', categoryStatus);
             
 
             // Set values in the edit category modal fields (default values)
             $('#edit-category-id').val(categoryId);
             $('#edit-category-name').val(categoryName);
             $('#edit-category-description').val(categoryDescription);
-            $('#edit-category-status').val(categoryStatus ? 'unlist' : 'list');
+            $('#edit-category-status').val(categoryStatus ? 'list' : 'unlist');  // use small letter in ajax ('list' & 'unlist')
 
             console.log('categoryId :', categoryId);
             console.log('categoryName :', categoryName);
@@ -303,13 +298,12 @@
 
     // for updating the values of modal
     $(document).ready(function() {
-        // Event listener for clicking the "Update" button in the edit category modal
         $('#updateCategoryBtn').click(function() {
             // Retrieve updated values from modal fields
-            var categoryId = $('#edit-category-id').val();
-            var categoryName = $('#edit-category-name').val().trim();
-            var categoryDescription = $('#edit-category-description').val().trim();
-            var categoryStatus = $('#edit-category-status').val();
+            let categoryId = $('#edit-category-id').val();
+            let categoryName = $('#edit-category-name').val().trim();
+            let categoryDescription = $('#edit-category-description').val().trim();
+            let categoryStatus = $('#edit-category-status').val();
 
             const editCategoryNameError = document.getElementById('edit-category-name-error');
             editCategoryNameError.style.display = "none";
@@ -336,7 +330,7 @@
             }
 
             if (!isValid) {
-                return; // Stop form submission
+                return;
             }
 
 
@@ -351,14 +345,17 @@
                     categoryStatus
                 }),
                 success: function(response) {
-                    console.log('Update Category Form submitted');
                     if (response.success){
                         Swal.fire({
                             icon: "success",
-                            title: "Success",
-                            text : "Category Updated Successfully!",
-                        })
-                        .then(location.reload());
+                            text: "Category Updated Successfully!",
+                            timer: 1000,
+                            showConfirmButton: false,
+                        });
+                        $("#table-body").load("/admin/categories #table-body");
+                        location.reload();
+                        // $('#editCategoryModal').trigger('hide.bs.modal');
+                        // $('#editCategoryModal').modal('hide');
                     } else if (response.exists){
                         editCategoryNameError.textContent = response.message;
                         editCategoryNameError.style.display = "block";

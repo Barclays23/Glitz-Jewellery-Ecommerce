@@ -109,15 +109,15 @@ const addToWishlist = async(req, res)=>{
 // save for later ---------------------------------------------
 const saveForLater = async(req, res)=>{
     try {
-        const userId = req.session.userId;
+        const sessionId = req.session.userId;
         const {productId, outOfStockItems} = req.body;
 
-        console.log('received single product id : ', productId);
+        console.log('received single product id for saveForLater : ', productId);
 
-        const userCart = await Cart.findOne({ userRef: userId });
+        const userCart = await Cart.findOne({ userRef: sessionId });
 
 
-        // for shifting the selected product from cart / checkout (single)
+        // for moving the selected product from cart / checkout (single)
         if (productId){    
             // finding the single product with productId
             const singleProduct = userCart.product.find(p => p._id.toString() === productId.toString());
@@ -127,11 +127,11 @@ const saveForLater = async(req, res)=>{
             const productRefId = singleProduct.productRef;
             console.log('ProductRef._id of single product is : ', productRefId);
 
-            const userWishlist = await Wishlist.findOne({userRef: userId});
+            const userWishlist = await Wishlist.findOne({userRef: sessionId});
 
             if (!userWishlist) {
                 const userWishlist = new Wishlist({
-                    userRef : userId,
+                    userRef : sessionId,
                     product : [{
                         productRef : productRefId,
                     }]
@@ -153,12 +153,26 @@ const saveForLater = async(req, res)=>{
 
             }
 
-            
             userCart.product.pull({productRef: productRefId});
             await userCart.save();
-            console.log('and product removed from cart.');
+            console.log('And product removed from cart.');
 
-            return res.status(200).json({ moved: true });
+            const updatedUserCart = await Cart.findOne({userRef: sessionId});
+            console.log('Updated user cart product length :', updatedUserCart.product.length);
+
+
+            // also remove the couponRef from the cart if cart become empty.
+            if (updatedUserCart.product.length === 0 && updatedUserCart.couponRef){
+                const removedCouponRef = await Cart.findOneAndUpdate(
+                    {userRef: sessionId},
+                    {$unset: {couponRef: 1}},
+                    {new : true}
+                );
+
+                console.log('also removedCouponRef from cart : ', removedCouponRef);  // delete variable removedCouponRef
+            }
+
+            return res.status(200).json({ moved: true, cartId: userCart._id});
 
         }
 
@@ -173,12 +187,12 @@ const saveForLater = async(req, res)=>{
                 
                 console.log('productRefIds of shifting (outOfStockItems) :', outOfStockProductRef._id);
 
-                const userWishlist = await Wishlist.findOne({userRef: userId});
+                const userWishlist = await Wishlist.findOne({userRef: sessionId});
 
                 if (!userWishlist){
                     console.log('userkk wishlist illaaa.');
                     const userWishlist = new Wishlist ({
-                        userRef : userId,
+                        userRef : sessionId,
                         product : [{
                             productRef : outOfStockProductRef
                         }]
@@ -211,7 +225,7 @@ const saveForLater = async(req, res)=>{
             }
 
 
-            return res.status(200).json({ movedOutOfStocks: true });
+            return res.status(200).json({ movedOutOfStocks: true, cartId: userCart._id });
             
         }
 

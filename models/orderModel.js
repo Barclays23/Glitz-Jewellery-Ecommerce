@@ -9,93 +9,97 @@ const orderSchema = new mongoose.Schema({
     orderedItems : {
         required : true,
         type : [{
-            // product : {
-                productRef : {
-                    type: mongoose.Schema.Types.ObjectId,
-                    ref: 'Product',
-                    required: true
-                },
-                image : {
-                    type: String,
-                    required: false
-                },
-                code : {
-                    type: String,
-                    required: true,
-                    unique : false
-                },
-                purity : {
-                    type: String,
-                    required: true
-                },
-                name : {
-                    type: String,
-                    required : true
-                },
-                grossWeight: {
-                    type : Number,
-                    required: true
-                },
-                stoneWeight: {
-                    type : Number,
-                    required: true
-                },
-                netWeight: {
-                    type : Number,
-                    required: true
-                },
-                VA: {
-                    type : Number,
-                    required: true
-                },
-                metalPrice : {
-                    type : Number,
-                    required: true
-                },
-                makingCharge : {
-                    type : Number,
-                    required: true
-                },
-                stoneCharge: {
-                    type : Number,
-                    required: true
-                },
-                GST : {
-                    type : Number,
-                    required: true
-                },
-                totalPrice: {
-                    type : Number,
-                    required: true
-                },
-                // offerDiscount : {   // offerDiscount  (offer discount is for individual products / categories. so should this obj move to each products ??)
-                //     type : Number,
-                //     required : true
-                // },
-                quantity : {
-                    type : Number,
-                    required : true
-                },
-                orderStatus : {
-                    type : String,
-                    default : 'Pending',
-                    enum : ['Pending', 'Placed', 'Confirmed', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled', 'Returned']
-                },
-                deliveryDate : {
-                    type: Date,
-                    // required : true
-                },
-                returnDate : {
-                    type: Date,
-                    // required : true
-                },
-                cancelReason : {
-                    type: String
-                },
-                returnReason : {
-                    type: String
-                },
-            // },
+            productRef : {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Product',
+                required: true
+            },
+            image : {
+                type: String,
+                required: false
+            },
+            code : {
+                type: String,
+                required: true,
+                unique : false
+            },
+            purity : {
+                type: String,
+                required: true
+            },
+            name : {
+                type: String,
+                required : true
+            },
+            grossWeight: {
+                type : Number,
+                required: true
+            },
+            stoneWeight: {
+                type : Number,
+                required: true
+            },
+            netWeight: {
+                type : Number,
+                required: true
+            },
+            VA: {
+                type : Number,
+                required: true
+            },
+            metalPrice : {
+                type : Number,
+                required: true
+            },
+            makingCharge : {
+                type : Number,
+                required: true
+            },
+            stoneCharge: {
+                type : Number,
+                required: true
+            },
+            GST : {
+                type : Number,
+                required: true
+            },
+            totalPrice: {
+                type : Number,
+                required: true
+            },
+            offerDiscount : {
+                type : Number,
+                // required : true
+            },
+            quantity : {
+                type : Number,
+                required : true
+            },
+            orderStatus : {
+                type : String,
+                default : 'Pending',
+                enum : ['Pending', 'Placed', 'Confirmed', 'Shipped', 'Out for Delivery', 'Delivered', 'Return Requested', 'Return Request Rejected', 'Return Request Accepted', 'Returned', 'Cancelled' ]
+            },
+            deliveryDate : {
+                type: Date,
+                // required : true
+            },
+            cancelDate : {
+                type: Date,
+                // required : true
+            },
+            cancelReason : {
+                type: String,
+                // required : true
+            },
+            returnDate : {
+                type: Date,
+                // required : true
+            },
+            returnReason : {
+                type: String,
+                // required : true
+            },
         }]
     },
 
@@ -123,14 +127,14 @@ const orderSchema = new mongoose.Schema({
         type : Number,
         required : true
     },
-    // offerDiscount : {   // offerDiscount  (offer discount is for individual products / categories. so should this obj move to each products ??)
-    //     type : Number,
-    //     required : true
-    // },
-    // couponDiscount : {   // not for the individual products, but for the cart amount
-    //     type : Number,
-    //     required : true
-    // },
+    couponDiscount : {
+        type : Number,
+        // required : true
+    },
+    specialDiscount : { // old discount structure (not using now after coupon & offer)
+        type : Number,
+        // required : true
+    },
     netAmount : {   // after all discounts
         type : Number,
         required : true,

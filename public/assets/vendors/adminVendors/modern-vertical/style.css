@@ -13497,7 +13497,7 @@ textarea.is-invalid.tt-hint, .select2-container--default .select2-selection--sin
   text-decoration: none;
   font-size: large;
   color: #00ec66; /*green color */
-  margin-left: 10px;
+  margin: 10px;
 }
 
 .pagination, .jsgrid .jsgrid-pager {

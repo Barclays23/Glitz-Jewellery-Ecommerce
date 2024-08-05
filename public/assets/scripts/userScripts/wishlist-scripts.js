@@ -22,7 +22,7 @@ function addToWishlist(productId){
                 $("#wishlist-count").load("/wishlist #wishlist-count");
                 $("#wishlist-table").load("/wishlist #wishlist-table");
                 // $("#product-actions_"+ productId).load("/shopping #product-actions_"+productId);
-                // $("#shop-products").load("/shopping #shop-products");
+                // $("#shop-products").load("/shopping #shop-products");  // not working
                 location.reload();
             }  else if (response.removed){
                 Swal.fire({
@@ -102,13 +102,22 @@ function saveForLater(productId) {
                     icon: "success",
                     showConfirmButton: false,
                     timer: 1500,
-                }).then(() => {
-                    $("#wishlist-count").load("/cart #wishlist-count");
-                    $("#cart-count").load("/cart #cart-count");
-                    $("#cart-table").load("/cart #cart-table");
-                    $("#cart-summary").load("/cart #cart-summary");
-                    $("#checkout-summary").load("/checkout #checkout-summary");
-                });
+                })
+                $("#wishlist-count").load("/cart #wishlist-count");
+                $("#cart-count").load("/cart #cart-count");
+                $("#cart-table").load("/cart #cart-table");
+                $("#coupon-area").load("/cart #coupon-area");
+                $("#cart-summary").load("/cart #cart-summary");
+                $("#coupon-area").load("/checkout #coupon-area");
+                $("#checkout-summary").load(`/checkout?cartId=${response.cartId} #checkout-summary`);
+                
+                // .then(() => {
+                    // $("#wishlist-count").load("/cart #wishlist-count");
+                    // $("#cart-count").load("/cart #cart-count");
+                    // $("#cart-table").load("/cart #cart-table");
+                    // $("#cart-summary").load("/cart #cart-summary");
+                    // $("#checkout-summary").load("/checkout #checkout-summary");
+                // });
             } else {
                 console.log('Failed to move product to wishlist');
             }

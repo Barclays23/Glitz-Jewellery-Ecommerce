@@ -2,7 +2,6 @@ const User = require('../models/userModel');
 const GoldPrice = require('../models/goldPriceModel');
 const Category = require ('../models/categoryModel');
 const Product = require ('../models/productModel');
-const goldPriceModel = require('../models/goldPriceModel');
 
 
 
@@ -16,11 +15,14 @@ const loadProductList = async(req, res)=>{
         const searchQuery = req.query.search || '';
         console.log('searchQuery : ', searchQuery);
 
-        const statusQuery = req.query['filter-status'] || 'all';
-        console.log('statusQuery : ', statusQuery);
-
         const categoryQuery = req.query['filter-category'] || 'all';
         console.log('categoryQuery : ', categoryQuery);
+        
+        const purityQuery = req.query['filter-purity'] || 'all';
+        console.log('purityQuery : ', purityQuery);
+        
+        const statusQuery = req.query['filter-status'] || 'all';
+        console.log('statusQuery : ', statusQuery);
 
         const sortQuery = req.query.sort || 'none';
         console.log('sortQuery : ', sortQuery);
@@ -41,12 +43,8 @@ const loadProductList = async(req, res)=>{
         }
 
 
-        // filtering
-        if (statusQuery !== 'all') {
-            productQuery.isBlocked = statusQuery === 'true';
-        }
-        
 
+        // filtering category
         if (categoryQuery !== 'all') {
             const category = await Category.findOne({ name: categoryQuery });
             if (category) {
@@ -54,26 +52,71 @@ const loadProductList = async(req, res)=>{
             }
         }
 
+        // filtering purity
+        if (purityQuery !== 'all') {
+            productQuery.purity = purityQuery === '22k' ? '22K (916)' : '18K (750)';
+        }
 
-        // sorting
-        const sortOptions = {};    // (need to sort gross wt, net wt, stone wt, VA, tota price, qty)
-        // if (sortQuery === 'orderNo-asc') {
-        //     sortOptions.orderNo = 1;
-        // } else if (sortQuery === 'orderNo-desc') {
-        //     sortOptions.orderNo = -1;
-        // } else {
-        //     sortOptions.orderDate = -1; // Default sorting by order date descending
-        // }
+        // filtering status
+        if (statusQuery !== 'all') {
+            productQuery.isBlocked = statusQuery === 'unlisted';
+        }
+
+
+        // SORTING QUERY OPTIONS
+        const sortOptions = {};
+        if (sortQuery === 'gross-wt-asc') {
+            sortOptions.grossWeight = 1;
+        } else if (sortQuery === 'gross-wt-desc') {
+            sortOptions.grossWeight = -1;
+        } else if (sortQuery === 'net-wt-asc') {
+            sortOptions.netWeight = 1;
+        } else if (sortQuery === 'net-wt-desc') {
+            sortOptions.netWeight = -1;
+        } else if (sortQuery === 'stone-wt-asc') {
+            sortOptions.stoneWeight = 1;
+        } else if (sortQuery === 'stone-wt-desc') {
+            sortOptions.stoneWeight = -1;
+        } else if (sortQuery === 'va-asc') {
+            sortOptions.VA = 1;
+        } else if (sortQuery === 'va-desc') {
+            sortOptions.VA = -1;
+        } else if (sortQuery === 'metal-price-asc') {
+            sortOptions.metalPrice = 1;
+        } else if (sortQuery === 'metal-price-desc') {
+            sortOptions.metalPrice = -1;
+        } else if (sortQuery === 'making-charge-asc') {
+            sortOptions.makingCharge = 1;
+        } else if (sortQuery === 'making-charge-desc') {
+            sortOptions.makingCharge = -1;
+        } else if (sortQuery === 'stone-charge-asc') {
+            sortOptions.stoneCharge = 1;
+        } else if (sortQuery === 'stone-charge-desc') {
+            sortOptions.stoneCharge = -1;
+        } else if (sortQuery === 'total-price-asc') { //
+            sortOptions.totalPrice = 1;
+        } else if (sortQuery === 'total-price-desc') {
+            sortOptions.totalPrice = -1;
+        } else if (sortQuery === 'quantity-asc') {
+            sortOptions.quantity = 1;
+        } else if (sortQuery === 'quantity-desc') {
+            sortOptions.quantity = -1;
+        } else {
+            sortOptions._id = -1; // Default sorting: by _id of products in descending (latest products first).
+        }
+
+        console.log('sortOptions query :', sortOptions);
 
 
         const productData = await Product.find(productQuery)
         .populate('categoryRef')
         .skip((pageNo - 1) * limit)
         .limit(limit)
-        .sort({_id: -1})
+        .sort(sortOptions)
         .exec();
 
         const count = await Product.countDocuments(productQuery);
+        console.log('product result count :', count);
 
         let totalPages = Math.ceil(count / limit);
 
@@ -87,8 +130,9 @@ const loadProductList = async(req, res)=>{
             goldPriceData,
             productData,
             categoryData,
-            searchQuery,   // searchQuery
+            searchQuery,
             categoryQuery,
+            purityQuery,
             statusQuery,
             sortQuery,
             count,

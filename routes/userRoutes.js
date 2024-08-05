@@ -93,7 +93,7 @@ userRoute.delete('/delete-address', userAuth.isLogin, addressController.deleteAd
 
 // WISHLIST ROUTES
 userRoute.get('/wishlist', userAuth.isLogin, wishlistController.loadUserWishlist);
-userRoute.post('/add-to-wishlist', wishlistController.addToWishlist);
+userRoute.post('/add-to-wishlist', wishlistController.addToWishlist); // also same function for remove to wishlist
 userRoute.delete('/save-for-later', userAuth.isLogin, wishlistController.saveForLater);
 
 

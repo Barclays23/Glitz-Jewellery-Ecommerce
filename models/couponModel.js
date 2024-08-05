@@ -22,7 +22,7 @@ const couponSchema = new mongoose.Schema({
     criteriaAmount: {
         type: Number,
         required: true,
-    },  
+    },
     couponValue: {
         type: Number,
         required: true,
@@ -48,7 +48,13 @@ const couponSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
-    usedCustomers: []
+    usedCustomers: [{
+        userRef: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            required: true
+        },
+    }]
 });
 
 

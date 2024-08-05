@@ -205,6 +205,9 @@ const applyCoupon = async(req, res)=>{
         const couponData = await Coupon.findOne({code: couponCode});
         console.log('coupon data for applying coupon discount :', couponData);
 
+        // const usedCustomer = couponData.usedCustomers.find(userRef => userRef.toString() === sessionId);
+        const usedCustomer = couponData.usedCustomers.some(user => user.userRef.toString() === sessionId);
+
         if (!couponData) {
             console.log(`coupon code ${couponCode} not found in database.`);
             return res.json({notfound: true, message: 'Invalid coupon code!'})
@@ -218,7 +221,11 @@ const applyCoupon = async(req, res)=>{
     
             } else if (!couponData.isActive){
                 console.log('coupon is blocked');
-                return res.json({inactive: true, message: 'The coupon code you entered is temporarily blocked.! Please try again later.'});
+                return res.json({inactive: true, message: 'We apologize, but this coupon code is temporarily not available.! Please try again later.'});
+
+            } else if (usedCustomer){
+                console.log('user already used this coupon');
+                return res.json({alreadyused: true, message: 'Sorry, you have already been redeemed this coupon. Check other offers.'});
     
             } else if (couponData.criteriaAmount >= subTotal){
                 console.log('not eligible: subtotal is not sufficient.');

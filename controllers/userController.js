@@ -84,11 +84,18 @@ const verifyLogin = async (req, res) => {
         console.count("verifyLogin");
         const userData = await User.findOne({ email: loginEmail });
 
+
         if (!userData) {
             console.log('no userdata');
             return res.status(404).json({ notFound: true, message: "The email is not registered with us. Please sign up." });
+
         } else if(userData.isBlocked === true){
             return res.status(401).json({ blocked: true, message: "Your account is blocked by admin!" });
+
+        } else if(!userData.password){
+            console.log('no password stored for Google auth users.');
+            return res.status(404).json({ incorrect: true, message: "Incorrect Password!" });
+
         } else{
             const passwordMatch = await bcrypt.compare(loginPassword, userData.password);
 
@@ -1189,10 +1196,12 @@ const loadCoupons = async (req, res)=>{
 const loadWallet = async (req, res)=>{
     try {
         const sessionId = req.session.userId;
-        const userData = await User.findById(sessionId);
         const goldPriceData = await GoldPrice.findOne({});
         const userCart = await Cart.findOne({ userRef: sessionId });
         const userWishlist = await Wishlist.findOne({ userRef: sessionId});
+
+        const userData = await User.findById(sessionId);
+
 
         let cartCount = 0;
         let wishlistCount = 0;

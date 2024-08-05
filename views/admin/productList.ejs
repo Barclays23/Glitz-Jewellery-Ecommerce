@@ -20,9 +20,12 @@
                         <thead>
                             <tr class="text-center">
                                 <th> No </th>
+                                
                                 <th> Image </th>
+
+                                <!-- Category -->
                                 <th>
-                                    <select name="filter-category" onchange="location.href='?filter-category=' + this.value + '&sort=<%= sortQuery %>&filter-status=<%= statusQuery %>'">
+                                    <select name="filter-category" onchange="location.href='?filter-category=' + this.value + '&filter-status=<%= statusQuery %>' + '&sort=<%= sortQuery %>' ">
                                         <option value="all" <%= categoryQuery === 'all' ? 'selected' : '' %>>Category</option>
                                         <% for (let i = 0; i < categoryData.length; i++) { %>
                                             <option value="<%= categoryData[i].name %>" <%= categoryQuery === categoryData[i].name ? 'selected' : '' %>>
@@ -30,21 +33,106 @@
                                             </option>
                                         <% } %>
                                     </select>
-                                </th>                               
+                                </th>
+
                                 <th> Product Code </th>
-                                <th> Purity </th>
+                                
+                                <!-- Purity -->
+                                <th>
+                                    <select name="filter-purity" onchange="location.href='?filter-purity=' + this.value + '&filter-category=<%= categoryQuery %>' + '&filter-status=<%= statusQuery %>' + '&sort=<%= sortQuery %>' ">
+                                        <option value="all" <%= purityQuery === 'all' ? 'selected' : '' %>> Purity</option>
+                                        <option value="22k" <%= purityQuery === '22k' ? 'selected' : '' %>> 22KT</option>
+                                        <option value="18k" <%= purityQuery === '18k' ? 'selected' : '' %>> 18KT</option>
+                                    </select>
+                                </th>
+
                                 <th> Product Name </th>
-                                <th> Gross Wt </th>
-                                <th> Stone Wt </th>
-                                <th> Net Wt </th>
-                                <th> VA % </th>
-                                <th> Metal Cost </th>
-                                <th> MC Value </th>
-                                <th> Stone Rate </th>
+
+                                <!-- Gross Weight -->
+                                <th>
+                                    <select name="sort" onchange="location.href='?sort=' + this.value + '&filter-category=<%= categoryQuery %>' + '&filter-purity=<%= purityQuery %>' + '&filter-status=<%= statusQuery %>' ">
+                                        <option value="none" <%= sortQuery === 'none' ? 'selected' : '' %>>Gross Weight</option>
+                                        <option value="gross-wt-asc" <%= sortQuery === 'gross-wt-asc' ? 'selected' : '' %>>Ascending</option>
+                                        <option value="gross-wt-desc" <%= sortQuery === 'gross-wt-desc' ? 'selected' : '' %>>Descending</option>
+                                    </select>
+                                </th>
+
+                                <!-- Stone Weight -->
+                                <th>
+                                    <select name="sort" onchange="location.href='?sort=' + this.value + '&filter-category=<%= categoryQuery %>' + '&filter-purity=<%= purityQuery %>' + '&filter-status=<%= statusQuery %>' ">
+                                        <option value="none" <%= sortQuery === 'none' ? 'selected' : '' %>>Stone Weight</option>
+                                        <option value="stone-wt-asc" <%= sortQuery === 'stone-wt-asc' ? 'selected' : '' %>>Ascending</option>
+                                        <option value="stone-wt-desc" <%= sortQuery === 'stone-wt-desc' ? 'selected' : '' %>>Descending</option>
+                                    </select>
+                                </th>
+
+                                <!-- Net Weight -->
+                                <th>
+                                    <select name="sort" onchange="location.href='?sort=' + this.value + '&filter-category=<%= categoryQuery %>' + '&filter-purity=<%= purityQuery %>' + '&filter-status=<%= statusQuery %>' ">
+                                        <option value="none" <%= sortQuery === 'none' ? 'selected' : '' %>>Net Weight</option>
+                                        <option value="net-wt-asc" <%= sortQuery === 'net-wt-asc' ? 'selected' : '' %>>Ascending</option>
+                                        <option value="net-wt-desc" <%= sortQuery === 'net-wt-desc' ? 'selected' : '' %>>Descending</option>
+                                    </select>
+                                </th>
+
+                                <th>
+                                    <select name="sort" onchange="location.href='?sort=' + this.value + '&filter-category=<%= categoryQuery %>' + '&filter-purity=<%= purityQuery %>' + '&filter-status=<%= statusQuery %>' ">
+                                        <option value="none" <%= sortQuery === 'none' ? 'selected' : '' %>> VA % </option>
+                                        <option value="va-asc" <%= sortQuery === 'va-asc' ? 'selected' : '' %>>Ascending</option>
+                                        <option value="va-desc" <%= sortQuery === 'va-desc' ? 'selected' : '' %>>Descending</option>
+                                    </select>
+                                </th>
+
+                                <th>
+                                    <select name="sort" onchange="location.href='?sort=' + this.value + '&filter-category=<%= categoryQuery %>' + '&filter-purity=<%= purityQuery %>' + '&filter-status=<%= statusQuery %>' ">
+                                        <option value="none" <%= sortQuery === 'none' ? 'selected' : '' %>> Metal Price </option>
+                                        <option value="metal-price-asc" <%= sortQuery === 'metal-price-asc' ? 'selected' : '' %>>Ascending</option>
+                                        <option value="metal-price-desc" <%= sortQuery === 'metal-price-desc' ? 'selected' : '' %>>Descending</option>
+                                    </select>
+                                </th>
+
+                                <th>
+                                    <select name="sort" onchange="location.href='?sort=' + this.value + '&filter-category=<%= categoryQuery %>' + '&filter-purity=<%= purityQuery %>' + '&filter-status=<%= statusQuery %>' ">
+                                        <option value="none" <%= sortQuery === 'none' ? 'selected' : '' %>> MC Value </option>
+                                        <option value="making-charge-asc" <%= sortQuery === 'making-charge-asc' ? 'selected' : '' %>>Ascending</option>
+                                        <option value="making-charge-desc" <%= sortQuery === 'making-charge-desc' ? 'selected' : '' %>>Descending</option>
+                                    </select>
+                                </th>
+
+                                <th>
+                                    <select name="sort" onchange="location.href='?sort=' + this.value + '&filter-category=<%= categoryQuery %>' + '&filter-purity=<%= purityQuery %>' + '&filter-status=<%= statusQuery %>' ">
+                                        <option value="none" <%= sortQuery === 'none' ? 'selected' : '' %>> Stone Rate </option>
+                                        <option value="stone-charge-asc" <%= sortQuery === 'stone-charge-asc' ? 'selected' : '' %>>Ascending</option>
+                                        <option value="stone-charge-desc" <%= sortQuery === 'stone-charge-desc' ? 'selected' : '' %>>Descending</option>
+                                    </select>
+                                </th>
+
                                 <th> GST </th>
-                                <th> Total Price </th>
-                                <th> Qty </th>
-                                <th> Status </th>
+
+                                <th>
+                                    <select name="sort" onchange="location.href='?sort=' + this.value + '&filter-category=<%= categoryQuery %>' + '&filter-purity=<%= purityQuery %>' + '&filter-status=<%= statusQuery %>' ">
+                                        <option value="none" <%= sortQuery === 'none' ? 'selected' : '' %>> Total Price </option>
+                                        <option value="total-price-asc" <%= sortQuery === 'total-price-asc' ? 'selected' : '' %>>Ascending</option>
+                                        <option value="total-price-desc" <%= sortQuery === 'total-price-desc' ? 'selected' : '' %>>Descending</option>
+                                    </select>
+                                </th>
+
+                                <th>
+                                    <select name="sort" onchange="location.href='?sort=' + this.value + '&filter-category=<%= categoryQuery %>' + '&filter-purity=<%= purityQuery %>' + '&filter-status=<%= statusQuery %>' ">
+                                        <option value="none" <%= sortQuery === 'none' ? 'selected' : '' %>> Quantity </option>
+                                        <option value="quantity-asc" <%= sortQuery === 'quantity-asc' ? 'selected' : '' %>>Ascending</option>
+                                        <option value="quantity-desc" <%= sortQuery === 'quantity-desc' ? 'selected' : '' %>>Descending</option>
+                                    </select>
+                                </th>
+
+                                <th>
+                                    <select name="filter-status" onchange="location.href='?filter-status=' + this.value + '&filter-category=<%= categoryQuery %>' + '&filter-purity=<%= purityQuery %>' + '&sort=<%= sortQuery %>' ">
+                                        <option value="all" <%= statusQuery === 'all' ? 'selected' : '' %>> Status</option>
+                                        <option value="listed" <%= statusQuery === 'listed' ? 'selected' : '' %>> Listed </option>
+                                        <option value="unlisted" <%= statusQuery === 'unlisted' ? 'selected' : '' %>> Unlisted </option>
+                                    </select>
+                                </th>
+
                                 <th> Actions </th>
                             </tr>
                         </thead>
@@ -53,7 +141,6 @@
                             <% if (productData.length > 0){
                                 for(let i=0; i < productData.length; i++){ %>
                                     <tr>
-
                                         <td> <%= (currentPage - 1) * limit + i + 1 %></td>
 
                                         <% if (productData[i].images.image1){ %>
@@ -80,19 +167,19 @@
 
                                         <td class="net-weight"> <%= productData[i].netWeight.toFixed(3) %> </td>
 
-                                        <td> <%= productData[i].VA %> % </td>
+                                        <td class="va"> <%= productData[i].VA %> % </td>
 
-                                        <td class="metal-cost" style="text-align: right;"> <%= productData[i].metalPrice.toFixed(2) %> </td>
+                                        <td class="metal-cost text-end"> <%= productData[i].metalPrice.toFixed(2) %> </td>
 
-                                        <td class="making-charge"> <%= productData[i].makingCharge.toFixed(2) %> </td>
+                                        <td class="making-charge text-end"> <%= productData[i].makingCharge.toFixed(2) %> </td>
 
-                                        <td class="stone-charge"> <%= productData[i].stoneCharge.toFixed(2) %> </td>
+                                        <td class="stone-charge text-end"> <%= productData[i].stoneCharge.toFixed(2) %> </td>
 
-                                        <td class="GST" style="text-align: right;"> <%= productData[i].GST.toFixed(2) %> </td>
+                                        <td class="GST text-end"> <%= productData[i].GST.toFixed(2) %> </td>
 
-                                        <td class="total-price" style="text-align: right;"> <%= productData[i].totalPrice.toFixed(2) %> </td>
+                                        <td class="total-price text-end"> <%= productData[i].totalPrice.toFixed(2) %> </td>
 
-                                        <td class="quantity"> <%= productData[i].quantity %> </td>
+                                        <td class="quantity text-center" style="font-size: medium;"> <%= productData[i].quantity %> </td>
 
                                         <% if(productData[i].isBlocked === false){ %>
                                             <td class="text-success">
@@ -151,18 +238,18 @@
                     </table>
 
                     <br>
-
-                    <div class="list-pagination text-center">
-                        <% for(let j=1; j <= totalPages; j++){ %>
-                            <% if (currentPage == j) { %>
-                                <a href="?page=<%= j %>&sort=<%= sortQuery %>&search=<%= searchQuery %>&filter-category=<%= categoryQuery %>&filter-status=<%= statusQuery %>" class="active"><%= j %></a>
-                            <% } else{ %>
-                                <a href="?page=<%= j %>&sort=<%= sortQuery %>&search=<%= searchQuery %>&filter-category=<%= categoryQuery %>&filter-status=<%= statusQuery %>"><%= j %></a>
-                            <% } %>
-                        <% } %>
-                    </div>
-                    
                 </div>
+
+                <div class="list-pagination" style="text-align: center">
+                    <% for(let j=1; j <= totalPages; j++){ %>
+                        <% if (currentPage == j) { %>
+                            <a href="?page=<%= j %>&sort=<%= sortQuery %>&search=<%= searchQuery %>&filter-category=<%= categoryQuery %>&filter-status=<%= statusQuery %>" class="text-white"><%= j %></a>
+                        <% } else{ %>
+                            <a href="?page=<%= j %>&sort=<%= sortQuery %>&search=<%= searchQuery %>&filter-category=<%= categoryQuery %>&filter-status=<%= statusQuery %>" class="text-success"><%= j %></a>
+                        <% } %>
+                    <% } %>
+                </div>
+
             </div>
         </div>
     </div>
@@ -184,6 +271,7 @@
             </div>
             <div class="modal-body">
                 <form id="add-product-form" enctype="multipart/form-data">
+                    <!-- if needed to upload single images each -->
                     <!-- <div class="form-group">
                         <div class="row">
                             <div class="col">
@@ -449,7 +537,6 @@
 
 
 <!-- SCRIPT FOR EDIT PRODUCTS FORM SUBMISSION -->
-
 <script>
     // to fill the net weight automatically.
     function calculateNetWeight() {

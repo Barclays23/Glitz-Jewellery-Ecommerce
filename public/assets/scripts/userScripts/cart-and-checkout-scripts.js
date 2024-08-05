@@ -58,6 +58,10 @@ function addToCart(productId) {
 }
 
 
+
+
+
+
 // Function to show the authentication SweetAlert
 function showAuthSwal() {
     const signInButtonId = 'signInSwalButton';
@@ -185,16 +189,26 @@ function removeFromCart(productId, index) {
                     productId,index
                 },
                 success: function(response) {
-                    if(response.removedProduct) {
+                    console.log('response from removeFromCart : ', response);
+
+                    if (response.removedProduct) {
                         Swal.fire({
                             title: "Item Removed",
                             text: "The item has been removed from your cart.",
                             icon: "success",
                             showConfirmButton: false,
                             timer: 1500,
-                        }).then(() => {
-                            location.reload();
                         });
+                        $("#wishlist-count").load("/cart #wishlist-count");
+                        $("#cart-count").load("/cart #cart-count");
+                        $("#cart-table").load("/cart #cart-table");
+                        $("#coupon-area").load("/cart #coupon-area");
+                        $("#cart-summary").load("/cart #cart-summary");
+                        $("#coupon-area").load("/checkout #coupon-area");
+                        $("#checkout-summary").load(`/checkout?cartId=${response.cartId} #checkout-summary`);
+
+                    } else if(response.emptyCart){
+                        window.location.href = '/cart';
                     } else {
                         console.log('Failed to remove product from cart');
                     }
@@ -212,23 +226,30 @@ function removeFromCart(productId, index) {
 
 
 // <!-- script for validating the carted items before proceed to checkout. -->
-function proceedToCheckout(userId) {
+function proceedToCheckout(userId, event) {
+
+    if (event) {
+        event.preventDefault();
+    }
+
     $.ajax({
         url: '/proceed-to-checkout',
         method: 'POST',
         success: function (response) {
             console.log('response for proceedToCheckout :', response);
-            if(response.nocartItems){
+            if (response.nocartItems){
                 Swal.fire({
                     title: 'Empty Cart',
                     text: 'Your cart is empty. Please add items before checking out.',
                     icon: 'warning',
+                    showConfirmButton: false
                 })
             } else if (response.outofstockfound) {
+                console.log('outofstockfound swal started running.');
                 Swal.fire({
                     icon: 'warning',
                     title: "Unavailable items in cart.",
-                    text: 'Some items in your cart are currently unavailable.. Please remove them or save for later before proceeding to checkout.',
+                    text: 'Some items in your cart are currently unavailable.. Please remove them or save for later before proceeding to checkout. Note: This will also reflect on your coupon discounts based on your subtotal.',
                     showDenyButton: true,
                     showCancelButton: true,
                     confirmButtonText: "Remove & Proceed",
@@ -243,11 +264,9 @@ function proceedToCheckout(userId) {
                         
                     } else if (result.isDenied) {  // if clicked Save for later button
                         saveOutOfStockItems(response.outOfStockItems);
-                        // Swal.fire("Saved & Cart Updated", "Unavailable items are saved to your wishlist", "success")
-                        // .then(()=>{
-                        //     window.location.href = '/checkout'; // Proceed to the checkout page after items saved to wishlist.
-                        // });
                     }
+                }).catch((error) => {
+                    console.log('outofstockfound Swal error :', error);
                 });
 
             } else if(response.proceed){
@@ -267,6 +286,7 @@ function proceedToCheckout(userId) {
 
 // <!-- to remove out of stock items from cart. -->
 function removeOutOfStockItems(outOfStockItems) {
+    console.log('removeOutOfStockItems() start running.');
     $.ajax({
         url: '/remove-from-cart',
         method: 'DELETE',
@@ -275,16 +295,31 @@ function removeOutOfStockItems(outOfStockItems) {
         success: function(response) {
             console.log('response from updateCart : ', response);
             if(response.removedOutOfStock){
-                Swal.fire("Removed Items!", "Unavailable items have been removed from your cart.", "success")
+                Swal.fire({
+                    icon: 'success',
+                    title: "Items Removed!",
+                    text: 'Unavailable items have been removed from your cart.',
+                    showConfirmButton: false,
+                    timer: 1000
+                })
                 .then(()=>{
-                    window.location.href = '/checkout';  // Proceed to the checkout page after removed from cart.
+                    console.log('response.cartId : ', response.cartId);
+                    window.location.href = `/checkout?cartId=${response.cartId}` // Proceed to the checkout page after removed from cart.
+                });
+            } else if (response.error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: "Error while removing out of stock items.",
+                    text: response.message,
+                    showConfirmButton: false,
                 });
             }
         },
         error: function(xhr) {
             Swal.fire({
             title: 'Error removing outofstock from cart',
-            text: xhr.responseText,
+            // text: xhr.message,
+            // text: xhr.responseText,
             icon: 'error',
             confirmButtonText: 'OK'
             });
@@ -314,16 +349,11 @@ function saveOutOfStockItems(outOfStockItems) {
                     icon: "success",
                     showConfirmButton: false,
                     timer: 1500,
-                }).then(() => {
-                    $("#wishlist-count").load("/cart #wishlist-count");
-                    $("#cart-count").load("/cart #cart-count");
-                    $("#cart-table").load("/cart #cart-table");
-                    $("#cart-summary").load("/cart #cart-summary");
-                    $("#checkout-summary").load("/checkout #checkout-summary");
                 })
-                // .then(()=>{
-                //     window.location.href = '/checkout';  // Proceed to the checkout page after removed from cart.
-                // });
+                .then(()=>{
+                    console.log('response.cartId : ', response.cartId);
+                    window.location.href = `/checkout?cartId=${response.cartId}` // Proceed to the checkout page after removed from cart.
+                })
             }
         },
         error: function(xhr) {
@@ -350,6 +380,7 @@ function applyCoupon() {
     if (couponCode === '') {
         Swal.fire({
             text: 'Please enter a coupon code.',
+            showConfirmButton: false,
         });
         return;
     }
@@ -383,6 +414,11 @@ function applyCoupon() {
                     showConfirmButton: false,
                 });
             } else if (response.inactive) {
+                Swal.fire({
+                    text: response.message,
+                    showConfirmButton: false,
+                });
+            } else if (response.alreadyused) {
                 Swal.fire({
                     text: response.message,
                     showConfirmButton: false,

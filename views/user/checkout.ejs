@@ -132,7 +132,7 @@
                                             <span class="tm-cart-totalprice" id="total_price_<%= i %>">₹<%= (userCart.product[i].productRef.totalPrice * userCart.product[i].quantity).toFixed(2) %></span>
                                         </td>
                                         <td class="bg-light">
-                                            <button class="tm-button tm-button-small">Save for Later</button>
+                                            <button class="tm-button tm-button-small" onclick="saveForLater('<%= userCart.product[i]._id %>')">Save for Later</button>
                                             <button class="tm-button tm-button-small" onclick="removeFromCart('<%= userCart.product[i]._id, i %>', '<%= i %>')"> Remove </button>
                                             <% if(userCart.product[i].productRef.quantity === 0){ %>
                                                 <br><br>
@@ -265,7 +265,7 @@
                                             <% } %>
                                         <% } %>
                                     </tbody>
-                                    <tfoot class="fw-bold" id="abcd">
+                                    <tfoot class="fw-bold">
                                         <tr>
                                             <td colspan="2"><hr style="border: 1px solid black;"></td>
                                         </tr>
@@ -277,16 +277,14 @@
                                             <td> Shipping Charge (+) </td>
                                             <td id="shipping-charge">₹ <%= shippingCharge.toFixed(2) %></td>
                                         </tr>
-                                        <tr class="tm-checkout-discount">
-                                            <td> Discount (-) </td>
+                                        <tr class="tm-checkout-offer">
+                                            <td> Offer Discount (-) </td>
                                             <td id="offer-discount" class="text-success">₹ <%= offerDiscount.toFixed(2) %></td>
                                         </tr>
-                                        <% if (userCart && userCart.couponRef) { %>
-                                            <tr class="tm-checkout-coupon">
-                                                <td> Coupon Discount (-) </td>
-                                                <td id="coupon-discount" class="text-success">₹ <%= couponDiscount.toFixed(2) %></td>
-                                            </tr>
-                                        <% } %>
+                                        <tr class="tm-checkout-coupon">
+                                            <td> Coupon Discount (-) </td>
+                                            <td id="coupon-discount" class="text-success">₹ <%= couponDiscount.toFixed(2) %></td>
+                                        </tr>
                                         <tr>
                                             <td colspan="2"><hr style="border: 1px solid black;"></td>
                                         </tr>
@@ -306,7 +304,7 @@
                                         <input type="radio" name="checkout-payment-method" id="checkout-payment-online" value="Online Payment" />
                                         <label for="checkout-payment-online"> Online Payment </label>
                                         <div class="tm-checkout-payment-content">
-                                            <p> Make your payment directly into our bank account. </p>
+                                            <p> Make your payment directly into our bank account using net banking facility. </p>
                                         </div>
                                     </div>
                                     <div class="tm-form-field">
@@ -314,22 +312,20 @@
                                         <input type="radio" name="checkout-payment-method" id="checkout-payment-wallet" value="Wallet" />
                                         <label for="checkout-payment-wallet"> Wallet </label>
                                         <div class="tm-checkout-payment-content">
-                                            <p>
-                                                Please send a check to Store Name, Store Street,
-                                                Store Town, Store State / County, Store Postcode.
-                                            </p>
+                                            <p>Pay with your wallet account. <br> Your current wallet balance is <b> ₹<%= userData.walletBalance.toFixed(2) %> </b></p>
                                         </div>
+                                        <input type="hidden" id="wallet-balance" value="<%= (userData.walletBalance) %>">
                                     </div>
                                     <div class="tm-form-field">
                                         <input type="radio" name="checkout-payment-method" id="checkout-payment-cashondelivery" value="Cash On Delivery"/>
                                         <label for="checkout-payment-cashondelivery">Cash On Delivery</label>
                                         <div class="tm-checkout-payment-content">
-                                            <p>Pay with cash upon delivery.</p>
+                                            <p>Pay with cash upon delivery.<br>Note: Cash on Delivery orders exceeding ₹2,00,000 are not allowed.</p>
                                         </div>
                                     </div>
                                     <div class="tm-form-field">
-                                        <input type="radio" name="checkout-payment-method" id="checkout-payment-creditcard" value="Card Payment"/>
-                                        <label for="checkout-payment-creditcard">Credit / Debit Card</label>
+                                        <input type="radio" name="checkout-payment-method" id="checkout-payment-cardpayment" value="Card Payment"/>
+                                        <label for="checkout-payment-cardpayment">Card Payment</label>
                                         <div class="tm-checkout-payment-content">
                                             <p>Pay with your credit card or debit card via Stripe.</p>
                                         </div>
@@ -671,6 +667,10 @@
  etc) -->
 
 
+ <!-- // importing the wishlist script for save for later (MOVE TO WISHLIST and remvoe from the cart / checkout) -->
+<script src="/assets/scripts/userScripts/wishlist-scripts.js"></script>
+
+
  
 
 
@@ -678,16 +678,6 @@
 <!-- script for place order -->
 <script>
     function placeOrder() {
-        // Check if the terms and conditions checkbox is ticked
-        let termsChecked = document.querySelector('input[name="checkout-read-terms"]').checked;
-        if (!termsChecked) {
-            Swal.fire({
-                html: `<p class="text-center text-danger"> You must agree to the terms and conditions before placing the order. </p>`,
-                showConfirmButton: false,
-            });
-            return;
-        }
-
 
         // Check if a shipping address is selected
         // let selectedAddressElement = document.querySelector('input[name="checkout-address"]:checked');
@@ -725,6 +715,18 @@
         }
 
 
+
+        // Check if the terms and conditions checkbox is ticked
+        let termsChecked = document.querySelector('input[name="checkout-read-terms"]').checked;
+        if (!termsChecked) {
+            Swal.fire({
+                html: `<p class="text-center text-danger"> You must agree to the terms and conditions before placing the order. </p>`,
+                showConfirmButton: false,
+            });
+            return;
+        }
+
+
         // Gather the selected address ID and payment method
         selectedAddressId = document.querySelector('input[name="checkout-address"]:checked').value;
         selectedPaymentMethod = document.querySelector('input[name="checkout-payment-method"]:checked').value;
@@ -739,11 +741,54 @@
         });
 
 
-        let subTotal = document.querySelector('.tm-checkout-subtotal td:nth-child(2)').textContent.trim();
-        let shippingCharge = document.querySelector('.tm-checkout-shipping td:nth-child(2)').textContent.trim();
-        let discountAmount = document.querySelector('.tm-checkout-discount td:nth-child(2)').textContent.trim();
-        let netAmount = document.querySelector('.tm-checkout-total td:nth-child(2) h4').textContent.trim();
 
+        let subTotal = document.querySelector('.tm-checkout-subtotal td:nth-child(2)').textContent;
+        let shippingCharge = document.querySelector('.tm-checkout-shipping td:nth-child(2)').textContent;
+        let offerDiscount = document.querySelector('.tm-checkout-offer td:nth-child(2)').textContent;
+        let couponDiscount = document.querySelector('.tm-checkout-coupon td:nth-child(2)').textContent;
+        let netAmount = document.querySelector('.tm-checkout-total td:nth-child(2) h4').textContent;
+
+        let walletBalance = parseFloat(document.getElementById('wallet-balance').value);
+        let netAmountValue = parseFloat(netAmount.replace(/[^0-9.-]+/g, ""));
+
+        console.log('subTotal to send :', subTotal);
+        console.log('shippingCharge to send :', shippingCharge);
+        console.log('offerDiscount to send :', offerDiscount);
+        console.log('couponDiscount to send :', couponDiscount);
+        console.log('netAmount to send :', netAmount);
+        console.log('walletBalance to send :', walletBalance);
+        console.log('walletBalance type :', typeof(walletBalance));
+
+
+
+        if (selectedPaymentMethod === 'Cash On Delivery' && Number(netAmount.replace(/[^0-9.-]+/g, "")) >= 200000) {
+            console.log('excess cash transaction....')
+            Swal.fire({
+                title: "Cash Payment Exceeds Limit",
+                html: `<p style="color: red; font-size: 15px"> Cash on Delivery orders exceeding Rs. 200,000 are not allowed.
+                    Accepting cash payments above this limit is illegal and can result in a penalty equal to the amount received.
+                    Please choose an alternative payment method or reduce your order value. </p>`,
+                icon: "warning",
+                showConfirmButton: false,
+            });
+            return;
+        }
+
+
+        // need to check the wallet balance before ordering.
+        if (selectedPaymentMethod === 'Wallet' && walletBalance < netAmountValue) {
+            console.log('wallet balance is insufficient.');
+            Swal.fire({
+                title: "Insufficient Wallet Balance",
+                html: `<p style="color: red; font-size: 15px"> You have only <b> ₹${walletBalance.toFixed(2)} </b> left in your wallet. <br>
+                    Please add money or adjust your cart to place your order.
+                    Else, please choose other payment options.`,
+                icon: "warning",
+                showConfirmButton: false,
+            });
+            return;
+        }
+        
 
         // Gather the shipping address
         let selectedAddressElement = document.querySelector('input[name="checkout-address"]:checked').parentElement;
@@ -787,7 +832,7 @@
                     <tr>
                         <td style="vertical-align: top;"><strong>Items Ordered</strong></td>
                         <td style="vertical-align: top;"><strong>:</strong></td>
-                        <td style="vertical-align: top;"><ul>${productList}</ul></td>
+                        <td style="vertical-align: top;"><ol>${productList}</ol></td>
                     </tr>
                     <tr>
                         <td><strong>Subtotal</strong></td>
@@ -800,9 +845,14 @@
                         <td class="text-right">${shippingCharge}</td>
                     </tr>
                     <tr>
-                        <td><strong>Discount Amount</strong></td>
+                        <td><strong>Offer Discount</strong></td>
                         <td><strong>:</strong></td>
-                        <td class="text-right">${discountAmount}</td>
+                        <td class="text-right">${offerDiscount}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Coupon Discount</strong></td>
+                        <td><strong>:</strong></td>
+                        <td class="text-right">${couponDiscount}</td>
                     </tr>
                     <tr>
                         <td><strong>Net Amount</strong></td>
@@ -815,7 +865,7 @@
                         <td class="p-2">${selectedPaymentMethod}</td>
                     </tr>
                 </table>
-                <p>By clicking "Place Order," you agree to our <a href="#">Terms and Conditions</a> and <a href="#">Return Policy</a>.</p>
+                <p>By clicking "Place Order," you agree to our <a href="#" class="terms-link">Terms and Conditions</a> and <a href="#" class="policy-link">Return Policy</a>.</p>
             `,
             icon: 'info',
             showCancelButton: true,
@@ -830,7 +880,7 @@
                     contentType: 'application/json',
                     data: JSON.stringify({selectedAddressId, selectedPaymentMethod}),
                     success: function(response) {
-                        if(response.successful) {
+                        if (response.successful) {
                             Swal.fire({
                                 title: "Order Placed",
                                 text: "Your order has been placed successfully.",
@@ -840,10 +890,48 @@
                             }).then(() => {
                                 window.location.href = '/thankyou'; // Proceed to the thank you page after completed ordering.
                             });
+                        
+                        } else if (response.outofstockfound) {
+                            const outOfStockList = response.outOfStockItems.map(item => `<li>${item.productRef.name} (Current Stock: ${item.productRef.quantity})</li>`).join('');
+                            Swal.fire({
+                                icon: 'warning',
+                                title: "Unavailable Items Found.",
+                                html: `
+                                    <p> <b> The following products are out of stock or have insufficient quantity in stock: </b> </p>
+                                    <ul>${outOfStockList}</ul>
+                                    <p style="font-size: 15px; color: red;">Please remove them or save for later before placing your order. <br> Note: This will also reflect on your coupon discounts based on your subtotal.</p>
+                                `,
+                                // text: 'Some items in your cart are currently unavailable.. Please remove them or save for later before proceeding to checkout. Note: This will also reflect on your coupon discounts based on your subtotal.',
+                                showDenyButton: true,
+                                showCancelButton: true,
+                                confirmButtonText: "Remove & Proceed",
+                                denyButtonText: `Save for later`,
+                                cancelButtonText: 'Cancel',
+                                confirmButtonColor: "red",
+                                // confirmButtonColor: "#3085d6",
+                                denyButtonColor: "green",
+                            }).then((result) => {
+                                if (result.isConfirmed) { // if clicked Remove & Proceed button
+                                    removeOutOfStockItems(response.outOfStockItems);
+                                    
+                                } else if (result.isDenied) {  // if clicked Save for later button
+                                    saveOutOfStockItems(response.outOfStockItems);
+                                }
+                            }).catch((error) => {
+                                console.log('outofstockfound Swal error :', error);
+                            });
+
+                        } else if (response.error){
+                            Swal.fire({
+                                title: "Error while placing order.",
+                                text: response.message,
+                                icon: "error",
+                                showConfirmButton: false,
+                            })
                         }
                     },
                     error: function(error) {
-                        console.error('Error in placing order :', error);
+                        console.error('Internal server error in placing order :', error);
                         Swal.fire({
                             title: "Order Failed",
                             text: "Error placing order. Please try again.",
@@ -910,5 +998,16 @@
     .dropdown-list li:hover {
         background-color: #f0f0f0;
     }
-    
 </style>
+
+
+<!-- style for order confirmation modal -->
+<!-- <style>
+.terms-link , .policy-link {
+    color: #ff2600;
+}
+
+.terms-link :hover, .policy-link :hover{
+    color: #9a0056;
+}
+</style> -->

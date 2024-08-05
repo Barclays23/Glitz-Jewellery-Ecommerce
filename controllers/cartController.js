@@ -5,9 +5,9 @@ const Product = require ('../models/productModel');
 const Wishlist = require ('../models/wishlistModel');
 const Cart = require ('../models/cartModel');
 const Order = require('../models/orderModel');
+const Coupon = require('../models/couponModel');
 const SerialNumber = require('../models/SerialNumberModel');
 
-const categoryModel = require('../models/categoryModel');
 
 
 
@@ -49,7 +49,7 @@ const loadUserCart = async (req, res)=>{
         
         if (userCart && userCart.product){
             const productLength = userCart.product.length;
-            console.log(`product array length : ${productLength}`);
+            console.log(`product array length in loadUserCart : ${productLength}`);
 
             userCart.product.forEach((product) => {
                 cartCount += product.quantity;
@@ -60,17 +60,44 @@ const loadUserCart = async (req, res)=>{
             console.log('subTotal of cart (totalAmount) : ', subTotal);
         }
 
-        shippingCharge = subTotal >= 100000 ? 0 : 300;
-        console.log("shippingCharge :", shippingCharge);
 
-        if(userCart && userCart.couponRef){
+        if (userCart && userCart.couponRef){
             couponDiscount = userCart.couponRef.couponValue;
             console.log("couponDiscount :", couponDiscount);
+            criteriaAmount = userCart.couponRef.criteriaAmount;
+            console.log("criteriaAmount :", criteriaAmount);
+
+            if (userCart.product.length === 0){
+                console.log('No items in cart.');
+                userCart.couponRef = null;
+                await userCart.save();
+                console.log('cancelled couponRef from cart.');
+                couponDiscount = 0;
+
+            } else if (subTotal < criteriaAmount){
+                console.log('criteriaAmount is less than cart subTotal.');
+                userCart.couponRef = null;
+                await userCart.save();
+                console.log('cancelled couponRef from cart.');
+                couponDiscount = 0;
+
+            } else if (userCart.couponRef.expiryDate < Date.now()){
+                console.log('coupon expiry date is over.');
+                userCart.couponRef = null;
+                await userCart.save();
+                console.log('cancelled couponRef from cart.');
+                couponDiscount = 0;
+
+            }
+
         }
+
+        shippingCharge = subTotal > 0 && subTotal < 100000 ? 300 : 0;
+        console.log("shippingCharge :", shippingCharge);
+
 
         netPayable = subTotal + shippingCharge - offerDiscount - couponDiscount;  // refferral / wallet amount also consider
         console.log("netPayable :", netPayable);
-
 
         res.render('userCart', { 
             userData, 
@@ -87,7 +114,7 @@ const loadUserCart = async (req, res)=>{
         });
 
     } catch (error) {
-        console.log('error in loading user cart', error.message);
+        console.log('error in loading user cart :', error.message);
     }
 }
 
@@ -201,7 +228,7 @@ const updateCartQuantity = async (req, res)=>{
 // remove product from user cart. -----------------------------
 const removeFromCart = async(req, res)=>{
     try {
-        const userId = req.session.userId;
+        const sessionId = req.session.userId;
         const {productId, outOfStockItems } = req.body;
 
         console.log('recieved productId for single product removing :', productId);
@@ -209,12 +236,21 @@ const removeFromCart = async(req, res)=>{
         // for removing the selected product from cart / checkout (single)
         if (productId){
             const updatedUserCart = await Cart.findOneAndUpdate(
-                {userRef: userId},
-                {$pull: {product: {_id: productId}}}
-            )
+                {userRef: sessionId},
+                {$pull: {product: {_id: productId}}},
+                {new : true}
+            );
+            console.log('product removed from cart.');
+            console.log('updatedUserCart product length : ', updatedUserCart.product.length);
 
-            console.log('product removed from cart');
-            return res.status(200).json({ removedProduct: true });
+            // // also remove the couponRef from the cart if cart become empty.
+            if (updatedUserCart.product.length === 0){
+                console.log('No more items left in cart after remove from cart.');
+                return res.json({emptyCart: true});
+            }
+
+            
+            return res.status(200).json({ removedProduct: true , cartId: updatedUserCart._id});
         }
 
 
@@ -227,20 +263,39 @@ const removeFromCart = async(req, res)=>{
 
             for (const products of outOfStockItems) {
                 let updatedUserCart = await Cart.findOneAndUpdate(
-                    { userRef: userId },
-                    { $pull: { product: { _id: products._id } } }
+                    { userRef: sessionId },
+                    { $pull: { product: { _id: products._id } } },
+                    { new : true }
                 );
+                console.log('updatedUserCart length after remove :', updatedUserCart.product.length);
 
-                console.log('updatedUserCart :', updatedUserCart);
+                // also remove the couponRef from the cart if cart become empty.
+                if (updatedUserCart.couponRef && updatedUserCart.product.length === 0){
+                    const removedCouponRef = await Cart.findOneAndUpdate(
+                        {userRef: sessionId},
+                        {$unset: {couponRef: 1}},
+                        {new : true}
+                    );
+                    console.log('also removedCouponRef from cart : ', removedCouponRef);
+                    console.log('No more items left in cart after outofstock clear.');
+                
+                    // no items in cart. so exit from checkout page.
+                    return res.json({emptyCart: true});
+                }
             }
 
-            console.log('produt removed from cart');
-            return res.status(200).json({ removedOutOfStock: true });
+            console.log('all out of stock products removed from cart');
+
+            const userCart = await Cart.findOne({userRef: sessionId});
+
+            return res.status(200).json({ removedOutOfStock: true,  cartId: userCart._id});
+
         }
 
 
     } catch (error) {
         console.log('error while removing from cart :', error.message);
+        return res.json({error: true, message: error.message});
     }
 }
 
@@ -248,42 +303,46 @@ const removeFromCart = async(req, res)=>{
 
 
 // proceed to checkout validation
-const proceedToCheckout = async(req, res)=>{
+const proceedToCheckout = async (req, res) => {
     try {
-        const userId = req.session.userId;
-        const sessionData = await User.findById(userId);
+        const sessionId = req.session.userId;
+        const userCart = await Cart.findOne({ userRef: sessionId }).populate('product.productRef');
 
-        const goldPriceData = await GoldPrice.findOne({});
-        const userCart = await Cart.findOne({ userRef: userId }).populate('product.productRef');
-        const userAddress = await Address.findOne({userRef: userId});
+        if (!userCart) {
+            console.log('No cart created for user or no products in user cart.');
+            return res.json({ nocartItems: true });
 
-        if (userCart && userCart.product){
-
-            let outOfStockItems = [];
-
-            // Check the inventory stock for each product in the cart
-            userCart.product.forEach((cartItem) => {
-                if (cartItem.productRef.quantity === 0) {
-                outOfStockItems.push(cartItem);
-                }
-            });
-
-            if (outOfStockItems.length > 0){
-                console.log('out of outOfStockItems found :', outOfStockItems);
-                return res.json({outofstockfound : true, outOfStockItems});
-            }
-        } else {
-            console.log('no cart for user or no product in user cart');
-            return res.json({nocartItems: true});
+        } else if (userCart && userCart.product.length === 0){
+            console.log('user have cart & product array. but the array is empty.');
+            return res.json({ nocartItems: true });
         }
 
-        return res.json({proceed: true, cartId: userCart._id});
 
+        let outOfStockItems = [];
+
+        userCart.product.forEach((cartItem) => {
+            // Check the inventory stock for each product in the cart
+            if (cartItem.quantity > cartItem.productRef.quantity) {
+                console.log('product inventory quantity is 0 or less than carted quantity.');
+                // Move out of stock items to outOfStockItems array.
+                outOfStockItems.push(cartItem);
+            }
+        });
+
+        if (outOfStockItems.length > 0) {
+            console.log('Out of stock items found:', outOfStockItems);
+            return res.json({ outofstockfound: true, outOfStockItems });
+        }
+
+        console.log('userCart.product.length before proceeding:', userCart.product.length);
+        return res.json({ proceed: true, cartId: userCart._id });
 
     } catch (error) {
-        console.log('error in loading checkout page: ', error.message);
+        console.log('Error in proceedToCheckout:', error.message);
+        res.status(500).json({ error: 'An error occurred while proceeding to checkout.' });
     }
-}
+};
+
 
 
 
@@ -325,7 +384,7 @@ const loadCheckout = async (req, res)=>{
 
         if (userCart && userCart.product){
             const productLength = userCart.product.length;
-            console.log(`product array length : ${productLength}`);
+            console.log(`product array length in loadCheckout : ${productLength}`);
 
             userCart.product.forEach((product) => {
                 cartCount += product.quantity;
@@ -334,6 +393,31 @@ const loadCheckout = async (req, res)=>{
             });
             console.log("cartCount in checkout :", cartCount);
             console.log('subTotal of checkout (totalAmount) : ', subTotal);
+        }
+
+
+        if (userCart && userCart.couponRef){
+            couponDiscount = userCart.couponRef.couponValue;
+            console.log("couponDiscount in checkout :", couponDiscount);
+            criteriaAmount = userCart.couponRef.criteriaAmount;
+            console.log("criteriaAmount in checkout :", criteriaAmount);
+
+            if (userCart.product.length === 0){
+                console.log('No items in checkout.');
+                userCart.couponRef = null;
+                await userCart.save();
+                console.log('cancelled couponRef from userCart.');
+                couponDiscount = 0;
+
+            } else if (subTotal < criteriaAmount){
+                console.log('criteriaAmount is less than checkout subTotal.');
+                userCart.couponRef = null;
+                await userCart.save();
+                console.log('cancelled couponRef from userCart.');
+                couponDiscount = 0;
+
+            }
+
         }
 
 
@@ -350,7 +434,7 @@ const loadCheckout = async (req, res)=>{
 
 
 
-        if(cartId && cartCount > 0){   
+        if (cartId && cartCount > 0){   
             res.render('checkout', { 
                 goldPriceData,
                 userData, 
@@ -373,7 +457,7 @@ const loadCheckout = async (req, res)=>{
 
 
     } catch (error) {
-        console.log('error in loading checkout page :', error.message);
+        console.log('error in loadCheckout :', error.message);
     }
 }
 
@@ -383,7 +467,7 @@ const loadCheckout = async (req, res)=>{
 // to complete / place the order
 const placeOrder = async(req, res)=>{
     try {
-        const userId = req.session.userId;
+        const sessionId = req.session.userId;
         const goldPriceData = await GoldPrice.findOne({});
         
         const {
@@ -394,32 +478,70 @@ const placeOrder = async(req, res)=>{
         console.log('selectedAddress :', selectedAddressId);
         console.log('selectedPaymentMethod :', selectedPaymentMethod);
 
-        const addressData =  await Address.findOne({userRef: userId});
+
+        const addressData =  await Address.findOne({userRef: sessionId});
         const userAddress = addressData.address.find(ad => ad._id.toString() === selectedAddressId);
-        console.log('find shipping address in backend : ', userAddress);
 
-        const userCheckout = await Cart.findOne({userRef: userId}).populate('product.productRef');
-        console.log('userCheckout.product : ', userCheckout.product);
+        const userCheckout = await Cart.findOne({ userRef: sessionId })
+        .populate({
+            path: 'product.productRef',
+            populate: {
+                path: 'offerRef'
+            }
+        })
+        .populate('couponRef');
 
-        let individualTotal = 0;
-        let cartSubTotal = 0;   //total checkout amount without discount/wallet/offer
-        userCheckout.product.forEach((item)=>{
-            individualTotal = (item.productRef.totalPrice * item.quantity);
-            cartSubTotal += individualTotal;
+        console.log('userCheckout.product length for placeOrder : ', userCheckout.product.length);
+
+        let outOfStockItems = [];
+        userCheckout.product.forEach((cartItem) => {
+            // Check the inventory stock for each product in the cart
+            if (cartItem.quantity > cartItem.productRef.quantity) {
+                console.log('product inventory quantity is 0 or less than carted quantity.');
+                // Move out of stock items to outOfStockItems array.
+                outOfStockItems.push(cartItem);
+            }
         });
-        console.log('cartSubTotal in backend is : ', cartSubTotal);
+
+        if (outOfStockItems.length > 0) {
+            console.log('Out of stock or insufficient items found for placeOrder :', outOfStockItems);
+            return res.json({ outofstockfound: true, outOfStockItems });
+        }
+
         
-        let shippingCharge = cartSubTotal >= 100000 ? 0 : 300;
-        console.log('shippingCharge in backend is : ', shippingCharge);
+        let cartSubTotal = 0;   //total checkout amount without any discount/offer/coupon/wallet
+        let totalOfferDiscount = 0;
 
-        let discountAmount = cartSubTotal * 1.5 /100; // dummy discount (currently 1.5% on cartSubTotal)
-        console.log('discountAmount in backend is : ', discountAmount);
-        // <% let discountAmount = subTotal * 1.5 /100 %>  // dummy discount amount given in front end also.
-        // can be provide the discount on makingCharge (later)
+        userCheckout.product.forEach((item)=>{
+            let unitPrice = item.productRef.totalPrice;
+            let itemQuantity = item.quantity;
+            let individualTotal = (unitPrice * itemQuantity);
+            cartSubTotal += individualTotal;
 
+            // let offerPercentage = (item.productRef.offerRef.offerPercentage);  // NEED TO APPLY OFFER AND POPULATE OFFERREF.
+            // individualOfferAmount = unitPrice * offerPercentage /100;  // each item's offer
+            // totalOfferDiscount += individualOfferAmount;
+        });
+        console.log('cartSubTotal for placeOrder : ', cartSubTotal);
+        console.log('totalOfferDiscount for placeOrder : ', totalOfferDiscount);
+        
+        let shippingCharge = cartSubTotal > 0 && cartSubTotal < 100000 ? 300 : 0;
+        console.log('shippingCharge for placeOrder : ', shippingCharge);
+        
+        let specialDiscount = 0;  // was implemented before offer and coupon (now no more needed).
+        let couponDiscount = 0;
+ 
+        if (userCheckout.couponRef != null){
+            couponDiscount = userCheckout.couponRef.couponValue;
+        }
+        console.log('couponDiscount for placeOrder : ', couponDiscount);
+        
+        let payableAmount = cartSubTotal + shippingCharge - specialDiscount - couponDiscount - totalOfferDiscount;
+        console.log('payableAmount for placeOrder : ', payableAmount);
+
+        
 
         //FOR ORDER NUMBER / INVOICE NUMBER
-        // Get the current date components
         const currentDate = new Date();
         const year = currentDate.getFullYear().toString().slice(-2);
         const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
@@ -431,7 +553,6 @@ const placeOrder = async(req, res)=>{
             { $inc: { serial: 1 } },
             { new: true, upsert: true }
         );
-
         const serialNumber = serialData.serial.toString().padStart(4, '0');
 
         // Generate the invoice number
@@ -439,7 +560,7 @@ const placeOrder = async(req, res)=>{
         console.log('Generated Invoice Number: ', invoiceNumber);
         
         const userOrders = new Order ({
-            userRef : userId,
+            userRef : sessionId,
             orderDate : Date.now(),
             billingRate : goldPriceData.price,
             orderedItems : [],     // initially empty items array
@@ -447,17 +568,25 @@ const placeOrder = async(req, res)=>{
             shippingAddress : userAddress,
             subTotal : cartSubTotal,
             deliveryCharge : shippingCharge,
-            discountAmount : discountAmount,  // (give this total discount amount including offers & coupons)
-            netAmount : cartSubTotal + shippingCharge - discountAmount,  //wallet or offer or coupon consider if any
+            couponDiscount : couponDiscount,
+            specialDiscount : specialDiscount, // specialDiscount was implemented before offer and coupon.
+            netAmount : payableAmount,
             paymentMethod: selectedPaymentMethod,
             paymentStatus : selectedPaymentMethod === 'Cash On Delivery' ? 'Pending' : selectedPaymentMethod === 'Online Payment' ? 'Processing' : selectedPaymentMethod === 'Wallet' ? 'Pending' : 'Pending' // || other if wallet or razorpay ?,
         });
         console.log('created userOrders : ', userOrders);
 
+        // for inserting products to the orderedItems array.
         for (const item of userCheckout.product) {
             const cartProductRef = item.productRef;
-            const CartQuantity = item.quantity;
-            console.log('CartQuantity of each products :', CartQuantity);
+            const cartQuantity = item.quantity;
+            console.log('cartQuantity of each products :', cartQuantity);
+
+            let offerDiscount = 0;  // offerDiscount of each item (currently 0, bcoz offer is not applied).
+            // let unitPrice = (item.productRef.totalPrice);
+            // let offerPercentage = (item.productRef.offerRef.offerPercentage);  // need to populate the offerRef for userCheckout query ?
+            // offerDiscount = unitPrice * offerPercentage /100;  // each item's offer
+            // console.log('offerDiscount of orderItem : ', offerDiscount);
 
             userOrders.orderedItems.push({
                 productRef : cartProductRef,
@@ -475,35 +604,90 @@ const placeOrder = async(req, res)=>{
                 makingCharge : cartProductRef.makingCharge,
                 GST : cartProductRef.GST,
                 totalPrice : cartProductRef.totalPrice,
-                quantity : CartQuantity,
-                productSum : cartProductRef.totalPrice * CartQuantity,
-
+                quantity : cartQuantity,
+                offerDiscount : offerDiscount, // (currently 0, bcoz offer is not applied).
                 orderStatus : 'Placed',  // if the payment failed, the initial order status should be 'Pending'
-                deliveryDate : Date.now() + 5,
+                deliveryDate : Date.now() + 5,   // expected delivery date (dummy date)
             });
 
-            await userOrders.save();
-            console.log('pushed product details into userOrders.orderedItems');
 
+            await userOrders.save();
+            console.log('pushed product details into orderedItems array.');
+
+            // removing products form the user cart
             userCheckout.product.pull({productRef: cartProductRef._id});
             await userCheckout.save();
-            console.log('removed item from cart and updated UserCart');
+            console.log('removed item from cart and updated UserCart.');
 
 
+            // updating the product inventory (quantity) after order.
             await Product.findOneAndUpdate(
                 { _id: cartProductRef },
-                { $inc: { quantity: -CartQuantity } },
+                { $inc: { quantity: -cartQuantity } },
                 { new: true }
             );
             console.log('updated the inventory stock of the ordered product.');
+
         }
+
+
+        // updating the used coupon count in coupon database (-1).
+        // And removing couponRef from userCart.
+        // also adding users into usedCustomers
+        if (userCheckout.couponRef && userCheckout.couponRef != null){
+            const updatedCouponData = await Coupon.findByIdAndUpdate(
+                userCheckout.couponRef._id,
+                { 
+                    $inc: { usedCount: 1 },
+                    $push: { usedCustomers: { userRef: sessionId } }
+                },
+                { new: true }
+            );
+            console.log('updated usedCoupon count :', updatedCouponData.usedCount);
+
+            // deactivating the coupon when the coupons are fully used.
+            if (updatedCouponData.couponCount === updatedCouponData.usedCount) {
+                updatedCouponData.isActive = false;
+                await updatedCouponData.save();
+                console.log('all coupons are used. and coupon is inactive now.');
+            }
+
+            userCheckout.couponRef = null;
+            await userCheckout.save();
+            console.log('cancelled couponRef from cart after order.');
+
+        }
+
+
+        // debit the money from user wallet if payment method is 'Wallet'.
+        if (selectedPaymentMethod === 'Wallet'){
+
+            const transactionDetails = {
+                date : userOrders.orderDate,
+                amount : -userOrders.netAmount,
+                description : 'Ornament purchase - Order No:  '+ userOrders.orderNo,
+            }
+            console.log('Amount to debit from user wallet :', transactionDetails.amount);
+
+
+            const updatedUserWallet = await User.findOneAndUpdate(
+                {_id: req.session.userId},
+                {
+                    $inc: {walletBalance: -userOrders.netAmount},
+                    $push: {walletHistory: transactionDetails},
+                },
+                {new: true}
+            );
+            console.log('updated user wallet amount :', updatedUserWallet.walletBalance);
+        }
+
 
         return res.json({successful: true});
 
 
     } catch (error) {
         console.log('error while creating the order.', error.message);
-        return res.json({error: true});  // and show the error sweet alert internal or else.
+        return res.json({error: true, message: error.message});  // and show the error sweet alert internal or else.
     }
 }
 
@@ -576,8 +760,16 @@ const loadOrderDetails = async(req, res)=>{
             });
         }
 
+        let totalOfferDiscount = 0;
 
-        res.render('orderDetails', { userData, orderData, cartCount, wishlistCount, goldPriceData });
+        orderData.orderedItems.forEach((item)=>{
+            offerDiscount = item.offerDiscount ? item.offerDiscount : 0;
+            totalOfferDiscount += offerDiscount;
+        });
+
+
+
+        res.render('orderDetails', { userData, orderData, totalOfferDiscount, cartCount, wishlistCount, goldPriceData });
         
     } catch (error) {
         console.log('error while loading the order details page :', error.message);

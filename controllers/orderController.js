@@ -1,5 +1,6 @@
 const User = require('../models/userModel');
 const Order = require('../models/orderModel');
+const Product = require('../models/productModel');
 
 const GoldPrice = require('../models/goldPriceModel');
 
@@ -198,53 +199,92 @@ const cancelOrder = async(req, res)=>{
         console.log('received data for cancel order :', req.body);
 
         // changing the order status to "Cancelled"
-        const canceledOrderData = await Order.findOneAndUpdate(
+        const cancelledOrderData = await Order.findOneAndUpdate(
             { _id: cancelOrderId, 'orderedItems.productRef': cancelProductRef },
             { 
                 $set: { 
                     'orderedItems.$.orderStatus': 'Cancelled',
-                    'orderedItems.$.cancelReason': cancelReason 
+                    'orderedItems.$.cancelReason': cancelReason,
+                    'orderedItems.$.cancelDate': new Date(),
                 }
             },
             { new: true }
         );
-        // console.log('canceledOrderData is : ', canceledOrderData);
+
+        console.log('order is cancelled. cancelledOrderData.orderNo :', cancelledOrderData.orderNo);
+
+
+        let subTotal = cancelledOrderData.subTotal; // total cart amount without any discounts.
+        let specialDiscount = cancelledOrderData.specialDiscount ? cancelledOrderData.specialDiscount : 0 ;  // old discount structure.
+        let couponDiscount = cancelledOrderData.couponDiscount ? cancelledOrderData.couponDiscount : 0 ;
+        let totalCommonDiscount = specialDiscount + couponDiscount;
+        let commonDiscountPercentage = totalCommonDiscount / subTotal * 100;
+        
+        console.log('specialDiscount of canceled order :', specialDiscount);
+        console.log('couponDiscount of canceled order :', couponDiscount);
+        console.log('totalCommonDiscount of canceled order :', totalCommonDiscount);
+        console.log('commonDiscountPercentage of canceled order :', commonDiscountPercentage);
+
+
+        const cancelledItem = cancelledOrderData.orderedItems.find(item => item.productRef.toString() === cancelProductRef);
+
+        const itemName = cancelledItem.name;
+        const itemPrice = cancelledItem.totalPrice;
+        const itemQuantity = cancelledItem.quantity;
+        const itemTotalPrice = itemPrice * itemQuantity;
+        console.log('itemName is :', itemName);
+        console.log('itemPrice is :', itemPrice);
+        console.log('itemQuantity is :', itemQuantity);
+        console.log('itemTotalPrice is :', itemTotalPrice);
+        
+        let equallentItemDiscount = itemTotalPrice * commonDiscountPercentage / 100;
+        console.log('equallentItemDiscount is :', equallentItemDiscount);
+
+        let offerDiscount = cancelledItem.offerDiscount ? cancelledItem.offerDiscount : 0; //offer discount value of cancelled item.
+        console.log('offerDiscount of canceled item :', offerDiscount);
+
+        // refund amount should be after deducting the discount (user paid the amount after discount)
+        const refundAmount = itemTotalPrice - (equallentItemDiscount + offerDiscount);
+        console.log('refundAmount to add into user wallet :', refundAmount);
 
 
         // transfer the money to user wallet if payment method is not COD
-        if (canceledOrderData.paymentMethod != 'Cash On Delivery'){  //for testing, it's Online Payment
-            let netAmount = canceledOrderData.netAmount;
-            let discountAmount = canceledOrderData.discountAmount; // also add the coupon discount tp discountAmount
-            let dicountPercentage = discountAmount / netAmount * 100;
+        if (cancelledOrderData.paymentMethod != 'Cash On Delivery'){
+
+            const transactionDetails = {
+                date : cancelledOrderData.cancelDate,
+                amount : refundAmount,
+                description : `Cancellation of order: ${itemName}. Order No: ${cancelledOrderData.orderNo}`,
+            }
 
 
-            const canceledItem = canceledOrderData.orderedItems.find(item => item.productRef.toString() === cancelProductRef);
-            console.log('cancelledItem :', canceledItem);
-
-            const itemPrice = canceledItem.totalPrice;  // check whether the product have discountedPrice
-            const itemQuantity = canceledItem.quantity;
-            const itemTotalPrice = itemPrice * itemQuantity;
-
-            const refundAmount = itemTotalPrice * dicountPercentage
-
-
-            await User.findByIdAndUpdate(
+            const updatedUserWallet = await User.findOneAndUpdate(
                 {_id: req.session.userId},
-                {$inc: {walletBalance: refundAmount}},
-                {$push: {walletHistory}}
-
-            )
-            // what for coupon and other payment methods ?
+                {
+                    $inc: {walletBalance: refundAmount},
+                    $push: {walletHistory: transactionDetails},
+                },
+                {new: true}
+            );
+            console.log('updated user wallet amount :', updatedUserWallet.walletBalance);
         }
 
 
+        // reverting the order quantity to the product stock inventory.
+        const updatedProductData = await Product.findOneAndUpdate(
+            {_id: cancelProductRef},
+            {$inc: {quantity: itemQuantity}},
+            {new: true}
+        );
+        console.log('updated product invetory quantity :', updatedProductData.quantity);
 
-        return res.json({success: true});
+
+        return res.json({ success: true, message: 'Order cancelled and refund processed successfully.' });
 
 
     } catch (error) {
         console.log('error while cancel the order :', error);
-        return res.json({error: true});
+        return res.status(500).json({ error: true, message: 'Failed to cancel order and process refund' });
     }
 }
 

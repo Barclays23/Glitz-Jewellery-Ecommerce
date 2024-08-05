@@ -132,12 +132,21 @@
                                         case 'Delivered': %>
                                             <td class="text-center color-theme text-success" id="order-status">Delivered</td>
                                             <% break; 
-                                        case 'Cancelled': %>
-                                            <td class="text-center color-theme text-danger" id="order-status">Cancelled</td>
-                                            <% break; 
+                                        case 'Return Requested': %>
+                                            <td class="text-center color-theme text-warning" id="order-status">Return Requested</td>
+                                            <% break;
+                                        case 'Return Request Rejected': %>
+                                            <td class="text-center color-theme text-danger" id="order-status">Return Request Rejected</td>
+                                            <% break;
+                                        case 'Return Request Accepted': %>
+                                            <td class="text-center color-theme text-primary" id="order-status">Return Request Accepted</td>
+                                            <% break;
                                         case 'Returned': %>
                                             <td class="text-center color-theme text-danger" id="order-status">Returned</td>
-                                            <% break; 
+                                            <% break;
+                                        case 'Cancelled': %>
+                                            <td class="text-center color-theme text-danger" id="order-status">Cancelled</td>
+                                            <% break;
                                         default: %>
                                             <td class="text-center color-theme text-secondary" id="order-status">Unknown</td>
                                     <% } %>
@@ -196,7 +205,7 @@
 <!-- script for edit order status -->
 <script>
     $(document).ready(function () {
-        const statusOrder = ['Pending', 'Placed', 'Confirmed', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled', 'Returned'];
+        const statusOrder = ['Pending', 'Placed', 'Confirmed', 'Shipped', 'Out for Delivery', 'Delivered', 'Return Requested', 'Return Request Rejected', 'Return Request Accepted', 'Returned', 'Cancelled' ];
 
         // order status validation based on their index order.
         $('.order-status').each(function () {

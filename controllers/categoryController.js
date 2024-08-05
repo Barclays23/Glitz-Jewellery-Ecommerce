@@ -66,44 +66,43 @@ const addCategory = async(req, res)=>{
 const updateCategory = async(req, res)=>{
     try {
         const {categoryId, categoryName, categoryDescription, categoryStatus} = req.body;
-        console.log('requested category to edit is :', categoryId);
-        console.log('requestd body is : ', req.body);
+        console.log('body received to edit category :', req.body);
 
         const existCategory = await Category.findOne({ _id: { $ne: categoryId }, name: categoryName });
-        console.log('existCategory : ', existCategory);
 
         if (existCategory) {
-            console.log('category name is existing.');
+            console.log('category name is already existing.');
             return res.json({exists: true, message: "Category name already exists. Choose a another name."})
+
         } else {
-            // const isBlocked = categoryStatus === "block";
+            console.log('category name is not already existing.');
             const isListed = categoryStatus === "list";
-            console.log('isListed is: ', isListed);
-            // const false = categoryStatus === "list";
+            console.log('isListed is :', isListed);
 
             const updatedCategoryData = await Category.findOneAndUpdate({_id: categoryId}, {name: categoryName, description: categoryDescription, isListed: isListed}, { new: true });
             console.log('updated category details :', updatedCategoryData);
 
+
+            // also blocking all products in that category.
             if (updatedCategoryData.isListed === true) {
                 const unblockedProductStatus = await Product.updateMany({categoryRef: categoryId}, {isBlocked: false});
                 console.log('unblockedProductStatus', unblockedProductStatus);
 
                 const productData = await Product.find({categoryRef: categoryId});
-                console.log('unblocked products find with category ref id: ', productData);
+                console.log('product[2] isBlocked status after edit category : ', productData[2].isBlocked);
+
             } else {
                 const blockedProductStatus = await Product.updateMany({categoryRef: categoryId}, {isBlocked: true});
                 console.log('blockedProductStatus', blockedProductStatus);
 
-                const productData = await Product.find({categoryRef: categoryId});
-                console.log('blocked products find with category ref id: ', productData);
             }
     
             return res.status(200).json({success: true});
         }
-
+        
 
     } catch (error) {
-        console.log('error in editing category', error.message);
+        console.log('error in editing category :', error.message);
     }
 }
 
