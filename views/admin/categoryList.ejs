@@ -45,6 +45,14 @@
                                         </td>
 
                                         <td>
+                                            <!-- 1. APPLY / CANCEL OFFER -->
+                                            <% if (!categoryData[i].offerRef || categoryData[i].offerRef === null){ %>
+                                                <a class="badge badge-success show-offer-link" style="text-decoration: none;" data-categoryData='<%= JSON.stringify(categoryData[i]) %>' onclick="showOffersModal()">Apply Offer</a>
+                                            <% } else { %>
+                                                <a href="#" class="badge badge" style="text-decoration: none; background: red;" onclick="cancelOffer('<%= categoryData[i]._id %>')"> Cancel Offer </a>
+                                            <% } %>
+
+                                            <!-- 2. EDIT -->
                                             <a href="<%= `/admin/edit-category?id=${categoryData[i]._id}` %>" class="badge badge-secondary" style="color: black; text-decoration: none;" 
                                                 data-toggle="modal" data-target="#editCategoryModal" 
                                                 data-id="<%= categoryData[i]._id %>" 
@@ -162,6 +170,34 @@
 <!-- Edit Category Modal Ends-->
 
 
+
+
+<!-- Apply Offer Modal -->
+<div id="offersModal" class="offer-modal">
+    <div class="offer-modal-content">
+        <span class="close" onclick="closeOffersModal()">&times;</span>
+        <h4 id="offer-category-name" class="badge-secondary text-dark mt-2 mb-4 p-2"> </h4>
+        <h5 class="select-offer mb-3">SELECT AN OFFER</h5>
+        <% if (offerData.length > 0) { %>
+            <div id="offersList" class="offers-list">
+                <% for (let i = 0; i < offerData.length; i++) { %>
+                    <div class="offer-card">
+                        <h3 class="offer-name"><%= offerData[i].offerName %></h3>
+                        <div class="offer-discount"><%= offerData[i].offerPercentage %>% OFF</div>
+                        <div class="offer-details">On Making Charge</div>
+                        <div class="offer-apply-button" data-offerData='<%= JSON.stringify(offerData[i]) %>' onclick="applyOffer()">Apply</div>
+                    </div>
+                <% } %>
+            </div>
+        <% } else { %>
+            <div>
+                <h4>NO ACTIVE OFFERS AVAILABLE</h4>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+
 <!-- --------------------------------------------------------------------------------- -->
 
 
@@ -175,7 +211,7 @@
 
 
 
-<!-- script for form submission to add new category -->
+<!-- script for add new category -->
 <script>
     $(document).ready(function() {
         // Event listener for form submission
@@ -266,7 +302,7 @@
 
 
 
-<!-- script for form submission to edit category -->
+<!-- script for edit category -->
 <script>
     $(document).ready(function() {
 
@@ -372,6 +408,238 @@
 
     
 </script>
+
+
+
+
+<!-- script for apply offer -->
+<script>
+    let categoryData;
+    
+    // to show the offers list modal
+    function showOffersModal() {
+        // Get the product data from the modal trigger (data-productData attribute)
+        const categoryElement = event.target;
+        categoryData = JSON.parse(categoryElement.getAttribute('data-categoryData'));
+
+        // Populate the modal with product details
+        document.getElementById('offer-category-name').innerText = categoryData.name;
+
+        const offerModal = document.getElementById("offersModal");
+        offerModal.style.display = "block";
+    }
+
+
+    // Function to apply an offer
+    function applyOffer() {
+        let categoryId = categoryData._id;
+        let categoryName = categoryData.name;
+
+
+        // Get the offer data from the modal trigger (data-offerData attribute)
+        const offerElement = event.target;
+        let offerData = JSON.parse(offerElement.getAttribute('data-offerData'));
+
+        let offerId = offerData._id;
+        let offerName = offerData.offerName;
+
+
+        // console.log('productDataId for apply offer :', productDataId);
+        console.log('categoryId for apply offer :', categoryId);
+        console.log('categoryName for apply offer :', categoryName);
+        console.log('offerId for apply offer :', offerId);
+        console.log('offerName for apply offer :', offerName);
+
+
+        $.ajax({
+            url: '/admin/apply-offer',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                categoryId,
+                offerId
+            }),
+            success: function(response) {
+                console.log('response for apply-offer :', response);
+                Swal.fire({
+                    text: 'Offer applied successfully!',
+                    icon: 'success',
+                    showConfirmButton: false,
+                    timer: 1000
+                });
+                closeOffersModal();
+                location.reload(); // or any other UI update logic
+            },
+            error: function(xhr, status, error) {
+                // Handle the error case
+                console.error('Error applying offer:', error);
+                alert('Failed to apply offer. Please try again.');
+            }
+        });
+    }
+
+
+
+    // Close the modal when clicking outside of it.
+    window.onclick = function(event) {
+        const modal = document.getElementById("offersModal");
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    // Close the modal when clicking close icon.
+    function closeOffersModal() {
+    document.getElementById('offersModal').style.display = 'none';
+}
+</script>
+
+
+
+
+<!-- script for cancel offer -->
+<script>
+    function cancelOffer(categoryId) {
+        console.log('categoryId for cancelling offer :', categoryId);
+    
+        $.ajax({
+            url: '/admin/cancel-offer',
+            type: 'PATCH',
+            contentType: 'application/json',
+            data: JSON.stringify({ categoryId }),
+            success: function(response) {
+                if (response.offerCancelled) {
+                    Swal.fire({
+                        title: 'Offer Cancelled!',
+                        icon: 'success',
+                        showConfirmButton: false,
+                        timer: 1000
+                    });
+                    location.reload();
+                } else if (response.failed) {
+                    Swal.fire({
+                        title: 'Failed!',
+                        text: response.message,
+                        icon: 'error',
+                        showConfirmButton: false,
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('An error occurred: ' + error);
+            }
+        });
+    }
+    
+</script>
+
+
+
+
+<!-- Apply Offer Modal Styles -->
+<style>
+    .offer-modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+    }
+    .offer-modal-content {
+        position: relative;
+        background-color: #fefefe;
+        margin: 10% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 60%;
+    }
+    .close {
+        float: right; 
+        position: absolute;
+        top: 1px;
+        right: 10px;
+        color: #aaa;
+        font-size: 28px;
+        font-weight: bold;
+    }
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    .show-offer-link {
+        cursor: pointer;
+    }
+    .offers-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+    }
+    .offer-card {
+        /* background: #fff; */
+        /* background: linear-gradient(135deg, #fe0000, #e0e0e0); */
+        background: linear-gradient(124deg, #00fe5c, #e0e0e0);
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 20px;
+        width: calc(33.333% - 20px); /* 3 cards per row, adjust for gaps */
+        text-align: center;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.393);
+        /* margin: 10px; */
+        box-sizing: border-box; /* Ensure padding and borders are included in width */
+    }
+    .offer-card h {
+        font-size: 1.5em;
+        margin: 0 0 10px 0;
+        color: #333;
+    }
+    .offer-card .offer-name {
+        font-size: 1.3em;
+        font-weight: bold;
+        color: #4d283d;
+    }
+    .offer-card .offer-discount {
+        font-size: 2.5em;
+        font-weight: bold;
+        /* color: #ff5722; */
+        color: #177a08;
+
+    }
+    .offer-card .offer-details {
+        font-size: 1em;
+        color: #666;
+        margin-bottom: 15px;
+    }
+    .offer-apply-button {
+        background-color: #28a745;
+        color: white;
+        padding: 10px 15px;
+        text-align: center;
+        border-radius: 5px;
+        cursor: pointer;
+        display: block;
+        margin: 0 auto;
+    }
+    .offer-apply-button:hover {
+        background-color: #218838;
+    }
+    /* Add specific color styles for h2 and h3 */
+    .offer-modal-content .select-offer {
+        color: #333; /* or any color you prefer */
+        text-align: center;
+    }
+    .offer-modal-content h4 {
+        color: #ff0000; /* or any color you prefer */
+        text-align: center;
+    }
+</style>
+
 
 
 

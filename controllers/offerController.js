@@ -1,5 +1,7 @@
 const User = require('../models/userModel');
 const Offer = require('../models/offerModel');
+const Product = require('../models/productModel');
+const Category = require('../models/categoryModel');
 const GoldPrice = require('../models/goldPriceModel');
 
 
@@ -147,6 +149,102 @@ const manageOffer = async (req, res)=>{
 
 
 
+// apply offer ----------------------------------
+const applyOffer = async (req, res)=>{
+    try {
+        const {offerId, productId, categoryId} = req.body;
+        console.log('data received for apply offer :', req.body);
+        
+        // for applying offer for product (single)
+        if(productId){
+            const updatedProductOffer = await Product.findOneAndUpdate(
+                {_id: productId},
+                {offerRef: offerId},
+                {new: true}
+            );
+
+            console.log('applied offer to product :', updatedProductOffer.code);
+
+            
+        // for applying offer for category (multiple products)
+        } else if (categoryId){
+            // saving the offerId in product database
+            const updatedOfferCategoryProducts = await Product.updateMany(
+                {categoryRef: categoryId},
+                {offerRef: offerId},
+                {new: true}
+            );
+
+            // also saving the offerId in category database
+            const updatedOfferCategory = await Category.findOneAndUpdate(
+                {_id: categoryId},
+                {offerRef: offerId},
+                {new: true}
+            );
+            
+            console.log('applied offer to category :', updatedOfferCategoryProducts.length);
+        }
+
+        return res.json({applied: true});
+
+
+    } catch (error) {
+        console.log('error in applying offer : ', error);
+        return res.json({failed: true});
+    }
+}
+
+
+
+
+
+// cancel offer ----------------------------------
+const cancelOffer = async (req, res)=>{
+    try {
+        const {offerId, productId, categoryId} = req.body;
+        console.log('data received for cancel offer :', req.body);
+        
+        // for cancelling offer for product (single)
+        if(productId){
+            const cancelledProductOffer = await Product.findOneAndUpdate(
+                {_id: productId},
+                {offerRef: null},
+                {new: true}
+            );
+
+            console.log('cancelled offer from product :', cancelledProductOffer.code);
+
+
+        // for cancelling offer for category (multiple products)
+        } else if (categoryId){
+            // cancelling the offerId from category database
+            const cancelledOfferCategory = await Category.findOneAndUpdate(
+                {_id: categoryId},
+                {offerRef: null},
+                {new: true}
+            );
+
+            // also cancelling the offerId from product database
+            const cancelledOfferCategoryProducts = await Product.updateMany(
+                {categoryRef: categoryId},
+                {offerRef: null},
+                {new: true}
+            );
+            
+            console.log('cancelled offer from category :', cancelledOfferCategoryProducts.length);
+        }
+
+        return res.json({offerCancelled: true});
+
+
+    } catch (error) {
+        console.log('error in cancelling offer : ', error);
+        return res.json({failed: true, message: error.message});
+    }
+}
+
+
+
 
 
 
@@ -157,4 +255,6 @@ module.exports = {
     addOffer,
     editOffer,
     manageOffer,
+    applyOffer,
+    cancelOffer
 }

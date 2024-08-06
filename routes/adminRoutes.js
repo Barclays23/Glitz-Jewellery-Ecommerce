@@ -83,6 +83,8 @@ adminRoute.get('/offers', adminAuth.isLogin, offerController.loadOfferList);
 adminRoute.post('/add-offer', adminAuth.isLogin, offerController.addOffer);
 adminRoute.put('/edit-offer', adminAuth.isLogin, offerController.editOffer);
 adminRoute.patch('/manage-offer', adminAuth.isLogin, offerController.manageOffer);
+adminRoute.post('/apply-offer', adminAuth.isLogin, offerController.applyOffer);
+adminRoute.patch('/cancel-offer', adminAuth.isLogin, offerController.cancelOffer);
 
 
 

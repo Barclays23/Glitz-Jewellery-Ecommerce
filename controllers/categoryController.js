@@ -1,6 +1,7 @@
 const User = require('../models/userModel');
 const GoldPrice = require('../models/goldPriceModel');
 const Category = require ('../models/categoryModel');
+const Offer = require ('../models/offerModel');
 const Product = require ('../models/productModel');
 
 
@@ -15,7 +16,17 @@ const loadCategoryList = async(req, res)=>{
         const categoryData = await Category.find({});
         // console.log('category data is : ', categoryData);
 
-        res.render('categoryList', {adminData, categoryData, goldPriceData});
+        const currentDate = new Date();
+        const offerData = await Offer.find(
+            {
+                isListed: true, 
+                activationDate: {$lte: currentDate},  // activation date is on running
+                expiryDate: {$gte: currentDate}  // not expired
+            }
+        );
+        console.log('Number of active running offers :', offerData.length);
+
+        res.render('categoryList', {adminData, categoryData, offerData, goldPriceData});
 
     } catch (error) {
         console.log('failed to load category page', error.message);

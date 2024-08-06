@@ -181,28 +181,37 @@
 
                                         <td class="quantity text-center" style="font-size: medium;"> <%= productData[i].quantity %> </td>
 
+                                        <!-- status -->
                                         <% if(productData[i].isBlocked === false){ %>
-                                            <td class="text-success">
+                                            <td class="text-success text-center">
                                                 Listed <i class="mdi mdi-check-circle text-success"></i>
                                             </td>
                                         <% } else{ %>
-                                            <td class="text-danger">
+                                            <td class="text-danger text-center">
                                                 Unlisted <i class="mdi mdi-do-not-disturb text-danger"></i>
                                             </td>
                                         <% } %>
 
+                                        <!-- actions -->
                                         <td>
-                                            
+                                            <!-- 1. APPLY / CANCEL OFFER -->
+                                            <% if (!productData[i].offerRef || productData[i].offerRef === null){ %>
+                                                <a class="badge badge-success show-offer-link" style="text-decoration: none;" data-productData='<%= JSON.stringify(productData[i]) %>' onclick="showOffersModal()">Apply Offer</a>
+                                            <% } else { %>
+                                                <a href="#" class="badge badge" style="text-decoration: none; background: red;" onclick="cancelOffer('<%= productData[i]._id %>')"> Cancel Offer </a>
+                                            <% } %>
+
+                                            <!-- 2. LIST / UNLIST -->
                                             <% if (productData[i].isBlocked === true){ %>
                                                 <a href="#" class="badge badge-secondary" id="blocked-product" style="text-decoration: none; color: black;" onclick="manageProduct('<%= productData[i]._id %>')">List</a>
                                             <% } else { %>
                                                 <a href="#" class="badge badge-danger" id="unblocked-product" style="text-decoration: none" onclick="manageProduct('<%= productData[i]._id %>')">Unlist</a>
                                             <% } %>
 
-                                            
+                                            <!-- 3. EDIT -->
                                             <!-- (use 1st line if using the "EDIT" text, use 2nd line if using the "edit-icon") -->
                                             <!-- <a href="<%= `/admin/edit-product?id=${productData[i]._id}` %>" class="badge badge-light" style="color: black; text-decoration: none;" data-toggle="modal" data-target="#editProductModal" -->
-                                            <a href="<%= `/admin/edit-product?id=${productData[i]._id}` %>" 
+                                            <a href="#" 
                                             style="color: black; text-decoration: none;" 
                                             data-toggle="modal" 
                                             data-target="#editProductModal"
@@ -528,525 +537,303 @@
 
 
 
+<!-- Apply Offer Modal -->
+<div id="offersModal" class="offer-modal">
+    <div class="offer-modal-content">
+        <span class="close" onclick="closeOffersModal()">&times;</span>
+        <h4 id="offer-product-name" class="badge-secondary text-dark mt-2 mb-4 p-2"> </h4>
+        <h5 class="select-offer mb-3">SELECT AN OFFER</h5>
+        <% if (offerData.length > 0) { %>
+            <div id="offersList" class="offers-list">
+                <% for (let i = 0; i < offerData.length; i++) { %>
+                    <div class="offer-card">
+                        <h3 class="offer-name"><%= offerData[i].offerName %></h3>
+                        <div class="offer-discount"><%= offerData[i].offerPercentage %>% OFF</div>
+                        <div class="offer-details">On Making Charge</div>
+                        <div class="offer-apply-button" data-offerData='<%= JSON.stringify(offerData[i]) %>' onclick="applyOffer()">Apply</div>
+                    </div>
+                <% } %>
+            </div>
+        <% } else { %>
+            <div>
+                <h4>NO ACTIVE OFFERS AVAILABLE</h4>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+
+
+  
+
+
+
+
+<!-- script for apply offer -->
+<script>
+
+    let productData;
+    
+    // to show the offers list modal
+    function showOffersModal() {
+        // Get the product data from the modal trigger (data-productData attribute)
+        const productElement = event.target;
+        productData = JSON.parse(productElement.getAttribute('data-productData'));
+
+        // Populate the modal with product details
+        document.getElementById('offer-product-name').innerText = productData.name;
+
+        const offerModal = document.getElementById("offersModal");
+        offerModal.style.display = "block";
+    }
+
+
+    // Function to apply an offer
+    function applyOffer() {
+        let productId = productData._id;
+        let productName = productData.name;
+
+
+        // Get the offer data from the modal trigger (data-offerData attribute)
+        const offerElement = event.target;
+        let offerData = JSON.parse(offerElement.getAttribute('data-offerData'));
+
+        let offerId = offerData._id;
+        let offerName = offerData.offerName;
+
+
+        // console.log('productDataId for apply offer :', productDataId);
+        console.log('productId for apply offer :', productId);
+        console.log('productName for apply offer :', productName);
+        console.log('offerId for apply offer :', offerId);
+        console.log('offerName for apply offer :', offerName);
+
+
+        $.ajax({
+            url: '/admin/apply-offer',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                productId,
+                offerId
+            }),
+            success: function(response) {
+                console.log('response for apply-offer :', response);
+                Swal.fire({
+                    text: 'Offer applied successfully!',
+                    icon: 'success',
+                    showConfirmButton: false,
+                    timer: 1000
+                });
+                closeOffersModal();
+                location.reload(); // or any other UI update logic
+            },
+            error: function(xhr, status, error) {
+                // Handle the error case
+                console.error('Error applying offer:', error);
+                alert('Failed to apply offer. Please try again.');
+            }
+        });
+    }
+
+
+
+    // Close the modal when clicking outside of it.
+    window.onclick = function(event) {
+        const modal = document.getElementById("offersModal");
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    // Close the modal when clicking close icon.
+    function closeOffersModal() {
+    document.getElementById('offersModal').style.display = 'none';
+}
+
+
+
+
+</script>
+
+
+
+
+<!-- script for cancel offer -->
+<script>
+function cancelOffer(productId) {
+    console.log('productId for cancelling offer :', productId);
+
+    $.ajax({
+        url: '/admin/cancel-offer',  // Replace with your actual URL
+        type: 'PATCH',
+        contentType: 'application/json',
+        data: JSON.stringify({ productId }),
+        success: function(response) {
+            if (response.offerCancelled) {
+                Swal.fire({
+                    title: 'Offer Cancelled!',
+                    // text: 'Offer has been cancelled successfully.',
+                    icon: 'success',
+                    showConfirmButton: false,
+                    timer: 1000
+                });
+                location.reload(); // or any other UI update logic
+            } else if (response.failed) {
+                Swal.fire({
+                    title: 'Failed!',
+                    text: response.message,
+                    icon: 'error',
+                    showConfirmButton: false,
+                });
+            }
+        },
+        error: function(xhr, status, error) {
+            alert('An error occurred: ' + error);
+        }
+    });
+}
+
+</script>
+
+
+
+
+
+<!-- Apply Offer Modal Styles -->
+<style>
+    .offer-modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+    }
+    .offer-modal-content {
+        position: relative;
+        background-color: #fefefe;
+        margin: 10% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 60%;
+    }
+    .close {
+        float: right; 
+        position: absolute;
+        top: 1px;
+        right: 10px;
+        color: #aaa;
+        font-size: 28px;
+        font-weight: bold;
+    }
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    .show-offer-link {
+        cursor: pointer;
+    }
+    .offers-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+    }
+    .offer-card {
+        /* background: #fff; */
+        /* background: linear-gradient(135deg, #fe0000, #e0e0e0); */
+        background: linear-gradient(124deg, #00fe5c, #e0e0e0);
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 20px;
+        width: calc(33.333% - 20px); /* 3 cards per row, adjust for gaps */
+        text-align: center;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.393);
+        /* margin: 10px; */
+        box-sizing: border-box; /* Ensure padding and borders are included in width */
+    }
+    .offer-card h {
+        font-size: 1.5em;
+        margin: 0 0 10px 0;
+        color: #333;
+    }
+    .offer-card .offer-name {
+        font-size: 1.3em;
+        font-weight: bold;
+        color: #4d283d;
+    }
+    .offer-card .offer-discount {
+        font-size: 2.5em;
+        font-weight: bold;
+        /* color: #ff5722; */
+        color: #177a08;
+
+    }
+    .offer-card .offer-details {
+        font-size: 1em;
+        color: #666;
+        margin-bottom: 15px;
+    }
+    .offer-apply-button {
+        background-color: #28a745;
+        color: white;
+        padding: 10px 15px;
+        text-align: center;
+        border-radius: 5px;
+        cursor: pointer;
+        display: block;
+        margin: 0 auto;
+    }
+    .offer-apply-button:hover {
+        background-color: #218838;
+    }
+    /* Add specific color styles for h2 and h3 */
+    .offer-modal-content .select-offer {
+        color: #333; /* or any color you prefer */
+        text-align: center;
+    }
+    .offer-modal-content h4 {
+        color: #ff0000; /* or any color you prefer */
+        text-align: center;
+    }
+</style>
+
+
+
+
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- for modals -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+
+<!-- script for add products -->
 <script src="/assets/scripts/adminScripts/add-product-script.js"></script>
 
+<!-- script for edit products -->
+<script src="/assets/scripts/adminScripts/edit-product-script.js"></script>
 
+<!-- script for block and unblock products -->
+<script src="/assets/scripts/adminScripts/manage-product-script.js"></script>
 
-<!-- SCRIPT FOR EDIT PRODUCTS FORM SUBMISSION -->
-<script>
-    // to fill the net weight automatically.
-    function calculateNetWeight() {
-        const grossWt = document.getElementById('edit-product-gross-wt').value;
-        const stoneWt = document.getElementById('edit-product-stone-wt').value;
-        const netWt = grossWt - stoneWt;
-        document.getElementById('edit-product-net-wt').value = netWt.toFixed(3);
-    }
 
-    // to enable/disble the stone charge field
-    function toggleStoneChargeField() {
-        const stoneWt = parseFloat(document.getElementById('edit-product-stone-wt').value) || 0;
-        const stoneChargeField = document.getElementById('edit-product-sc');
-        if (!stoneWt || stoneWt === "") {
-            stoneChargeField.disabled = true;
-            stoneChargeField.value = 0;
-        } else {
-            stoneChargeField.disabled = false;
-        }
-    }
 
-    document.getElementById('edit-product-gross-wt').addEventListener('input', calculateNetWeight);
-    document.getElementById('edit-product-stone-wt').addEventListener('input', calculateNetWeight);
-    document.getElementById('edit-product-stone-wt').addEventListener('input', toggleStoneChargeField);
 
 
 
-    // Function to handle image preview and remove button
-    $(document).ready(function () {
-        const imagePreviews = ['edit-image-preview1', 'edit-image-preview2', 'edit-image-preview3', 'edit-image-preview4'];
-        const imageInputs = ['edit-product-image1', 'edit-product-image2', 'edit-product-image3', 'edit-product-image4'];
-        const replacedImages = [];
-        let existingImages = [];
 
 
-        // Function to add image preview with remove button
-        function addImagePreview(imageUrl, index, fileName, isExisting = false, imageName = "") {
-            const imgContainer = $('<div>').css('position', 'relative').css('display', 'flex').css('align-items', 'center');
-            const img = $('<img>').attr('src', imageUrl).css('maxWidth', '100px').css('margin', '10px').css('border', '1px solid white');
-            const fileNameElement = $('<p>').text(fileName).css('margin', '0').css('marginLeft', '5px');
-            
-            imgContainer.append(img);
-            imgContainer.append(fileNameElement);
 
-            $('#' + imagePreviews[index]).html(imgContainer);
 
-            // if (isExisting) {
-            //     existingImages[index] = fileName; // Keep track of existing images
-            //     console.log(existingImages[index]);
-            // } else {
-            //     replacedImages[index] = fileName; // Keep track of new images
-            //     console.log(replacedImages[index]);
-            // } 
-        }
 
-        // Event listener for file input change (for inserted images)
-        imageInputs.forEach((inputId, index) => {
-            const inputElement = document.getElementById(inputId);
-            
-            if (inputElement) {
-                inputElement.addEventListener('change', function () {
-                    const file = this.files[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = function (e) {
-                            addImagePreview(e.target.result, index, file.name);
-                            replacedImages[index] = file;
-                        }
-                        reader.readAsDataURL(file);
-                    }
-                });
-            }
-        });
-
-
-
-        // set the default values in the edit product form fields (including images)
-        $(document).ready(function () {
-            $('a[data-target="#editProductModal"]').click(function () {
-                // Retrieve data attributes from <a> tag (.data attibutes must be in small letter. eg: makingcharge, grossweight etc)
-                var productId = $(this).data('id');
-                var productImages = $(this).data('images'); //array
-                var productCategory = $(this).data('category');
-                var productCode = $(this).data('code');
-                var productName = $(this).data('name');
-                var productDescription = $(this).data('description');
-                var productGrossWeight = $(this).data('grossweight');
-                var productStoneWeight = $(this).data('stoneweight');
-                var productNetWeight = $(this).data('netweight');
-                var productMc = $(this).data('makingcharge');
-                var productSc = $(this).data('stonecharge');
-                var productPurity = $(this).data('purity');
-                var productQty = $(this).data('quantity');
-                var productStatus = $(this).data('islisted');
-
-                console.log("Default productImages A : ", productImages[1]);
-
-
-                // Set the default values in the form fields.
-                $('#edit-product-id').val(productId);
-                $('#edit-product-code').val(productCode);
-                $('#edit-product-category').val(productCategory);
-                $('#edit-product-name').val(productName);
-                $('#edit-product-description').val(productDescription);
-                $('#edit-product-gross-wt').val(productGrossWeight);
-                $('#edit-product-stone-wt').val(productStoneWeight);
-                $('#edit-product-net-wt').val(productNetWeight);
-                $('#edit-product-mc').val(productMc);
-                $('#edit-product-sc').val(productSc);
-                $('#edit-product-purity').val(productPurity);
-                $('#edit-product-quantity').val(productQty);
-                $('#edit-product-status').val(productStatus ? 'unlist' : 'list');
-
-                // Clear previous images
-                imagePreviews.forEach(preview => $('#' + preview).html(''));
-                replacedImages.length = 0;
-                existingImages.length = 0;
-
-                // Display default images
-                if (productImages) {
-                    productImages.forEach((imageUrl, index) => {
-                        addImagePreview('/assets/images/productImages/' + imageUrl, index, imageUrl, true, imageUrl);
-                    });
-                }
-
-                console.log("Default ProductId : ", productId);
-                console.log("Default productImages B : ", productImages);
-                console.log("Default ProductCategory : ", productCategory);
-                console.log("Default ProductCode : ", productCode);
-                console.log("Default ProductName : ", productName);
-                console.log("Default ProductDescription : ", productDescription);
-                console.log("Default ProductGrossWt : ", productGrossWeight);
-                console.log("Default ProductStoneWt : ", productStoneWeight);
-                console.log("Default ProductNetWt : ", productNetWeight);
-                console.log("Default ProductMC : ", productMc);
-                console.log("Default ProductSC : ", productSc);
-                console.log("Default ProductPurity : ", productPurity);
-                console.log("Default ProductQty : ", productQty);
-                console.log("Default ProductStatus : ", productStatus);
-            });
-        });
-
-
-
-        //for validating and submitting the edit form
-        $('#updateProductBtn').click(function () {
-            console.log('updateProductBtn function started execute' );
-
-            // Retrieve updated values from modal fields
-            const productId = $('#edit-product-id').val();
-            // const productImages = $('#edit-product-images');
-            // const productImages = $('#edit-product-image1');
-            const existingImages = $('#edit-image-previews').children().length;
-            const productCategory = $('#edit-product-category').val();
-            const productCode = $('#edit-product-code').val();
-            const productName = $('#edit-product-name').val();
-            const productDescription = $('#edit-product-description').val();
-            const productGrossWt = parseFloat($('#edit-product-gross-wt').val()) || 0;
-            const productStoneWt = parseFloat($('#edit-product-stone-wt').val()) || 0;
-            const productNetWt = parseFloat($('#edit-product-net-wt').val()) || 0;
-            const productMc = parseFloat($('#edit-product-mc').val()) || 0;
-            const productSc = parseFloat($('#edit-product-sc').val()) || 0;
-            const productPurity = $('#edit-product-purity').val();
-            // const productQty = parseInt($('#edit-product-quantity').val()) || 0;
-            const productQty = $('#edit-product-quantity').val().trim();
-            const productStatus = $('#edit-product-status').val();
-
-
-            console.log("Current ProductId : ", productId);
-            // console.log("Current productImages : ", productImages);
-            console.log("Current existingImages : ", existingImages);
-            console.log("Current ProductCategory : ", productCategory);
-            console.log("Current ProductCode : ", productCode);
-            console.log("Current ProductName : ", productName);
-            console.log("Current ProductDescription : ", productDescription);
-            console.log("Current productGrossWeight : ", productGrossWt);
-            console.log("Current productStoneWeight : ", productStoneWt);
-            console.log("Current productNetWeight : ", productNetWt);
-            console.log("Current ProductMc : ", productMc);
-            console.log("Current ProductSc : ", productSc);
-            console.log("Current ProductPurity : ", productPurity);
-            console.log("Current ProductQty : ", productQty);
-            console.log("Current ProductStatus : ", productStatus);
-
-
-
-            const editProductImagesError = document.getElementById('edit-product-images-error');
-            const choosenFileError = document.getElementById('choosen-file-error');
-            const editProductCategoryError = document.getElementById('edit-product-category-error');
-            const editProductNameError = document.getElementById('edit-product-name-error');
-            const editProductDescriptionError = document.getElementById('edit-product-description-error');
-            const editProductGrossWtError = document.getElementById('edit-product-gross-wt-error');
-            const editProductStoneWtError = document.getElementById('edit-product-stone-wt-error');
-            const editProductNetWtError = document.getElementById('edit-product-net-wt-error');
-            const editProductMcError = document.getElementById('edit-product-mc-error');
-            const editProductScError = document.getElementById('edit-product-sc-error');
-            const editProductQtyError = document.getElementById('edit-product-quantity-error');
-
-            editProductImagesError.style.display = "none";
-            editProductCategoryError.style.display = "none";
-            editProductNameError.style.display = "none";
-            editProductDescriptionError.style.display = "none";
-            editProductGrossWtError.style.display = "none";
-            editProductStoneWtError.style.display = "none";
-            editProductNetWtError.style.display = "none";
-            editProductMcError.style.display = "none";
-            editProductScError.style.display = "none";
-            editProductQtyError.style.display = "none";
-
-
-            let isValid = true;
-
-            var allowedFormats = ["jpg", "jpeg", "png", "gif", "webp"]; // Add more formats if needed
-            const hasNewImages = replacedImages.some(img => img);
-
-
-            if (!hasNewImages && existingImages.length === 0) {
-                editProductImagesError.textContent = "Please choose image files to proceed.";
-                editProductImagesError.style.display = "block";
-                isValid = false;
-            } else if (hasNewImages) {
-                for (const file of replacedImages) {
-                    if (file) {
-                        const fileExtension = file.name.split('.').pop().toLowerCase();
-                        if (!allowedFormats.includes(fileExtension)) {
-                            editProductImagesError.textContent = "Please select files in JPG, PNG, GIF, or another supported image format.";
-                            editProductImagesError.style.display = "block";
-                            isValid = false;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if (productCategory === "select-category") {
-                editProductCategoryError.textContent = "Select product category.";
-                editProductCategoryError.style.display = "block";
-                isValid = false;
-            } else {
-                editProductCategoryError.style.display = "none";
-            }
-
-            if (productName === "") {
-                editProductNameError.textContent = "Product name is required.";
-                editProductNameError.style.display = "block";
-                isValid = false;
-            } else if (!/[a-zA-Z0-9]/.test(productName)){
-                editProductNameError.textContent = "Name cannot be blank.";
-                editProductNameError.style.display = "block";
-                isValid = false;
-            } else {
-                editProductNameError.style.display = "none";
-            }
-
-            if (productDescription === "") {
-                editProductDescriptionError.textContent = "Product description is required.";
-                editProductDescriptionError.style.display = "block";
-                isValid = false;
-            } else if (!/[a-zA-Z0-9]/.test(productDescription)){
-                editProductDescriptionError.textContent = "Description cannot be blank.";
-                editProductDescriptionError.style.display = "block";
-                isValid = false;
-            } else {
-                editProductDescriptionError.style.display = "none";
-            }
-
-
-
-            if (!productGrossWt) {
-                editProductGrossWtError.textContent = "Gross weight is required.";
-                editProductGrossWtError.style.display = "block";
-                isValid = false;
-            } else if (productGrossWt < 0) {
-                editProductGrossWtError.textContent = "Gross weight must be greater than 0.";
-                editProductGrossWtError.style.display = "block";
-                isValid = false;
-            } else if (!/^\d+(\.\d+)?$/.test(productGrossWt)) {
-                editProductGrossWtError.textContent = "Enter a valid weight (numbers only).";
-                editProductGrossWtError.style.display = "block";
-                isValid = false;
-            } else {
-                editProductGrossWtError.style.display = "none";
-            }
-
-
-            if (productStoneWt < 0) {
-                editProductStoneWtError.textContent = "Stone weight must be greater than or equal to 0.";
-                editProductStoneWtError.style.display = "block";
-                isValid = false;
-            } if (productStoneWt > productGrossWt) {
-                editProductStoneWtError.textContent = "Stone weight must be less than gross weight.";
-                editProductStoneWtError.style.display = "block";
-                isValid = false;
-            } else if (!/^\d+(\.\d+)?$/.test(productStoneWt)) {
-                editProductStoneWtError.textContent = "Enter a valid weight (numbers only).";
-                editProductStoneWtError.style.display = "block";
-                isValid = false;
-            } else {
-                editProductStoneWtError.style.display = "none";
-            }
-
-
-            if (!productNetWt) {
-                editProductNetWtError.textContent = "Net weight is required.";
-                editProductNetWtError.style.display = "block";
-                isValid = false;
-            } else if (productNetWt < 0) {
-                editProductNetWtError.textContent = " negative value";
-                editProductNetWtError.style.display = "block";
-                isValid = false;
-            } else if (!/^\d+(\.\d+)?$/.test(productNetWt)) {
-                editProductNetWtError.textContent = "Enter a valid weight (numbers only).";
-                editProductNetWtError.style.display = "block";
-                isValid = false;
-            } else {
-                editProductNetWtError.style.display = "none";
-            }
-
-
-            if (!productMc) {
-                editProductMcError.textContent = "Making Charge is required.";
-                editProductMcError.style.display = "block";
-                isValid = false;
-            } else if (productMc <= 0) {
-                editProductMcError.textContent = "Making charge must be greater than 0.";
-                editProductMcError.style.display = "block";
-                isValid = false;
-            } else if (!/^\d+(\.\d+)?$/.test(productMc)) {
-                editProductMcError.textContent = "Enter a valid MC (numbers only).";
-                editProductMcError.style.display = "block";
-                isValid = false;
-            } else {
-                editProductMcError.style.display = "none";
-            }
-
-
-
-            if (productStoneWt > 0 && !productSc) {
-                editProductScError.textContent = "Stone charge is required.";
-                editProductScError.style.display = "block";
-                isValid = false;
-            } else if (productStoneWt > 0 && productSc <= 0) {
-                editProductScError.textContent = "Stone charge must be greater than 0.";
-                editProductScError.style.display = "block";
-                isValid = false;
-            } else if (!productStoneWt && productSc > 0) {
-                editProductScError.textContent = "Cannot enter stone rate for stoneless ornaments.";
-                editProductScError.style.display = "block";
-                isValid = false;
-            } else if (!/^\d+(\.\d+)?$/.test(productSc)) {
-                editProductScError.textContent = "Enter a valid service charge (numbers only).";
-                editProductScError.style.display = "block";
-                isValid = false;
-            } else {
-                editProductScError.style.display = "none";
-            }
-
-
-            if (productQty === "") {
-                editProductQtyError.textContent = "Quantity is required.";
-                editProductQtyError.style.display = "block";
-                isValid = false;
-            } else if (!/^[-+]?\d+$/.test(productQty)) {
-                editProductQtyError.textContent = "Enter a valid product quantity (numbers only).";
-                editProductQtyError.style.display = "block";
-                isValid = false;
-            } else {
-                const parsedQty = parseInt(productQty, 10); // Parse the trimmed input as an integer
-                if (parsedQty < 0) {
-                    editProductQtyError.textContent = "Quantity cannot be a negative value.";
-                    editProductQtyError.style.display = "block";
-                    isValid = false;
-                } else {
-                    editProductQtyError.style.display = "none";
-                }
-            }
-
-
-
-            if (isValid) {
-                const formData = new FormData();
-
-                imageInputs.forEach((inputId, index) => {
-                    const inputElement = document.getElementById(inputId);
-                    if (inputElement && inputElement.files.length > 0) {
-                        formData.append('croppedImages', inputElement.files[0]);
-                        formData.append('imageIndex[]', index); // Indicate which image slot this file belongs to
-                    } else {
-                        // If no new file is selected, check if there's an existing image
-                        const existingImage = $('#' + imagePreviews[index] + ' img');
-                        if (existingImage.length > 0) {
-                            const imageUrl = existingImage.attr('src');
-                            const imageName = imageUrl.substring(imageUrl.lastIndexOf('/') + 1); // Extract image name
-                            formData.append('existingImages[]', imageName);
-                            formData.append('imageIndex[]', index); // Indicate which image slot this existing image belongs to
-                        }
-                    }
-                });
-
-                formData.append('productId', productId);
-                formData.append('productCode', productCode);
-                formData.append('productCategory', productCategory);
-                formData.append('productName', productName);
-                formData.append('productDescription', productDescription);
-                formData.append('productGrossWt', productGrossWt.toFixed(3));
-                formData.append('productStoneWt', productStoneWt.toFixed(3));
-                formData.append('productNetWt', productNetWt.toFixed(3));
-                formData.append('productMc', productMc);
-                formData.append('productSc', productSc.toFixed(2));
-                formData.append('productPurity', productPurity);
-                formData.append('productQty', productQty);
-                formData.append('productStatus', productStatus);
-
-
-                function logFormData(formData) {
-                    for (let [key, value] of formData.entries()) {
-                        console.log(key, value);
-                    }
-                }
-
-                console.log('sending formData is given below.');
-                logFormData(formData);
-
-
-
-                $.ajax({
-                    url: '/admin/edit-product',
-                    method: 'PUT',
-                    // contentType: 'application/json',
-                    contentType: false, // Don't set contentType when using FormData
-                    data: formData,
-                    processData: false,
-                    success: function (response) {
-                        console.log('Update Product Form submitted', response);
-                        if (response.success) {
-                            Swal.fire({
-                                icon: "success",
-                                title: "Success",
-                                text: "Product Updated Successfully!",
-                            })
-                            .then(location.reload());
-                        } else {
-                            console.error('Update Product Failed:', response.message);
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('Error in updating product:', error);
-                    }
-                });
-            }
-
-        });
-    });
-
-</script>
-
-
-
-
-
-
-
-
-
-
-<!-- SCRIPT TO MANAGE PRODUCT (BLOCK AND UNBLOCK) -->
-<script>
-    
-    function manageProduct(id) {
-        console.log('manageProduct id: ', id);
-
-        Swal.fire({
-            title: "Are you sure?",
-            text: "Do you want to block/unblock this product?",
-            icon: "question",
-            showCancelButton: true,
-            confirmButtonColor: "#28a745",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, confirm!"
-        })
-        .then((result) => {
-        if (result.isConfirmed) {
-            $.ajax({
-                url: '/admin/manage-product',
-                type: 'PATCH',
-                contentType: 'application/json',
-                data: JSON.stringify({id}),
-                success: function(response) {
-                    if (response.success === true){
-                        location.reload();
-                    } else if(response.categoryBlocked){
-                        // Swal.fire("SweetAlert2 is working!");
-                        Swal.fire({
-                            icon: "error",
-                            title: "Cannot list this item. Product category is blocked!",
-                            showConfirmButton: false,
-                            timer: 3000
-                        });
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.log('Error:', error);
-                }
-            });
-        }
-        });
-
-    
-    }
-</script>
 
 
 

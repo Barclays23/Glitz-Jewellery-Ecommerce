@@ -14,7 +14,11 @@ const categorySchema = new mongoose.Schema({
     isListed : {
         type : Boolean,
         default : true
-    }
+    },
+    offerRef : {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Offer',
+    },
 });
 
 

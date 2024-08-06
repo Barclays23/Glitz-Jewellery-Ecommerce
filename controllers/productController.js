@@ -2,6 +2,7 @@ const User = require('../models/userModel');
 const GoldPrice = require('../models/goldPriceModel');
 const Category = require ('../models/categoryModel');
 const Product = require ('../models/productModel');
+const Offer = require ('../models/offerModel');
 
 
 
@@ -125,9 +126,20 @@ const loadProductList = async(req, res)=>{
 
         const categoryData = await Category.find({});
 
+        const currentDate = new Date();
+        const offerData = await Offer.find(
+            {
+                isListed: true, 
+                activationDate: {$lte: currentDate},  // activation date is on running
+                expiryDate: {$gte: currentDate}  // not expired
+            }
+        );
+        console.log('Number of active running offers :', offerData.length);
+
         res.render('productList', {
             adminData,
             goldPriceData,
+            offerData,
             productData,
             categoryData,
             searchQuery,
