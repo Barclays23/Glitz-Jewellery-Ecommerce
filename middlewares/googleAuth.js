@@ -52,7 +52,7 @@ passport.use(new GoogleStrategy({
                firstname : profile.name.givenName,
                lastname : profile.name.familyName,
                email : profile.emails[0].value,
-               photo: profile.photos[0].value,
+               // photo: profile.photos[0].value,
                // mobile : req.body.userMobile,
                // password : securedPass,
                isBlocked : false,

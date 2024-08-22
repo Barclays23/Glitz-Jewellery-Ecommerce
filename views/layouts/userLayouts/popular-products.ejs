@@ -14,13 +14,6 @@
             <!-- product 1 -->
             <% for(i=1; i<=8; i++){ %>
                 <% if(popularProducts[i]){ %>
-                    <% const popularNetWeight = Number(popularProducts[i].netWeight) %>
-                    <% const popularMetalCost = goldPriceData.price * popularProducts[i].netWeight %>
-                    <% const popularMakingCharge = popularMetalCost * popularProducts[i].VA/100 %>
-                    <% const popularStoneCharge = popularProducts[i].stoneCharge %>
-                    <% const popularGST = (popularMetalCost + popularMakingCharge + popularStoneCharge) * (3/100) %>
-                    <% const popularTotalPrice = popularMetalCost + popularMakingCharge + popularStoneCharge + popularGST %>
-
                     <div class="col-lg-3 col-md-4 col-sm-6 col-12">
                         <div class="tm-product tm-scrollanim">
                             <div class="tm-product-topside">
@@ -48,18 +41,22 @@
                                     <span class="is-active"><i class="ion-android-star-outline"></i></span>
                                     <span><i class="ion-android-star-outline"></i></span>
                                 </div>
-                                <span class="tm-product-price">₹<%= Math.round(popularTotalPrice).toFixed(2) %></span>
+
+                                <% if (popularProducts[i].offerRef != null){ %>
+                                    <span class="tm-product-price">₹<%= Math.round((popularProducts[i].totalPrice) - (popularProducts[i].makingCharge * popularProducts[i].offerRef.offerPercentage / 100)).toFixed(2) %></span>
+                                <% } else { %>
+                                    <span class="tm-product-price">₹<%= Math.round(popularProducts[i].totalPrice).toFixed(2) %></span>
+                                <% } %>
+
                                 <div class="tm-product-content">
                                     <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                                        Lorem
-                                        Ipsum has been the industry's standard dummy text ever since the
+                                        Lorem Ipsum has been the industry's standard dummy text ever since the
                                         when an unknown printer took a galley of type and scrambled it to make a
                                         type specimen book. It has survived not only five centuries, but also the
                                         leap into electronic typesetting.</p>
                                     <ul class="tm-product-actions">
                                         <li><a href="#"><i class="ion-android-cart"></i> Add to cart</a></li>
-                                        <li><button data-fancybox data-src="#tm-product-quickview"><i
-                                                    class="ion-eye"></i></button></li>
+                                        <li><button data-fancybox data-src="#tm-product-quickview"><i class="ion-eye"></i></button></li>
                                         <li><a href="#"><i class="ion-heart"></i></a></li>
                                     </ul>
                                 </div>

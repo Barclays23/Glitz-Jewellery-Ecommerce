@@ -98,16 +98,20 @@
                                         <div class="tm-form-inner">
                                             <div class="tm-form-field no-border row">
                                                 <div class="col-6 image-container">
-                                                    <% if(userData.photo){ %>
+                                                    <% if (userData.photo){ %>
                                                         <div class="image-wrapper">
                                                             <img id="image-preview" src="assets/images/userImages/<%= userData.photo %>" alt="Profile Image">
+                                                        </div>
+                                                    <% } else if (userData.googleAccount && userData.googleAccount.googlePhoto) { %>
+                                                        <div class="image-wrapper">
+                                                            <img id="image-preview" src="<%= userData.googleAccount.googlePhoto %>" alt="Profile Image">
                                                         </div>
                                                     <% } else { %>
                                                         <div class="image-wrapper">
                                                             <img id="image-preview" src="assets/images/icons/dummy-profile-pic2.png" alt="Profile Image">
                                                         </div>
                                                     <% } %>
-                                                </div>
+                                                </div>                                                
                                             </div>
                                             <div class="col-12 name-container">
                                                 <h1><%= userData.firstname %> <%= userData.lastname %></h1>

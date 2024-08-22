@@ -2,8 +2,6 @@ const express = require ('express');
 const nocache = require ('nocache');
 
 
-const cron = require('node-cron');
-const {getGoldRateFromAPI} = require('./controllers/goldRateController');
 
 
 const config = require('./config/config');
@@ -16,7 +14,14 @@ app.use(nocache());
 
 app.use(express.static('public'));
 
+
+// cron job functions
+const cron = require('node-cron');
+const {getGoldRateFromAPI} = require('./controllers/goldRateController');
+const {pendingOrdersManaging} = require('./controllers/orderController');
 getGoldRateFromAPI();
+pendingOrdersManaging();
+
 
 
 // for user routes

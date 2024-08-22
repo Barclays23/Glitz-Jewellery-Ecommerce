@@ -4,6 +4,7 @@ const Category = require ('../models/categoryModel');
 const Cart = require ('../models/cartModel');
 const Wishlist = require ('../models/wishlistModel');
 const Coupon = require ('../models/couponModel');
+const Offer = require ('../models/offerModel');
 const GoldPrice = require('../models/goldPriceModel');
 const UserOtp = require ('../models/otpModel');
 const bcrypt =  require ('bcrypt');
@@ -20,15 +21,15 @@ const randomString = require('randomstring');
 const loadHome = async(req, res)=>{
     try {
         const sessionId = req.session.userId;
-        console.log("User ID in home page:", sessionId);
+        console.log("User ID in home page:", req.session.userId);
 
         const userData = await User.findOne({_id : sessionId});
         const goldPriceData = await GoldPrice.findOne({});
-        const popularProducts = await Product.find({});
-        const newProducts = await Product.find({});
+        const popularProducts = await Product.find({}).populate('offerRef');;
+        const newProducts = await Product.find({}).populate('offerRef');
         const userCart = await Cart.findOne({ userRef: sessionId });
         const userWishlist = await Wishlist.findOne({userRef : sessionId});
-        const offerBannerProduct = await Product.findOne({_id: '669354be843722a03a04dbf6'});
+        const offerBannerProduct = await Product.findOne({_id: '669354be843722a03a04dbf6'}).populate('offerRef');
         console.log('offerBannerProduct is : ', offerBannerProduct.code);
 
         let cartCount = 0;
@@ -45,6 +46,48 @@ const loadHome = async(req, res)=>{
                 wishlistCount += product.quantity;
             });
         }
+
+
+
+        // Find expired offers
+        const expiredOffers = await Offer.find({
+            expiryDate: { $lt: new Date() },
+            isListed: true // Only select offers that are currently listed
+        }, '_id');
+        const expiredOfferIds = expiredOffers.map(offer => offer._id);
+        console.log('found ', expiredOfferIds.length, ' expired active offers in home.');
+
+        // Find unlisted offers
+        const unlistedOffers = await Offer.find({
+            isListed: false
+        }, '_id');
+        const unlistedOfferIds = unlistedOffers.map(offer => offer._id);
+        console.log('found ', unlistedOfferIds.length, ' unlisted/ blocked offers in home.');
+
+        // Combine both sets of offer IDs
+        const offerIdsToCancel = new Set([...expiredOfferIds, ...unlistedOfferIds]);
+
+        // If there are no offers to cancel, skip the update operation
+        if (offerIdsToCancel.size === 0) {
+            console.log('No offers to cancel.');
+            return;
+        }
+
+        // cancel the offer from category
+        const updatedCategoryOffer = await Category.updateMany(
+            { offerRef: { $in: [...offerIdsToCancel] } },
+            { offerRef: null }
+        );
+        console.log('Number of cancelled offer category in home :', updatedCategoryOffer.modifiedCount);
+        
+        // cancel the offer from products
+        const updatedProductOffer = await Product.updateMany(
+            { offerRef: { $in: [...offerIdsToCancel] } },
+            { offerRef: null }
+        );
+        console.log('Number of cancelled offer products in home :', updatedProductOffer.modifiedCount);
+
+
 
         res.render('home', {userData, wishlistCount, cartCount, goldPriceData, offerBannerProduct, popularProducts, newProducts});
 
@@ -519,7 +562,7 @@ const loadShopping = async (req, res)=>{
         console.log('session id in shopping : ', sessionId);
         const categoryData = await Category.find({});
         const goldPriceData = await GoldPrice.findOne({});
-        const popularProducts = await Product.find({});
+        const popularProducts = await Product.find({}).populate('offerRef');
         const userCart = await Cart.findOne({ userRef: sessionId });
         const userWishlist = await Wishlist.findOne({ userRef: sessionId});
 
@@ -540,6 +583,46 @@ const loadShopping = async (req, res)=>{
                 wishlistCount += product.quantity;
             });
         }
+
+
+        // Find expired offers
+        const expiredOffers = await Offer.find({
+            expiryDate: { $lt: new Date() },
+            isListed: true // Only select offers that are currently listed
+        }, '_id');
+        const expiredOfferIds = expiredOffers.map(offer => offer._id);
+        console.log('found ', expiredOfferIds.length, ' expired active offers in shopping.');
+
+        // Find unlisted offers
+        const unlistedOffers = await Offer.find({
+            isListed: false
+        }, '_id');
+        const unlistedOfferIds = unlistedOffers.map(offer => offer._id);
+        console.log('found ', unlistedOfferIds.length, ' unlisted/ blocked offers in shopping.');
+
+        // Combine both sets of offer IDs
+        const offerIdsToCancel = new Set([...expiredOfferIds, ...unlistedOfferIds]);
+
+        // If there are no offers to cancel, skip the update operation
+        if (offerIdsToCancel.size === 0) {
+            console.log('No offers to cancel.');
+            return;
+        }
+
+        // cancel the offer from category
+        const updatedCategoryOffer = await Category.updateMany(
+            { offerRef: { $in: [...offerIdsToCancel] } },
+            { offerRef: null }
+        );
+        console.log('Number of cancelled offer category in shopping :', updatedCategoryOffer.modifiedCount);
+        
+        // cancel the offer from products
+        const updatedProductOffer = await Product.updateMany(
+            { offerRef: { $in: [...offerIdsToCancel] } },
+            { offerRef: null }
+        );
+        console.log('Number of cancelled offer products in shopping :', updatedProductOffer.modifiedCount);
+
 
 
         const categoryQuery = req.query.categoryId;
@@ -598,6 +681,7 @@ const loadShopping = async (req, res)=>{
 
         const productData = await Product.find(query)
         .populate('categoryRef')
+        .populate('offerRef')
         .sort(sortOptions)
         .skip(skip)
         .limit(limit)
@@ -669,11 +753,11 @@ const productDetals = async(req, res)=>{
         const sessionId = req.session.userId;
 
         const userData = await User.findOne({_id: sessionId});
-        const productData = await Product.findOne({_id: req.query.id}).populate('categoryRef');
+        const productData = await Product.findOne({_id: req.query.id}).populate('categoryRef').populate('offerRef');
         const categoryData = await Category.find({});
         const goldPriceData = await GoldPrice.findOne({});
-        const similarProducts = await Product.find({categoryRef: productData.categoryRef._id});
-        const popularProducts = await Product.find({});
+        const similarProducts = await Product.find({categoryRef: productData.categoryRef._id}).populate('offerRef');
+        const popularProducts = await Product.find({}).populate('offerRef');
         const userCart = await Cart.findOne({ userRef: sessionId });
         const userWishlist = await Wishlist.findOne({ userRef: sessionId});
 
@@ -695,6 +779,44 @@ const productDetals = async(req, res)=>{
                 wishlistCount += product.quantity;
             });
         }
+
+        // Find expired offers
+        const expiredOffers = await Offer.find({
+            expiryDate: { $lt: new Date() },
+            isListed: true // Only select offers that are currently listed
+        }, '_id');
+        const expiredOfferIds = expiredOffers.map(offer => offer._id);
+        console.log('found ', expiredOfferIds.length, ' expired active offers in productDetails.');
+
+        // Find unlisted offers
+        const unlistedOffers = await Offer.find({
+            isListed: false
+        }, '_id');
+        const unlistedOfferIds = unlistedOffers.map(offer => offer._id);
+        console.log('found ', unlistedOfferIds.length, ' unlisted/ blocked offers in productDetails.');
+
+        // Combine both sets of offer IDs
+        const offerIdsToCancel = new Set([...expiredOfferIds, ...unlistedOfferIds]);
+
+        // If there are no offers to cancel, skip the update operation
+        if (offerIdsToCancel.size === 0) {
+            console.log('No offers to cancel.');
+            return;
+        }
+
+        // cancel the offer from category
+        const updatedCategoryOffer = await Category.updateMany(
+            { offerRef: { $in: [...offerIdsToCancel] } },
+            { offerRef: null }
+        );
+        console.log('Number of cancelled offer category in productDetails :', updatedCategoryOffer.modifiedCount);
+        
+        // cancel the offer from products
+        const updatedProductOffer = await Product.updateMany(
+            { offerRef: { $in: [...offerIdsToCancel] } },
+            { offerRef: null }
+        );
+        console.log('Number of cancelled offer products in productDetails :', updatedProductOffer.modifiedCount);
 
 
         if (sessionId) {
@@ -1117,19 +1239,22 @@ const updateUserProfile = async (req, res)=>{
 // update user-password -----------------------------------------
 const updateUserPassword = async (req, res)=>{
     try {
+        const sessionId = req.session.userId;
         const {oldPassword, newPassword} = req.body;
         console.log('oldPassword :', oldPassword);
         console.log('newPassword :', newPassword);
         
-        const userData = await User.findOne({_id: req.session.userId});
-        console.log('userData in update password :', userData._id);
+        const userData = await User.findOne({_id: sessionId});
         
-        const matchPassword = await bcrypt.compare(oldPassword, userData.password);
-        console.log('matchPassword: ', matchPassword);
-
-        if (!matchPassword) {
-            console.log('incorrect password');
-            return res.json({ incorrect: true});
+        // if any password already stored in db. (no password stored if google signup)
+        if (userData.password){
+            const matchPassword = await bcrypt.compare(oldPassword, userData.password);
+            console.log('matchPassword: ', matchPassword);
+    
+            if (!matchPassword) {
+                console.log('incorrect password');
+                return res.json({ incorrect: true});
+            }
         }
 
         const securePassword = await bcrypt.hash(newPassword, 10);

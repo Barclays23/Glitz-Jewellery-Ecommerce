@@ -110,7 +110,7 @@
                                     <% let bal = 0 %>
                                     <% userData.walletHistory.forEach((transaction)=> { %>
                                         <tr>
-                                            <td><%= new Date(transaction.date).toLocaleDateString() %></td>
+                                            <td><%= new Date(transaction.date).toLocaleDateString('en-GB') %></td>
                                             <td><%= transaction.description %></td>
                                             <% if (transaction.amount > 0){ %>
                                                 <td></td>
@@ -125,7 +125,7 @@
                                     <% }); %>
                                 <% } else { %>
                                     <tr>
-                                        <td colspan="4" class="text-center">No transactions found</td>
+                                        <td colspan="5" class="text-center">No transactions found</td>
                                     </tr>
                                 <% } %>
                             </tbody>

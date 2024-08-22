@@ -6425,13 +6425,15 @@ button.tm-videobutton img {
     font-weight: 700;
     margin-bottom: 5px;
     display: block;
-    font-size: 18px
+    font-size: 18px;
 }
 
 .tm-prodetails-price del {
+    font-weight: 400;
     color: #707070;
     margin-right: 10px;
-    font-size: 16px
+    /* font-size: 16px; */
+    font-size: 20px;
 }
 
 .tm-prodetails-infos {

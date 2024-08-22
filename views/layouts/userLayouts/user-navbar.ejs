@@ -17,7 +17,7 @@
                             
                             <div class="tm-dropdown tm-header-links">
                                 <button>
-                                    <% if(userData){ %>
+                                    <% if (userData){ %>
                                         <a href="#"><%= userData.firstname %> <%= userData.lastname %></a>
                                     <% } else { %>
                                         <a href="/login">Login</a>
@@ -25,7 +25,7 @@
                                 </button>
 
                                 <ul>
-                                    <% if(userData){ %>
+                                    <% if (userData){ %>
                                         <li><a href="/profile#account">My Profile</a></li>
                                         <li><a href="/wishlist#account">Wishlist</a></li>
                                         <li><a href="/cart#account">Cart</a></li>
@@ -101,7 +101,7 @@
             <div class="container">
                 <nav class="tm-header-nav">
                     <ul>
-                        <% if(userData){ %>
+                        <% if (userData){ %>
                         <li class="tm-header-nav-dropdown"><a href="/my-account">My Account</a>
                             <ul>
                                 <li><a href="/profile#account">My Profile</a></li>

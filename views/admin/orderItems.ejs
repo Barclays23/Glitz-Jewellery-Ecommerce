@@ -91,8 +91,9 @@
                                 <th class="text-success"> Unit Price </th>
                                 <th class="text-success"> Qty </th>
                                 <th class="text-success"> Total Price </th>
-                                <th class="text-success"> Order Status </th>
-                                <th class="text-success"> Actions </th>
+                                <th class="text-success"> Payment Status </th>
+                                <th class="text-success"> Product Order Status </th>
+                                <th class="text-success" colspan="2"> Actions </th>
                             </tr>
                         </thead>
 
@@ -113,43 +114,66 @@
                                     
                                     <td class="text-end"> <%= (orderData.orderedItems[i].totalPrice * orderData.orderedItems[i].quantity).toFixed(2) %> </td>
 
-                                    <% switch (orderData.orderedItems[i].orderStatus) { 
-                                        case 'Pending': %>
-                                            <td class="text-center color-theme text-warning" id="order-status">Pending</td>
-                                            <% break; 
+                                    <td class="text-center"> <%= orderData.orderedItems[i].paymentStatus %> </td>
+
+                                    <% switch (orderData.orderedItems[i].productStatus) {
+                                        case 'Not Applicable': %>
+                                        <td class="text-center color-theme text-secondary" id="product-status">Not Applicable</td>
+                                        <% break; 
+                                        case 'Pending Confirmation': %>
+                                        <td class="text-center color-theme text-warning" id="product-status">Pending Confirmation</td>
+                                        <% break; 
                                         case 'Placed': %>
-                                            <td class="text-center color-theme text-info" id="order-status">Order Placed</td>
+                                            <td class="text-center color-theme text-info" id="product-status">Order Placed</td>
                                             <% break; 
                                         case 'Confirmed': %>
-                                            <td class="text-center color-theme text-info" id="order-status">Order Confirmed</td>
+                                            <td class="text-center color-theme text-info" id="product-status">Order Confirmed</td>
                                             <% break; 
                                         case 'Shipped': %>
-                                            <td class="text-center color-theme text-primary" id="order-status">Item Shipped</td>
+                                            <td class="text-center color-theme text-primary" id="product-status">Item Shipped</td>
                                             <% break; 
                                         case 'Out for Delivery': %>
-                                            <td class="text-center color-theme text-info" id="order-status">Out for Delivery</td>
+                                            <td class="text-center color-theme text-info" id="product-status">Out for Delivery</td>
                                             <% break; 
                                         case 'Delivered': %>
-                                            <td class="text-center color-theme text-success" id="order-status">Delivered</td>
+                                            <td class="text-center color-theme text-success" id="product-status">Delivered</td>
                                             <% break; 
                                         case 'Return Requested': %>
-                                            <td class="text-center color-theme text-warning" id="order-status">Return Requested</td>
+                                            <td class="text-center color-theme text-warning" id="product-status">Return Requested</td>
                                             <% break;
                                         case 'Return Request Rejected': %>
-                                            <td class="text-center color-theme text-danger" id="order-status">Return Request Rejected</td>
+                                            <td class="text-center color-theme text-danger" id="product-status">Return Request Rejected</td>
                                             <% break;
                                         case 'Return Request Accepted': %>
-                                            <td class="text-center color-theme text-primary" id="order-status">Return Request Accepted</td>
+                                            <td class="text-center color-theme text-primary" id="product-status">Return Request Accepted</td>
                                             <% break;
                                         case 'Returned': %>
-                                            <td class="text-center color-theme text-danger" id="order-status">Returned</td>
+                                            <td class="text-center color-theme text-danger" id="product-status">Returned</td>
                                             <% break;
                                         case 'Cancelled': %>
-                                            <td class="text-center color-theme text-danger" id="order-status">Cancelled</td>
+                                            <td class="text-center color-theme text-danger" id="product-status">Cancelled</td>
                                             <% break;
                                         default: %>
-                                            <td class="text-center color-theme text-secondary" id="order-status">Unknown</td>
+                                            <td class="text-center color-theme text-white bg-danger" id="product-status">Unknown</td>
                                     <% } %>
+
+
+                                    <td class="text-center">
+                                        <select style="width: auto;" class="form-select product-status" data-order-id="<%= orderData._id %>" data-item-productref="<%= orderData.orderedItems[i].productRef %>" data-current-status="<%= orderData.orderedItems[i].productStatus %>">
+                                            <option value="Not Applicable">Not Applicable</option>
+                                            <option value="Pending Confirmation">Pending Confirmation</option>
+                                            <option value="Placed">Order Placed</option>
+                                            <option value="Confirmed">Order Confirmed</option>
+                                            <option value="Shipped">Shipped</option>
+                                            <option value="Out for Delivery">Out for Delivery</option>
+                                            <option value="Delivered">Delivered</option>
+                                            <option value="Return Requested">Return Requested</option>
+                                            <option value="Return Request Rejected">Return Request Rejected</option>
+                                            <option value="Return Request Accepted">Return Request Accepted</option>
+                                            <option value="Returned">Returned</option>
+                                            <option value="Cancelled">Cancelled</option> <!-- OPTION NOT NEEDED FOR ADMIN -->                                    
+                                        </select>
+                                    </td>
 
                                     <td>
                                         <a href="<%= `/admin/edit-order?id=${orderData.orderedItems[i]._id}` %>" 
@@ -163,18 +187,6 @@
                                         </a>
                                     </td>
 
-                                    <td class="text-center">
-                                        <select class="form-select order-status" data-order-id="<%= orderData._id %>" data-item-id="<%= orderData.orderedItems[i]._id %>" data-current-status="<%= orderData.orderedItems[i].orderStatus %>">
-                                            <option value="Pending">Pending</option>
-                                            <option value="Placed">Order Placed</option>
-                                            <option value="Confirmed">Order Confirmed</option>
-                                            <option value="Shipped">Shipped</option>
-                                            <option value="Out for Delivery">Out for Delivery</option>
-                                            <option value="Delivered">Delivered</option>
-                                            <option value="Cancelled">Cancelled</option>
-                                            <option value="Returned">Returned</option>
-                                        </select>
-                                    </td>
                                 </tr>
                             <% } %>
                         </tbody>
@@ -202,36 +214,83 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 
-<!-- script for edit order status -->
+<!-- script for change order status -->
 <script>
     $(document).ready(function () {
-        const statusOrder = ['Pending', 'Placed', 'Confirmed', 'Shipped', 'Out for Delivery', 'Delivered', 'Return Requested', 'Return Request Rejected', 'Return Request Accepted', 'Returned', 'Cancelled' ];
+        
+        const statusInOrder = [
+            'Not Applicable', 
+            'Pending Confirmation', 
+            'Placed', 
+            'Confirmed', 
+            'Shipped', 
+            'Out for Delivery', 
+            'Delivered', 
+            'Return Requested', 
+            'Return Request Rejected', 
+            'Return Request Accepted', 
+            'Returned', 
+            'Cancelled'
+        ];
 
         // order status validation based on their index order.
-        $('.order-status').each(function () {
+        $('.product-status').each(function () {
             const currentStatus = $(this).data('current-status');
-            const currentIndex = statusOrder.indexOf(currentStatus);
+            const currentIndex = statusInOrder.indexOf(currentStatus);
 
             $(this).addClass('select-enabled');
 
+            
+            // If the current status is 'Not Applicable' or 'Pending Confirmation', disable all options.
+            if (currentStatus === 'Not Applicable' || currentStatus === 'Pending Confirmation') {
+                $(this).find('option').attr('disabled', true);
+                return;  // Skip further processing for this element.
+            }
+
+
             $(this).find('option').each(function () {
                 const optionValue = $(this).val();
-                const optionIndex = statusOrder.indexOf(optionValue);
+                const optionIndex = statusInOrder.indexOf(optionValue);
 
+                // Disable the options "Not Applicable", "Pending Confirmation", and "Return Requested" and "Cancelled"
+                if (optionValue === 'Not Applicable' || optionValue === 'Pending Confirmation' || optionValue === 'Return Requested' || optionValue === 'Cancelled') {
+                    $(this).attr('disabled', true);
+                }
+
+                // Enable "Return Request Rejected" and "Return Request Accepted" only if the current status is "Return Requested"
+                if (currentStatus !== 'Return Requested' && 
+                   (optionValue === 'Return Request Rejected' || optionValue === 'Return Request Accepted')) {
+                    $(this).attr('disabled', true);
+                }
+
+                // Enable "Returned" only if the current status is "Return Request Accepted"
+                if (currentStatus !== 'Return Request Accepted' && optionValue === 'Returned') {
+                    $(this).attr('disabled', true);
+                }
+
+                // Disable the option if it's in a previous status
                 if (optionIndex < currentIndex) {
                     $(this).attr('disabled', true);
                 }
             });
 
+
+
+
+            // Set the current status as the selected value
             $(this).val(currentStatus);
         });
 
 
-        $('.order-status').change(function () {
+        $('.product-status').change(function () {
             const selectElement = $(this);
             const orderId = $(this).data('order-id');
-            const itemId = $(this).data('item-id');
+            const itemProductRef = $(this).data('item-productref');
             const newStatus = $(this).val();
+
+            console.log('orderId to update status in front end :', orderId);
+            console.log('itemProductRef to update status in front end :', itemProductRef);
+            console.log('newStatus to update status in front end :', newStatus);
 
             Swal.fire({
                 title: `Do you want to change the order status to <b class="text-black">${newStatus}</b>?`,
@@ -248,7 +307,7 @@
                         contentType: 'application/json',
                         data: JSON.stringify({
                             orderId,
-                            itemId,
+                            itemProductRef,
                             newStatus
                         }),
                         success: function (response) {

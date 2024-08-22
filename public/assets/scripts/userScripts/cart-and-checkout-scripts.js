@@ -33,7 +33,7 @@ function addToCart(productId) {
                     }
                 })
             } else if (response.nosession){
-                showAuthSwal();
+                showAuthSwalForCart();
             } else if (response.existProduct){
                 Swal.fire({
                     text: "Product already added to your cart!",
@@ -45,7 +45,7 @@ function addToCart(productId) {
         error: function(xhr, status, error) {
             console.log('Error in adding to cart :', error);
             if (xhr.status === 401) {
-                showAuthSwal();
+                showAuthSwalForCart();
             } else {
                 Swal.fire({
                     text: "An error occurred while adding to the cart.",
@@ -63,7 +63,7 @@ function addToCart(productId) {
 
 
 // Function to show the authentication SweetAlert
-function showAuthSwal() {
+function showAuthSwalForCart() {
     const signInButtonId = 'signInSwalButton';
     const registerButtonId = 'registerSwalButton';
     

@@ -22,41 +22,109 @@
                 <div class="table-responsive">
                     <table class="table">
                         <thead>
+                            <tr class="text-center bg-success">
+                                <th class="text-black"> NO </th>
+                                <th class="text-black"> ORDER NO </th>
+                                <th class="text-black"> ORDER DATE </th>
+                                <th class="text-black"> CUSTOMER </th>
+                                <th class="text-black"> TOTAL <br> AMOUNT </th>
+                                <th class="text-black"> NO OF <br> ITEMS </th>
+                                <th class="text-black"> SHIPMENT <br> PENDINGS </th>
+                                <th class="text-black"> DELIVERY <br> PENDINGS </th>
+                                <th class="text-black"> CANCELLED </th>
+                                <th class="text-black"> DELIVERED </th>
+                                <th class="text-black"> RETURNED </th>
+                                <th class="text-black"> RETURN <br> REQUESTS </th>
+                                <th class="text-black"> PAYMENT <br> METHOD </th>
+                                <th class="text-black"> ORDER <br> STATUS </th>
+                                <th class="text-black"> ACTIONS </th>
+                            </tr>
+                        </thead>
+                        <thead>
                             <tr class="text-center">
-                                <th> No </th>
-                                <th>
-                                    <select name="sort" onchange="location.href='?sort=' + this.value + '&filter-status=<%= statusQuery %>&filter-method=<%= methodQuery %>'">
-                                        <option value="none" <%= sortQuery === 'none' ? 'selected' : '' %>>Order ID</option>
-                                        <option value="orderNo-asc" <%= sortQuery === 'orderNo-asc' ? 'selected' : '' %>>Ascending</option>
-                                        <option value="orderNo-desc" <%= sortQuery === 'orderNo-desc' ? 'selected' : '' %>>Descending</option>
+                                <th> <!-- NO --> </th>
+                                <th> <!-- ORDER NO -->
+                                    <select class="text-success" style="width: 150px;" name="sort" onchange="location.href='?sort=' + this.value + '&order-status=<%= statusQuery %>&payment-method=<%= methodQuery %>'">
+                                        <option value="none" <%= sortQuery === 'none' ? 'selected' : '' %>> Sort </option>
+                                        <option value="orderNo-asc" <%= sortQuery === 'orderNo-asc' ? 'selected' : '' %>> Ascending </option>
+                                        <option value="orderNo-desc" <%= sortQuery === 'orderNo-desc' ? 'selected' : '' %>> Descending </option>
                                     </select>
                                 </th>
-                                <th> Order Date </th>
-                                <th> Customer </th>
-                                <th> Total Amount </th>
-                                <th> No of Items </th>
-                                <th>
-                                    <select name="filter-method" onchange="location.href='?filter-method=' + this.value + '&sort=<%= sortQuery %>&filter-status=<%= statusQuery %>'">
-                                        <option value="all" <%= methodQuery === 'all' ? 'selected' : '' %>>Payment Method</option>
-                                        <option value="Card Payment" <%= methodQuery === 'Card Payment' ? 'selected' : '' %>>Card Payment</option>
-                                        <option value="RazorPay" <%= methodQuery === 'RazorPay' ? 'selected' : '' %>>RazorPay</option>
-                                        <option value="PayPal" <%= methodQuery === 'PayPal' ? 'selected' : '' %>>PayPal</option>
-                                        <option value="Online Payment" <%= methodQuery === 'Online Payment' ? 'selected' : '' %>>Online Payment</option>
-                                        <option value="Cash On Delivery" <%= methodQuery === 'Cash On Delivery' ? 'selected' : '' %>>Cash On Delivery</option>
-                                        <option value="Wallet" <%= methodQuery === 'Wallet' ? 'selected' : '' %>>Wallet</option>
+
+                                <th> <!-- ORDER DATE --> </th>
+
+                                <th> <!-- CUSTOMER --> </th>
+
+                                <th> <!-- TOTAL AMOUNT --> </th>
+
+                                <th> <!-- NO OF ITEMS --> </th>
+
+                                <th> <!-- SHIPMENT PENDINGS -->
+                                    <select class="text-success" style="width: 150px;" name="sort" onchange="location.href='?sort=' + this.value + '&order-status=<%= statusQuery %>&payment-method=<%= methodQuery %>'">
+                                        <option value="none" <%= sortQuery === 'none' ? 'selected' : '' %>> Sort </option>
+                                        <option value="shipment-pendings-asc" <%= sortQuery === 'shipment-pendings-asc' ? 'selected' : '' %>> Ascending </option>
+                                        <option value="shipment-pendings-desc" <%= sortQuery === 'shipment-pendings-desc' ? 'selected' : '' %>> Descending </option>
                                     </select>
                                 </th>
-                                <th>
-                                    <select name="filter-status" onchange="location.href='?filter-status=' + this.value + '&sort=<%= sortQuery %>&filter-method=<%= methodQuery %>'">
-                                        <option value="all" <%= statusQuery === 'all' ? 'selected' : '' %>>Payment Status</option>
-                                        <option value="Pending" <%= statusQuery === 'Pending' ? 'selected' : '' %>>Pending</option>
-                                        <option value="Processing" <%= statusQuery === 'Processing' ? 'selected' : '' %>>Processing</option>
-                                        <option value="Completed" <%= statusQuery === 'Completed' ? 'selected' : '' %>>Completed</option>
-                                        <option value="Failed" <%= statusQuery === 'Failed' ? 'selected' : '' %>>Failed</option>
-                                        <option value="Refunded" <%= statusQuery === 'Refunded' ? 'selected' : '' %>>Refunded</option>
+
+                                <th> <!-- DELIVERY PENDINGS -->
+                                    <select class="text-success" style="width: 150px;" name="sort" onchange="location.href='?sort=' + this.value + '&order-status=<%= statusQuery %>&payment-method=<%= methodQuery %>'">
+                                        <option value="none" <%= sortQuery === 'none' ? 'selected' : '' %>> Sort </option>
+                                        <option value="delivery-pendings-asc" <%= sortQuery === 'delivery-pendings-asc' ? 'selected' : '' %>> Ascending </option>
+                                        <option value="delivery-pendings-desc" <%= sortQuery === 'delivery-pendings-desc' ? 'selected' : '' %>> Descending </option>
                                     </select>
                                 </th>
-                                <th> Actions </th>
+
+                                <th> <!-- CANCELLED -->
+                                    <select class="text-success" style="width: 150px;" name="sort" onchange="location.href='?sort=' + this.value + '&order-status=<%= statusQuery %>&payment-method=<%= methodQuery %>'">
+                                        <option value="none" <%= sortQuery === 'none' ? 'selected' : '' %>> Sort </option>
+                                        <option value="cancelled-asc" <%= sortQuery === 'cancelled-asc' ? 'selected' : '' %>> Ascending </option>
+                                        <option value="cancelled-desc" <%= sortQuery === 'cancelled-desc' ? 'selected' : '' %>> Descending </option>
+                                    </select>
+                                </th>
+
+                                <th> <!-- DELIVERED -->
+                                    <select class="text-success" style="width: 150px;" name="sort" onchange="location.href='?sort=' + this.value + '&order-status=<%= statusQuery %>&payment-method=<%= methodQuery %>'">
+                                        <option value="none" <%= sortQuery === 'none' ? 'selected' : '' %>> Sort </option>
+                                        <option value="delivered-asc" <%= sortQuery === 'delivered-asc' ? 'selected' : '' %>> Ascending </option>
+                                        <option value="delivered-desc" <%= sortQuery === 'delivered-desc' ? 'selected' : '' %>> Descending </option>
+                                    </select>
+                                </th>
+
+                                <th> <!-- RETURNED -->
+                                    <select class="text-success" style="width: 150px;" name="sort" onchange="location.href='?sort=' + this.value + '&order-status=<%= statusQuery %>&payment-method=<%= methodQuery %>'">
+                                        <option value="none" <%= sortQuery === 'none' ? 'selected' : '' %>> Sort </option>
+                                        <option value="returned-asc" <%= sortQuery === 'returned-asc' ? 'selected' : '' %>> Ascending </option>
+                                        <option value="returned-desc" <%= sortQuery === 'returned-desc' ? 'selected' : '' %>> Descending </option>
+                                    </select>
+                                </th>
+
+                                <th> <!-- RETURN REQUESTS -->
+                                    <select class="text-success" style="width: 150px;" name="sort" onchange="location.href='?sort=' + this.value + '&order-status=<%= statusQuery %>&payment-method=<%= methodQuery %>'">
+                                        <option value="none" <%= sortQuery === 'none' ? 'selected' : '' %>> Sort </option>
+                                        <option value="return-requests-asc" <%= sortQuery === 'return-requests-asc' ? 'selected' : '' %>> Ascending </option>
+                                        <option value="return-requests-desc" <%= sortQuery === 'return-requests-desc' ? 'selected' : '' %>> Descending </option>
+                                    </select>
+                                </th>
+
+                                <th> <!-- PAYMENT METHOD -->
+                                    <select class="text-success" name="payment-method" onchange="location.href='?payment-method=' + this.value + '&sort=<%= sortQuery %>&order-status=<%= statusQuery %>'">
+                                        <option style="color: greenyellow;" value="all" <%= methodQuery === 'all' ? 'selected' : '' %>> All Methods </option>
+                                        <option value="Cash On Delivery" <%= methodQuery === 'Cash On Delivery' ? 'selected' : '' %>> Cash On Delivery </option>
+                                        <option value="Online Payment" <%= methodQuery === 'Online Payment' ? 'selected' : '' %>> Online Payment </option>
+                                        <option value="Wallet" <%= methodQuery === 'Wallet' ? 'selected' : '' %>> Wallet Payment </option>
+                                    </select>
+                                </th>
+                                <th> <!-- ORDER STATUS -->
+                                    <select class="text-success" name="order-status" onchange="location.href='?order-status=' + this.value + '&sort=<%= sortQuery %>&payment-method=<%= methodQuery %>'">
+                                        <option style="color: greenyellow;" value="all" <%= statusQuery === 'all' ? 'selected' : '' %>> All Status </option>
+                                        <option value="Pending" <%= statusQuery === 'Pending' ? 'selected' : '' %>> Pending </option>
+                                        <option value="Failed" <%= statusQuery === 'Failed' ? 'selected' : '' %>> Failed </option>
+                                        <option value="Processing" <%= statusQuery === 'Processing' ? 'selected' : '' %>> Processing </option>
+                                        <option value="Process Completed" <%= statusQuery === 'Process Completed' ? 'selected' : '' %>> Process Completed </option>
+                                    </select>
+                                </th>
+                                <th> <!-- ACTIONS --> </th>
                             </tr>
                         </thead>
 
@@ -65,7 +133,9 @@
                                 for(let i=0; i < orderData.length; i++){ %>
                                     <tr>
                                         <td> <%= (currentPage - 1) * limit + i + 1 %></td>
+
                                         <td> <%= orderData[i].orderNo %> </td>
+
                                         <td><% 
                                             const orderDate = new Date(orderData[i].orderDate);
                                             const options = { day: '2-digit', month: 'long', year: 'numeric' };
@@ -73,26 +143,44 @@
                                             %>
                                             <%= formattedDate %>
                                         </td>
+
                                         <td> <%= orderData[i].userRef.email %> </td>
+
                                         <td class="text-end"> <%= (orderData[i].netAmount).toFixed(2) %> </td>
                                         <td class="text-center"> <%= orderData[i].orderedItems.length %> </td>
-                                        <td> <%= orderData[i].paymentMethod %> </td>
+                                        <td class="text-center"> <%= orderData[i].shipmentPendings %> </td>
+                                        <td class="text-center"> <%= orderData[i].deliveryPendings %> </td>
+                                        <td class="text-center"> <%= orderData[i].cancelledCount %> </td>
+                                        <td class="text-center"> <%= orderData[i].deliveredCount %> </td>
+                                        <td class="text-center"> <%= orderData[i].returnedCount %> </td>
+                                        <td class="text-center"> <%= orderData[i].returnRequests %> </td>
+
+                                        <% if (orderData[i].paymentMethod === 'Online Payment'){ %>
+                                            <td class="text-primary"> <%= orderData[i].paymentMethod %> </td>
+
+                                        <% } else if (orderData[i].paymentMethod === 'Wallet'){ %>
+                                            <td class="text-info"> <%= orderData[i].paymentMethod %> </td>
+
+                                        <% } else if (orderData[i].paymentMethod === 'Cash On Delivery'){ %>
+                                            <td class="text-warning"> <%= orderData[i].paymentMethod %> </td>
+                                        <% } %>
+
                                         <td class="text-center
-                                            <% if (orderData[i].paymentStatus === 'Pending'){ %> text-warning
-                                            <% } else if (orderData[i].paymentStatus === 'Processing'){ %> text-info
-                                            <% } else if (orderData[i].paymentStatus === 'Completed'){ %> text-success
-                                            <% } else if (orderData[i].paymentStatus === 'Failed'){ %> text-danger
-                                            <% } else if (orderData[i].paymentStatus === 'Refunded'){ %> text-secondary
+                                            <% if (orderData[i].orderStatus === 'Pending'){ %> text-warning
+                                            <% } else if (orderData[i].orderStatus === 'Failed'){ %> text-danger
+                                            <% } else if (orderData[i].orderStatus === 'Processing'){ %> text-info
+                                            <% } else if (orderData[i].orderStatus === 'Process Completed'){ %> text-success
                                             <% } %>">
-                                            <%= orderData[i].paymentStatus %>
+                                            <%= orderData[i].orderStatus %>
                                         </td>
+
                                         <td><a href="/admin/order-items?id=<%= orderData[i]._id %>" class="badge badge-danger" id="view-order-items" style="text-decoration: none">View Orders</a></td>
                                     </tr>
                                 <% }
                             }
                             else{ %>
                                 <tr>
-                                    <td colspan="9" class="text-danger" style="text-align: center"> No Orders Found </td>
+                                    <td colspan="15" class="text-danger"> No Orders Found </td>
                                 </tr>
                             <% } %>
                         </tbody>
@@ -107,7 +195,7 @@
                             <% if (j === currentPage) { %>
                                 <span class="active"><%= j %></span>
                             <% } else { %>
-                                <a href="?page=<%= j %>&search=<%= searchQuery %>"><%= j %></a>
+                                <a href="?page=<%= j %>&search=<%= searchQuery %>&sort=<%= sortQuery %>&order-status=<%= statusQuery %>&payment-method=<%= methodQuery %>"><%= j %></a>
                             <% } %>
                         <% } %>
                     </div>

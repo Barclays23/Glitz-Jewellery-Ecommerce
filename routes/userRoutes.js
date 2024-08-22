@@ -107,11 +107,19 @@ userRoute.post('/proceed-to-checkout', userAuth.isLogin, cartController.proceedT
 
 // ORDER ROUTES FOR USER
 userRoute.get('/checkout', userAuth.isLogin, cartController.loadCheckout);
+
+userRoute.post('/make-payment', userAuth.isLogin, cartController.makePayment);
 userRoute.post('/place-order', userAuth.isLogin, cartController.placeOrder);
-userRoute.get('/orders', userAuth.isLogin, cartController.loadUserOrders);
-userRoute.get('/order-details', userAuth.isLogin, cartController.loadOrderDetails);
-userRoute.get('/thankyou', userAuth.isLogin, cartController.loadThankyou);
+userRoute.post('/verify-payment', userAuth.isLogin, cartController.verifyPayment);
+userRoute.get('/order-success', userAuth.isLogin, cartController.loadOrderSuccess);
+userRoute.get('/orders', userAuth.isLogin, cartController.loadUserOrders);  // orderController
+userRoute.get('/order-details', userAuth.isLogin, cartController.loadOrderDetails);  // orderController
+
 userRoute.post('/cancel-order', userAuth.isLogin, orderController.cancelOrder);
+userRoute.post('/return-order', userAuth.isLogin, orderController.returnOrder);
+userRoute.get('/retry-payment', userAuth.isLogin, orderController.loadRetryPayment);
+userRoute.post('/retry-payment', userAuth.isLogin, orderController.retryPayment);
+userRoute.patch('/update-order', userAuth.isLogin, orderController.updateRetryOrder);
 
 
 // WALLET ROUTES

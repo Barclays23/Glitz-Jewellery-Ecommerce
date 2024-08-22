@@ -37,13 +37,13 @@ function addToWishlist(productId){
                 // $("#shop-products").load("/shopping #shop-products");
                 location.reload();
             } else if (response.nosession){
-                showAuthSwal();
+                showAuthSwalForWishlist();
             }
         },
         error: function(xhr, status, error) {
             console.log('Error in adding to wishlist :', error);
             if (xhr.status === 401) {
-                showAuthSwal();
+                showAuthSwalForWishlist();
             } else {
                 Swal.fire({
                     text: "An error occurred while adding to the cart.",
@@ -61,10 +61,9 @@ const signInButtonId = 'signInSwalButton';
 const registerButtonId = 'registerSwalButton';
 
 // Function to show the authentication SweetAlert
-function showAuthSwal() {
+function showAuthSwalForWishlist() {
     Swal.fire({
-        text: "You need to sign in to add products to your cart.",
-        // icon: 'warning',
+        text: "You need to sign in to add products to your wishlist.",
         showCloseButton: true,
         showCancelButton: true,
         confirmButtonText: '<span id="'+signInButtonId+'">Sign In</span>',

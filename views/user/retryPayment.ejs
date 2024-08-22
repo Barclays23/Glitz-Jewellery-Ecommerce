@@ -1,0 +1,525 @@
+
+<%- include('../layouts/userLayouts/user-header.ejs') %>
+
+<%- include('../layouts/userLayouts/user-preloader.ejs') %>
+
+<%- include('../layouts/userLayouts/user-navbar.ejs') %>
+
+
+
+
+
+<main class="page-content">
+    <div class="tm-section tm-checkout-area bg-white tm-padding-section">
+        <div class="container">
+            <div class="mt-1 mb-3">
+                <h1 class="small-title text-center"> RETRY PAYMENT</h1>
+            </div>
+            <div class="row checkout-border-row p-2 mb-5">               
+                <div class="row">
+                    <!-- order summary starts -->
+                    <div class="col-lg-6">
+                        <div class="tm-checkout-orderinfo">
+                            <div class="table-responsive" id="checkout-summary">
+                                <h3 class="text-center">Order Summary</h3>
+                                <h5 class="text-center mb-2"> Order No : <%= pendingOrderData.orderNo %> </h5>
+                                <table class="table table-borderless tm-checkout-ordertable">
+                                    <thead>
+                                        <tr>
+                                            <th>Products</th>
+                                            <th>Qty</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if (pendingOrderData && pendingOrderData.orderedItems.length > 0){ %>
+                                            <% for(i=0; i< pendingOrderData.orderedItems.length; i++){ %>
+                                                <tr>
+                                                    <td style="padding: 0.50rem;"> <%= pendingOrderData.orderedItems[i].name %> </td>
+                                                    <td style="padding: 0.50rem;"> <%= pendingOrderData.orderedItems[i].quantity %> </td>
+                                                    <td style="padding: 0.50rem;"> ₹ <%= (pendingOrderData.orderedItems[i].totalPrice * pendingOrderData.orderedItems[i].quantity).toFixed(2) %> </td>
+                                                </tr>
+                                            <% } %>
+                                        <% } %>
+                                    </tbody>
+                                    <tfoot class="fw-bold">
+                                        <tr>
+                                            <td colspan="3"><hr style="border: 1px solid black;"></td>
+                                        </tr>
+                                        <tr class="tm-checkout-subtotal">
+                                            <td>SUBTOTAL</td>
+                                            <td></td>
+                                            <td id="sub-total">₹ <%= subTotal.toFixed(2) %></td>
+                                        </tr>
+                                        <tr class="tm-checkout-shipping">
+                                            <td> Shipping Charge (+) </td>
+                                            <td></td>
+                                            <td id="shipping-charge">₹ <%= shippingCharge.toFixed(2) %></td>
+                                        </tr>
+                                        <tr class="tm-checkout-offer">
+                                            <td> Offer Discount (-) </td>
+                                            <td></td>
+                                            <td id="offer-discount" class="text-success">₹ <%= totalOfferDiscount.toFixed(2) %></td>
+                                        </tr>
+                                        <tr class="tm-checkout-coupon">
+                                            <td> Coupon Discount (-) </td>
+                                            <td></td>
+                                            <td id="coupon-discount" class="text-success">₹ <%= couponDiscount.toFixed(2) %></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3"><hr style="border: 1px solid black;"></td>
+                                        </tr>
+                                        <tr class="tm-checkout-total-amount">
+                                            <td style="font-size: large;"> TOTAL </td>
+                                            <td></td>
+                                            <td id="total" style="font-size: large;">₹ <%= payableAmount.toFixed(2) %></td>
+                                        </tr>
+                                        <tr class="tm-checkout-round-off">
+                                            <td> Round Off </td>
+                                            <td></td>
+                                            <td id="round-off">₹ <%= roundOffAmount.toFixed(2) %></td>
+                                        </tr>
+                                        <tr class="tm-checkout-total">
+                                            <td>Net Payable </td>
+                                            <td></td>
+                                            <td id="net-payable"> <h4 style="color: #9a0056;"> <b> ₹ <%= (payableAmount - roundOffAmount).toFixed(2) %> </b> </h4></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+
+                            <!-- checkout payment methods -->
+                            <div class="tm-checkout-payment">
+                                <h4>Select Payment Method</h4>
+                                <div class="tm-form-inner">
+                                    <div class="tm-form-field">
+                                        <input type="radio" name="checkout-payment-method" id="checkout-payment-online" value="Online Payment" />
+                                        <label for="checkout-payment-online"> Online Payment </label>
+                                        <div class="tm-checkout-payment-content">
+                                            <p> Make your payment directly into our bank account using net banking facility. </p>
+                                        </div>
+                                    </div>
+                                    <div class="tm-form-field">
+                                        <!--removed checked="checked" -->
+                                        <input type="radio" name="checkout-payment-method" id="checkout-payment-wallet" value="Wallet" />
+                                        <label for="checkout-payment-wallet"> Wallet </label>
+                                        <div class="tm-checkout-payment-content">
+                                            <p>Pay with your wallet account. <br> Your current wallet balance is <b> ₹<%= userData.walletBalance.toFixed(2) %> </b></p>
+                                        </div>
+                                        <input type="hidden" id="wallet-balance" value="<%= (userData.walletBalance) %>">
+                                    </div>
+                                    <div class="tm-form-field">
+                                        <input type="radio" name="checkout-payment-method" id="checkout-payment-cashondelivery" value="Cash On Delivery"/>
+                                        <label for="checkout-payment-cashondelivery">Cash On Delivery</label>
+                                        <div class="tm-checkout-payment-content">
+                                            <p>Pay with cash upon delivery.<br>Note: Cash on Delivery orders exceeding ₹2,00,000 are not allowed.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- checkout submit -->
+                            <div class="tm-checkout-submit">
+                                <p id="timer-info">
+                                    After the timer expires, the order will be failed. <br>
+                                    And you will need to place a new order if the payment is not completed.
+                                </p>
+                                <div class="tm-form-inner">
+                                    <div class="tm-form-field d-flex">
+                                        <h4 id="countdown" style="color: red;"></h4>
+                                        <button type="submit" class="tm-button ml-auto" onclick='retryPayment(<%= JSON.stringify(pendingOrderData) %>)'> Retry Payment </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+
+
+
+<%- include('../layouts/userLayouts/user-footer.ejs') %>
+
+
+
+
+<!-- --------------------------------------------------- -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- importing the script for add address modal form -->
+<script src="/assets/scripts/userScripts/add-address-modal-script.js"></script>
+<script src="/assets/scripts/userScripts/edit-address-modal-script.js"></script>
+
+
+
+<!-- importing the script for carted items -->
+<script src="/assets/scripts/userScripts/cart-and-checkout-scripts.js"></script>
+ <!-- (UPDATE CART QUANTITY, 
+ REMOVE FROM CART & CHECKOUT, 
+ REMOVE OUTOFSTOCK CART ITEMS,
+ APPLY COUPON,
+ CANCEL COUPON
+ etc) -->
+
+
+ <!-- // importing the wishlist script for save for later (MOVE TO WISHLIST and remvoe from the cart / checkout) -->
+<script src="/assets/scripts/userScripts/wishlist-scripts.js"></script>
+
+
+
+<!-- importing the razorpay library link -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"> </script>
+ 
+
+
+
+<!-- // script for countdown timer of retry payment -->
+<script>
+    const orderDate = new Date('<%= pendingOrderData.orderDate %>'); // Order date from server-side
+    const expiryTime = new Date(orderDate.getTime() + 1 * 60000); // 1 minutes from orderDate (same duration should be there in backend.)
+
+
+    function updateTimer() {
+        const now = new Date();
+        const timeRemaining = expiryTime - now;
+
+        if (timeRemaining <= 0) {
+            document.getElementById('countdown').innerText = "00:00:00";
+            clearInterval(timerInterval);
+        } else {
+            const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+            // Display the timer in HH:MM:SS format
+            document.getElementById('countdown').innerText = 
+                `${String(hours).padStart(2, '0')} : ${String(minutes).padStart(2, '0')} : ${String(seconds).padStart(2, '0')}`;
+        }
+    }
+
+    const timerInterval = setInterval(updateTimer, 1000); // Update the timer every second
+</script>
+
+
+
+
+
+
+<!-- script for retry order payment -->
+<script>
+
+    function retryPayment(pendingOrderData) {
+
+        let pendingOrderId = pendingOrderData._id;
+        let pendingOrderNo = pendingOrderData.orderNo;
+        let payableAmount = pendingOrderData.netAmount;
+        let walletBalance = parseFloat(document.getElementById('wallet-balance').value);
+        
+
+        console.log('orderId of pendingOrderData :', pendingOrderId);
+        console.log('orderNo of pendingOrderData :', pendingOrderNo);
+        console.log('payableAmount of pendingOrderData :', payableAmount);
+        console.log('walletBalance :', walletBalance);
+
+
+
+
+        // Check if the payment method is selected.
+        let selectedPaymentMethod = document.querySelector('input[name="checkout-payment-method"]:checked');
+        
+        if (!selectedPaymentMethod) {
+            Swal.fire({
+                html: `<h6 class="text-danger"> Please choose a payment method for retry payment. </h6>`,
+                showConfirmButton: false,
+            });
+            return;
+        }
+
+        selectedPaymentMethod = document.querySelector('input[name="checkout-payment-method"]:checked').value;
+        console.log('selectedPaymentMethod for retry payment : ', selectedPaymentMethod);
+
+
+
+        // need restrict the COD payment limit.
+        if (selectedPaymentMethod === 'Cash On Delivery' && payableAmount >= 200000) {
+            console.log('excess cash transaction....')
+            Swal.fire({
+                title: "Cash Payment Exceeds Limit",
+                html: `<p style="color: red; font-size: 15px"> Cash on Delivery orders exceeding Rs. 200,000 are not allowed.
+                    Accepting cash payments above this limit is illegal and can result in a penalty equal to the amount received.
+                    Please choose an alternative payment method or reduce your order value. </p>`,
+                icon: "warning",
+                showConfirmButton: false,
+            });
+            return;
+        }
+
+
+        // need to check the wallet balance before ordering.
+        if (selectedPaymentMethod === 'Wallet' && walletBalance < payableAmount) {
+            console.log('wallet balance is insufficient.');
+            Swal.fire({
+                title: "Insufficient Wallet Balance",
+                html: `<p style="color: red; font-size: 15px"> You have only <b> ₹${walletBalance.toFixed(2)} </b> left in your wallet. <br>
+                    Please add money to your wallet.
+                    Else, please choose other payment options.`,
+                icon: "warning",
+                showConfirmButton: false,
+            });
+            return;
+        }
+        
+
+
+        // Gather product details (name, quantity, total price)
+        let products = [];
+        document.querySelectorAll('tbody tr').forEach(row => {
+            let productName = row.querySelector('td:nth-child(1)').textContent.trim();
+            let productQuantity = row.querySelector('td:nth-child(3)').textContent.trim();
+            products.push({ name: productName, qty: productQuantity });
+        });
+
+        // Format the product list
+        let productList = products.map(product => `<li>${product.name} - ${product.totalPrice}</li>`).join('');
+
+
+        
+        $.ajax({
+            url: '/retry-payment',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({pendingOrderId, selectedPaymentMethod}),
+            success: function(response) {
+                console.log('response from retryPayment : ', response);
+
+                if (response.retryExpired){  // retry payment time expired.
+                    Swal.fire({
+                        title: "Link Expired!",
+                        html: `<p style="color: red; font-size: 17px"> Your payment retry period has expired. <br>
+                                Please proceed with a new order or contact support for assistance.`,
+                        // icon: "error",
+                        showConfirmButton: false,
+                    }).then(() => {
+                        location.reload();  // Reload the page or redirect to another page if needed
+                    });
+
+                } else if (response.lowBalance) {  // wallet balance is insufficient.
+                    Swal.fire({
+                        title: "Insufficient Wallet Balance",
+                        html: `<p style="color: red; font-size: 15px"> You have only <b> ₹${response.walletBalance.toFixed(2)} </b> left in your wallet. <br>
+                            Please add money to your wallet.
+                            Else, please choose other payment options.`,
+                        icon: "warning",
+                        showConfirmButton: false,
+                    });
+                    
+                } else if (response.instanceFailed) {  // failed to create razorPay order instance.
+                    Swal.fire({
+                        title: "Online Payment Failed!",
+                        text: `Internal Server Error.! ${response.err.error.description}`,
+                        icon: "error",
+                        showConfirmButton: false,
+                    });
+
+                } else if (response.proceedToRazorPay) {  // instance created & proceed to razorPay.
+                    retryRazorPay(response);
+
+                } else if (response.updateOrder){  // update orderStatus, paymentStatus, productStatus
+                    updateOrder(response); // send pendingOrderId, paymentMethod, paymentStatus in response
+
+                } else if (response.error){
+                    Swal.fire({
+                        title: "Error in Retry Payment.",
+                        text: "An error occured while retry payment. Please try again.",
+                        icon: "error",
+                        showConfirmButton: false,
+                        timer: 1500,
+                    });
+                }
+            },
+            error: function(error) {
+                console.error('Internal server error in retry payment :', error);
+                Swal.fire({
+                    title: "Error while retry payment.",
+                    text: response.message,
+                    icon: "error",
+                    showConfirmButton: false,
+                });
+            }
+
+        });
+        
+    }
+
+
+
+
+
+    function retryRazorPay(orderResponse) {
+        console.log('orderResponse in retryRazorPay : ', orderResponse);
+
+        const baseUrl = window.location.origin; // Gets the current base URL like http://localhost:3000
+
+        const options = {
+            "key": "rzp_test_Z16lJwrcSEZFzf", // Enter the Key ID generated from the Dashboard
+            "amount": orderResponse.order.amount, // Amount is in currency subunits (paise). Default currency is INR. Hence, amount * 100 paise.
+            "currency": orderResponse.order.currency, // INR
+            "name": "Glitz Jewellery Boutique",
+            "description": "Test Transaction",
+            "image": `${baseUrl}/assets/images/logos/Glitz-Logo7.png`, // Constructed URL
+            "order_id": orderResponse.order.id, // razorPay order.id the backend
+            // "callback_url": "https://eneqd3r9zrjok.x.pipedream.net/",
+            // callback_url: 'http://localhost:3000/payment-success', // Your success URL
+            // handler or callback url if payment success
+            "handler": function (response){
+                console.log('response in handler (success retry payment) : ', response);
+                // console.log('orderResponse in handler : ', orderResponse);
+                alert(response.razorpay_payment_id);
+                alert(response.razorpay_order_id);
+                alert(response.razorpay_signature);
+
+                verifyRetryPayment(response, orderResponse);
+            },
+            "prefill": {
+                "name": `${orderResponse.userData.firstname} ${orderResponse.userData.lastname}`,
+                "email": orderResponse.userData.email,
+                "contact": orderResponse.userData.mobile
+            },
+            "notes": {
+                "address": "Razorpay Corporate Office"
+            },
+            "theme": {
+                "color": "#9a0056"
+            }
+        };
+
+        var rzp1 = new Razorpay(options);
+
+        rzp1.on('payment.failed', function (response){
+            console.log('response after retry payment failed :', response.error);
+
+            alert(response.error.code);
+            alert(response.error.description);
+            alert(response.error.source);
+            alert(response.error.step);
+            alert(response.error.reason);
+            alert(response.error.metadata.order_id);
+            alert(response.error.metadata.payment_id);
+
+            verifyRetryPayment(response, orderResponse);  // to change the payment status 'Pending' to 'Failed' again.
+            
+        });
+
+        // razorPay 'Pay Now' button.
+        // document.getElementById('rzp-button1').onclick = function(e){
+            rzp1.open();
+            // e.preventDefault();
+        // }
+
+    }
+
+
+
+
+
+    function verifyRetryPayment(paymentResponse, orderResponse) {
+        console.log('orderResponse in verifyRetryPayment : ', orderResponse);
+
+        $.ajax({
+            url : '/verify-payment',
+            method : 'POST',
+            data : {
+                paymentResponse,
+                orderResponse
+            },
+            success: function(response) {
+                console.log('response from verifyPayment :', response);
+
+                if (response.verifySuccess) {
+                    updateOrder(response.orderResponse);  // update the orderStatus & paymentStatus.
+
+                } else if (response.verifyFailed){
+                    alert(response.message);
+                    location.reload();  // user can countinue the process until the time over or success.
+                    // window.location.href = `/retry-payment?orderId=${response.pendingOrderData._id}`;
+                    // updateOrder(response.orderResponse);  // update the orderStatus & paymentStatus.
+                }
+            }
+        });
+    }
+
+
+
+
+    // for updating the orderStatus and paymentStatus after payment success
+    function updateOrder(Response) {
+        console.log('data in updateOrder to send :', Response);
+
+        const paymentMethod = Response.selectedPaymentMethod;
+        const paymentStatus = Response.paymentStatus;
+        const razorPayOrder = Response.order ? Response.order : undefined;  // only if Online Payment.
+        const pendingOrderId = Response.pendingOrderId ? Response.pendingOrderId : undefined;  // if COD or Wallet Payment.
+
+        $.ajax({
+            url: '/update-order',
+            method: 'PATCH',
+            contentType: 'application/json',
+            data: JSON.stringify({razorPayOrder, pendingOrderId, paymentMethod, paymentStatus}),
+            success: function(response) {
+                console.log('response from placeOrder : ', response);
+
+                if (response.updateSuccess) {
+                    Swal.fire({
+                        title: "Order Placed",
+                        text: "Your order has been placed successfully.",
+                        icon: "success",
+                        showConfirmButton: false,
+                        timer: 1500,
+                    }).then(() => {
+                        window.location.href = '/order-success'; // redirect order success page after order completed.
+                    });
+
+                } else if (response.proceedRetry){
+                    window.location.href = `/retry-payment?orderId=${response.pendingOrderData._id}`;  // again load the retry-payment page.
+
+                } else if (response.error){
+                    Swal.fire({
+                        title: "Error while placing order.",
+                        text: response.message,
+                        icon: "error",
+                        showConfirmButton: false,
+                    });
+                }
+            },
+            error: function(error) {
+                console.error('Internal server error in placing order :', error);
+                Swal.fire({
+                    title: "Order Failed",
+                    text: "Error in placing order. Please try again.",
+                    icon: "error",
+                    showConfirmButton: false,
+                    timer: 1500,
+                });
+            }
+
+        });
+
+
+
+    }
+
+
+
+
+
+</script>
+
+

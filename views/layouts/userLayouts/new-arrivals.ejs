@@ -13,7 +13,7 @@
 
             <!-- new arrived product 1 -->
             <% for(i=1; i<= 4; i++){ %>
-                <% if (newProducts[i] && goldPriceData) { %>
+                <% if (newProducts[i]) { %>
                     <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mt-50">
                         <div class="tm-product tm-scrollanim">
                             <div class="tm-product-topside">
@@ -47,22 +47,22 @@
                                     <span class="is-active"><i class="ion-android-star-outline"></i></span>
                                     <span><i class="ion-android-star-outline"></i></span>
                                 </div>
-                                <% const newProductsNetWeight = Number(newProducts[i].netWeight) %>                                
-                                <% const newProductsMetalCost = goldPriceData.price * newProducts[i].netWeight %>
-                                <% const newProductsMakingCharge = newProductsMetalCost * newProducts[i].VA/100 %>
-                                <% const newProductsStoneCharge = newProducts[i].stoneCharge %>
-                                <% const newProductsGST = (newProductsMetalCost + newProductsMakingCharge + newProductsStoneCharge) * (3/100) %>
-                                <% const newProductsTotalPrice = newProductsMetalCost + newProductsMakingCharge + newProductsStoneCharge + newProductsGST %>
-                                <span class="tm-product-price">₹<%= Math.round(newProductsTotalPrice).toFixed(2) %></span>
+
+                                <% if (newProducts[i].offerRef != null){ %>
+                                    <span class="tm-product-price">₹<%= Math.round((newProducts[i].totalPrice) - (newProducts[i].makingCharge * newProducts[i].offerRef.offerPercentage / 100)).toFixed(2) %></span>
+                                <% } else { %>
+                                    <span class="tm-product-price">₹<%= Math.round(newProducts[i].totalPrice).toFixed(2) %></span>
+                                <% } %>
+
                                 <div class="tm-product-content">
                                     <p>
                                         <%= newProducts[i].description %> <br>
                                         Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                                        Lorem
-                                        Ipsum has been the industry's standard dummy text ever since the
+                                        Lorem Ipsum has been the industry's standard dummy text ever since the
                                         when an unknown printer took a galley of type and scrambled it to make a
                                         type specimen book. It has survived not only five centuries, but also the
-                                        leap into electronic typesetting.</p>
+                                        leap into electronic typesetting.
+                                    </p>
                                     <ul class="tm-product-actions">
                                         <li><a href="#"><i class="ion-android-cart"></i> Add to cart</a></li>
                                         <li><button data-fancybox data-src=""> <i class="ion-eye"></i></button></li>

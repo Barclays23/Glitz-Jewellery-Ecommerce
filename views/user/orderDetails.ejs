@@ -76,19 +76,19 @@
                                     <p><span>Unknown</span></p>
                             <% } %>
                             <br>
-                            <p><strong>Payment Status</strong></p>
-                            <% switch (orderData.paymentStatus) { 
+                            <p><strong>Order Status</strong></p>
+                            <% switch (orderData.orderStatus) { 
                                 case 'Pending': %>
                                     <p><span class="color-theme text-white bg-warning">Pending</span></p>
+                                    <% break; 
+                                case 'Failed': %>
+                                    <p><span class="color-theme text-white bg-danger">Failed</span></p>
                                     <% break; 
                                 case 'Processing': %>
                                     <p><span class="color-theme text-white bg-info">Processing</span></p>
                                     <% break; 
-                                case 'Completed': %>
-                                    <p><span class="color-theme text-white bg-success">Completed</span></p>
-                                    <% break; 
-                                case 'Failed': %>
-                                    <p><span class="color-theme text-white bg-danger">Failed</span></p>
+                                case 'Process Completed': %>
+                                    <p><span class="color-theme text-white bg-success">Process Completed</span></p>
                                     <% break; 
                                 case 'Refunded': %>
                                     <p><span class="color-theme text-white bg-secondary">Refunded</span></p>
@@ -136,6 +136,7 @@
                         </div>
                     </div>
                     <div class="container">
+
                         <% for (i=0; i< orderData.orderedItems.length; i++){ %>
                             <div class="row product-details bg-grey">
                                 <!-- Product Overview -->
@@ -163,23 +164,99 @@
                                             <td style="border: 1px solid black; padding: 8px;"><%= (orderData.orderedItems[i].netWeight).toFixed(3) %></td>
                                         </tr>
                                     </table>
+
+                                    <!-- calculating the return deadline days -->
+                                    <%
+                                        let deadlineDays = 0;
+
+                                        if (orderData.orderedItems[i].orderStatus === 'Delivered'){
+
+                                            const orderItem = (orderData.orderedItems[i].code);
+                                            console.log('delivered orderItem :', orderItem)
+
+                                            const currentDate = new Date(); 
+                                            console.log('currentDate :', currentDate)
+
+                                            const deliveryDate = new Date(orderData.orderedItems[i].deliveryDate);
+                                            console.log('deliveryDate :', deliveryDate)
+                                            
+                                            const differenceInMilliseconds = currentDate - deliveryDate;
+                                            console.log('differenceInMilliseconds :', differenceInMilliseconds)
+                                            
+                                            deadlineDays = Math.floor(differenceInMilliseconds / (1000 * 60 * 60 * 24));
+                                            console.log('deadlineDays :', deadlineDays)
+                                        }
+                                    %>
+                                    
                                     <div>
                                         <p><strong>Sold by : </strong> Glits Boutique Manufacturers</p>
-                                        <% if(orderData.orderedItems[i].orderStatus != 'Pending' && orderData.orderedItems[i].orderStatus != 'Placed' && orderData.orderedItems[i].orderStatus != 'Confirmed'){ %>
-                                            <p><strong>Return window closed</strong></p>
+
+                                        <%
+                                            let expectedDate = new Date();
+                                                
+                                            if (orderData.orderedItems[i].productStatus == 'Placed' 
+                                                || orderData.orderedItems[i].productStatus == 'Confirmed' 
+                                                || orderData.orderedItems[i].productStatus == 'Shipped' 
+                                                || orderData.orderedItems[i].productStatus == 'Out for Delivery' ){
+                                                    
+                                                    expectedDate.setDate(expectedDate.getDate() + 3);
+                                                    expectedDate = expectedDate.toLocaleDateString('en-GB');
+                                                    console.log("expectedDate :", expectedDate);
+                                                    %>
+                                                <p><strong> Expected Delivery Date :</strong> <%= expectedDate %></p>
+                                            <% } else if (orderData.orderedItems[i].deliveryDate){ %>
+                                                <p><strong> Delivered On :</strong> <%= orderData.orderedItems[i].deliveryDate.toLocaleDateString('en-GB') %></p>
+                                            <% } %>
+
+                                        <% if (orderData.orderedItems[i].productStatus === 'Return Requested'){ %>
+                                            <p><strong>Return Status :</strong> Return Request Submitted </p>
+
+                                        <% } else if (orderData.orderedItems[i].productStatus === 'Return Request Rejected'){ %>
+                                            <p><strong>Return Status :</strong> <span class="text-danger"> Return Request Rejected </span> </p>
+
+                                        <% } else if (orderData.orderedItems[i].productStatus === 'Return Request Accepted'){ %>
+                                            <p><strong>Return Status :</strong> Return Request Accepted </p>
+
+                                        <% } else if (orderData.orderedItems[i].productStatus === 'Returned'){ %>
+                                            <p><strong>Return Status :</strong> <span class="text-danger"> Item Returned </span> </p>
+                                        <% } %>
+
+                                        <% if (orderData.orderedItems[i].productStatus === 'Delivered' && deadlineDays > 5 ){ %>
+                                            <% console.log('deadlineDays for return window closing :', deadlineDays) %>
+                                            <p class="text-danger"><strong>Return window closed</strong></p>
                                         <% } %>
                                     </div>
                                     <div class="order-actions">
-                                        <a href="/product-details?id=<%= orderData.orderedItems[i].productRef %>"> <p>Buy it again</p></a>
-                                        <a> <p>Write a product review</p></a>
-                                        <% if(orderData.orderedItems[i].orderStatus === 'Pending' || orderData.orderedItems[i].orderStatus === 'Placed' || orderData.orderedItems[i].orderStatus === 'Confirmed'){ %>
+                                        <a href="/product-details?id=<%= orderData.orderedItems[i].productRef %>"> <p>Buy Again</p></a>
 
-                                            <!-- <a class="cancel-order-link" data-order='<%= JSON.stringify(orderData.orderedItems[i]) %>'> <p>Cancel Order</p></a> -->
-                                            
+                                        <% if (orderData.orderedItems[i].productStatus === 'Delivered'
+                                            || orderData.orderedItems[i].productStatus === 'Returned'
+                                            || orderData.orderedItems[i].productStatus === 'Return Requested'
+                                            || orderData.orderedItems[i].productStatus === 'Return Request Rejected'
+                                            || orderData.orderedItems[i].productStatus === 'Return Request Accepted'){ %> 
+                                            <a class="write-review-link" data-toggle="modal" data-target="#writeProductReview" 
+                                                data-order-id="<%= encodeURIComponent(JSON.stringify(orderData._id)) %>"
+                                                data-order-item="<%= encodeURIComponent(JSON.stringify(orderData.orderedItems[i])) %>">
+                                                <p>Write Review</p>
+                                            </a>
+                                        <% } %>
+                                        
+
+                                        <% if (orderData.orderedItems[i].productStatus === 'Placed'
+                                            || orderData.orderedItems[i].productStatus === 'Confirmed'){ %> 
                                             <a class="cancel-order-link" data-toggle="modal" data-target="#cancelOrderModal" 
                                                 data-order-id="<%= encodeURIComponent(JSON.stringify(orderData._id)) %>"
                                                 data-order-item="<%= encodeURIComponent(JSON.stringify(orderData.orderedItems[i])) %>">
                                                 <p>Cancel Order</p>
+                                            </a>
+                                        <% } %>
+
+                                        
+                                        <% if (orderData.orderedItems[i].productStatus === 'Delivered' && deadlineDays <= 5 ){ %>
+                                            <a class="return-item-link" data-toggle="modal" data-target="#returnItemModal" 
+                                                data-order-id="<%= encodeURIComponent(JSON.stringify(orderData._id)) %>"
+                                                data-order-item="<%= encodeURIComponent(JSON.stringify(orderData.orderedItems[i])) %>">
+                                                <p>Return Item</p>
                                             </a>
                                         <% } %>
                                     </div>
@@ -188,36 +265,71 @@
                                 <div class="product-info detailed-information">
                                     <div class="info-container detailed-info">
                                         <table border="0" cellpadding="5">
-                                            <th style="width: 120px"></th>
                                             <th></th>
                                             <th></th>
+                                            <th></th>
+
+                                            <!-- payment status -->
                                             <tr>
-                                                <td><b>Order Status :</b></td>
-                                                <% switch (orderData.orderedItems[i].orderStatus) { 
+                                                <td><b>Payment Status :</b></td>
+                                                <% switch (orderData.orderedItems[i].paymentStatus) { 
                                                     case 'Pending': %>
                                                         <td><span class="color-theme text-white bg-warning">Pending</span></td>
-                                                        <% break; 
+                                                    <% break; 
+                                                    case 'Failed': %>
+                                                        <td><span class="color-theme text-white bg-danger">Failed</span></td>
+                                                    <% break; 
+                                                    case 'Success': %>
+                                                        <td><span class="color-theme text-white bg-success">Success</span></td>
+                                                    <% break; 
+                                                    case 'Refunded': %>
+                                                        <td><span class="color-theme text-white bg-info">Refunded</span></td>
+                                                    <% break;
+                                                    default: %>
+                                                        <td><span class="color-theme text-white bg-secondary">Unknown</span></td>
+                                                <% } %>
+                                            </tr>
+                                            
+                                            <!-- product status -->
+                                            <tr>
+                                                <td><b>Product Status :</b></td>
+                                                <% switch (orderData.orderedItems[i].productStatus) { 
+                                                    case 'Not Applicable': %>
+                                                        <td><span class="color-theme text-white bg-secondary">Not Applicable</span></td>
+                                                    <% break; 
+                                                    case 'Pending Confirmation': %>
+                                                        <td><span class="color-theme text-white bg-warning">Pending Confirmation</span></td>
+                                                    <% break; 
                                                     case 'Placed': %>
-                                                        <td><span class="color-theme text-white bg-info">Order Placed</span></td>
+                                                            <td><span class="color-theme text-white bg-info">Order Placed</span></td>
                                                         <% break; 
                                                     case 'Confirmed': %>
-                                                        <td><span class="color-theme text-white bg-info">Order Confirmed</span></td>
+                                                            <td><span class="color-theme text-white bg-info">Order Confirmed</span></td>
                                                         <% break; 
                                                     case 'Shipped': %>
-                                                        <td><span class="color-theme text-white bg-primary">Item Shipped</span></td>
+                                                            <td><span class="color-theme text-white bg-primary">Item Shipped</span></td>
                                                         <% break; 
                                                     case 'Out for Delivery': %>
-                                                        <td><span class="color-theme text-white bg-info">Out for Delivery</span></td>
+                                                            <td><span class="color-theme text-white bg-info">Out for Delivery</span></td>
                                                         <% break; 
                                                     case 'Delivered': %>
-                                                        <td><span class="color-theme text-white bg-success">Item Delivered</span></td>
+                                                            <td><span class="color-theme text-white bg-success">Delivered</span></td>
                                                         <% break; 
                                                     case 'Cancelled': %>
-                                                        <td><span class="color-theme text-white bg-danger">Cancelled</span></td>
-                                                        <% break; 
+                                                            <td><span class="color-theme text-white bg-danger">Cancelled</span></td>
+                                                        <% break;
+                                                    case 'Return Requested': %>
+                                                            <td><span class="color-theme text-white bg-dark">Return Requested</span></td>
+                                                        <% break;
+                                                    case 'Return Request Rejected': %>
+                                                            <td><span class="color-theme text-white bg-dark">Return Request Rejected</span></td>
+                                                        <% break;
+                                                    case 'Return Request Accepted': %>
+                                                            <td><span class="color-theme text-white bg-dark">Return Request Accepted</span></td>
+                                                        <% break;
                                                     case 'Returned': %>
-                                                        <td><span class="color-theme text-white bg-dark">Returned</span></td>
-                                                        <% break; 
+                                                            <td><span class="color-theme text-white bg-dark">Returned</span></td>
+                                                        <% break;
                                                     default: %>
                                                         <td><span class="color-theme text-white bg-secondary">Unknown</span></td>
                                                 <% } %>
@@ -346,6 +458,81 @@
 
 
 
+
+<!-- Return Item Modal Starts -->
+<div class="modal fade" id="returnItemModal" tabindex="-1" role="dialog" aria-labelledby="returnItemModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="small-title"><b>RETURN ITEM</b></h4>
+                <button type="button" class="close bg-black text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="#" class="tm-form tm-checkout-form">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="tm-checkout-billingform">
+                                <div class="tm-form-inner">
+                                    <div class="tm-form-field">
+                                        <h5 class="mb-2">Are you sure you want to return this item?</h5>
+                                        <input type="hidden" id="return-order-id"/>
+                                        <input type="hidden" id="return-product-ref"/>
+                                        <div id="order-item-details" class="d-flex align-items-center mb-3">
+                                            <div class="item-image mr-3" style="border: 1px solid #ccc; padding: 5px;">
+                                                <img id="return-product-image" src="" alt="product-image" class="product-image">
+                                            </div>
+                                            <div class="item-text" style="line-height: 15px;">
+                                                <p id="return-product-name"></p>
+                                                <p id="return-product-code"></p>
+                                                <p id="return-product-totalPrice"></p>
+                                                <p id="return-product-quantity"></p>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group d-flex" style="align-items: baseline;">
+                                            <label for="return-reason-select"><h6 style="margin-right: 15px;">Reason for Return: </h6></label>
+                                            <select id="return-reason-select">
+                                                <option value="" selected disabled>Select a reason</option>
+                                                <option value="Received Damaged Product">Received Damaged Product</option>
+                                                <option value="Product Not as Described">Product Not as Described</option>
+                                                <option value="Wrong Item Sent">Wrong Item Sent</option>
+                                                <option value="Better Alternative Found">Better Alternative Found</option>
+                                                <option value="No Longer Needed">No Longer Needed</option>
+                                                <option value="Item Arrived Late">Item Arrived Late</option>
+                                                <option value="Quality Not Satisfactory">Quality Not Satisfactory</option>
+                                                <option value="Size or Fit Issue">Size or Fit Issue</option>
+                                                <option value="Changed Mind">Changed Mind</option>
+                                                <option value="Found Cheaper Elsewhere">Found Cheaper Elsewhere</option>
+                                                <option value="Incorrect Quantity Delivered">Incorrect Quantity Delivered</option>
+                                                <option value="Other">Other</option>
+                                            </select>                                            
+                                        </div>
+                                        <textarea id="return-reason" class="return-reason" placeholder="Enter additional details here"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" id="confirmReturnItem">Return Item</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Return Item Modal Ends -->
+
+
+
+
+
+
+
+
 <!-- script for date & time format -->
 <% function formatDate(dateString) {
     const date = new Date(dateString);
@@ -446,7 +633,7 @@
                         Swal.fire({
                             icon: 'success',
                             title: 'Order Canceled',
-                            text: 'Your order has been canceled successfully.',
+                            text: 'Your order has been cancelled successfully.',
                             showConfirmButton: false
                         }).then(()=>{
                             location.reload();
@@ -477,6 +664,110 @@
 </script>
 
 
+
+
+
+
+
+<!-- script for return item -->
+<script>
+    $(document).ready(function() {
+        $('.return-item-link').on('click', function() {
+
+            // parsing the order id (from return item link)
+            var orderId = JSON.parse(decodeURIComponent($(this).data('order-id')));
+
+            // parsing all the details of the selected order item (from return item link)
+            var orderItem = JSON.parse(decodeURIComponent($(this).data('order-item')));
+            
+            $('#return-order-id').val(orderId);
+            $('#return-product-ref').val(orderItem.productRef);
+            $('#return-product-image').attr('src', '/assets/images/productImages/' + orderItem.image);
+            $('#return-product-name').text('Name: ' + orderItem.name);
+            $('#return-product-code').text('Code: ' + orderItem.code);
+            $('#return-product-totalPrice').text('Total Price: ₹' + (orderItem.totalPrice * orderItem.quantity).toFixed(2));
+            $('#return-product-quantity').text('Quantity: ' + orderItem.quantity);
+
+            // $('#returnItemModal').modal('show');
+        });
+
+        $('#confirmReturnItem').click(function() {
+            var returnOrderId = $('#return-order-id').val();
+            var returnProductRef = $('#return-product-ref').val();
+            var returnReasonSelect = $('#return-reason-select').val();
+            var returnReasonComment = $('#return-reason').val();
+
+            console.log('returnOrderId for return :', returnOrderId);
+            console.log('returnProductRef for return :', returnProductRef);
+            console.log('returnReasonSelect for return :', returnReasonSelect);
+            console.log('returnReasonComment for return :', returnReasonComment);
+            
+            let returnReason = `${returnReasonSelect}: "${returnReasonComment}"`;
+            console.log('returnReason :', returnReason);
+
+            // Validate the return reason
+            if (!returnReasonSelect) {
+                Swal.fire({
+                    text: 'Please choose a valid reason for returning the item',
+                    showConfirmButton: false
+                });
+                return;
+            }
+
+            var words = returnReasonComment.trim().split(/\s+/);
+            if (!returnReasonComment) {
+                Swal.fire({
+                    text: 'Additional details required.',
+                    showConfirmButton: false
+                });
+            } else if (words.length < 5) {
+                Swal.fire({
+                    text: 'The additional details must contain at least 5 words.',
+                    showConfirmButton: false
+                });
+                return;
+            }
+
+            $.ajax({
+                url: '/return-order',
+                method: 'POST',
+                data: {
+                    returnOrderId,
+                    returnProductRef,
+                    returnReason
+                },
+                success: function(response) {
+                    if (response.returnRequested) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Return Request Submitted',
+                            text: `Your return request has been submitted successfully.
+                                Our customer service team will contact you for further proceedings within 2 days.`,
+                            showConfirmButton: false
+                        })
+                        .then(()=>{
+                            location.reload();
+                        });
+                    } else if(response.error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Return Failed',
+                            text: response.message,
+                            showConfirmButton: false
+                        });
+                    }
+                },
+                error: function(error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Return Failed',
+                        text: 'An error occured while returning the item.'
+                    });
+                }
+            });
+        });
+    });
+</script>
 
 
 

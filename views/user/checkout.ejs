@@ -122,14 +122,26 @@
                                             <h5><a href="/product-details?id=<%= userCart.product[i].productRef._id %>" class="tm-cart-productname"><%= userCart.product[i].productRef.name %></a></h5>
                                             <h6><%= userCart.product[i].productRef.code %></h6>
                                         </td>
-                                        <td class="tm-cart-price bg-light"> <h6>₹<%= (userCart.product[i].productRef.totalPrice).toFixed(2) %></h6></td>
+                                        <% if (userCart.product[i].productRef.offerRef != null){ %>
+                                            <td class="tm-cart-price bg-light">
+                                                <del><h6 style="color: grey;">₹<%= (userCart.product[i].productRef.totalPrice).toFixed(2) %></h6></del>
+                                                <h6>₹<%= ((userCart.product[i].productRef.totalPrice) - (userCart.product[i].productRef.makingCharge * userCart.product[i].productRef.offerRef.offerPercentage / 100)).toFixed(2) %></h6>
+                                            </td>
+                                        <% } else { %>
+                                            <td class="tm-cart-price bg-light"> <h6>₹<%= (userCart.product[i].productRef.totalPrice).toFixed(2) %></h6></td>
+                                        <% } %>
+
                                         <td class="bg-light">
                                             <div class="tm-quantitybox bg-white">
                                                 <input type="number" class="quantity-input" value="<%= userCart.product[i].quantity %>" id="quantity_<%= i %>" data-product-id="<%= userCart.product[i]._id %>" data-index="<%= i %>" data-cart-id="<%= userCart._id %>">
                                             </div>
                                         </td>
                                         <td class="bg-light">
-                                            <span class="tm-cart-totalprice" id="total_price_<%= i %>">₹<%= (userCart.product[i].productRef.totalPrice * userCart.product[i].quantity).toFixed(2) %></span>
+                                            <% if (userCart.product[i].productRef.offerRef != null){ %>
+                                                <span class="tm-cart-totalprice" id="total_price_<%= i %>">₹<%= ((userCart.product[i].productRef.totalPrice) - (userCart.product[i].productRef.makingCharge * userCart.product[i].productRef.offerRef.offerPercentage / 100)).toFixed(2) * (userCart.product[i].quantity) %></span>
+                                            <% } else { %>
+                                                <span class="tm-cart-totalprice" id="total_price_<%= i %>">₹<%= (userCart.product[i].productRef.totalPrice * userCart.product[i].quantity).toFixed(2) %></span>
+                                            <% } %>
                                         </td>
                                         <td class="bg-light">
                                             <button class="tm-button tm-button-small" onclick="saveForLater('<%= userCart.product[i]._id %>')">Save for Later</button>
@@ -270,7 +282,7 @@
                                             <td colspan="2"><hr style="border: 1px solid black;"></td>
                                         </tr>
                                         <tr class="tm-checkout-subtotal">
-                                            <td>TOTAL</td>
+                                            <td>SUBTOTAL</td>
                                             <td id="sub-total">₹ <%= subTotal.toFixed(2) %></td>
                                         </tr>
                                         <tr class="tm-checkout-shipping">
@@ -288,9 +300,17 @@
                                         <tr>
                                             <td colspan="2"><hr style="border: 1px solid black;"></td>
                                         </tr>
+                                        <tr class="tm-checkout-total-amount">
+                                            <td style="font-size: large;"> TOTAL </td>
+                                            <td id="total" style="font-size: large;">₹ <%= netPayable.toFixed(2) %></td>
+                                        </tr>
+                                        <tr class="tm-checkout-round-off">
+                                            <td> Round Off </td>
+                                            <td id="round-off">₹ <%= roundOffAmount.toFixed(2) %></td>
+                                        </tr>
                                         <tr class="tm-checkout-total">
                                             <td>Net Payable </td>
-                                            <td id="net-payable"> <h4 style="color: #9a0056;"> <b> ₹ <%= netPayable.toFixed(2) %> </b> </h4></td>
+                                            <td id="net-payable"> <h4 style="color: #9a0056;"> <b> ₹ <%= (netPayable - roundOffAmount).toFixed(2) %> </b> </h4></td>
                                         </tr>
                                     </tfoot>
                                 </table>
@@ -323,13 +343,13 @@
                                             <p>Pay with cash upon delivery.<br>Note: Cash on Delivery orders exceeding ₹2,00,000 are not allowed.</p>
                                         </div>
                                     </div>
-                                    <div class="tm-form-field">
+                                    <!-- <div class="tm-form-field">
                                         <input type="radio" name="checkout-payment-method" id="checkout-payment-cardpayment" value="Card Payment"/>
                                         <label for="checkout-payment-cardpayment">Card Payment</label>
                                         <div class="tm-checkout-payment-content">
                                             <p>Pay with your credit card or debit card via Stripe.</p>
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
 
@@ -346,7 +366,7 @@
                                         <label for="checkout-read-terms">I have read and agree to the website terms and conditions</label>
                                     </div>
                                     <div class="tm-form-field">
-                                        <button type="submit" class="tm-button ml-auto" onclick="placeOrder()"> Place Order </button>
+                                        <button type="submit" class="tm-button ml-auto" onclick="checkoutOrder()"> PLACE ORDER </button>
                                     </div>
                                 </div>
                             </div>
@@ -671,26 +691,17 @@
 <script src="/assets/scripts/userScripts/wishlist-scripts.js"></script>
 
 
+
+<!-- importing the razorpay library link -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"> </script>
  
 
 
 
-<!-- script for place order -->
+<!-- script for placing order -->
 <script>
-    function placeOrder() {
 
-        // Check if a shipping address is selected
-        // let selectedAddressElement = document.querySelector('input[name="checkout-address"]:checked');
-        // if (!selectedAddressElement) {
-        //     Swal.fire({
-        //         title: "No Shipping Address",
-        //         html: `<h6 class="text-danger"> Please select a shipping address or add new one to place your order. </h6>`,
-        //         showConfirmButton: false,
-        //     });
-        //     return;
-        // }
-
-
+    function checkoutOrder() {
         // Check if a shipping address is selected or no address.
         let selectedAddressId = document.querySelector('input[name="checkout-address"]:checked');
         if (!selectedAddressId) {
@@ -757,7 +768,6 @@
         console.log('couponDiscount to send :', couponDiscount);
         console.log('netAmount to send :', netAmount);
         console.log('walletBalance to send :', walletBalance);
-        console.log('walletBalance type :', typeof(walletBalance));
 
 
 
@@ -874,77 +884,284 @@
             cancelButtonText: 'Go Back'
         }).then((result) => {
             if (result.isConfirmed) {
-                $.ajax({
-                    url: '/place-order',
-                    method: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({selectedAddressId, selectedPaymentMethod}),
-                    success: function(response) {
-                        if (response.successful) {
-                            Swal.fire({
-                                title: "Order Placed",
-                                text: "Your order has been placed successfully.",
-                                icon: "success",
-                                showConfirmButton: false,
-                                timer: 1500,
-                            }).then(() => {
-                                window.location.href = '/thankyou'; // Proceed to the thank you page after completed ordering.
-                            });
-                        
-                        } else if (response.outofstockfound) {
-                            const outOfStockList = response.outOfStockItems.map(item => `<li>${item.productRef.name} (Current Stock: ${item.productRef.quantity})</li>`).join('');
-                            Swal.fire({
-                                icon: 'warning',
-                                title: "Unavailable Items Found.",
-                                html: `
-                                    <p> <b> The following products are out of stock or have insufficient quantity in stock: </b> </p>
-                                    <ul>${outOfStockList}</ul>
-                                    <p style="font-size: 15px; color: red;">Please remove them or save for later before placing your order. <br> Note: This will also reflect on your coupon discounts based on your subtotal.</p>
-                                `,
-                                // text: 'Some items in your cart are currently unavailable.. Please remove them or save for later before proceeding to checkout. Note: This will also reflect on your coupon discounts based on your subtotal.',
-                                showDenyButton: true,
-                                showCancelButton: true,
-                                confirmButtonText: "Remove & Proceed",
-                                denyButtonText: `Save for later`,
-                                cancelButtonText: 'Cancel',
-                                confirmButtonColor: "red",
-                                // confirmButtonColor: "#3085d6",
-                                denyButtonColor: "green",
-                            }).then((result) => {
-                                if (result.isConfirmed) { // if clicked Remove & Proceed button
-                                    removeOutOfStockItems(response.outOfStockItems);
-                                    
-                                } else if (result.isDenied) {  // if clicked Save for later button
-                                    saveOutOfStockItems(response.outOfStockItems);
-                                }
-                            }).catch((error) => {
-                                console.log('outofstockfound Swal error :', error);
-                            });
+                makePayment(selectedAddressId, selectedPaymentMethod);
+            }
+        });
+    }
 
-                        } else if (response.error){
-                            Swal.fire({
-                                title: "Error while placing order.",
-                                text: response.message,
-                                icon: "error",
-                                showConfirmButton: false,
-                            })
+
+
+
+    
+    function makePayment(selectedAddressId, selectedPaymentMethod) {
+        $.ajax({
+            url: '/make-payment',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({selectedAddressId, selectedPaymentMethod}),
+            success: function(response) {
+                console.log('response from makePayment : ', response);
+
+                if (response.outofstockfound) {
+                    const outOfStockList = response.outOfStockItems.map(item => `<li>${item.productRef.name} (Current Stock: ${item.productRef.quantity})</li>`).join('');
+                    Swal.fire({
+                        icon: 'warning',
+                        title: "Unavailable Items Found.",
+                        html: `
+                            <p> <b> The following products are out of stock or have insufficient quantity in stock: </b> </p>
+                            <ul>${outOfStockList}</ul>
+                            <p style="font-size: 15px; color: red;">Please remove them or save for later before placing your order. <br> Note: This will also reflect on your coupon discounts based on your subtotal.</p>
+                        `,
+                        // text: 'Some items in your cart are currently unavailable.. Please remove them or save for later before proceeding to checkout. Note: This will also reflect on your coupon discounts based on your subtotal.',
+                        showDenyButton: true,
+                        showCancelButton: true,
+                        confirmButtonText: "Remove & Proceed",
+                        denyButtonText: `Save for later`,
+                        cancelButtonText: 'Cancel',
+                        confirmButtonColor: "red",
+                        // confirmButtonColor: "#3085d6",
+                        denyButtonColor: "green",
+                    }).then((result) => {
+                        if (result.isConfirmed) { // if clicked Remove & Proceed button
+                            removeOutOfStockItems(response.outOfStockItems);
+                            
+                        } else if (result.isDenied) {  // if clicked Save for later button
+                            saveOutOfStockItems(response.outOfStockItems);
                         }
-                    },
-                    error: function(error) {
-                        console.error('Internal server error in placing order :', error);
-                        Swal.fire({
-                            title: "Order Failed",
-                            text: "Error placing order. Please try again.",
-                            icon: "error",
-                            showConfirmButton: false,
-                            timer: 1500,
-                        });
-                    }
+                    }).catch((error) => {
+                        console.log('outofstockfound Swal error :', error);
+                    });
 
+                } else if (response.lowBalance){
+                    Swal.fire({
+                        title: "Insufficient Wallet Balance",
+                        html: `<p style="color: red; font-size: 15px"> You have only <b> ₹${response.walletBalance.toFixed(2)} </b> left in your wallet. <br>
+                            Please add money or adjust your cart to place your order.
+                            Else, please choose other payment options.`,
+                        icon: "warning",
+                        showConfirmButton: false,
+                    });
+
+                } else if (response.instanceFailed){
+                    // failed / error in creating razorPay instance for order.
+                    // need to show this sweet alert or show any other process ??
+                    Swal.fire({
+                        title: "Online Payment Failed!",
+                        text: `Internal Server Error.! ${response.err.error.description}`,
+                        icon: "error",
+                        showConfirmButton: false,
+                    })
+                    // .then(()=>{
+                    //     // redirect to retryPayment page
+                    //     window.location.href = `/retry-payment?orderId=${response.userOrders._id}`;
+                    // })
+                    
+                    // razorPayPayment(response);  // pass failed response
+
+                } else if (response.proceedToOrder){
+                    // directly proceeding to order for "COD and Wallet Payment"
+                    placeOrder(response);  // pass response data (selectedAddressId, selectedPaymentMethod, paymentStatus)
+
+                } else if (response.proceedToRazorPay){
+                    // go to payment gateway with razorPay order instance.
+                    razorPayPayment(response);  // pass order instance response (order, selectedAddressId, selectedPaymentMethod, paymentStatus, userData)
+
+                } else if (response.error){
+                    Swal.fire({
+                        title: "Error while making payment.",
+                        text: response.message,
+                        icon: "error",
+                        showConfirmButton: false,
+                    });
+                }
+            },
+            error: function(error) {
+                console.error('Internal server error in make payment :', error);
+                Swal.fire({
+                    title: "Payment Failed",
+                    text: "Error in make payment. Please try again.",
+                    icon: "error",
+                    showConfirmButton: false,
+                    timer: 1500,
+                });
+            }
+
+        });
+
+    }
+
+
+
+
+
+    function razorPayPayment(orderResponse) {
+        console.log('orderResponse in razorPayPayment : ', orderResponse);
+
+        // baseUrl is required to display the logo in Razorpay window.
+        const baseUrl = window.location.origin; // Gets the current base URL like http://localhost:3000
+
+        const options = {
+            "key": "rzp_test_Z16lJwrcSEZFzf", // Enter the Key ID generated from the Dashboard
+            "amount": orderResponse.order.amount, // Amount is in currency subunits (paise). Default currency is INR. Hence, amount * 100 paise.
+            "currency": orderResponse.order.currency, // INR
+            "name": "Glitz Jewellery Boutique",
+            "description": "Test Transaction",
+            "image": `${baseUrl}/assets/images/logos/Glitz-Logo7.png`, // Constructed URL
+            "order_id": orderResponse.order.id, // razorPay order.id the backend
+            // "callback_url": "https://eneqd3r9zrjok.x.pipedream.net/",
+            // callback_url: 'http://localhost:3000/payment-success', // Your success URL
+            // handler or callback url if payment success
+            "handler": function (response){
+                console.log('response in handler (success payment) : ', response);
+                // console.log('orderResponse in handler : ', orderResponse);
+                alert(response.razorpay_payment_id);
+                alert(response.razorpay_order_id);
+                alert(response.razorpay_signature);
+
+                verifyPayment(response, orderResponse);  // sending paymentSuccessResponse and orderResponse
+            },
+            "prefill": {
+                "name": `${orderResponse.userData.firstname} ${orderResponse.userData.lastname}`,
+                "email": orderResponse.userData.email,
+                "contact": orderResponse.userData.mobile
+            },
+            "notes": {
+                "address": "Razorpay Corporate Office"
+            },
+            "theme": {
+                "color": "#9a0056"
+            }
+        };
+
+        var rzp1 = new Razorpay(options);
+
+        rzp1.on('payment.failed', function (response){
+            console.log('response after the initial payment failed :', response.error);
+
+            alert(response.error.code);
+            alert(response.error.description);
+            alert(response.error.source);
+            alert(response.error.step);
+            alert(response.error.reason);
+            alert(response.error.metadata.order_id);
+            alert(response.error.metadata.payment_id);
+
+            verifyPayment(response, orderResponse);   // sending paymentFailureResponse and orderResponse
+        });
+
+
+        // razorPay 'Pay Now' button.
+        // document.getElementById('rzp-button1').onclick = function(e){
+            rzp1.open();
+            // e.preventDefault();
+        // }
+
+
+    }
+
+
+
+
+
+    function verifyPayment(paymentResponse, orderResponse) {
+        console.log('orderResponse in verifyPayment : ', orderResponse);
+
+        $.ajax({
+            url : '/verify-payment',
+            method : 'POST',
+            data : {
+                paymentResponse,
+                orderResponse
+            },
+            success: function(response) {
+                console.log('response after verifyPayment :', response);
+
+                if (response.verifySuccess) {
+                    placeOrder(response.orderResponse); // orderResponse includes selectedAddressId, selectedPaymentMethod, paymentStatus
+
+                } else if (response.verifyFailed){
+                    alert(response.message);
+                    placeOrder(response.orderResponse); // orderResponse includes selectedAddressId, selectedPaymentMethod, paymentStatus
+                    // showing retry payment message.
+                    // or can directly redirect to the retry-payment?orderId page instead of razorPay's retry payment.
+
+                }
+            },
+            error: function(error) {
+                console.error('Internal server error in verifying payment :', error);
+                Swal.fire({
+                    title: "Payment Verification Failed",
+                    text: "Error in verify payment. Please try again.",
+                    icon: "error",
+                    showConfirmButton: false,
+                    timer: 1500,
                 });
             }
         });
     }
+
+
+
+
+
+    function placeOrder(Response) {
+        console.log('Response received in placeOrder :', Response);
+
+        const addressId = Response.selectedAddressId;
+        const paymentMethod = Response.selectedPaymentMethod;
+        const paymentStatus = Response.paymentStatus;
+
+        $.ajax({
+            url: '/place-order',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({addressId, paymentMethod, paymentStatus}),
+            success: function(response) {
+                console.log('response from placeOrder : ', response);
+
+                if (response.orderSuccess) {
+                    Swal.fire({
+                        title: "Order Placed",
+                        text: "Your order has been placed successfully.",
+                        icon: "success",
+                        showConfirmButton: false,
+                        timer: 1500,
+                    }).then(() => {
+                        window.location.href = '/order-success'; // redirect order success page after order completed.
+                    });
+
+                } else if (response.proceedRetry){
+                    window.location.href = `/retry-payment?orderId=${response.pendingOrderData._id}`;
+
+                } else if (response.error){
+                    Swal.fire({
+                        title: "Error while placing order.",
+                        text: response.message,
+                        icon: "error",
+                        showConfirmButton: false,
+                    });
+                }
+            },
+            error: function(error) {
+                console.error('Internal server error in placing order :', error);
+                Swal.fire({
+                    title: "Order Failed",
+                    text: "Error in placing order. Please try again.",
+                    icon: "error",
+                    showConfirmButton: false,
+                    timer: 1500,
+                });
+            }
+
+        });
+
+
+
+    }
+
+
+
+
 
 </script>
 
@@ -999,15 +1216,3 @@
         background-color: #f0f0f0;
     }
 </style>
-
-
-<!-- style for order confirmation modal -->
-<!-- <style>
-.terms-link , .policy-link {
-    color: #ff2600;
-}
-
-.terms-link :hover, .policy-link :hover{
-    color: #9a0056;
-}
-</style> -->

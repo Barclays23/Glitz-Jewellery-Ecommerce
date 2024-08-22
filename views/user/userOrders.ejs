@@ -114,12 +114,30 @@
                                                 </div>
                                             </div>
                                             <div>
-                                                <div><b>BILLING RATE</b></div>
-                                                <div class="billing-rate">₹ <%= userOrders[i].billingRate %> / Gram</div>
-                                            </div>
-                                            <div>
                                                 <div><b>TOTAL AMOUNT</b></div>
                                                 <div><h5 class="item-price"><%= (userOrders[i].netAmount).toFixed(2) %></h5></div>
+                                            </div>
+                                            <div>
+                                                <div><b>ORDER STATUS</b></div>
+                                                <% switch (userOrders[i].orderStatus) { 
+                                                    case 'Pending': %>
+                                                        <div class="p-1 text-center order-status color-theme text-white bg-warning">Pending</div>
+                                                        <% break; 
+                                                    case 'Failed': %>
+                                                        <div class="p-1 text-center order-status color-theme text-white bg-danger">Failed</div>
+                                                        <% break; 
+                                                    case 'Processing': %>
+                                                        <div class="p-1 text-center order-status color-theme text-white bg-info">Processing</div>
+                                                        <% break; 
+                                                    case 'Process Completed': %>
+                                                        <div class="p-1 text-center order-status color-theme text-white bg-success">Process Completed</div>
+                                                        <% break; 
+                                                    case 'Refunded': %>
+                                                        <div class="p-1 text-center order-status color-theme text-white bg-secondary">Refunded</div>
+                                                        <% break; 
+                                                    default: %>
+                                                        <div class="p-1 text-center order-status color-theme text-white bg-dark">Unknown</div>
+                                                <% } %>
                                             </div>
                                             <div class="order-options">
                                                 <div class="text-success text-right"><b><%= userOrders[i].orderNo %></b></div>
@@ -136,12 +154,98 @@
                                                             <img src="assets/images/productImages/<%= userOrders[i].orderedItems[j].image %>" alt="product image">
                                                         <% } %>
                                                     </div>
-                                                    <div class="col-md-10 col-10 each-item-text">
-                                                        <p class="item-name"><%= userOrders[i].orderedItems[j].code %></p>
-                                                        <h6 class="item-name mb-3"><%= userOrders[i].orderedItems[j].name %></h6>
+                                                    <div class="col-md-8 col-8 each-item-text">
+                                                        <p class="item-code mb-2"><%= userOrders[i].orderedItems[j].code %></p>
+                                                        <h6 class="item-name mb-2"><%= userOrders[i].orderedItems[j].name %></h6>
+                                                        <p class="item-quantity"> Quantity : <%= userOrders[i].orderedItems[j].quantity %></p>
                                                         <!-- <h6 class="item-price">₹ <%= (userOrders[i].orderedItems[j].totalPrice).toFixed(2) %></h6> -->
-                                                        <p class="item-quantity">Quantity: <%= userOrders[i].orderedItems[j].quantity %></p>
+
+                                                        <!-- product status -->
+                                                        <% switch (userOrders[i].orderedItems[j].productStatus) { 
+                                                            case 'Not Applicable': %>
+                                                                <p class="product-status mt-4"> Product Status : <span class="text-muted"> Not Applicable </span> </p>
+                                                            <% break; 
+                                                            case 'Pending Confirmation': %>
+                                                                <p class="product-status mt-4"> Product Status : <span class="text-warning"> Pending Confirmation </span> </p>
+                                                            <% break; 
+                                                            case 'Placed': %>
+                                                                <p class="product-status mt-4"> Product Status : <span class="text-info"> Order Placed </span> </p>
+                                                                <% break; 
+                                                            case 'Confirmed': %>
+                                                                <p class="product-status mt-4"> Product Status : <span class="text-primary"> Order Confirmed </span> </p>
+                                                                <% break; 
+                                                            case 'Shipped': %>
+                                                                <p class="product-status mt-4"> Product Status : <span class="text-primary"> Item Shipped </span> </p>
+                                                                <% break; 
+                                                            case 'Out for Delivery': %>
+                                                                <p class="product-status mt-4"> Product Status : <span class="text-primary"> Out for Delivery </span> </p>
+                                                                <% break; 
+                                                            case 'Delivered': %>
+                                                                <p class="product-status mt-4"> Product Status : <span class="text-success"> Delivered </span> </p>
+                                                                <% break; 
+                                                            case 'Cancelled': %>
+                                                                <p class="product-status mt-4"> Product Status : <span class="text-danger"> Cancelled </span> </p>
+                                                                <% break;
+                                                            case 'Return Requested': %>
+                                                                <p class="product-status mt-4"> Product Status : <span class="text-warning"> Return Requested </span> </p>
+                                                                <% break;
+                                                            case 'Return Request Rejected': %>
+                                                                <p class="product-status mt-4"> Product Status : <span class="text-danger"> Return Request Rejected </span> </p>
+                                                                <% break;
+                                                            case 'Return Request Accepted': %>
+                                                                <p class="product-status mt-4"> Product Status : <span class="text-success"> Return Request Accepted </span> </p>
+                                                                <% break;
+                                                            case 'Returned': %>
+                                                                <p class="product-status mt-4"> Product Status : <span class="text-danger"> Returned </span> </p>
+                                                                <% break;
+                                                            default: %>
+                                                                <p class="product-status mt-4"> Product Status : <span class="text-secondary"> Unknown </span> </p>
+                                                        <% } %>
                                                     </div>
+                                                    
+                                                    <div class="col-md-2 col-2 retry-options">
+                                                        <% if (userOrders[i].orderStatus === 'Pending') { %>
+                                                            <!-- Countdown Timer Script -->
+                                                            <script>
+                                                                // Parse the order date from the server-side
+                                                                const orderDate = new Date('<%= userOrders[i].orderDate %>');
+                                                                
+                                                                // Set the expiry time to 1 minute from the order date
+                                                                const expiryTime = new Date(orderDate.getTime() + 1 * 60000);
+                                                    
+                                                                // Function to update the countdown timer
+                                                                function updateTimer() {
+                                                                    const now = new Date();
+                                                                    const timeRemaining = expiryTime - now;
+                                                    
+                                                                    if (timeRemaining <= 0) {
+                                                                        // Time expired, clear the interval and set the countdown to 00:00:00
+                                                                        clearInterval(timerInterval);
+                                                                        document.getElementById('countdown-<%= userOrders[i]._id %>').innerText = "00 : 00 : 00";
+                                                                    } else {
+                                                                        // Calculate hours, minutes, and seconds remaining
+                                                                        const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                                                                        const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+                                                                        const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+                                                    
+                                                                        // Display the timer in HH:MM:SS format
+                                                                        document.getElementById('countdown-<%= userOrders[i]._id %>').innerText =
+                                                                            `${String(hours).padStart(2, '0')} : ${String(minutes).padStart(2, '0')} : ${String(seconds).padStart(2, '0')}`;
+                                                                    }
+                                                                }
+                                                    
+                                                                // Set the interval to update the timer every second
+                                                                const timerInterval = setInterval(updateTimer, 1000);
+                                                            </script>
+                                                    
+                                                            <!-- Countdown Timer Display -->
+                                                            <h5 class="countdown" id="countdown-<%= userOrders[i]._id %>" style="color: red;">00:01:00</h5>
+                                                    
+                                                            <!-- Retry Payment Link -->
+                                                            <a href="/retry-payment?orderId=<%= userOrders[i]._id %>">Retry Payment</a>
+                                                        <% } %>
+                                                    </div>
+                                                    
                                                 </div>
                                             <% } %>
                                         </div>
@@ -283,6 +387,40 @@
     line-height: 0.1 !important;
 }
 
+.retry-options {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.retry-options .countdown{
+    margin-left: 20px;
+}
+.retry-options p {
+    color: black;
+    margin-bottom: 0rem;
+}
+.retry-options p:hover {
+    color: rgb(255, 255, 255);
+}
+.retry-options a {
+    font-weight: 600;
+    color: black;
+    background-color: #cfcfcf;
+    border: 1px solid lightgrey;
+    border-radius: 5px;
+    margin-right: 10px;
+    margin: 5px;
+    padding: 7px 13px;
+    cursor: pointer;
+    font-size: 16px;
+}
+.retry-options a:hover p {
+    color: white;
+}
+.retry-options a:hover {
+    background-color: #9a0056;
+}
 
 
 
@@ -306,3 +444,6 @@
     }
 }
 </style>
+
+
+

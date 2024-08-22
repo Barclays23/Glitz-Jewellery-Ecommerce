@@ -75,10 +75,14 @@ const orderSchema = new mongoose.Schema({
                 type : Number,
                 required : true
             },
-            orderStatus : {
+            paymentStatus : {
                 type : String,
-                default : 'Pending',
-                enum : ['Pending', 'Placed', 'Confirmed', 'Shipped', 'Out for Delivery', 'Delivered', 'Return Requested', 'Return Request Rejected', 'Return Request Accepted', 'Returned', 'Cancelled' ]
+                enum : ['Pending', 'Failed', 'Success', 'Refunded', 'NEWSTATUS'],
+                default : 'Pending'
+            },
+            productStatus : {
+                type : String,
+                enum : [ 'Not Applicable', 'Pending Confirmation', 'Placed', 'Confirmed', 'Shipped', 'Out for Delivery', 'Delivered', 'Return Requested', 'Return Request Rejected', 'Return Request Accepted', 'Returned', 'Cancelled' ]
             },
             deliveryDate : {
                 type: Date,
@@ -103,12 +107,12 @@ const orderSchema = new mongoose.Schema({
         }]
     },
 
-    orderNo : {
-        type : String,
-        required : true
-    },
     shippingAddress : {
         type : Object,
+        required : true
+    },
+    orderNo : {
+        type : String,
         required : true
     },
     orderDate : {
@@ -135,19 +139,43 @@ const orderSchema = new mongoose.Schema({
         type : Number,
         // required : true
     },
-    netAmount : {   // after all discounts
+    netAmount : {   // after all discounts (payable amount)
         type : Number,
         required : true,
     },
     paymentMethod : {
         type : String,
         required : true,
-        enum : ['Card Payment', 'RazorPay', 'PayPal', 'Online Payment', 'Cash On Delivery', 'Wallet'],
+        enum : ['Cash On Delivery', 'Wallet', 'Online Payment'],
     },
-    paymentStatus : {
+    orderStatus : {
         type : String,
-        enum : ['Pending', 'Processing', 'Completed', 'Failed', 'Refunded'],
-        default : 'Pending'
+        default : 'Pending',
+        enum : ['Pending', 'Failed', 'Processing', 'Process Completed']
+    },
+    shipmentPendings : {
+        type : Number,
+        default : 0
+    },
+    deliveryPendings : {
+        type : Number,
+        default : 0
+    },
+    cancelledCount : {
+        type : Number,
+        default : 0
+    },
+    deliveredCount : {
+        type : Number,
+        default : 0
+    },
+    returnedCount : {
+        type : Number,
+        default : 0
+    },
+    returnRequests : {
+        type : Number,
+        default : 0
     },
 
 });

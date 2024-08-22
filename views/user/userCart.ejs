@@ -131,10 +131,19 @@
                                                             <li> Stone Charge </li>
                                                             <li> GST (3%)</li>
                                                             <hr style="border: 1px solid black;">
-                                                            <li><b> Total </b></li> <!-- totalPrice -->
-                                                            <li><b> Discount (Offer) </b></li> <!-- offerAmount (product / category offer ref amount) -->
-                                                            <li><b> NET AMOUNT </b></li> <!-- totalPrice - offerAmount -->
+                                                            <li><b> Total </b></li>
+
+                                                            <% if (userCart.product[i].productRef.offerRef != null){ %>
+                                                                <!-- offerPercentage (product / category offer percentage) -->
+                                                                <li><b>Discount</b> <b style="font-size: 12px;">(<%= userCart.product[i].productRef.offerRef.offerPercentage %>% on MC) </b></li>
+                                                            <% } else { %>
+                                                                <!-- no offer / discount -->
+                                                                <li><b> Discount </b></li>
+                                                            <% } %>
+
+                                                            <li><b> NET AMOUNT </b></li>
                                                         </ul>
+
                                                         <ul class="col text-right" style="list-style-type: none;">
                                                             <li> <%= (userCart.product[i].productRef.grossWeight).toFixed(3) %> </li>
                                                             <li> <%= (userCart.product[i].productRef.stoneWeight).toFixed(3) %> </li>
@@ -142,14 +151,28 @@
                                                             <li> <%= (userCart.product[i].productRef.purity) %> </li>
                                                             <li> <%= (userCart.product[i].productRef.VA) %>% </li>
                                                             <hr style="border: 1px solid black;">
-                                                            <li class="tm-cart-pricebreakup"> <%= (userCart.product[i].productRef.metalPrice).toFixed(2) %></li>
-                                                            <li class="tm-cart-pricebreakup"> <%= (userCart.product[i].productRef.makingCharge).toFixed(2) %></li>
-                                                            <li class="tm-cart-pricebreakup"> <%= (userCart.product[i].productRef.stoneCharge).toFixed(2) %></li>
-                                                            <li class="tm-cart-pricebreakup"> <%= (userCart.product[i].productRef.GST).toFixed(2) %></li>
+                                                            <li class="tm-cart-metal-price"> <%= (userCart.product[i].productRef.metalPrice).toFixed(2) %></li>
+                                                            <li class="tm-cart-making-charge"> <%= (userCart.product[i].productRef.makingCharge).toFixed(2) %></li>
+                                                            <li class="tm-cart-stone-charge"> <%= (userCart.product[i].productRef.stoneCharge).toFixed(2) %></li>
+                                                            <li class="tm-cart-gst"> <%= (userCart.product[i].productRef.GST).toFixed(2) %></li>
                                                             <hr style="border: 1px solid black;">
-                                                            <li class="tm-cart-pricebreakup"> <b><%= (userCart.product[i].productRef.totalPrice).toFixed(2) %></b></li>
-                                                            <li class="tm-cart-pricebreakup"> <b class="text-success">- 500.00</b></li>
-                                                            <li class="tm-cart-pricebreakup"> <b><%= (userCart.product[i].productRef.totalPrice - 500.00).toFixed(2) %></b></li>
+
+                                                            <!-- total amount -->
+                                                            <li class="tm-cart-total-price"> <b><%= (userCart.product[i].productRef.totalPrice).toFixed(2) %></b></li>
+
+                                                            <!-- discount amount -->
+                                                            <% if (userCart.product[i].productRef.offerRef != null){ %>
+                                                                <li class="tm-cart-offer-discount"> <b class="text-success">₹<%= (userCart.product[i].productRef.makingCharge * userCart.product[i].productRef.offerRef.offerPercentage / 100).toFixed(2) %> </b></li>
+                                                            <% } else { %>
+                                                                <li class="tm-cart-offer-discount"> <b class="text-success">0.00</b></li>
+                                                            <% } %>
+
+                                                            <!-- net amount -->
+                                                            <% if (userCart.product[i].productRef.offerRef != null){ %>
+                                                                <li class="tm-cart-net-amount"> <b class="text-success">₹<%= ((userCart.product[i].productRef.totalPrice) - (userCart.product[i].productRef.makingCharge * userCart.product[i].productRef.offerRef.offerPercentage / 100)).toFixed(2) %> </b></li>
+                                                            <% } else { %>
+                                                                <li class="tm-cart-net-amount"> <b class="text-success"><%= (userCart.product[i].productRef.totalPrice - 0.00).toFixed(2) %></b></li>
+                                                            <% } %>
                                                         </ul>
                                                     </div>
                                                 </td>
@@ -159,7 +182,11 @@
                                                     </div>
                                                 </td>
                                                 <td class="bg-light">
-                                                    <span class="tm-cart-totalprice" id="total_price_<%= i %>">₹<%= (userCart.product[i].productRef.totalPrice * userCart.product[i].quantity).toFixed(2) %></span>
+                                                    <% if (userCart.product[i].productRef.offerRef != null){ %>
+                                                        <span class="tm-cart-totalprice" id="total_price_<%= i %>">₹<%= ((userCart.product[i].productRef.totalPrice) - (userCart.product[i].productRef.makingCharge * userCart.product[i].productRef.offerRef.offerPercentage / 100)).toFixed(2) * (userCart.product[i].quantity) %></span>
+                                                    <% } else { %>
+                                                        <span class="tm-cart-totalprice" id="total_price_<%= i %>"><%= ((userCart.product[i].productRef.totalPrice - 0.00) * (userCart.product[i].quantity)).toFixed(2) %></span>
+                                                    <% } %>
                                                 </td>
                                                 <td class="bg-light">
                                                     <button class="tm-button tm-button-small" onclick="saveForLater('<%= userCart.product[i]._id %>')">Save for Later</button>
@@ -222,7 +249,7 @@
                                                     </tr>
                                                     <tr class="tm-cart-pricebox-offer-discount">
                                                         <td>Discount Amount</td>
-                                                        <td class="text-success">₹ 50.00</td>
+                                                        <td class="text-success">₹ <%= offerDiscount.toFixed(2) %></td>
                                                     </tr>
                                                     <% if (userCart && userCart.couponRef) { %>
                                                         <tr class="tm-cart-pricebox-coupon-discount">
@@ -231,8 +258,16 @@
                                                         </tr>
                                                     <% } %>
                                                     <tr class="tm-cart-pricebox-total">
+                                                        <td style="font-size: large; font-weight: 500;">TOTAL</td>
+                                                        <td style="font-size: large; font-weight: 500;">₹ <%= netPayable.toFixed(2) %></td>
+                                                    </tr>
+                                                    <tr class="tm-cart-pricebox-round-off">
+                                                        <td>Round Off</td>
+                                                        <td>₹ <%= roundOffAmount.toFixed(2) %></td>
+                                                    </tr>
+                                                    <tr class="tm-cart-pricebox-total">
                                                         <td><h6 style="color: #9a0056; font-size: 20px; font-weight: 600;">NET AMOUNT</h6></td>
-                                                        <td><h6 style="color: #9a0056; font-size: 20px; font-weight: 600;">₹ <%= netPayable.toFixed(2) %></h6></td>
+                                                        <td><h6 style="color: #9a0056; font-size: 20px; font-weight: 600;">₹ <%= (netPayable - roundOffAmount).toFixed(2) %></h6></td>
                                                     </tr>
                                                 </tbody>
                                             </table>

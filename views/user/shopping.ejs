@@ -127,22 +127,37 @@
                                                     <br>
                                                     <h6 class="tm-product-title"><a><%= productData[i].code %></a></h6>
                                                     <h6 class="tm-product-title"><a href="product-details?id=<%= productData[i]._id %>"><%= productData[i].name %></a></h6>
-                                                    <div class="tm-ratingbox">
+                                                    <!-- <div class="tm-ratingbox">
                                                         <span class="is-active"><i class="ion-android-star-outline"></i></span>
                                                         <span class="is-active"><i class="ion-android-star-outline"></i></span>
                                                         <span class="is-active"><i class="ion-android-star-outline"></i></span>
                                                         <span class="is-active"><i class="ion-android-star-outline"></i></span>
                                                         <span><i class="ion-android-star-outline"></i></span>
-                                                    </div>
-                                                    <% const netWeight = Number(productData[i].netWeight)%>
-                                                    <% const metalCost = goldPriceData.price * productData[i].netWeight %>
-                                                    <% const makingCharge = metalCost * productData[i].VA/100 %>
-                                                    <% const stoneCharge = productData[i].stoneCharge %>
-                                                    <% const GST = (metalCost + makingCharge + stoneCharge) * (3/100) %>
-                                                    <% const totalPrice = metalCost + makingCharge + stoneCharge + GST %>
-                                                    <span class="tm-product-price">₹ <%= Math.round(totalPrice).toFixed(2) %></span>
+                                                    </div> -->
+
+                                                    <% if (productData[i].offerRef != null){ %>
+                                                        <del><span class="tm-product-price" style="color: grey;">₹<%= (productData[i].totalPrice).toFixed(2) %></span></del>
+                                                        <div class="tm-ratingbox">
+                                                            <span class="is-active"><i class="ion-android-star-outline"></i></span>
+                                                            <span class="is-active"><i class="ion-android-star-outline"></i></span>
+                                                            <span class="is-active"><i class="ion-android-star-outline"></i></span>
+                                                            <span class="is-active"><i class="ion-android-star-outline"></i></span>
+                                                            <span><i class="ion-android-star-outline"></i></span>
+                                                        </div>
+                                                        <span class="tm-product-price" style="font-size: large;">₹<%= Math.round((productData[i].totalPrice) - (productData[i].makingCharge * productData[i].offerRef.offerPercentage / 100)).toFixed(2) %></span>
+                                                    <% } else { %>
+                                                        <br>
+                                                        <div class="tm-ratingbox">
+                                                            <span class="is-active"><i class="ion-android-star-outline"></i></span>
+                                                            <span class="is-active"><i class="ion-android-star-outline"></i></span>
+                                                            <span class="is-active"><i class="ion-android-star-outline"></i></span>
+                                                            <span class="is-active"><i class="ion-android-star-outline"></i></span>
+                                                            <span><i class="ion-android-star-outline"></i></span>
+                                                        </div>
+                                                        <span class="tm-product-price" style="font-size: large;">₹<%= Math.round(productData[i].totalPrice).toFixed(2) %></span>
+                                                    <% } %>
+
                                                     <div class="tm-product-content">
-                                                        
                                                         <table border="0" cellpadding="5">
                                                             <th style="width: 120px"></th>
                                                             <th></th>
@@ -175,22 +190,22 @@
                                                             <tr>
                                                             <td>Metal Price</td>
                                                             <td style="text-align: right;"> ₹ </td>
-                                                            <td style="text-align: right;"> <%= (metalCost).toFixed(2) %> </td>
+                                                            <td style="text-align: right;"> <%= (productData[i].metalPrice).toFixed(2) %> </td>
                                                             </tr>
                                                             <tr>
                                                             <td>Making Charge (<%= productData[i].VA %> %)</td>
                                                             <td style="text-align: right;"> ₹ </td>
-                                                            <td style="text-align: right;"> <%= (makingCharge).toFixed(2) %> </td>
+                                                            <td style="text-align: right;"> <%= (productData[i].makingCharge).toFixed(2) %> </td>
                                                             </tr>
                                                             <tr>
                                                             <td>Stone Charge</td>
                                                             <td style="text-align: right;"> ₹ </td>
-                                                            <td style="text-align: right;"> <%= (stoneCharge).toFixed(2) %> </td>
+                                                            <td style="text-align: right;"> <%= (productData[i].stoneCharge).toFixed(2) %> </td>
                                                             </tr>
                                                             <tr>
                                                             <td>Tax</td>
                                                             <td style="text-align: right;"> ₹ </td>
-                                                            <td style="text-align: right;"> <%= (GST).toFixed(2) %> </td>
+                                                            <td style="text-align: right;"> <%= (productData[i].GST).toFixed(2) %> </td>
                                                             </tr>
                                                             <tr>
                                                                 <td colspan="3"> <hr style="border: 1px solid black;"></td>
@@ -198,7 +213,7 @@
                                                             <tr style="color: #9A0056; font-size: 18px;">
                                                                 <td><b>TOTAL</b></td>
                                                                 <td style="text-align: right;"><b>₹</b></td>
-                                                                <td style="text-align: right;"><b> <%= (totalPrice).toFixed(2) %></b></td>
+                                                                <td style="text-align: right;"><b> <%= (productData[i].totalPrice).toFixed(2) %></b></td>
                                                             </tr>
                                                         </table>
 
@@ -276,24 +291,18 @@
                                 <ul>
                                     <% for(i=0; i<=3; i++){ %>
                                         <% if(popularProducts[i]){ %>
-                                            <% const popularNetWeight = Number(popularProducts[i].netWeight) %>
-                                            
-                                            <% const popularMetalCost = goldPriceData.price * popularProducts[i].netWeight %>
-
-                                            <% const popularMakingCharge = popularMetalCost * popularProducts[i].VA/100 %>
-
-                                            <% const popularStoneCharge = popularProducts[i].stoneCharge %>
-
-                                            <% const popularGST = (popularMetalCost + popularMakingCharge + popularStoneCharge) * (3/100) %>
-
-                                            <% const popularTotalPrice = popularMetalCost + popularMakingCharge + popularStoneCharge + popularGST %>
                                         <li>
                                             <a href="product-details?id=<%= popularProducts[i]._id %>" class="widget-popularproduct-image">
                                                 <img src="assets/images/productImages/<%= popularProducts[i].images.image1 %>" alt="product thumbnail">
                                             </a>
                                             <div class="widget-popularproduct-content">
                                                 <h6><a href="product-details?id=<%= popularProducts[i]._id %>"><%= popularProducts[i].name %></a></h6>
-                                                <span>₹<%= Math.round(popularTotalPrice).toFixed(2) %></span>
+                                                <% if (popularProducts[i].offerRef != null){ %>
+                                                    <span class="tm-product-price">₹<%= Math.round((popularProducts[i].totalPrice) - (popularProducts[i].makingCharge * popularProducts[i].offerRef.offerPercentage / 100)).toFixed(2) %></span>
+                                                <% } else { %>
+                                                    <span class="tm-product-price">₹<%= Math.round(popularProducts[i].totalPrice).toFixed(2) %></span>
+                                                <% } %>
+                                                
                                             </div>
                                         </li>
                                         <% } %>

@@ -1,8 +1,10 @@
 const User = require ('../models/userModel');
 const Product = require ('../models/productModel');
+const Category = require ('../models/categoryModel');
 const GoldPrice = require ('../models/goldPriceModel');
 const Wishlist = require ('../models/wishlistModel');
 const Cart = require ('../models/cartModel');
+const Offer = require ('../models/offerModel');
 
 
 
@@ -19,7 +21,57 @@ const loadUserWishlist = async (req, res)=>{
 
         const goldPriceData = await GoldPrice.findOne({});
         const userCart = await Cart.findOne({userRef: sessionId});
-        const userWishlist = await Wishlist.findOne({ userRef: sessionId}).populate('product.productRef');
+
+
+
+        // Find expired offers
+        const expiredOffers = await Offer.find({
+            expiryDate: { $lt: new Date() },
+            isListed: true // Only select offers that are currently listed
+        }, '_id');
+        const expiredOfferIds = expiredOffers.map(offer => offer._id);
+        console.log('found ', expiredOfferIds.length, ' expired active offers in wishlist.');
+
+        // Find unlisted offers
+        const unlistedOffers = await Offer.find({
+            isListed: false
+        }, '_id');
+        const unlistedOfferIds = unlistedOffers.map(offer => offer._id);
+        console.log('found ', unlistedOfferIds.length, ' unlisted/ blocked offers in wishlist.');
+
+        // Combine both sets of offer IDs
+        const offerIdsToCancel = new Set([...expiredOfferIds, ...unlistedOfferIds]);
+
+        // If there are no offers to cancel, skip the update operation
+        if (offerIdsToCancel.size === 0) {
+            console.log('No offers to cancel.');
+            return;
+        }
+
+        // cancel the offer from category
+        const updatedCategoryOffer = await Category.updateMany(
+            { offerRef: { $in: [...offerIdsToCancel] } },
+            { offerRef: null }
+        );
+        console.log('Number of cancelled offer category in wishlist :', updatedCategoryOffer.modifiedCount);
+        
+        // cancel the offer from products
+        const updatedProductOffer = await Product.updateMany(
+            { offerRef: { $in: [...offerIdsToCancel] } },
+            { offerRef: null }
+        );
+        console.log('Number of cancelled offer products in wishlist :', updatedProductOffer.modifiedCount);
+        
+
+
+        const userWishlist = await Wishlist.findOne({ userRef: sessionId })
+        .populate({
+            path: 'product.productRef',
+            populate: {
+                path: 'offerRef',
+                model: 'Offer'
+            }
+        });
 
         let cartCount = 0;
         let wishlistCount = 0;
