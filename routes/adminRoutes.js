@@ -96,6 +96,11 @@ adminRoute.patch('/manage-coupon', adminAuth.isLogin, couponController.manageCou
 
 
 
+// TEST
+adminRoute.get('/abcd',  adminAuth.isLogin, adminController.loadDashboard2);
+adminRoute.get('/sales-report',  adminAuth.isLogin, adminController.loadSalesReport);
+adminRoute.get('/sales-report-pdf',  adminAuth.isLogin, adminController.salesReportPdf);
+adminRoute.get('/sales-report-excel',  adminAuth.isLogin, adminController.salesReportExcel);
 
 
 
