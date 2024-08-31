@@ -661,6 +661,43 @@
 
 
 
+
+<!-- Payment Failed Modal -->
+<div id="paymentFailedModal" class="payment-failed-modal">
+    <div class="failed-modal-content">
+        <span class="close">&times;</span>
+        <h2>Payment Failed</h2>
+        <p>Unfortunately, your payment could not be processed. Please try again.</p>
+        <button id="retryPaymentButton">Retry Payment</button>
+    </div>
+</div>
+
+
+<!-- Styles for payment failed modal -->
+<style>
+    .payment-failed-modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1000; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+    }
+
+    .failed-modal-content {
+        background-color: #fefefe;
+        margin: 15% auto; /* 15% from the top and centered */
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%; /* Could be more or less, depending on screen size */
+    }
+</style>
+
+
+
 <%- include('../layouts/userLayouts/user-footer.ejs') %>
 
 
@@ -670,6 +707,12 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- SweetAlert2 CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+<!-- SweetAlert2 JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
 
 <!-- importing the script for add address modal form -->
 <script src="/assets/scripts/userScripts/add-address-modal-script.js"></script>
@@ -701,6 +744,7 @@
 <!-- script for placing order -->
 <script>
 
+    // for checking checkout options and validations.
     function checkoutOrder() {
         // Check if a shipping address is selected or no address.
         let selectedAddressId = document.querySelector('input[name="checkout-address"]:checked');
@@ -892,7 +936,7 @@
 
 
 
-    
+    // for proceeding to payment route
     function makePayment(selectedAddressId, selectedPaymentMethod) {
         $.ajax({
             url: '/make-payment',
@@ -942,28 +986,18 @@
                         showConfirmButton: false,
                     });
 
-                } else if (response.instanceFailed){
-                    // failed / error in creating razorPay instance for order.
-                    // need to show this sweet alert or show any other process ??
+                } else if (response.instanceFailed){ // failed / error in creating razorPay instance for order.
                     Swal.fire({
                         title: "Online Payment Failed!",
                         text: `Internal Server Error.! ${response.err.error.description}`,
                         icon: "error",
                         showConfirmButton: false,
                     })
-                    // .then(()=>{
-                    //     // redirect to retryPayment page
-                    //     window.location.href = `/retry-payment?orderId=${response.userOrders._id}`;
-                    // })
-                    
-                    // razorPayPayment(response);  // pass failed response
 
-                } else if (response.proceedToOrder){
-                    // directly proceeding to order for "COD and Wallet Payment"
+                } else if (response.proceedToOrder){ // directly proceeding to order for "COD and Wallet Payment"
                     placeOrder(response);  // pass response data (selectedAddressId, selectedPaymentMethod, paymentStatus)
 
-                } else if (response.proceedToRazorPay){
-                    // go to payment gateway with razorPay order instance.
+                } else if (response.proceedToRazorPay){ // go to payment gateway with razorPay order instance.
                     razorPayPayment(response);  // pass order instance response (order, selectedAddressId, selectedPaymentMethod, paymentStatus, userData)
 
                 } else if (response.error){
@@ -993,7 +1027,7 @@
 
 
 
-
+    // make online payment after creating the the razorpay instance.
     function razorPayPayment(orderResponse) {
         console.log('orderResponse in razorPayPayment : ', orderResponse);
 
@@ -1014,10 +1048,17 @@
             "handler": function (response){
                 console.log('response in handler (success payment) : ', response);
                 // console.log('orderResponse in handler : ', orderResponse);
-                alert(response.razorpay_payment_id);
-                alert(response.razorpay_order_id);
-                alert(response.razorpay_signature);
 
+                // alert(response.razorpay_payment_id);
+                // alert(response.razorpay_order_id);
+                // alert(response.razorpay_signature);
+
+                // Swal.fire({  // No need to show sweet alert (RazorPay is already showing the success alert)
+                //     title: 'Payment Successful!',
+                //     text: `Payment ID: ${response.razorpay_payment_id}`,
+                //     icon: 'success',
+                //     showConfirmButton: false
+                // });
                 verifyPayment(response, orderResponse);  // sending paymentSuccessResponse and orderResponse
             },
             "prefill": {
@@ -1038,15 +1079,18 @@
         rzp1.on('payment.failed', function (response){
             console.log('response after the initial payment failed :', response.error);
 
-            alert(response.error.code);
-            alert(response.error.description);
-            alert(response.error.source);
-            alert(response.error.step);
-            alert(response.error.reason);
-            alert(response.error.metadata.order_id);
-            alert(response.error.metadata.payment_id);
+            // alert(response.error.code);
+            // alert(response.error.description);
+            // alert(response.error.source);
+            // alert(response.error.step);
+            // alert(response.error.reason);
+            // alert(response.error.metadata.order_id);
+            // alert(response.error.metadata.payment_id);
 
-            verifyPayment(response, orderResponse);   // sending paymentFailureResponse and orderResponse
+            setTimeout(function() {
+                verifyPayment(response, orderResponse);   // sending paymentFailureResponse and orderResponse
+            }, 2000);
+
         });
 
 
@@ -1062,7 +1106,7 @@
 
 
 
-
+    // verify the payment.
     function verifyPayment(paymentResponse, orderResponse) {
         console.log('orderResponse in verifyPayment : ', orderResponse);
 
@@ -1080,11 +1124,8 @@
                     placeOrder(response.orderResponse); // orderResponse includes selectedAddressId, selectedPaymentMethod, paymentStatus
 
                 } else if (response.verifyFailed){
-                    alert(response.message);
                     placeOrder(response.orderResponse); // orderResponse includes selectedAddressId, selectedPaymentMethod, paymentStatus
-                    // showing retry payment message.
                     // or can directly redirect to the retry-payment?orderId page instead of razorPay's retry payment.
-
                 }
             },
             error: function(error) {
@@ -1103,7 +1144,7 @@
 
 
 
-
+    // place order / create order in DB after verify payment.
     function placeOrder(Response) {
         console.log('Response received in placeOrder :', Response);
 

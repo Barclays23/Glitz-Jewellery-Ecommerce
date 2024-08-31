@@ -35,6 +35,7 @@ const loadUserCart = async (req, res)=>{
 
         const userWishlist = await Wishlist.findOne({ userRef: sessionId }).populate('product.productRef').exec();
 
+
         // Find expired offers
         const expiredOffers = await Offer.find({
             expiryDate: { $lt: new Date() },
@@ -779,13 +780,13 @@ const verifyPayment = async (req, res) => {
             console.log('Payment verification is success.');
             // change the order status and payment status "PLACED" and "SUCCESS"
             orderResponse.paymentStatus = 'Success';
-            return res.json({verifySuccess: true, message: 'Payment verification is successful', orderResponse});   // send orderResponse
+            return res.json({verifySuccess: true, orderResponse, message: 'Payment verification is successful'});   // send orderResponse
 
         } else {
             console.log('Payment verification failed.');
             // change the orderStatus "PENDING" and paymentStatus "FAILED"
             orderResponse.paymentStatus = 'Failed';
-            return res.json({verifyFailed: true, message: 'Payment Verification Failed. Please Retry Payment.', orderResponse});
+            return res.json({verifyFailed: true, paymentResponse, orderResponse, message: 'Payment Verification Failed. Please Retry Payment.'});
         }
 
     } catch (error) {
@@ -804,330 +805,315 @@ const placeOrder = async(req, res)=>{
         const sessionId = req.session.userId;
         const goldPriceData = await GoldPrice.findOne({});
 
-        // find the last online payment order and its status == pending or failed,
         // redirect to retry-payment page instead of placing another order.
         const lastOrderData = await Order.findOne({ userRef: sessionId })
         .sort({ orderDate: -1 });
 
-        // Check if the last order's payment method was 'Online Payment' and its status is 'Pending' or 'Failed'
-        // and retrying the last payment
-        // if (lastOrderData && lastOrderData.paymentMethod === 'Online Payment' && 
-        //     (lastOrderData.paymentStatus === 'Pending' || lastOrderData.paymentStatus === 'Failed')) {
-        //     console.log('Last order is online and its payment status is Pending or Failed');
-        //     return res.redirect(`/retry-payment?orderId=${lastOrderData._id}`);
 
-        // proceed with placing new order
-        // } else {
-            let { addressId, paymentMethod, paymentStatus} = req.body;
-    
-            console.log('addressId for placeOrder :', addressId);
-            console.log('paymentMethod for placeOrder :', paymentMethod);
-            console.log('paymentStatus for placeOrder :', paymentStatus);
-    
-            const addressData =  await Address.findOne({userRef: sessionId});
-            const userAddress = addressData.address.find(ad => ad._id.toString() === addressId);
-    
-            const userCheckout = await Cart.findOne({ userRef: sessionId })
-            .populate({
-                path: 'product.productRef',
-                populate: {
-                    path: 'offerRef'
-                }
-            })
-            .populate('couponRef');
-    
-            console.log('userCheckout.product length for placeOrder : ', userCheckout.product.length);
-    
-            
-            let cartSubTotal = 0;   //total checkout amount without any discount/offer/coupon/wallet
-            let totalOfferDiscount = 0;
-    
-            userCheckout.product.forEach((item)=>{
-                let unitPrice = item.productRef.totalPrice;
-                let unitMakingCharge = item.productRef.makingCharge;
-                let itemQuantity = item.quantity;
-                let individualTotal = (unitPrice * itemQuantity);
-                cartSubTotal += individualTotal;
-    
-                let offerPercentage = (item.productRef.offerRef ? item.productRef.offerRef.offerPercentage : 0); // each item's offer percentage
-                individualOfferAmount = unitMakingCharge * offerPercentage /100 * itemQuantity;  // each item's offer amount * itemQuantity
-                totalOfferDiscount += individualOfferAmount;
-            });
-            console.log('cartSubTotal for placeOrder : ', cartSubTotal);
-            console.log('totalOfferDiscount for placeOrder : ', totalOfferDiscount);
-            
-            let shippingCharge = cartSubTotal > 0 && cartSubTotal < 100000 ? 300 : 0;
-            console.log('shippingCharge for placeOrder : ', shippingCharge);
-            
-            let specialDiscount = 0;  // was implemented before offer and coupon (now no more needed).
-            let couponDiscount = 0;
-     
-            if (userCheckout.couponRef != null){
-                couponDiscount = userCheckout.couponRef.couponValue;
+
+        let { addressId, paymentMethod, paymentStatus} = req.body;
+
+        console.log('addressId for placeOrder :', addressId);
+        console.log('paymentMethod for placeOrder :', paymentMethod);
+        console.log('paymentStatus for placeOrder :', paymentStatus);
+
+        const addressData =  await Address.findOne({userRef: sessionId});
+        const userAddress = addressData.address.find(ad => ad._id.toString() === addressId);
+
+        const userCheckout = await Cart.findOne({ userRef: sessionId })
+        .populate({
+            path: 'product.productRef',
+            populate: {
+                path: 'offerRef'
             }
-            console.log('couponDiscount for placeOrder : ', couponDiscount);
-            
-            let payableAmount = cartSubTotal + shippingCharge - specialDiscount - couponDiscount - totalOfferDiscount;
-            console.log('payableAmount for placeOrder : ', payableAmount);
-    
-            let roundOffAmount = payableAmount - Math.floor(payableAmount);
-            console.log("roundOffAmount for placeOrder :", roundOffAmount);
+        })
+        .populate('couponRef');
 
+        console.log('userCheckout.product length for placeOrder : ', userCheckout.product.length);
+
+        
+        let cartSubTotal = 0;   //total checkout amount without any discount/offer/coupon/wallet
+        let totalOfferDiscount = 0;
+
+        userCheckout.product.forEach((item)=>{
+            let unitPrice = item.productRef.totalPrice;
+            let unitMakingCharge = item.productRef.makingCharge;
+            let itemQuantity = item.quantity;
+            let individualTotal = (unitPrice * itemQuantity);
+            cartSubTotal += individualTotal;
+
+            let offerPercentage = (item.productRef.offerRef ? item.productRef.offerRef.offerPercentage : 0); // each item's offer percentage
+            individualOfferAmount = unitMakingCharge * offerPercentage /100 * itemQuantity;  // each item's offer amount * itemQuantity
+            totalOfferDiscount += individualOfferAmount;
+        });
+        console.log('cartSubTotal for placeOrder : ', cartSubTotal);
+        console.log('totalOfferDiscount for placeOrder : ', totalOfferDiscount);
+        
+        let shippingCharge = cartSubTotal > 0 && cartSubTotal < 100000 ? 300 : 0;
+        console.log('shippingCharge for placeOrder : ', shippingCharge);
+        
+        let specialDiscount = 0;  // was implemented before offer and coupon (now no more needed).
+        let couponDiscount = 0;
     
-            //FOR ORDER NUMBER / INVOICE NUMBER
-            const currentDate = new Date();
-            const year = currentDate.getFullYear().toString().slice(-2);
-            const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-            const day = currentDate.getDate().toString().padStart(2, '0');
-    
-            // Get the last serial number and increment it
-            const serialData = await SerialNumber.findOneAndUpdate(
-                { year: currentDate.getFullYear() },
-                { $inc: { serial: 1 } },
-                { new: true, upsert: true }
+        if (userCheckout.couponRef != null){
+            couponDiscount = userCheckout.couponRef.couponValue;
+        }
+        console.log('couponDiscount for placeOrder : ', couponDiscount);
+        
+        let payableAmount = cartSubTotal + shippingCharge - specialDiscount - couponDiscount - totalOfferDiscount;
+        console.log('payableAmount for placeOrder : ', payableAmount);
+
+        let roundOffAmount = payableAmount - Math.floor(payableAmount);
+        console.log("roundOffAmount for placeOrder :", roundOffAmount);
+
+
+        //FOR ORDER NUMBER / INVOICE NUMBER
+        const currentDate = new Date();
+        const year = currentDate.getFullYear().toString().slice(-2);
+        const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+        const day = currentDate.getDate().toString().padStart(2, '0');
+
+        // Get the last serial number and increment it
+        const serialData = await SerialNumber.findOneAndUpdate(
+            { year: currentDate.getFullYear() },
+            { $inc: { serial: 1 } },
+            { new: true, upsert: true }
+        );
+        const serialNumber = serialData.serial.toString().padStart(4, '0');
+
+        // Generate the invoice number
+        const invoiceNumber = `GL 2425/${year}${month}${day}${serialNumber}`;
+        console.log('Generated Invoice Number: ', invoiceNumber);
+
+        let orderStatus = 'Pending';  // 'Pending' by default. Change according to the paymentMethod and paymentStatus.
+
+        if (paymentStatus === 'Success'){  // change to 'Failed' after the retry payment fails or time expire.
+            orderStatus = 'Processing';
+        }
+        
+        let userOrder = new Order ({
+            userRef : sessionId,
+            orderedItems : [],     // initially empty items array
+            shippingAddress : userAddress,
+            orderNo : invoiceNumber,
+            orderDate : Date.now(),
+            billingRate : goldPriceData.price,
+            subTotal : cartSubTotal,
+            deliveryCharge : shippingCharge,
+            couponDiscount : couponDiscount,
+            specialDiscount : specialDiscount, // specialDiscount was implemented before offer and coupon.
+            netAmount : Math.floor(payableAmount),  // rounded off amount to pay
+            paymentMethod: paymentMethod,
+            // orderStatus : orderStatus  // ['Pending (by default)', 'Failed', 'Processing', 'Process Completed']
+            // shipmentPendings : shipmentPendings
+        });
+
+        console.log('userOrder created.');
+
+
+        // for inserting products & details to the orderedItems array (also updating CART & INVENTORY STOCK).
+        for (const item of userCheckout.product) {
+            const cartProductRef = item.productRef;
+            const cartProductItem = item.productRef.code;
+            const cartQuantity = item.quantity;
+
+            console.log(`adding item into orderedItems : ${cartProductItem}`);
+            console.log('cartQuantity of the item :', cartQuantity);
+
+            let unitMC = (item.productRef.makingCharge);
+            let offerPercentage = (item.productRef.offerRef ? item.productRef.offerRef.offerPercentage : 0); // each item's offer percentage
+            offerDiscount = unitMC * offerPercentage /100;  // each item's offer (for single quantity)
+            console.log('offerDiscount of orderItem : ', offerDiscount);
+
+            userOrder.orderedItems.push({
+                productRef : cartProductRef,
+                image : cartProductRef.images.image1,
+                code : cartProductRef.code,
+                purity : cartProductRef.purity,
+                name : cartProductRef.name,
+                grossWeight : cartProductRef.grossWeight,
+                stoneWeight : cartProductRef.stoneWeight,
+                netWeight : cartProductRef.netWeight,
+                VA : cartProductRef.VA,
+                stoneCharge : cartProductRef.stoneCharge,
+                metalPrice : cartProductRef.metalPrice,
+                makingCharge : cartProductRef.makingCharge,
+                GST : cartProductRef.GST,
+                totalPrice : cartProductRef.totalPrice,
+                offerDiscount : offerDiscount,
+                quantity : cartQuantity,
+                paymentStatus : paymentStatus,
+                // productStatus : 'Placed',  // initially NO STATUS. update to 'PLACED' the status after order is  after if the payment failed, the initial order status should be 'Pending'
+                // failedOrder / failedPayment : true / false for finding the failedOrders
+            });
+
+
+            console.log('Pushed product details into orderedItems array.');
+
+            // removing products form the user cart
+            userCheckout.product.pull({productRef: cartProductRef._id});
+            await userCheckout.save();
+            console.log('And removed item from cart and updated UserCart.');
+
+
+            // updating the each product's inventory (quantity) after pushing to orderedItems array.
+            await Product.findOneAndUpdate(
+                { _id: cartProductRef },
+                { $inc: { quantity: -cartQuantity } },
+                { new: true }
             );
-            const serialNumber = serialData.serial.toString().padStart(4, '0');
-    
-            // Generate the invoice number
-            const invoiceNumber = `GL 2425/${year}${month}${day}${serialNumber}`;
-            console.log('Generated Invoice Number: ', invoiceNumber);
+            console.log('And updated the inventory stock of the ordered product.');
 
-            let orderStatus = 'Pending';  // 'Pending' by default. Change according to the paymentMethod and paymentStatus.
+        }
 
-            if (paymentStatus === 'Success'){  // change to 'Failed' after the retry payment fails or time expire.
-                orderStatus = 'Processing';
-            }
-            
-            let userOrder = new Order ({
-                userRef : sessionId,
-                orderedItems : [],     // initially empty items array
-                shippingAddress : userAddress,
-                orderNo : invoiceNumber,
-                orderDate : Date.now(),
-                billingRate : goldPriceData.price,
-                subTotal : cartSubTotal,
-                deliveryCharge : shippingCharge,
-                couponDiscount : couponDiscount,
-                specialDiscount : specialDiscount, // specialDiscount was implemented before offer and coupon.
-                netAmount : Math.floor(payableAmount),  // rounded off amount to pay
-                paymentMethod: paymentMethod,
-                // orderStatus : orderStatus  // ['Pending (by default)', 'Failed', 'Processing', 'Process Completed']
-                // shipmentPendings : shipmentPendings
-            });
+        const orderData = await userOrder.save();
 
-            console.log('userOrder created.');
-    
-    
-            // for inserting products & details to the orderedItems array.
-            for (const item of userCheckout.product) {
-                const cartProductRef = item.productRef;
-                const cartProductItem = item.productRef.code;
-                const cartQuantity = item.quantity;
-    
-                console.log(`adding item into orderedItems : ${cartProductItem}`);
-                console.log('cartQuantity of the item :', cartQuantity);
-    
-                let unitMC = (item.productRef.makingCharge);
-                let offerPercentage = (item.productRef.offerRef ? item.productRef.offerRef.offerPercentage : 0); // each item's offer percentage
-                offerDiscount = unitMC * offerPercentage /100;  // each item's offer (for single quantity)
-                console.log('offerDiscount of orderItem : ', offerDiscount);
-    
-                userOrder.orderedItems.push({
-                    productRef : cartProductRef,
-                    image : cartProductRef.images.image1,
-                    code : cartProductRef.code,
-                    purity : cartProductRef.purity,
-                    name : cartProductRef.name,
-                    grossWeight : cartProductRef.grossWeight,
-                    stoneWeight : cartProductRef.stoneWeight,
-                    netWeight : cartProductRef.netWeight,
-                    VA : cartProductRef.VA,
-                    stoneCharge : cartProductRef.stoneCharge,
-                    metalPrice : cartProductRef.metalPrice,
-                    makingCharge : cartProductRef.makingCharge,
-                    GST : cartProductRef.GST,
-                    totalPrice : cartProductRef.totalPrice,
-                    offerDiscount : offerDiscount,
-                    quantity : cartQuantity,
-                    paymentStatus : paymentStatus,
-                    // productStatus : 'Placed',  // initially NO STATUS. update to 'PLACED' the status after order is  after if the payment failed, the initial order status should be 'Pending'
-                    // failedOrder / failedPayment : true / false for finding the failedOrders
-                });
-    
-    
-                console.log('Pushed product details into orderedItems array.');
-    
-                // removing products form the user cart
-                // userCheckout.product.pull({productRef: cartProductRef._id});
-                // await userCheckout.save();
-                // console.log('And removed item from cart and updated UserCart.');
-    
-    
-                // updating the each product's inventory (quantity) after pushing to orderedItems array.
-                await Product.findOneAndUpdate(
-                    { _id: cartProductRef },
-                    { $inc: { quantity: -cartQuantity } },
-                    { new: true }
-                );
-                console.log('And updated the inventory stock of the ordered product.');
-    
+        console.log('Saved userOrder :', orderData);
+
+
+        
+
+        // MANAGING THE COUPON AFTER ORDER
+        if (userCheckout.couponRef && userCheckout.couponRef != null){
+
+            // updating the used coupon count in coupon database (+1).
+            // also adding users into usedCustomers.
+            const updatedCouponData = await Coupon.findByIdAndUpdate(
+                userCheckout.couponRef._id,
+                { 
+                    $inc: { usedCount: 1 },
+                    $push: { usedCustomers: { userRef: sessionId } }
+                },
+                { new: true }
+            );
+            console.log('Updated usedCoupon count :', updatedCouponData.usedCount);
+
+
+            // And removing couponRef from userCart.
+            userCheckout.couponRef = null;
+            await userCheckout.save();
+            console.log('Cancelled couponRef from cart after order.');
+
+
+            // deactivating the coupon when the coupons are fully used.
+            if (updatedCouponData.couponCount === updatedCouponData.usedCount) {
+                updatedCouponData.isActive = false;
+                await updatedCouponData.save();
+                console.log('All coupons are used. and coupon is inactive now.');
             }
 
-            const orderData = await userOrder.save();
+        }
 
-            console.log('Saved userOrder :', orderData);
 
-    
-            
 
-            // MANAGING THE COUPON AFTER ORDER
-            if (userCheckout.couponRef && userCheckout.couponRef != null){
+        // if payment method is 'Wallet', debit the money from user wallet.
+        if (paymentMethod === 'Wallet'){
 
-                // updating the used coupon count in coupon database (+1).
-                // also adding users into usedCustomers.
-                const updatedCouponData = await Coupon.findByIdAndUpdate(
-                    userCheckout.couponRef._id,
-                    { 
-                        $inc: { usedCount: 1 },
-                        $push: { usedCustomers: { userRef: sessionId } }
-                    },
-                    { new: true }
-                );
-                console.log('Updated usedCoupon count :', updatedCouponData.usedCount);
-    
-
-                // And removing couponRef from userCart.
-                userCheckout.couponRef = null;
-                await userCheckout.save();
-                console.log('Cancelled couponRef from cart after order.');
-    
-    
-                // deactivating the coupon when the coupons are fully used.
-                if (updatedCouponData.couponCount === updatedCouponData.usedCount) {
-                    updatedCouponData.isActive = false;
-                    await updatedCouponData.save();
-                    console.log('All coupons are used. and coupon is inactive now.');
-                }
-    
+            const transactionDetails = {
+                date : orderData.orderDate,
+                amount : -orderData.netAmount,
+                description : `Purchasing of Ornaments - Order No : ${orderData.orderNo}`,
             }
-    
-    
-    
-            // if payment method is 'Wallet', debit the money from user wallet.
-            if (paymentMethod === 'Wallet'){
-    
-                const transactionDetails = {
-                    date : orderData.orderDate,
-                    amount : -orderData.netAmount,
-                    description : `Purchasing of ornaments - Order No: ${orderData.orderNo}`,
-                }
-                console.log('Amount to debit from user wallet :', transactionDetails.amount);
-    
-    
-                const updatedUserWallet = await User.findOneAndUpdate(
-                    {_id: sessionId},
+            console.log('Amount to debit from user wallet :', transactionDetails.amount);
+
+
+            const updatedUserWallet = await User.findOneAndUpdate(
+                {_id: sessionId},
+                {
+                    $inc: {walletBalance: -orderData.netAmount},
+                    $push: {walletHistory: transactionDetails},
+                },
+                {new: true}
+            );
+            console.log('updated user wallet amount :', updatedUserWallet.walletBalance);
+
+            // change the paymentStatus to "Success".
+            if (updatedUserWallet){
+                const updatedOrderData = await Order.findOneAndUpdate(
+                    {orderNo : orderData.orderNo},
                     {
-                        $inc: {walletBalance: -orderData.netAmount},
-                        $push: {walletHistory: transactionDetails},
-                    },
-                    {new: true}
-                );
-                console.log('updated user wallet amount :', updatedUserWallet.walletBalance);
-
-                // change the paymentStatus to "Success".
-                if (updatedUserWallet){
-                    const updatedOrderData = await Order.findOneAndUpdate(
-                        {orderNo : orderData.orderNo},
-                        {
-                            $set : {
-                                orderStatus : 'Processing',
-                                shipmentPendings : orderData.orderedItems.length,
-                                'orderedItems.$[].paymentStatus': 'Success',
-                                'orderedItems.$[].productStatus': 'Placed',
-                            }
-                        },
-                        {new : true}
-                    );
-                    
-                    console.log('updatedOrderData.orderStatus :', updatedOrderData.orderStatus);
-                    console.log('updatedOrderData.orderedItems[0].paymentStatus :', updatedOrderData.orderedItems[0].paymentStatus);
-                    console.log('updatedOrderData.orderedItems[0].productStatus :', updatedOrderData.orderedItems[0].productStatus);
-                    
-                    console.log('order success with Wallet Payment.');
-                    return res.json({orderSuccess: true});
-                }
-    
-    
-            // if payment method is 'Online Payment'
-            } else if (paymentMethod === 'Online Payment'){
-
-                if (paymentStatus === 'Success'){
-                    const successOrderData = await Order.findOneAndUpdate(
-                        {orderNo : orderData.orderNo},
-                        { $set : {
+                        $set : {
                             orderStatus : 'Processing',
+                            shipmentPendings : orderData.orderedItems.length,
                             'orderedItems.$[].paymentStatus': 'Success',
                             'orderedItems.$[].productStatus': 'Placed',
-                        }},
-                        {new : true}
-                    );
-
-                    console.log('successOrderData.orderStatus :', successOrderData.orderStatus);
-                    console.log('successOrderData.orderedItems[0].paymentStatus :', successOrderData.orderedItems[0].paymentStatus);
-                    console.log('successOrderData.orderedItems[0].productStatus :', successOrderData.orderedItems[0].productStatus);
-
-                    console.log('order success with Online Payment.');
-                    return res.json({orderSuccess: true});
-
-                } else {
-                    const pendingOrderData = await Order.findOneAndUpdate(
-                        {orderNo : orderData.orderNo},
-                        {   $set : {
-                                // orderStatus : 'Pending',  // no need to change. initially it is 'Pending'
-                                'orderedItems.$[].paymentStatus': paymentStatus,  // 'Failed'
-                                'orderedItems.$[].productStatus': 'Pending Confirmation',  // no need to 'Placed' for pending order.    
-                            }
-                        },
-                        {new : true}
-                    );
-
-                    console.log('pendingOrderData.orderStatus :', pendingOrderData.orderStatus);
-                    console.log('pendingOrderData.orderedItems[0].paymentStatus :', pendingOrderData.orderedItems[0].paymentStatus);
-                    
-                    console.log('order failed with Online Payment.');
-                    return res.json({proceedRetry: true, pendingOrderData});
-                }
+                        }
+                    },
+                    {new : true}
+                );
                 
-    
-            // if payment method is COD and no more process left in ordering.
-            } else if (paymentMethod === 'Cash On Delivery'){
-                console.log('orderNo for updation :', orderData.orderNo);
+                console.log('updatedOrderData.orderStatus :', updatedOrderData.orderStatus);
+                console.log('updatedOrderData.orderedItems[0].paymentStatus :', updatedOrderData.orderedItems[0].paymentStatus);
+                console.log('updatedOrderData.orderedItems[0].productStatus :', updatedOrderData.orderedItems[0].productStatus);
+                
+                console.log('order success with Wallet Payment.');
+                return res.json({orderSuccess: true});
+            }
 
-                const updatedOrderData = await Order.findOneAndUpdate(
+
+        // if payment method is 'Online Payment'
+        } else if (paymentMethod === 'Online Payment'){
+
+            if (paymentStatus === 'Success'){
+                const successOrderData = await Order.findOneAndUpdate(
                     {orderNo : orderData.orderNo},
                     { $set : {
                         orderStatus : 'Processing',
-                        shipmentPendings : orderData.orderedItems.length,
-                        // 'orderedItems.$[].paymentStatus': '------', // no need to change for COD
+                        'orderedItems.$[].paymentStatus': 'Success',
                         'orderedItems.$[].productStatus': 'Placed',
                     }},
                     {new : true}
                 );
 
-                console.log('updatedOrderData.orderStatus :', updatedOrderData.orderStatus);
-                console.log('updatedOrderData.orderedItems[0].paymentStatus :', updatedOrderData.orderedItems[0].paymentStatus);
-                console.log('updatedOrderData.orderedItems[0].productStatus :', updatedOrderData.orderedItems[0].productStatus);
+                console.log('successOrderData.orderStatus :', successOrderData.orderStatus);
+                console.log('successOrderData.orderedItems[0].paymentStatus :', successOrderData.orderedItems[0].paymentStatus);
+                console.log('successOrderData.orderedItems[0].productStatus :', successOrderData.orderedItems[0].productStatus);
+
+                console.log('order success with Online Payment.');
+                return res.json({orderSuccess: true});
+
+            } else {
+                const pendingOrderData = await Order.findOneAndUpdate(
+                    {orderNo : orderData.orderNo},
+                    {   $set : {
+                            // orderStatus : 'Pending',  // no need to change. initially it is 'Pending'
+                            'orderedItems.$[].paymentStatus': paymentStatus,  // 'Failed'
+                            'orderedItems.$[].productStatus': 'Pending Confirmation',  // no need to 'Placed' for pending order.    
+                        }
+                    },
+                    {new : true}
+                );
+
+                console.log('pendingOrderData.orderStatus :', pendingOrderData.orderStatus);
+                console.log('pendingOrderData.orderedItems[0].paymentStatus :', pendingOrderData.orderedItems[0].paymentStatus);
                 
-                console.log('order success with COD.');
-                return res.json({orderSuccess: true, });
+                console.log('order failed with Online Payment.');
+                return res.json({proceedRetry: true, pendingOrderData});
             }
+            
 
+        // if payment method is COD and no more process left in ordering.
+        } else if (paymentMethod === 'Cash On Delivery'){
+            console.log('orderNo for updation :', orderData.orderNo);
 
+            const updatedOrderData = await Order.findOneAndUpdate(
+                {orderNo : orderData.orderNo},
+                { $set : {
+                    orderStatus : 'Processing',
+                    shipmentPendings : orderData.orderedItems.length,
+                    // 'orderedItems.$[].paymentStatus': '------', // no need to change for COD
+                    'orderedItems.$[].productStatus': 'Placed',
+                }},
+                {new : true}
+            );
 
-        // }
-        
-
-
+            console.log('updatedOrderData.orderStatus :', updatedOrderData.orderStatus);
+            console.log('updatedOrderData.orderedItems[0].paymentStatus :', updatedOrderData.orderedItems[0].paymentStatus);
+            console.log('updatedOrderData.orderedItems[0].productStatus :', updatedOrderData.orderedItems[0].productStatus);
+            
+            console.log('order success with COD.');
+            return res.json({orderSuccess: true, });
+        }
 
         
 

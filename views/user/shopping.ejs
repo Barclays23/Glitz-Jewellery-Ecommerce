@@ -242,16 +242,16 @@
                             <% if (totalPages > 0){ %>
                                 <h6> Pages : </h6>
                                 <ul>
-                                    <% if(currentPage > 1) { %>
-                                        <li><a href="?page=<%= currentPage - 1 %>&search=<%= searchQuery %>&categoryId=<%= categoryQuery %>&sort=<%= sortQuery %>"><i class="ion-chevron-left"></i></a></li>
-                                        <li><a href="?page=<%= currentPage - 1 %>&search=<%= searchQuery %>&categoryId=<%= categoryQuery %>&sort=<%= sortQuery %>">Prev</a></li>
+                                    <% if (currentPage > 1) { %>
+                                        <li><a href="?page=<%= currentPage - 1 %>&search=<%= searchQuery %>&categoryId=<%= categoryQuery %>&sort=<%= sortQuery %>"><i class="ion-chevron-left"></i> Prev</a></li>
                                     <% } %>
-                                    <% for(let j=1; j <= totalPages; j++) { %>
-                                        <li class="<%= currentPage === j ? 'active' : '' %> is-active"><a href="?page=<%= j %>&search=<%= searchQuery %>&categoryId=<%= categoryQuery %>&sort=<%= sortQuery %>"><%= j %></a></li>
+
+                                    <% for (let j=1; j <= totalPages; j++) { %>
+                                        <li class="<%= currentPage === j ? 'active' : 'is-active' %>"><a href="?page=<%= j %>&search=<%= searchQuery %>&categoryId=<%= categoryQuery %>&sort=<%= sortQuery %>"><%= j %></a></li>
                                     <% } %>
-                                    <% if(currentPage < totalPages) { %>
-                                        <li><a href="?page=<%= currentPage + 1 %>&search=<%= searchQuery %>&categoryId=<%= categoryQuery %>&sort=<%= sortQuery %>">Next</a></li>
-                                        <li><a href="?page=<%= currentPage + 1 %>&search=<%= searchQuery %>&categoryId=<%= categoryQuery %>&sort=<%= sortQuery %>"><i class="ion-chevron-right"></i></a></li>
+                                    
+                                    <% if (currentPage < totalPages) { %>
+                                        <li><a href="?page=<%= currentPage + 1 %>&search=<%= searchQuery %>&categoryId=<%= categoryQuery %>&sort=<%= sortQuery %>">Next <i class="ion-chevron-right"></i></a></li>
                                     <% } %>
                                 </ul>
                             <% } %>

@@ -87,21 +87,31 @@
                     <!-- account tabs ends -->
 
                     <!-- account tab-content starts -->
-                    <div class="tab-content" id="account-ontent">
+                    <div class="tab-content" id="account-content">
                         <!-- section 1: Dashboard -->
-                        <div class="tab-pane fade show active" id="account-dashboard" role="tabpanel"
-                            aria-labelledby="account-dashboard-tab">
+                        <div class="tab-pane fade show active" id="account-dashboard" role="tabpanel" aria-labelledby="account-dashboard-tab">
                             <div class="tm-myaccount-dashboard">
                                 <p>Hello
                                     <% if (userData) { %>
-                                        <b> <%= userData.firstname %> <%= userData.lastname %> </b>
+                                        <b><%= userData.firstname %> <%= userData.lastname %></b>
                                     <% } %>
                                 </p>
-                                <p>From your account dashboard you can view your recent orders, manage your
-                                    shipping and billing addresses, and edit your password and account details.</p>
+                                <p>From your account dashboard you can view your recent orders, manage your shipping and billing addresses, and edit your password and account details.</p>
+                                
+                                <!-- Referral Link Section -->
+                                <% if (userData) { %>
+                                    <div class="referral-link-section">
+                                        <p>Your Referral Link:</p>
+                                        <!-- Button to copy the referral link -->
+                                        <button onclick="copyReferralLink()" style="background-color: #AA0056; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">
+                                            Copy Link
+                                        </button>
+                                    </div>
+                                <% } %>
                             </div>
                         </div>
                     </div>
+                    
                     <!-- account tab-content ends -->
                 </div>
             </div>
@@ -113,3 +123,52 @@
 </div>
 
 <%- include('../layouts/userLayouts/user-footer.ejs') %>
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+<script>
+    function copyReferralLink() {
+        // Create a temporary input element to hold the referral link
+        var tempInput = document.createElement("input");
+
+        // Set the value of the input to the referral link
+        tempInput.value = `${window.location.origin}/register?referral=<%= userData._id %>`;
+
+        // Append the input element to the body
+        document.body.appendChild(tempInput);
+
+        // Select the text field
+        tempInput.select();
+        tempInput.setSelectionRange(0, 99999); // For mobile devices
+
+        // Copy the text inside the input field
+        document.execCommand("copy");
+
+        // Remove the temporary input element from the DOM
+        document.body.removeChild(tempInput);
+
+        // Display success message using SweetAlert
+        Swal.fire({
+            text: 'Referral link copied to clipboard!',
+            showConfirmButton: false,
+            timer: 1500,
+            customClass: {
+                popup: 'swal-text-success'
+            }
+        });
+
+    }
+</script>
+
+
+
+<style>
+.swal-text-success {
+color: green; /* or any color you prefer */
+}
+
+</style>

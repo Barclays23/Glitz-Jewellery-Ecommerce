@@ -598,7 +598,7 @@
                     <div class="preview-list">
                         <div class="preview-item border-bottom">
                             <div class="preview-thumbnail">
-                                <img src="../assets/images/faces/face6.jpg" alt="image" class="rounded-circle" />
+                                <img src="../assets/images/userImages/faces/face6.jpg" alt="image" class="rounded-circle" />
                             </div>
                             <div class="preview-item-content d-flex flex-grow">
                                 <div class="flex-grow">
@@ -612,7 +612,7 @@
                         </div>
                         <div class="preview-item border-bottom">
                             <div class="preview-thumbnail">
-                                <img src="../assets/images/faces/face8.jpg" alt="image" class="rounded-circle" />
+                                <img src="../assets/images/userImages/faces/face8.jpg" alt="image" class="rounded-circle" />
                             </div>
                             <div class="preview-item-content d-flex flex-grow">
                                 <div class="flex-grow">
@@ -626,7 +626,7 @@
                         </div>
                         <div class="preview-item border-bottom">
                             <div class="preview-thumbnail">
-                                <img src="../assets/images/faces/face9.jpg" alt="image" class="rounded-circle" />
+                                <img src="../assets/images/userImages/faces/face9.jpg" alt="image" class="rounded-circle" />
                             </div>
                             <div class="preview-item-content d-flex flex-grow">
                                 <div class="flex-grow">
@@ -640,7 +640,7 @@
                         </div>
                         <div class="preview-item border-bottom">
                             <div class="preview-thumbnail">
-                                <img src="../assets/images/faces/face11.jpg" alt="image" class="rounded-circle" />
+                                <img src="../assets/images/userImages/faces/face11.jpg" alt="image" class="rounded-circle" />
                             </div>
                             <div class="preview-item-content d-flex flex-grow">
                                 <div class="flex-grow">
@@ -676,7 +676,7 @@
                         <div class="preview-list w-100">
                             <div class="preview-item p-0">
                                 <div class="preview-thumbnail">
-                                    <img src="../assets/images/faces/face12.jpg" class="rounded-circle" alt="">
+                                    <img src="../assets/images/userImages/faces/face12.jpg" class="rounded-circle" alt="">
                                 </div>
                                 <div class="preview-item-content d-flex flex-grow">
                                     <div class="flex-grow">
@@ -760,57 +760,79 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title text-success"> SALES BY CATEGORIES </h5>
+                    <!-- Filter Form -->
+                    <form id="filterForm">
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <label for="filter">Filter By:</label>
+                                <select id="filter" name="filter" class="form-control">
+                                    <option value="yearly">Yearly</option>
+                                    <option value="monthly">Monthly</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="year">Year:</label>
+                                <input type="number" id="year" name="year" class="form-control" value="<%= new Date().getFullYear() %>">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="month">Month:</label>
+                                <select id="month" name="month" class="form-control">
+                                    <option value="">Select Month</option>
+                                    <option value="1">January</option>
+                                    <option value="2">February</option>
+                                    <option value="3">March</option>
+                                    <option value="4">April</option>
+                                    <option value="5">May</option>
+                                    <option value="6">June</option>
+                                    <option value="7">July</option>
+                                    <option value="8">August</option>
+                                    <option value="9">September</option>
+                                    <option value="10">October</option>
+                                    <option value="11">November</option>
+                                    <option value="12">December</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <button type="submit" class="btn btn-primary mt-4">Apply Filter</button>
+                            </div>
+                        </div>
+                    </form>
                     <div class="row">
-                        <div class="col-md-5">
+                        <div class="col-md-6">
                             <div class="table-responsive">
-                                <table class="table">
+                                <table class="table" id="categorySalesTable">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-primary">CATEGORY NAME</th>
+                                            <th class="text-primary text-center">QUANTITY</th>
+                                            <th class="text-primary text-end">AMOUNT</th>
+                                        </tr>
+                                    </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>
-                                                <i class="flag-icon flag-icon-au"></i>
-                                            </td>
-                                            <td>Bangle</td>
-                                            <td class="text-end"> 760 </td>
-                                            <td class="text-end font-weight-medium"> 15.45% </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <i class="flag-icon flag-icon-gb"></i>
-                                            </td>
-                                            <td>Bracelet</td>
-                                            <td class="text-end"> 450 </td>
-                                            <td class="text-end font-weight-medium"> 25.00% </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <i class="flag-icon flag-icon-ro"></i>
-                                            </td>
-                                            <td>Finger Ring</td>
-                                            <td class="text-end"> 620 </td>
-                                            <td class="text-end font-weight-medium"> 10.25% </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <i class="flag-icon flag-icon-de"></i>
-                                            </td>
-                                            <td>Necklace</td>
-                                            <td class="text-end"> 800 </td>
-                                            <td class="text-end font-weight-medium"> 33.25% </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <i class="flag-icon flag-icon-br"></i>
-                                            </td>
-                                            <td>Pendant</td>
-                                            <td class="text-end"> 230 </td>
-                                            <td class="text-end font-weight-medium"> 75.00% </td>
-                                        </tr>
+                                        <% if (categoryWiseSalesReport.length >0){ %>
+                                            <% for (let i=0; i< categoryWiseSalesReport.length; i++ ){ %>
+                                                <tr>
+                                                    <td> <%= categoryWiseSalesReport[i]._id %></td> <!-- category name -->
+                                                    <td class="text-center"> <%= categoryWiseSalesReport[i].totalQuantity %> </td>
+                                                    <td class="text-end font-weight-medium"> <%= (categoryWiseSalesReport[i].totalSales).toFixed(2) %> </td>
+                                                </tr>
+                                            <% } %>
+                                            <tr>
+                                                <td class="text-warning"> TOTAL </td>
+                                                <td class="text-warning text-center"> <%= totalSaleQuantity %> </td>
+                                                <td class="text-warning text-end font-weight-medium"> <%= (totalSaleAmount).toFixed(2) %> </td>
+                                            </tr>
+                                        <% } %>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
-                        <div class="col-md-7">
-                            <div id="audience-map" class="vector-map"></div>
+                        <div class="col-md-6 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div id="category-sale-pie-chart"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -880,3 +902,158 @@
 
 
 <%- include('../layouts/adminLayouts/adminDashboardFooter.ejs') %>
+
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/d3@5.16.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/c3@0.7.20/c3.min.js"></script>
+
+
+<script>
+
+document.getElementById('filterForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    
+    const filter = document.getElementById('filter').value;
+    const year = document.getElementById('year').value;
+    const month = document.getElementById('month').value;
+    
+    const response = await fetch(`/admin/categorywise-sale-report?filter=${filter}&year=${year}&month=${month}`);
+
+    if (response.ok) {
+        const data = await response.json();
+        console.log('Fetched Data :', data);
+
+        updateCategoryWiseSalesReport(data);  // Update the page with new data (update table & chart)
+    } else {
+        console.error('Failed to fetch data:', response.statusText);
+    }
+    
+    // Update the page with new data (update table & chart)
+    // updateCategoryWiseSalesReport(data);
+});
+
+
+function updateCategoryWiseSalesReport(data) {
+    console.log('Updating with data :', data);
+
+    const { categoryWiseSalesReport, totalSaleAmount, totalSaleQuantity } = data;
+    
+    // Update table
+    const tableBody = document.querySelector('#categorySalesTable tbody');
+    console.log('Table Body :', tableBody);
+    tableBody.innerHTML = ''; // Clear existing data
+
+    // Add table headers
+    // const headerRow = document.createElement('tr');
+    // headerRow.innerHTML = `
+    //     <th class="text-primary">CATEGORY NAME</th>
+    //     <th class="text-primary text-center">QUANTITY</th>
+    //     <th class="text-primary text-end">AMOUNT</th>
+    // `;
+    // tableBody.appendChild(headerRow);
+    
+    if (categoryWiseSalesReport.length > 0) {
+
+        // Add table data rows
+        categoryWiseSalesReport.forEach(report => {
+            console.log('report in updateCategoryWiseSalesReport : ', report);
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${report._id}</td>
+                <td class="text-center">${report.totalQuantity}</td>
+                <td class="text-end font-weight-medium">${(report.totalSales).toFixed(2)}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+
+        // Add totals row after listing all category-wise sales
+        const totalRow = document.createElement('tr');
+        totalRow.innerHTML = `
+            <td class="text-warning">TOTAL</td>
+            <td class="text-warning text-center">${totalSaleQuantity}</td>
+            <td class="text-warning text-end font-weight-medium">${totalSaleAmount.toFixed(2)}</td>
+        `;
+        tableBody.appendChild(totalRow);
+
+    } else {
+        // Display a message or handle empty state if necessary
+        const noDataRow = document.createElement('tr');
+        noDataRow.innerHTML = `<td colspan="3" class="text-center">No data available</td>`;
+        tableBody.appendChild(noDataRow);
+    }
+
+
+    // Update pie chart (assuming you use a chart library like Chart.js)
+    updatePieChart(categoryWiseSalesReport);
+}
+
+
+
+function updatePieChart(categoryWiseSalesReport) {
+    const pieData = categoryWiseSalesReport.map(item => [item._id, item.totalSales]);
+
+    // Generate or update the pie chart
+    c3.generate({
+        bindto: '#category-sale-pie-chart',
+        data: {
+            columns: pieData,
+            type: 'pie',
+            labels: true
+        },
+        color: {
+            pattern: [
+                '#FF5733', '#33FF57', '#FF33A8', '#FFD700', '#33A1FF',
+                '#FF8C00', '#8A2BE2', '#FF6347', '#3CB371', '#D2691E',
+                '#FF4500', '#2E8B57'
+            ]
+        },
+        pie: {
+            label: {
+                show: true,
+                format: function(value, ratio, id) {
+                    return `${id}: ${(ratio * 100).toFixed(2)} %`;
+                }
+            }
+        },
+        padding: {
+            top: 0,
+            right: 0,
+            bottom: 30,
+            left: 0
+        }
+    });
+}
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Retrieve and safely parse the EJS data
+    var rawCategoryWiseSalesReport = `<%- JSON.stringify(categoryWiseSalesReport).replace(/</g, '\\u003c') %>`;
+
+    var categoryWiseSalesReport;
+
+    try {
+        categoryWiseSalesReport = JSON.parse(rawCategoryWiseSalesReport);
+    } catch (e) {
+        console.error("Error parsing JSON data:", e);
+        return;
+    }
+
+    if (categoryWiseSalesReport && categoryWiseSalesReport.length > 0) {
+        // Initialize the pie chart with existing data on page load
+        updatePieChart(categoryWiseSalesReport);
+        // updateCategoryWiseSalesReport(categoryWiseSalesReport);
+
+    } else {
+        console.log("No data available for the pie chart.");
+    }
+});
+
+
+</script>
+
+

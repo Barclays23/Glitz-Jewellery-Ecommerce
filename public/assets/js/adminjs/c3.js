@@ -161,30 +161,30 @@ var c3StepChart = c3.generate({
 var c3PieChart = c3.generate({
    bindto: '#c3-pie-chart',
    data: {
-   // iris data from R
-   columns: [
-      ['data1', 30],
-      ['data2', 120],
-   ],
-   type: 'pie',
-   onclick: function(d, i) {
-      console.log("onclick", d, i);
-   },
-   onmouseover: function(d, i) {
-      console.log("onmouseover", d, i);
-   },
-   onmouseout: function(d, i) {
-      console.log("onmouseout", d, i);
-   }
+      // iris data from R
+      columns: [
+         ['data1', 30],
+         ['data2', 120],
+      ],
+      type: 'pie',
+      onclick: function(d, i) {
+         console.log("onclick", d, i);
+      },
+      onmouseover: function(d, i) {
+         console.log("onmouseover", d, i);
+      },
+      onmouseout: function(d, i) {
+         console.log("onmouseout", d, i);
+      }
    },
    color: {
    pattern: ['#FF5733', '#33FF57', '#FF33A8', '#FFD700']
    },
    padding: {
-   top: 0,
-   right: 0,
-   bottom: 30,
-   left: 0,
+      top: 0,
+      right: 0,
+      bottom: 30,
+      left: 0,
    }
 });
 
@@ -206,6 +206,11 @@ setTimeout(function() {
    ids: 'data2'
    });
 }, 5500);
+
+
+
+
+// CATEGORY SALE PIE CHART ---------------------------------------------------------
 
 
 

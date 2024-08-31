@@ -1,38 +1,52 @@
-<%- include('../layouts/adminLayouts/admin-header.ejs') %>
+   <%- include('../layouts/adminLayouts/admin-header.ejs') %>
 
-    <div class="container-scroller">
+
+
+   <div class="container-scroller">
       <div class="container-fluid page-body-wrapper full-page-wrapper">
-        <div class="content-wrapper d-flex align-items-center text-center error-page bg-primary">
-          <div class="row flex-grow">
-            <div class="col-lg-7 mx-auto text-white">
-              <div class="row align-items-center d-flex flex-row">
-                <div class="col-lg-6 text-lg-right pr-lg-4">
-                  <h1 class="display-1 mb-0">404</h1>
-                </div>
-                <div class="col-lg-6 error-page-divider text-lg-left pl-lg-4">
-                  <h2>SORRY! </h2>
-                  <h4>The page you’re looking for was not found.</h4>
-                  <h4 class="error-message font-weight-light"> <%= invalidToken %></h4>
+          <div class="content-wrapper d-flex align-items-center text-center error-page"
+              style="background-color: #011903; color: #ffffff; padding: 20px; border-radius: 8px;">
+              <div class="row flex-grow">
+                  <div class="col-lg-7 mx-auto text-white">
+                      <div class="row align-items-center d-flex flex-row">
+                          <div class="col-lg-6 text-lg-right pr-lg-4">
+                              <h1 class="display-1 mb-0">404</h1>
+                          </div>
+                          <div class="col-lg-6 error-page-divider text-lg-left pl-lg-4">
+                              <h2 class="sorry" style="font-size: 50px; color: #dc3545;">Page Not Found</h2>
+                              <h3>We can't seem to find the page you're looking for.</h3>
+                              <h4 class="error-message font-weight-light">The page might have been removed, had its name changed, or is temporarily unavailable.</h4>
+                              <p class="contact-support">For assistance, contact IT support at <br>
+                                  <a href="mailto:itsmesajeer@gmail.com" class="text-success">itsmesajeer@gmail.com</a>
+                              </p>
+                          </div>
+                          <div class="row mt-4">
+                              <div class="col-12 text-center mt-xl-2">
+                                  <a class="text-white font-weight-medium" href="/admin">Back to Home</a>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="row mt-4">
+                          <div class="col-12 mt-xl-2">
+                              <p class="text-white font-weight-medium text-center">
+                                  Copyright &copy; <script>document.write(new Date().getFullYear());</script> All Rights Reserved.
+                              </p>
+                          </div>
+                      </div>
+                  </div>
               </div>
-              <div class="row mt-5">
-                <div class="col-12 text-center mt-xl-2">
-                  <a class="text-white font-weight-medium" href="/admin">Back to home</a>
-                </div>
-              </div>
-              <div class="row mt-5">
-                <div class="col-12 mt-xl-2">
-                  <p class="text-white font-weight-medium text-center">Copyright &copy; 2018 All rights reserved.</p>
-                </div>
-              </div>
-            </div>
           </div>
-        </div>
-        <!-- content-wrapper ends -->
       </div>
-      <!-- page-body-wrapper ends -->
-    </div>
-    <!-- container-scroller -->
+  </div>
+  
 
 
-<%- include('../layouts/adminLayouts/admin-footer.ejs') %>
+   <%- include('../layouts/adminLayouts/admin-footer.ejs') %>
 
+
+   <script>
+   document.addEventListener('DOMContentLoaded', (event) => {
+      const currentYear = new Date().getFullYear();
+      document.getElementById('currentYear').textContent = currentYear;
+   });
+   </script>

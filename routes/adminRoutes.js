@@ -27,11 +27,13 @@ const orderController = require('../controllers/orderController');
 const offerController = require('../controllers/offerController');
 const couponController = require('../controllers/couponController');
 const goldRateController = require('../controllers/goldRateController');
+const dashboardController = require('../controllers/dashboardController');
+
+
+
 
 
 // ADMIN CONTROLLER ROUTES
-adminRoute.get('/', adminAuth.isLogin, adminController.loadAdminDashboard);
-// adminRoute.get('/dashboard', adminAuth.isLogin, adminController.loadAdminDashboard);
 adminRoute.get('/login', adminAuth.isLogout, adminController.loadLogin);
 adminRoute.post('/login', adminController.verifyLogin);
 adminRoute.get('/logout', adminAuth.isLogin, adminController.adminLogout);
@@ -72,9 +74,12 @@ adminRoute.get('/order-items', adminAuth.isLogin, orderController.loadOrderItems
 adminRoute.patch('/update-order-status', adminAuth.isLogin, orderController.updateOrderStatus);
 
 
+
+
 // GOLD RATE CONTROLLER ROUTES
 // adminRoute.get('/gold-rate', adminAuth.isLogin, goldRateController.getGoldRate);
 adminRoute.put('/update-gold-rate', adminAuth.isLogin, goldRateController.updateGoldRateManually);
+
 
 
 
@@ -88,6 +93,7 @@ adminRoute.patch('/cancel-offer', adminAuth.isLogin, offerController.cancelOffer
 
 
 
+
 // COUPON CONTROLLER ROUTES
 adminRoute.get('/coupons', adminAuth.isLogin, couponController.loadCouponList);
 adminRoute.post('/add-coupon', adminAuth.isLogin, multer.uploadCouponImage, couponController.addCoupon);
@@ -96,11 +102,17 @@ adminRoute.patch('/manage-coupon', adminAuth.isLogin, couponController.manageCou
 
 
 
-// TEST
-adminRoute.get('/abcd',  adminAuth.isLogin, adminController.loadDashboard2);
-adminRoute.get('/sales-report',  adminAuth.isLogin, adminController.loadSalesReport);
-adminRoute.get('/sales-report-pdf',  adminAuth.isLogin, adminController.salesReportPdf);
-adminRoute.get('/sales-report-excel',  adminAuth.isLogin, adminController.salesReportExcel);
+
+
+// DASHBOARD & SALES REPORT ROUTES
+adminRoute.get('/',  adminAuth.isLogin, dashboardController.loadAdminDashboard);
+adminRoute.get('/sales-report',  adminAuth.isLogin, dashboardController.loadSalesReport);
+adminRoute.get('/sales-report-pdf',  adminAuth.isLogin, dashboardController.salesReportPdf);
+adminRoute.get('/sales-report-excel',  adminAuth.isLogin, dashboardController.salesReportExcel);
+adminRoute.get('/categorywise-sale-report',  adminAuth.isLogin, dashboardController.filterCategorySale);
+// adminRoute.get('/productwise-sale-report',  adminAuth.isLogin, dashboardController.filterProductSale);
+
+
 
 
 

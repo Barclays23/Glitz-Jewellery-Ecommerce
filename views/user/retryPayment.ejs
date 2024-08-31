@@ -382,11 +382,11 @@
             "handler": function (response){
                 console.log('response in handler (success retry payment) : ', response);
                 // console.log('orderResponse in handler : ', orderResponse);
-                alert(response.razorpay_payment_id);
-                alert(response.razorpay_order_id);
-                alert(response.razorpay_signature);
+                // alert(response.razorpay_payment_id);
+                // alert(response.razorpay_order_id);
+                // alert(response.razorpay_signature);
 
-                verifyRetryPayment(response, orderResponse);
+                verifyRetryPayment(response, orderResponse);  // sending paymentSuccessResponse and orderResponse
             },
             "prefill": {
                 "name": `${orderResponse.userData.firstname} ${orderResponse.userData.lastname}`,
@@ -406,15 +406,17 @@
         rzp1.on('payment.failed', function (response){
             console.log('response after retry payment failed :', response.error);
 
-            alert(response.error.code);
-            alert(response.error.description);
-            alert(response.error.source);
-            alert(response.error.step);
-            alert(response.error.reason);
-            alert(response.error.metadata.order_id);
-            alert(response.error.metadata.payment_id);
+            // alert(response.error.code);
+            // alert(response.error.description);
+            // alert(response.error.source);
+            // alert(response.error.step);
+            // alert(response.error.reason);
+            // alert(response.error.metadata.order_id);
+            // alert(response.error.metadata.payment_id);
 
-            verifyRetryPayment(response, orderResponse);  // to change the payment status 'Pending' to 'Failed' again.
+            setTimeout(function() {
+                verifyPayment(response, orderResponse);   // sending paymentFailureResponse and orderResponse to change the payment status 'Pending' to 'Failed' again.
+            }, 2000);
             
         });
 
@@ -448,9 +450,7 @@
 
                 } else if (response.verifyFailed){
                     alert(response.message);
-                    location.reload();  // user can countinue the process until the time over or success.
-                    // window.location.href = `/retry-payment?orderId=${response.pendingOrderData._id}`;
-                    // updateOrder(response.orderResponse);  // update the orderStatus & paymentStatus.
+                    location.reload();  // user can countinue the process until the time over or payment success.
                 }
             }
         });

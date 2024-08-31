@@ -10,6 +10,7 @@ const UserOtp = require ('../models/otpModel');
 const bcrypt =  require ('bcrypt');
 const nodemailer = require ('nodemailer');
 const randomString = require('randomstring');
+const { session } = require('passport');
 
 
 
@@ -212,65 +213,115 @@ const securePassword = async(password)=>{
 // create/insert new user data --------------------------------
 const insertUser = async(req, res)=>{
     try {
+        const { 
+            userFirstName,
+            userLastName,
+            userEmail,
+            userMobile,
+            userPassword,
+            referralCode
+        } = req.body;
+
         console.log('req.body is: ', req.body);
-        const existEmail = await User.findOne({email: req.body.userEmail});
-        const existMobile = await User.findOne({mobile: req.body.userMobile});
+
+        const existEmail = await User.findOne({email: userEmail});
+        const existMobile = await User.findOne({mobile: userMobile});
+
 
         if (existEmail && existMobile){
-            return res.status(409).json({emailExists: true, mobileExists: true})
+            return res.json({bothExists: true});
+
         } else if (existEmail) {
             console.log('Email is exist...');
-            return res.status(409).json({emailExists: true})
+            return res.json({emailExists: true});
+
         } else if (existMobile){
             console.log('Mobile is exist...');
-           return res.status(409).json({mobileExists: true})
+           return res.json({mobileExists: true});
+
         } else {
-            const securedPass = await securePassword(req.body.userPassword);
+            const securedPass = await securePassword(userPassword);
+
             const user = new User ({
-                firstname : req.body.userFirstName,
-                lastname : req.body.userLastName,
-                email : req.body.userEmail,
-                mobile : req.body.userMobile,
+                firstname : userFirstName,
+                lastname : userLastName,
+                email : userEmail,
+                mobile : userMobile,
                 password : securedPass,
                 isAdmin : 0,
                 isBlocked : false
             });
 
             const userData = await user.save();
-            console.log('created new user data');
 
+
+            // add some money to reffered user's wallet after new user registered.
+            if (userData && referralCode){
+
+                const refferalAmount = 500;
+                const currentDate = new Date().toISOString();
+                
+                const transactionDetails = {
+                    date : currentDate,
+                    amount : refferalAmount,
+                    description: `Referral Bonus for the User : ${userData.email}`,
+                }
+
+                const updatedReferredUser = await User.findOneAndUpdate(
+                    {_id: referralCode},
+                    {
+                        $inc: {walletBalance: refferalAmount},
+                        $push: {walletHistory: transactionDetails},
+                    },
+                    {new: true}
+                );
+
+                if (updatedReferredUser){
+                    console.log('Updated referred user wallet amount:', updatedReferredUser.walletBalance);
+                } else {
+                    console.log('Failed to update the referred user wallet.');
+                }
+            }
+
+            // send success response to user.
             if (userData) {
-                console.log('User ID:', userData._id);
+                const userId = userData._id;
+                console.log('Created new user data :', userData._id);
+                
+                // proceed to send verification mail to user.
                 sendOtpVerificationMail(userData, res);
-            } else {
-                return res.status(400).json({failed: true, message: "Registration Failed !"})
+                
+                // return res.json({created: true, userId, message: 'You are now registered with us. Please verify your account.'});
+            } 
+            else {
+                console.log('failed to create user data.');
+                return res.json({registerFailed : true, message: "Failed to create your account."});
             }
         }
+
+
     } catch (error) {
-        console.log(error.message);
+        console.log('error in inserting the user :', error.message);
     }
 }
 
 
 
 // for sending mail for verification --------------------------
-const sendOtpVerificationMail = async({firstname, lastname, email, _id}, res)=>{
+const sendOtpVerificationMail = async(userData, res)=>{
     try {
+        const firstname = userData.firstname;
+        const lastname = userData.lastname;
+        const userEmail = userData.email;
+        const userId = userData._id;
+
         const otp = Math.floor(Math.random()*900000+100000);
-        console.log('generated otp is : ' + otp);
-        const expirationDuration = 3 * 60 * 1000; // 3 minutes in milliseconds
+        console.log('generated OTP is :', otp);
+        
+        const expirationDuration = 1 * 60 * 1000; // 2 minutes in milliseconds
         const expirationTime = new Date(Date.now() + expirationDuration);
-        console.log('OTP expirationTime : ', expirationTime);
+
         const hashedOtp = await bcrypt.hash(otp.toString(), 10);
-
-
-        // const generatedTime = new Date(); // Current time when generated
-        // console.log('generatedTime : ', generatedTime);
-        // const duration = 2 * 60 * 1000; // 2 minutes in milliseconds
-        // console.log('duration :', duration);
-        // const expireTime = new Date(generatedTime.getTime() + duration);
-        // console.log('expireTime : ', expireTime);
-
 
 
         const transporter = nodemailer.createTransport({
@@ -283,160 +334,165 @@ const sendOtpVerificationMail = async({firstname, lastname, email, _id}, res)=>{
 
 
         const mailOptions = {
-          from: process.env.emailUser,
-          to: email,
-          subject: "Your One-Time Password (OTP) for Account Verification",
-          // html: `<p>Hi ${firstname} ${lastname},<br>Please click <a href="http://localhost:3000/verify?id=${_id}"> here </a> to verify your email ID </p>`
-          html: `
+            from: process.env.emailUser,
+            to: userEmail,
+            subject: "Your One-Time Password (OTP) for Account Verification",
+            html:
+            `
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Glitz Jewellery Boutique - Account Verification</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            max-width: 700px;
+                            margin: 0;
+                            padding: 0;
+                            background-color: #f5f5f5;
+                            color: #333;
+                        }
+                        .main{
+                            border-radius: 10px;
+                            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                            border: 4px solid #9A0056; /* Your special color */
+                        }
+                        .container {
+                            max-width: 600px;
+                            margin: 20px auto;
+                            padding: 10px;
+                            background-color: #fff;
+                        }
+                        .logo {
+                            text-align: center;
+                            margin-bottom: 20px;
+                        }
+                        .logo img {
+                            max-width: 150px;
+                        }
+                        .header {
+                            background-color: #9A0056; /* Your special color */
+                            text-align: center;
+                            border-top-left-radius: 10px;
+                            border-top-right-radius: 10px;
+                            margin-top: -4px; /* Remove gap between border and header */
+                        }
+                        .header h2 {
+                            margin: 0;
+                            color: #fff;
+                            padding: 10px 0; /* Add padding to the h2 directly */
+                        }
+                        h1 {
+                            text-align: center;
+                            color: #9A0056; /* Your special color */
+                        }
+                        p {
+                            line-height: 1.6;
+                            margin-bottom: 20px;
+                        }
+                        .otp {
+                            padding: 10px 20px;
+                            color: #fff;
+                            background-color: #9A0056; /* Your special color */
+                            border-radius: 5px;
+                            display: inline-block;
+                            margin-bottom: 20px;
+                            font-size: 18px;
+                        }
+                        .contact h5 {
+                            color: #9A0056; /* Your special color */
+                            line-height: 0.5;
+                        }
+                        .footer {
+                            text-align: center;
+                            margin-top: 20px;
+                            color: #666;
+                            font-size: 12px;
+                        }
+                    </style>
+                </head>
+                <body>
+                <div class="main">
+                    <div class="header">
+                        <h2>Glitz Jewellery Boutique</h2>
+                    </div>
+                    <div class="container">
+                        <div class="logo">
+                            <img src="https://glitzjewellery.com/cdn/shop/files/glitz_logo_black_320x.png?v=1665889126" alt="Glitz Jewellery Boutique" alt="Glitz Jewellery Boutique">
+                        </div>
+                        <h1>Welcome to Glitz Jewellery Boutique!</h1>
+                        <p>Dear <strong>${firstname} ${lastname}</strong>,</p>
+                        <p>Thank you for registering with <strong>Glitz Jewellery Boutique</strong>! To complete the registration process, please enter the following One-Time Password (OTP) in the provided field:</p>
+                        <div class="otp">
+                            <strong>OTP:</strong> ${otp}
+                        </div>
+                        <p>This OTP is valid for a single use and will expire shortly. Please do not share this OTP with anyone for security reasons.</p>
 
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>Glitz Jewellery Boutique - Account Verification</title>
-              <style>
-                  body {
-                      font-family: Arial, sans-serif;
-                      max-width: 700px;
-                      margin: 0;
-                      padding: 0;
-                      background-color: #f5f5f5;
-                      color: #333;
-                  }
-                  .main{
-                    border-radius: 10px;
-                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                    border: 4px solid #9A0056; /* Your special color */
-                  }
-                  .container {
-                      max-width: 600px;
-                      margin: 20px auto;
-                      padding: 10px;
-                      background-color: #fff;
-                  }
-                  .logo {
-                      text-align: center;
-                      margin-bottom: 20px;
-                  }
-                  .logo img {
-                      max-width: 150px;
-                  }
-                  .header {
-                      background-color: #9A0056; /* Your special color */
-                      text-align: center;
-                      border-top-left-radius: 10px;
-                      border-top-right-radius: 10px;
-                      margin-top: -4px; /* Remove gap between border and header */
-                  }
-                  .header h2 {
-                      margin: 0;
-                      color: #fff;
-                      padding: 10px 0; /* Add padding to the h2 directly */
-                  }
-                  h1 {
-                      text-align: center;
-                      color: #9A0056; /* Your special color */
-                  }
-                  p {
-                      line-height: 1.6;
-                      margin-bottom: 20px;
-                  }
-                  .otp {
-                      padding: 10px 20px;
-                      color: #fff;
-                      background-color: #9A0056; /* Your special color */
-                      border-radius: 5px;
-                      display: inline-block;
-                      margin-bottom: 20px;
-                      font-size: 18px;
-                  }
-                  .contact h5 {
-                    color: #9A0056; /* Your special color */
-                    line-height: 0.5;
-                  }
-                  .footer {
-                      text-align: center;
-                      margin-top: 20px;
-                      color: #666;
-                      font-size: 12px;
-                  }
-              </style>
-          </head>
-          <body>
-          <div class="main">
-            <div class="header">
-                <h2>Glitz Jewellery Boutique</h2>
-            </div>
-            <div class="container">
-                <div class="logo">
-                    <img src="https://glitzjewellery.com/cdn/shop/files/glitz_logo_black_320x.png?v=1665889126" alt="Glitz Jewellery Boutique" alt="Glitz Jewellery Boutique">
+                        <p>In case you missed or closed the verification page, you can access it again by clicking <a href=http://localhost:3000/verify-account?id=${userId}> <b> here.<a></b></p>
+
+                        <p>If you did not request this registration or if you have any questions, please contact our support team immediately.</p>
+                        <p>Thank you,</p><br>
+                        <div class="contact">
+                            <h5><strong>Glitz Jewellery Team</strong></h5>
+                            <h5><strong>+91 9633699766</strong></h5>
+                            <img src="https://glitzjewellery.com/cdn/shop/files/glitz_logo_black_320x.png?v=1665889126" width="25%" alt="Glitz Jewellery Boutique" alt="Glitz Jewellery Boutique">
+                        </div>
+                    </div>
                 </div>
-                <h1>Welcome to Glitz Jewellery Boutique!</h1>
-                <p>Dear <strong>${firstname} ${lastname}</strong>,</p>
-                <p>Thank you for registering with <strong>Glitz Jewellery Boutique</strong>! To complete the registration process, please enter the following One-Time Password (OTP) in the provided field:</p>
-                <div class="otp">
-                    <strong>OTP:</strong> ${otp}
+                <div class="footer">
+                    <p>This email was sent from Glitz Jewellery Boutique. If you have any questions or concerns, please don't hesitate to contact us.</p>
                 </div>
-                <p>This OTP is valid for a single use and will expire shortly. Please do not share this OTP with anyone for security reasons.</p>
+                </body>
+                </html>
 
-                <p>In case you missed or closed the verification page, you can access it again by clicking <a href=http://localhost:3000/verify-account?id=${_id}> <b> here.<a></b></p>
-
-                <p>If you did not request this registration or if you have any questions, please contact our support team immediately.</p>
-                <p>Thank you,</p><br>
-                <div class="contact">
-                    <h5><strong>Glitz Jewellery Team</strong></h5>
-                    <h5><strong>+91 9633699766</strong></h5>
-                    <img src="https://glitzjewellery.com/cdn/shop/files/glitz_logo_black_320x.png?v=1665889126" width="25%" alt="Glitz Jewellery Boutique" alt="Glitz Jewellery Boutique">
-                </div>
-            </div>
-          </div>
-          <div class="footer">
-              <p>This email was sent from Glitz Jewellery Boutique. If you have any questions or concerns, please don't hesitate to contact us.</p>
-          </div>
-          </body>
-          </html>
-          
-
-        `
+            `
         };
 
 
 
-        
-        const userOtpRecord = await UserOtp.findOne({userRef : _id});
+        const userOtpRecord = await UserOtp.findOne({userRef : userId});
 
         if (userOtpRecord) {
-            await UserOtp.updateOne({userRef: _id}, {otp: hashedOtp, createdAt: Date.now(), expireAt: expirationTime});
+            const updatedOtpData = await UserOtp.updateOne(
+                {userRef: userId},
+                {
+                    otp: hashedOtp, 
+                    createdAt: Date.now(), 
+                    expireAt: expirationTime
+                },
+                {new: true}
+            );
+
         } else {
             const newUserOtp = new UserOtp ({
                 otp : hashedOtp,
-                userRef : _id,
+                userRef : userId,
                 createdAt : Date.now(),
                 expireAt : expirationTime
             });
 
-            const otpData = await newUserOtp.save();
+            const savedOtpData = await newUserOtp.save();
         }
 
 
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
-                console.log('Error in Sending OTP Verification Mail', error);
-                res.status(500).send('Error sending email');
-                // res.status(500).json({ error: 'Internal Server Error' });
+                console.log('Error in sending OTP verification mail :', error);
+                return res.json({mailFailed: true, userId, message: 'Failed to send verification code due to some netwonk issues.'});
+
             } else {
                 console.log('Email sent : ' + info.response);
-                console.log('print this after info.response line');
-                console.log('data after sent mail (_id and expirationTime): ', _id, expirationTime);  //expireTime can also log if defined.
-                return res.status(200).json({success: true, userId: _id, expirationTime: expirationTime}); // {expireTime: expireTime} can also give as response if defined and used
+                console.log('data after sent mail (_id and expirationTime) : ', userId, expirationTime);
+                return res.json({success: true, userId, message: 'Your account has been created successfully. Please verify your account.'});
             }
         });
         
     
         
     } catch (error) {
-        console.log(error.message);
+        console.log('Error in sendOtpVerificationMail :', error.message);
     }
 }
 
@@ -446,23 +502,21 @@ const sendOtpVerificationMail = async({firstname, lastname, email, _id}, res)=>{
 // resend otp function -----------------------------------------
 const resendOtp = async(req, res)=>{
     try {
-        console.log("resend Otp page loaded");
-        console.log("resend Otp Id  : ", req.query.id);
+        console.log("resend Otp query Id  : ", req.query.id);
 
         const userData = await User.findOne({_id: req.query.id});
-        console.log("userData : ",userData);
-        // const existMobile = await User.findOne({mobile: req.body.mobile}); if otp is providing to mobile number instead of email
 
         if (userData) {
             sendOtpVerificationMail(userData, res);
-            console.log('sendOtpVerificationMail called for resending');
-            // res.redirect(`/verify-account?id=${userData._id}`);
-            // redirect function is in sendMail function
-            console.log('redirected to otp page after resend otp');
+            console.log('sendOtpVerificationMail called for re-sending');
+
+        } else {
+            console.log('No user found with query id.');
+            return res.json({failed: true});
         }
+
     } catch (error) {
-        console.log(error.message);
-        console.log('resend otp failed.');
+        console.log('erron in resendOtp :', error.message);
     }
 }
 
@@ -472,38 +526,55 @@ const resendOtp = async(req, res)=>{
 // load otp verification / account verification page ----------
 const loadVerifyAccount = async(req, res)=>{
     try {
-        const userQueryId = req.query.id;
-        const exp = req.query.expire;
-        console.log("query received in register-otp page :", userQueryId, exp);
+        const userId = req.query.id;
+        console.log("Query received from otp page (/verify-account) :", req.query);
 
-        const sessionId = req.session.userId;
+        if (userId){
+            const userData = await User.findOne({_id: userId});
+            const userCart = await Cart.findOne({ userRef: userId });
+            const userWishlist = await Wishlist.findOne({ userRef: userId});
 
-        const userData = await User.findOne({_id: sessionId});
+            const otpData = await UserOtp.findOne({userRef: userId});
 
-        const userCart = await Cart.findOne({ userRef: sessionId });
-        const userWishlist = await Wishlist.findOne({ userRef: sessionId});
 
-        let cartCount = 0;
-        let wishlistCount = 0;
+            let cartCount = 0;
+            let wishlistCount = 0;
+            
+            if (userCart){
+                    userCart.product.forEach((product) => {
+                    cartCount += product.quantity;
+                });
+            }
+        
+            if (userWishlist){
+                userWishlist.product.forEach((product) => {
+                    wishlistCount += product.quantity;
+                });
+            }
 
-        if (userCart){
-            userCart.product.forEach((product) => {
-                cartCount += product.quantity;
-            });
+            if (otpData){
+                // Calculate remaining time for OTP expiration
+                const currentTime = new Date();
+                const remainingTime = Math.max(0, otpData.expireAt - currentTime); // in milliseconds
+
+
+                res.render('registerOtp', {
+                    userData,
+                    otpData,
+                    cartCount,
+                    wishlistCount,
+                    remainingTime
+                });
+                console.log("Loaded verify account (otp) page with remaining time:", remainingTime, 'ms');
+            }
+            
         }
+            
 
-        if (userWishlist){
-            userWishlist.product.forEach((product) => {
-                wishlistCount += product.quantity;
-            });
-        }
-
-        // res.render('register-otp', {userId, exp, userData, cartCount, wishlistCount});
-        res.render('register-otp', { exp, userData });
-        console.log("loaded verify account (otp) page");
 
     } catch (error) {
-        console.log('Register otp page loading failed');
+        console.log('Register otp page loading failed :', error.message);
+
     }
 }
 
@@ -513,36 +584,39 @@ const loadVerifyAccount = async(req, res)=>{
 const verifyAccount = async (req, res)=>{
     try {
         const submittedOtp = req.body.OTP;
+        const userId = req.body.userId;
         const submittedAt = Date.now();
-        console.log('body id from hidden form field  or submitted otp & time : ', submittedOtp, submittedAt);
+
+        console.log('data received for verifyAccount : ', req.body);
+        console.log('OTP submittedAt : ', submittedAt);
 
 
-        const otpData = await UserOtp.findOne({userRef: req.body.userID});
+        const otpData = await UserOtp.findOne({userRef: userId});
         console.log('database hashed otp & time : '+ otpData.otp, otpData.createdAt);
 
         if (!otpData) {
-            return res.status(400).json({ notFound: true, message: 'OTP not found' });
+            return res.json({ notFound: true, message: 'OTP not found' });
         }   
         
         const isMatch = await bcrypt.compare(submittedOtp, otpData.otp);
         console.log('isMatch OTP: ', isMatch);
         
-        if(submittedAt > otpData.expireAt){
-            return res.status(400).json({otpExpire: true, message :'OTP Already Expired! Please Resend Code.'});
+        if (submittedAt > otpData.expireAt){
+            return res.json({otpExpire: true, message :'OTP Already Expired! Please Resend Code.'});
         }
 
-        if(!isMatch){
-            return res.status(400).json({incorrect: true, message : 'Incorrect OTP !'});
+        if (!isMatch){
+            return res.json({incorrect: true, message : 'Incorrect OTP !'});
         }
 
         console.log('OTP verification successful');
-        const updateInfo = await User.updateOne({_id: req.body.userID}, {isVerified: 1});
+        const updateInfo = await User.updateOne({_id: userId}, {isVerified: 1});
         console.log('updated user info after account verify : ', updateInfo);
 
-        req.session.userId = req.body.userID;
+        // userId assinged to the session
+        req.session.userId = userId;
 
-        return res.json({ success: true});
-
+        return res.json({verified : true});
 
 
     } catch (error) {

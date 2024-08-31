@@ -80,425 +80,378 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
+<!-- script for registration -->
 <script>
-    document.addEventListener('DOMContentLoaded', function (){
+
+
+// FOR FORM VALIDATION
+document.addEventListener('DOMContentLoaded', function (){
+    let isValid = true;       
+
+    let firstNameField = document.getElementById("first-name-field");
+    let lastNameField = document.getElementById("last-name-field");
+    let emailField = document.getElementById("email-field");
+    let mobileField = document.getElementById("mobile-field");
+    let passwordField = document.getElementById("password-field");
+    let confirmPasswordField = document.getElementById("confirm-password-field");
+    let termsField = document.getElementById("terms-field");
+
+    
+    let firstNameError = document.getElementById("first-name-error");
+    let lastNameError = document.getElementById("last-name-error");
+    let emailError = document.getElementById("email-error");
+    let mobileError = document.getElementById("mobile-error");
+    let passwordError = document.getElementById("password-error");
+    let confirmPasswordError = document.getElementById("confirm-password-error");
+    let termsError = document.getElementById("terms-error");
+    let errorMessage = document.getElementById("error-message");
+
+
+    let submitButton = document.getElementById("register-button");
+    let registerForm = document.querySelector('.tm-register-form');
+
+
+    // email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const isValidEmail = emailRegex.test(emailField);
+
+
+    // mobile number validation
+    const mobileRegex = /^[0-9]{10}$/;
+    isValidMobile = mobileRegex.test(mobileField);
+
+
+    // Password validation
+    function validateExpressions (passwordField) {
+        let uppercaseRegex = /[A-Z]/;
+        let lowercaseRegex = /[a-z]/;
+        let numberRegex = /[0-9]/;
+        let symbolRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
+        return (
+            uppercaseRegex.test(passwordField) &&
+            lowercaseRegex.test(passwordField) &&
+            numberRegex.test(passwordField) &&
+            symbolRegex.test(passwordField)
+        );
+    }
+
+
+
+    // Check first name
+    firstNameField.addEventListener('input', function(){
+        if (firstNameField.value ==='') {
+            firstNameError.textContent = "Enter your first name.";
+            firstNameError.style.display = "block";
+            isValid = false;
+        }
+        else{
+            firstNameError.style.display = "none";
+        }
+    });
+
+
+    // Check last name
+    lastNameField.addEventListener('input', function(){
+        if (lastNameField.value ==='') {
+            lastNameError.textContent = "Enter your last name.";
+            lastNameError.style.display = "block";
+            isValid = false;
+        }
+        else{
+            lastNameError.style.display = "none";
+        }
+    });
+
+
+    // check email
+    emailField.addEventListener('input', function(){
+        if (!emailField.value) {
+            emailError.textContent = "Enter your email address.";
+            emailError.style.display = 'block';
+            isValid = false;
+        } else if (!emailRegex.test(emailField.value)) {
+            emailError.textContent = "Invalid Email Format";
+            emailError.style.display = 'block';
+            isValid = false;
+        } else {
+            emailError.style.display = 'none';
+        }
+    });
+
+
+    // Check mobile
+    mobileField.addEventListener('input', function(){
+        if(!mobileField.value){
+            mobileError.textContent = 'Enter mobile number';
+            mobileError.style.display = 'block';
+            isValid = false;
+        } else if (!mobileRegex.test(mobileField.value)) {
+            mobileError.textContent = "Please enter a 10-digit mobile number (digits 0-9) only.";
+            mobileError.style.display = 'block';
+            isValid = false;
+        } else {
+            mobileError.style.display = 'none';
+        }
+    });
+
+
+    // Check password
+    passwordField.addEventListener('input', function(){
+        if (!passwordField.value){
+            passwordError.textContent = "Enter your password";
+            passwordError.style.display = 'block';
+            isValid = false;
+        } else if (passwordField.value.length < 8 && !validateExpressions(passwordField.value)) {
+            passwordError.textContent = "Password should be at least 8 characters long and include a combination of uppercase and lowercase letters, numbers, and symbols.";
+            passwordError.style.display = 'block';
+            isValid = false;
+        } else if (!validateExpressions(passwordField.value)) {
+            passwordError.textContent = "Password should contain at least one uppercase letter, one lowercase letter, one number, and one symbol.";
+            passwordError.style.display = 'block';
+            isValid = false;
+        } else {
+            passwordError.style.display = 'none';
+        }
+    });
+        
+
+    // Check confirm password
+    confirmPasswordField.addEventListener('input', function(){
+        if(!confirmPasswordField.value){
+            confirmPasswordError.textContent = "Re-enter password!"
+            confirmPasswordError.style.display = "block";
+            isValid = false;
+        }else if (confirmPasswordField.value !== passwordField.value) {
+            confirmPasswordError.textContent = "Password mismatch.!"
+            confirmPasswordError.style.display = "block";
+            isValid = false;
+        } else {
+            confirmPasswordError.style.display = "none";
+        }
+    });
+
+
+    // Check terms
+    termsField.addEventListener('input', function(){
+        if (!termsField.checked) {
+            termsError.textContent = "Please agree to the terms and conditions.";
+            termsError.style.display = "block";
+            isValid = false;
+        } else {
+            termsError.style.display = "none";
+        }
+    });
+
+
+
+    // form validation
+    submitButton.addEventListener('click', function(event){
+        event.preventDefault();
+
+        emailError.textContent = '';
+        passwordError.textContent = '';
+
 
         let isValid = true;
-        
 
-        var firstNameField = document.getElementById("first-name-field");
-        var lastNameField = document.getElementById("last-name-field");
-        var emailField = document.getElementById("email-field");
-        var mobileField = document.getElementById("mobile-field");
-        var passwordField = document.getElementById("password-field");
-        var confirmPasswordField = document.getElementById("confirm-password-field");
-        var termsField = document.getElementById("terms-field");
-
-        
-        var firstNameError = document.getElementById("first-name-error");
-        var lastNameError = document.getElementById("last-name-error");
-        var emailError = document.getElementById("email-error");
-        var mobileError = document.getElementById("mobile-error");
-        var passwordError = document.getElementById("password-error");
-        var confirmPasswordError = document.getElementById("confirm-password-error");
-        var termsError = document.getElementById("terms-error");
-        var errorMessage = document.getElementById("error-message");
-
-
-        let submitButton = document.getElementById("register-button");
-        let registerForm = document.querySelector('.tm-register-form');
-
-
-        // email validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const isValidEmail = emailRegex.test(emailField);
-
-
-        // mobile number validation
-        var mobileRegex = /^[0-9]{10}$/;
-        isValidMobile = mobileRegex.test(mobileField);
-
-
-        // Password validation
-        function validateExpressions(passwordField) {
-            let uppercaseRegex = /[A-Z]/;
-            let lowercaseRegex = /[a-z]/;
-            let numberRegex = /[0-9]/;
-            let symbolRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
-            return (
-                uppercaseRegex.test(passwordField) &&
-                lowercaseRegex.test(passwordField) &&
-                numberRegex.test(passwordField) &&
-                symbolRegex.test(passwordField)
-            );
+        // Check first name
+        if (!firstNameField.value) {
+            firstNameError.textContent = "Enter your first name."
+            firstNameError.style.display = "block";
+            isValid = false;
+        } else {
+            firstNameError.style.display = "none";
         }
 
-        
-        submitButton.addEventListener('click', function(event){
-            event.preventDefault();
 
-            // let registerFirstName = document.getElementById("register-first-name").value;
-            // let registerLastName = document.getElementById("register-last-name").value;
-            // let registerEmail = document.getElementById("register-email").value;
-            // let registerMobile = document.getElementById("register-mobile").value;
-            // let registerPassword = document.getElementById("register-password").value;
-            // let registerConfirmPassword = document.getElementById("confirm-password").value;
-            // let terms = document.getElementById("register-terms");
-
-
-            emailError.textContent = '';
-            passwordError.textContent = '';
-
-
-            let isValid = true;
-
-            // Check first name
-            if (!firstNameField.value) {
-                firstNameError.textContent = "Enter your first name."
-                firstNameError.style.display = "block";
-                isValid = false;
-            } else {
-                firstNameError.style.display = "none";
-            }
-
-
-            // Check last name
-            if (!lastNameField.value) {
-                lastNameError.textContent = "Enter your last name."
-                lastNameError.style.display = "block";
-                isValid = false;
-            } else {
-                lastNameError.style.display = "none";
-            }
-
-
-            // check email
-            if (!emailField.value) {
-                emailError.textContent = "Enter your email address.";
-                emailError.style.display = 'block';
-                isValid = false;
-            } else if (!emailRegex.test(emailField.value)) {
-                emailError.textContent = "Invalid Email Format";
-                emailError.style.display = 'block';
-                isValid = false;
-            } else {
-                emailError.style.display = 'none';
-            }
-
-
-
-            // Check mobile
-            if(!mobileField.value){
-                mobileError.textContent = 'Enter mobile number';
-                mobileError.style.display = 'block';
-                isValid = false;
-            } else if (!mobileRegex.test(mobileField.value)) {
-                mobileError.textContent = "Please enter a 10-digit mobile number (digits 0-9) only.";
-                mobileError.style.display = 'block';
-                isValid = false;
-            } else {
-                mobileError.style.display = 'none';
-            }
-            
-
-
-            
-            // Check password
-            if (!passwordField.value){
-                passwordError.textContent = "Enter your password";
-                passwordError.style.display = 'block';
-                isValid = false;
-            } else if (passwordField.value.length < 8 && !validateExpressions(passwordField.value)) {
-                passwordError.textContent = "Password should be at least 8 characters long and include a combination of uppercase and lowercase letters, numbers, and symbols.";
-                passwordError.style.display = 'block';
-                isValid = false;
-            } else if (!validateExpressions(passwordField.value)) {
-                passwordError.textContent = "Password should contain at least one uppercase letter, one lowercase letter, one number, and one symbol.";
-                passwordError.style.display = 'block';
-                isValid = false;
-            } else {
-                passwordError.style.display = 'none';
-            }
-
-
-            // Check confirm password
-            if(!confirmPasswordField.value){
-                confirmPasswordError.textContent = "Re-enter password!"
-                confirmPasswordError.style.display = "block";
-                isValid = false;
-            }else if (confirmPasswordField.value != passwordField.value) {
-                confirmPasswordError.textContent = "Password mismatch.!"
-                confirmPasswordError.style.display = "block";
-                isValid = false;
-            } else {
-                confirmPasswordError.style.display = "none";
-            }
-
-
-            // Check terms
-            if (!termsField.checked) {
-                termsError.textContent = "Please agree to the terms and conditions.";
-                termsError.style.display = "block";
-                isValid = false;
-            } else {
-                termsError.style.display = "none";
-            }
-
-
-
-            if (!isValid) {
-                return; // Prevent form submission
-            } else{
-                formSubmit();
-                // formSubmit(userEmail, userPassword);
-            }
-
-
-            // function formSubmit(userEmail, userPassword) {
-            function formSubmit() {
-                var userFirstName = document.getElementById("first-name-field").value;
-                var userLastName = document.getElementById("last-name-field").value;
-                var userEmail = document.getElementById("email-field").value;
-                var userMobile = document.getElementById("mobile-field").value;
-                var userPassword = document.getElementById("password-field").value;
-
-                const url = '/register';
-                console.log('userfirstname', userFirstName);
-                // Create fetch request
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        userFirstName,
-                        userLastName,
-                        userEmail,
-                        userMobile,
-                        userPassword,
-                     })
-
-                })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    } else {
-                        console.error('Network response was not ok:', response.status);
-                        return response.json();
-                        // throw new Error('Network response was not ok.');
-                    }
-                })
-                // .then(response => response.json())
-                .then(data => {
-                    console.log('response data after registration & otp generating is: ', data);
-                    if (data.success) {
-                        const userId = data.userId;
-                        // Show Sweet Alert for successful registration
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Your are now registered with us. Please verify your account.',
-                            icon: 'success',
-                            showConfirmButton: false,
-                            // timer: 1500
-                        }).then(() => {
-                            window.location.href = `/verify-account?id=${data.userId}&expire=${data.expirationTime}`; // Redirect to verification otp page after 1.5 seconds
-                        });
-                    }
-                    else if (data.emailExists && data.mobileExists) {
-                        emailError.textContent = 'Email Already Exists.!';
-                        emailError.style.display = 'block';
-                        mobileError.textContent = 'Mobile number already exists.!';
-                        mobileError.style.display = 'block';
-                    }
-                    else if (data.emailExists) {
-                        emailError.textContent = 'Email Already Exists.!';
-                        emailError.style.display = 'block';
-                    }
-                    else if (data.mobileExists) {
-                        mobileError.textContent = 'Mobile number already exists.!';
-                        mobileError.style.display = 'block';
-                    }
-                    else {
-                        errorMessage.textContent = "Registration Failed !"
-                       return window.location.href = '/register'; // Redirect to registration page
-                        console.error('Registration failed');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-
-                // window.formSubmit = formSubmit;
-            }
-
-
-
-
-
-            // Form submission validation            
-            // registerForm.addEventListener('submit', function(event) {
-            //     if (!isValid) {
-            //         event.preventDefault(); // Prevent form submission
-            //     }
-            // });
-
-        });
-
-
-
-
-
-        // ================================================================================
-        // INDIVIDUAL CHECKING BEFORE SUBMIT
-
-
-        
-        // var firstNameInput = document.getElementById("register-first-name");
-        // var lastNameInput = document.getElementById("register-last-name");
-        // var emailInput = document.getElementById("register-email");
-        // var mobileInput = document.getElementById("register-mobile");
-        // var passwordInput = document.getElementById("register-password");
-        // var confirmPasswordInput = document.getElementById("confirm-password");
-        // var termsInput = document.getElementById("register-terms");
-
-
-        // // Check first name
-        firstNameField.addEventListener('input', function(){
-            if (firstNameField.value ==='') {
-                firstNameError.textContent = "Enter your first name.";
-                firstNameError.style.display = "block";
-                isValid = false;
-            }
-            else{
-                firstNameError.style.display = "none";
-            }
-        });
-
-        // // Check last name
-        lastNameField.addEventListener('input', function(){
-            if (lastNameField.value ==='') {
-                lastNameError.textContent = "Enter your last name.";
-                lastNameError.style.display = "block";
-                isValid = false;
-            }
-            else{
-                lastNameError.style.display = "none";
-            }
-        });
+        // Check last name
+        if (!lastNameField.value) {
+            lastNameError.textContent = "Enter your last name."
+            lastNameError.style.display = "block";
+            isValid = false;
+        } else {
+            lastNameError.style.display = "none";
+        }
 
 
         // check email
-        // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        // const isValidEmail = emailRegex.test(registerEmail);
+        if (!emailField.value) {
+            emailError.textContent = "Enter your email address.";
+            emailError.style.display = 'block';
+            isValid = false;
+        } else if (!emailRegex.test(emailField.value)) {
+            emailError.textContent = "Invalid Email Format";
+            emailError.style.display = 'block';
+            isValid = false;
+        } else {
+            emailError.style.display = 'none';
+        }
 
-        emailField.addEventListener('input', function(){
-            if (!emailField.value) {
-                emailError.textContent = "Enter your email address.";
-                emailError.style.display = 'block';
-                isValid = false;
-            } else if (!emailRegex.test(emailField.value)) {
-                emailError.textContent = "Invalid Email Format";
-                emailError.style.display = 'block';
-                isValid = false;
-            } else {
-                emailError.style.display = 'none';
-            }
-        });
 
 
         // Check mobile
-        // var mobileRegex = /^[0-9]{10}$/;
-        // isValidMobile = mobileRegex.test(registerMobile);
-        mobileField.addEventListener('input', function(){
-            if(!mobileField.value){
-                mobileError.textContent = 'Enter mobile number';
-                mobileError.style.display = 'block';
-                isValid = false;
-            } else if (!mobileRegex.test(mobileField.value)) {
-                mobileError.textContent = "Please enter a 10-digit mobile number (digits 0-9) only.";
-                mobileError.style.display = 'block';
-                isValid = false;
-            } else {
-                mobileError.style.display = 'none';
-            }
-        });
+        if(!mobileField.value){
+            mobileError.textContent = 'Enter mobile number';
+            mobileError.style.display = 'block';
+            isValid = false;
+        } else if (!mobileRegex.test(mobileField.value)) {
+            mobileError.textContent = "Please enter a 10-digit mobile number (digits 0-9) only.";
+            mobileError.style.display = 'block';
+            isValid = false;
+        } else {
+            mobileError.style.display = 'none';
+        }
+        
 
 
-
-
-    
-            
-        // Password validation
-        // function validateExpressions(registerPassword) {
-        //     let uppercaseRegex = /[A-Z]/;
-        //     let lowercaseRegex = /[a-z]/;
-        //     let numberRegex = /[0-9]/;
-        //     let symbolRegex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
-        //     return (
-        //         uppercaseRegex.test(registerPassword.value) &&
-        //         lowercaseRegex.test(registerPassword.value) &&
-        //         numberRegex.test(registerPassword.value) &&
-        //         symbolRegex.test(registerPassword.value)
-        //     );
-        // }
-
-
+        
         // Check password
-        passwordField.addEventListener('input', function(){
-            if (!passwordField.value){
-                passwordError.textContent = "Enter your password";
-                passwordError.style.display = 'block';
-                isValid = false;
-            } else if (passwordField.value.length < 8 && !validateExpressions(passwordField.value)) {
-                passwordError.textContent = "Password should be at least 8 characters long and include a combination of uppercase and lowercase letters, numbers, and symbols.";
-                passwordError.style.display = 'block';
-                isValid = false;
-            } else if (!validateExpressions(passwordField.value)) {
-                passwordError.textContent = "Password should contain at least one uppercase letter, one lowercase letter, one number, and one symbol.";
-                passwordError.style.display = 'block';
-                isValid = false;
-            } else {
-                passwordError.style.display = 'none';
-            }
-        });
-            
+        if (!passwordField.value){
+            passwordError.textContent = "Enter your password";
+            passwordError.style.display = 'block';
+            isValid = false;
+        } else if (passwordField.value.length < 8 && !validateExpressions(passwordField.value)) {
+            passwordError.textContent = "Password should be at least 8 characters long and include a combination of uppercase and lowercase letters, numbers, and symbols.";
+            passwordError.style.display = 'block';
+            isValid = false;
+        } else if (!validateExpressions(passwordField.value)) {
+            passwordError.textContent = "Password should contain at least one uppercase letter, one lowercase letter, one number, and one symbol.";
+            passwordError.style.display = 'block';
+            isValid = false;
+        } else {
+            passwordError.style.display = 'none';
+        }
 
 
         // Check confirm password
-        confirmPasswordField.addEventListener('input', function(){
-            if(!confirmPasswordField.value){
-                confirmPasswordError.textContent = "Re-enter password!"
-                confirmPasswordError.style.display = "block";
-                isValid = false;
-            }else if (confirmPasswordField.value !== passwordField.value) {
-                confirmPasswordError.textContent = "Password mismatch.!"
-                confirmPasswordError.style.display = "block";
-                isValid = false;
-            } else {
-                confirmPasswordError.style.display = "none";
-            }
-        });
-
-
+        if(!confirmPasswordField.value){
+            confirmPasswordError.textContent = "Re-enter password!"
+            confirmPasswordError.style.display = "block";
+            isValid = false;
+        }else if (confirmPasswordField.value != passwordField.value) {
+            confirmPasswordError.textContent = "Password mismatch.!"
+            confirmPasswordError.style.display = "block";
+            isValid = false;
+        } else {
+            confirmPasswordError.style.display = "none";
+        }
 
 
         // Check terms
-        termsField.addEventListener('input', function(){
-            if (!termsField.checked) {
-                termsError.textContent = "Please agree to the terms and conditions.";
-                termsError.style.display = "block";
-                isValid = false;
-            } else {
-                termsError.style.display = "none";
-            }
-        });
+        if (!termsField.checked) {
+            termsError.textContent = "Please agree to the terms and conditions.";
+            termsError.style.display = "block";
+            isValid = false;
+        } else {
+            termsError.style.display = "none";
+        }
 
 
 
-
-
+        if (!isValid) {
+            return; // Prevent form submission
+        } else {
+            formSubmit();
+        }
 
     });
+
+
+
+});
+
+
+
+
+// FOR REGISTER FORM SUBMITION (/register)
+function formSubmit() {
+    let userFirstName = document.getElementById("first-name-field").value;
+    let userLastName = document.getElementById("last-name-field").value;
+    let userEmail = document.getElementById("email-field").value;
+    let userMobile = document.getElementById("mobile-field").value;
+    let userPassword = document.getElementById("password-field").value;
+
+    let emailError = document.getElementById("email-error");
+    let mobileError = document.getElementById("mobile-error");
+    let errorMessage = document.getElementById("error-message");
+
+
+    // Function to get query parameters from URL
+    function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        console.log('urlParams :', urlParams);
+        return urlParams.get(param);
+    }
+
+    const referralCode = getQueryParam('referral-code') ? getQueryParam('referral-code') : '';
+    console.log("referralCode for sending :", referralCode);
+
+
+    $.ajax({
+        url: '/register',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            userFirstName,
+            userLastName,
+            userEmail,
+            userMobile,
+            userPassword,
+            referralCode
+        }),
+        success: function(response) {
+            console.log('response from /register', response);
+            if (response.success) {
+                Swal.fire({
+                    title: 'Success!',
+                    text: `${response.message}`, // account is created, pls verify
+                    icon: 'success',
+                    showConfirmButton: false,
+                })
+                .then(() => {
+                    // call send otp functon route. then redirect to verify-account.
+                    window.location.href = `/verify-account?id=${response.userId}`; // Redirect to verification otp page
+                });
+
+            } else if (response.registerFailed) {
+                Swal.fire({
+                    title: 'Registration Failed!',
+                    text: `${response.message}`, // failed to create account.
+                    icon: 'error',
+                    showConfirmButton: false,
+                });
+            } else if (response.mailFailed) {
+                Swal.fire({
+                    title: 'Failed to Send Verification Code !',
+                    text: `Your account is created successfully. But ${response.message}`, // account created but failed to send verification mail.
+                    icon: 'error',
+                    showConfirmButton: false,
+                })
+                .then(() => {
+                    window.location.href = `/verify-account?id=${response.userId}`; // Redirect to verification otp page
+                });
+
+            } else if (response.bothExists) {
+                emailError.textContent = 'Email Already Exists.!'; emailError.style.display = 'block';
+                mobileError.textContent = 'Mobile number already exists.!'; mobileError.style.display = 'block';
+
+            } else if (response.emailExists) {
+                emailError.textContent = 'Email Already Exists.!'; emailError.style.display = 'block';
+
+            } else if (response.mobileExists) {
+                mobileError.textContent = 'Mobile number already exists.!'; mobileError.style.display = 'block';
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error in /register :', error);
+        }
+    });
+
+
+}
+
+
+
 </script>
 
 

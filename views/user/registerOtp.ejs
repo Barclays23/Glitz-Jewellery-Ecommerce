@@ -1,0 +1,248 @@
+<%- include('../layouts/userLayouts/user-header.ejs') %>
+
+<%- include('../layouts/userLayouts/user-preloader.ejs') %>
+
+<%- include('../layouts/userLayouts/user-navbar.ejs') %>
+
+
+
+<main class="page-content">
+    <div class="tm-section bg-white tm-padding-section">
+        <div class="container">
+            <form class="tm-regular-form otpform">
+                <div>
+                    <h4 class="form-title">VERIFY YOUR ACCOUNT</h4>
+                </div>
+                <div>
+                    <p class="form-title-info">We've just sent you an email containing a verification code. Please check your inbox and enter the code here to complete the registration process.</p>
+                </div>
+                <div class="tm-otpform-inner">
+                    <div class="tm-form-field otp-area">
+                        <input type="text" name="digit1" id="digit1" class="otp-field" maxlength="1" oninput="moveToNext(this)" onkeypress="return isNumberKey(event)" onfocus="clearInput(this)" pattern="[0-9]*" inputmode="numeric"/>
+                        <input type="text" name="digit2" id="digit2" class="otp-field" maxlength="1" oninput="moveToNext(this)" onkeypress="return isNumberKey(event)" onfocus="clearInput(this)" pattern="[0-9]*" inputmode="numeric"/>
+                        <input type="text" name="digit3" id="digit3" class="otp-field" maxlength="1" oninput="moveToNext(this)" onkeypress="return isNumberKey(event)" onfocus="clearInput(this)" pattern="[0-9]*" inputmode="numeric"/>
+                        <input type="text" name="digit4" id="digit4" class="otp-field" maxlength="1" oninput="moveToNext(this)" onkeypress="return isNumberKey(event)" onfocus="clearInput(this)" pattern="[0-9]*" inputmode="numeric"/>
+                        <input type="text" name="digit5" id="digit5" class="otp-field" maxlength="1" oninput="moveToNext(this)" onkeypress="return isNumberKey(event)" onfocus="clearInput(this)" pattern="[0-9]*" inputmode="numeric"/>
+                        <input type="text" name="digit6" id="digit6" class="otp-field" maxlength="1" oninput="moveToNext(this)" onkeypress="return isNumberKey(event)" onfocus="clearInput(this)" pattern="[0-9]*" inputmode="numeric"/>
+                    </div>
+                </div>
+                <div>
+                    <span id="otp-timer" style="color: red; font-size: large;"> </span>
+                    <p class="form-bottom-msg" id="resend-message" style="display: none;">
+                        Didn't receive the verification code yet or expired ?
+                        <button type="button" id="resend-button" style="color: #9a0056; display: none;" onclick="resendCode(<%= JSON.stringify(otpData) %>)"><b>Resend Code</b></button>
+                    </p>
+                </div>
+                <div class="tm-checkout-submit">
+                    <span id="error-message" style="color: red; font-size: large;"></span>
+                    <div class="tm-form-inner">
+                        <div class="tm-form-field">
+                            <button type="button" onclick="otpSubmit(<%= JSON.stringify(otpData) %>)" id="verifyButton" class="tm-button ml-auto">Verify Account</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+
+
+<!-- ------------------------------------------------------------------------------- -->
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+<!-- script for otp timer -->
+<script>
+    function startOtpTimer(remainingTime) {
+        const timerElement = document.getElementById('otp-timer');
+        const resendMessage = document.getElementById('resend-message');
+        const resendButton = document.getElementById('resend-button');
+
+        // Function to format time as MM:SS
+        function formatTime(milliseconds) {
+            const totalSeconds = Math.floor(milliseconds / 1000);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            return `${minutes.toString().padStart(2, '0')} : ${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Initial display
+        timerElement.textContent = formatTime(remainingTime);
+
+        // Update the timer every second
+        const interval = setInterval(() => {
+            remainingTime -= 1000; // Decrement by one second (1000ms)
+            
+            if (remainingTime <= 0) {
+                clearInterval(interval);
+                timerElement.textContent = "OTP Expired!";
+
+                // Show the resend message and button
+                resendMessage.style.display = 'block';
+                resendButton.style.display = 'inline';
+
+            } else {
+                timerElement.textContent = formatTime(remainingTime);
+            }
+        }, 1000);
+    }
+
+    // Start the OTP timer with the remaining time from the backend
+    startOtpTimer('<%= remainingTime %>');
+
+
+
+
+    // to move the curser to next field automatically
+    function moveToNext(input) {
+        if (input.value.length >= input.maxLength) {
+            var nextInput = input.nextElementSibling;
+            if (nextInput !== null) {
+                nextInput.focus();
+            }
+        }
+    }
+
+    // can only enter the number digits
+    function isNumberKey(evt) {
+        var charCode = (evt.which) ? evt.which : event.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+        }
+        return true;
+    }
+
+
+     // Clear the current value when focused
+    function clearInput(input) {
+        input.value = '';
+    }
+
+
+</script>
+
+
+
+
+
+
+<script>
+    
+// for submitting otp form (verify-account)
+function otpSubmit(otpData) {
+    console.log('otpData in otpSubmit function:', otpData);
+    const userId = otpData.userRef;
+
+    // Get OTP digits
+    const num1 = document.getElementById('digit1')?.value || '';
+    const num2 = document.getElementById('digit2')?.value || '';
+    const num3 = document.getElementById('digit3')?.value || '';
+    const num4 = document.getElementById('digit4')?.value || '';
+    const num5 = document.getElementById('digit5')?.value || '';
+    const num6 = document.getElementById('digit6')?.value || '';
+
+    const OTP = num1 + num2 + num3 + num4 + num5 + num6;
+
+    const errorMessage = document.getElementById('error-message');
+
+ 
+    if (OTP.length < 6){
+        errorMessage.textContent = "Enter Valid OTP";
+        errorMessage.style.display = 'block';
+        return;
+    }
+    
+
+    console.log('User entered OTP:', OTP);
+    console.log('User ID:', userId);
+
+    $.ajax({
+        url: '/verify-account',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ OTP, userId }),
+        success: function (response) {
+            console.log('Response from verifyAccount :', response);
+
+            if (response.verified) {
+                Swal.fire({
+                    title: 'Verified!',
+                    text: 'Your account verification is successful.',
+                    icon: 'success',
+                    showConfirmButton: false,
+                    timer: 2000 // Close alert after 2 seconds
+                }).then(() => {
+                    window.location.href = '/'; // Redirect to homepage or login page
+                });
+            } else if (response.incorrect || response.otpExpire) {
+                errorMessage.textContent = response.message;
+                errorMessage.style.display = 'block';
+
+            } else {
+                console.error('Unexpected response :', response);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error('Error in OTP submission:', error);
+        }
+    });
+}
+
+
+
+
+// for resending otp
+function resendCode(otpData) {
+    console.log('otpData in otpSubmit function:', otpData);
+    const userId = otpData.userRef;
+
+    const resendUrl = `/resend-otp?id=${userId}`;
+
+    $.ajax({
+        url: resendUrl,
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        success: function(response) {
+            console.log('response from resend-otp :', response);
+            if (response.success) {
+                Swal.fire({
+                    title: 'Sent',
+                    text: 'The verification code has been successfully resent to your email.',
+                    icon: 'success',
+                    showConfirmButton: false,
+                })
+                .then(() => {
+                    location.reload();
+                });
+                
+            } else {
+                console.log('resend otp data failed');
+            }
+        },
+        error: function(error) {
+            console.error('Error in resending otp', error);
+        }
+    });
+
+
+}
+
+
+
+
+
+</script>
+
+
+
+
+
+<!-- ----------------------------------------------------------------------- -->
+
+
+<%- include('../layouts/userLayouts/user-footer.ejs') %>

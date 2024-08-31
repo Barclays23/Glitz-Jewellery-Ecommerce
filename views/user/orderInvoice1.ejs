@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <link rel="apple-touch-icon" href="assets/images/logos/G Logo (1).png">
+    <link rel="shortcut icon" href="assets/images/logos/Glitz-Logo7.png">
+
+</head>
+
+
+<body>
+    <main class="page-content">
+        <div class="invoice-container">
+            <header class="invoice-header">
+                <div class="text-center">
+                    <img src="/assets/images/logos/Glitz_Logo_Transformed-4.png" alt="Company Logo" class="invoice-logo">
+                    <h3><strong>TAX INVOICE</strong></h3>
+                </div>
+                <div class="invoice-info">
+                    <div class="shipping-info">
+                        <h4><strong>Billing To:</strong></h4>
+                        <p><strong><%= orderData.shippingAddress.firstname %> <%= orderData.shippingAddress.lastname %></strong></p>
+                        <p><%= orderData.shippingAddress.street %></p>
+                        <p><%= orderData.shippingAddress.city %></p>
+                        <p><%= orderData.shippingAddress.state %>-<%= orderData.shippingAddress.pincode %></p>
+                        <p><%= orderData.shippingAddress.contact %></p>
+                        <p><%= orderData.userRef.email %></p>
+                    </div>
+                    <div class="invoice-details">
+                        <table>
+                            <tr class="invoice-row">
+                                <td class="invoice-label text-left">Invoice No</td>
+                                <td> <strong> : </strong></td>
+                                <td class="invoice-value"><%= orderData.orderNo %></td>
+                            </tr>
+                            <tr class="invoice-row">
+                                <td class="invoice-label text-left">Date</td>
+                                <td> <strong> : </strong></td>
+                                <td class="invoice-value"> <%= formatDate(orderData.orderDate) %> </td>
+                            </tr>
+                            <tr class="invoice-row">
+                                <td class="invoice-label text-left">Billing Rate</td>
+                                <td> <strong> : </strong></td>
+                                <td class="invoice-value">₹ <%= orderData.billingRate %> / Gram</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </header>
+
+            <section class="invoice-body">
+                <div class="invoice-body-content">
+                    <div class="product-details">
+                        <table class="product-specs">
+                            <thead>
+                                <tr>
+                                    <th style="width: 4%;">NO</th>
+                                    <th style="width: 6%;">IMAGE</th>
+                                    <th style="width: 22%;">PRODUCT</th>
+                                    <th style="width: 6%;">PURITY</th>
+                                    <th style="width: 8%;">GROSS WT</th>
+                                    <th style="width: 8%;">STONE WT</th>
+                                    <th style="width: 7%;">NET WT</th>
+                                    <th style="width: 5%;">VA</th>
+                                    <th style="width: 10%;">STONE RATE</th>
+                                    <th style="width: 5%;">QTY</th>
+                                    <th style="width: 9%;">TOTAL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% for (let i = 0; i < orderData.orderedItems.length; i++) { %>
+                                <tr>
+                                    <td><%= i+1 %></td>
+                                    <td><img src="/assets/images/productImages/<%= orderData.orderedItems[i].image %>" alt="product-image" class="product-image"></td>
+                                    <td class="text-left"><%= orderData.orderedItems[i].code %> <%= orderData.orderedItems[i].name %></td>
+                                    <td><%= orderData.orderedItems[i].purity === '22K (916)' ? '22k' : '18k' %></td>
+                                    <td class="text-right"><%= (orderData.orderedItems[i].grossWeight).toFixed(3) %></td>
+                                    <td class="text-right"><%= (orderData.orderedItems[i].stoneWeight).toFixed(3) %></td>
+                                    <td class="text-right"><%= (orderData.orderedItems[i].netWeight).toFixed(3) %></td>
+                                    <td><%= orderData.orderedItems[i].VA %>%</td>
+                                    <td class="text-right"><%= (orderData.orderedItems[i].stoneCharge).toFixed(2) %></td>
+                                    <td><%= orderData.orderedItems[i].quantity %></td>
+                                    <td class="text-right"><%= ((orderData.orderedItems[i].totalPrice - orderData.orderedItems[i].GST) * orderData.orderedItems[i].quantity).toFixed(2) %> </td>
+                                </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="order-summary">
+                        <table class="summary-table">
+                            <tbody>
+                                <tr class="summary-items">
+                                    <td>CGST (1.5%)</td>
+                                    <td>:</td>
+                                    <td class="text-right"> ₹<%= (totalGST /2).toFixed(2) %></td>
+                                </tr>
+                                <tr class="summary-items">
+                                    <td>SGST (1.5%)</td>
+                                    <td>:</td>
+                                    <td class="text-right"> ₹<%= (totalGST /2).toFixed(2) %></td>
+                                </tr>
+                                <tr class="summary-items">
+                                    <td>Item(s) Subtotal</td>
+                                    <td>:</td>
+                                    <td class="text-right"> ₹<%= orderData.subTotal.toFixed(2) %></td>
+                                </tr>
+                                <tr class="summary-items">
+                                    <td>Shipping Charge</td>
+                                    <td>:</td>
+                                    <td class="text-right"> ₹<%= orderData.deliveryCharge.toFixed(2) %></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3">
+                                        <hr class="line-separator">
+                                    </td>
+                                </tr>
+                                <tr class="summary-items">
+                                    <td><strong>Total Amount</strong></td>
+                                    <td>:</td>
+                                    <td class="text-right"><strong> ₹<%= (orderData.subTotal + orderData.deliveryCharge).toFixed(2) %></strong></td>
+                                </tr>
+                                <tr class="summary-items">
+                                    <td>Special Discount</td>
+                                    <td>:</td>
+                                    <td class="text-right discount">- ₹<%= orderData.specialDiscount.toFixed(2) %></td>
+                                </tr>
+                                <tr class="summary-items">
+                                    <td>Offer Discount</td>
+                                    <td>:</td>
+                                    <td class="text-right discount">- ₹<%= totalOfferDiscount.toFixed(2) %></td>
+                                </tr>
+                                <tr class="summary-items">
+                                    <td>Coupon Discount</td>
+                                    <td>:</td>
+                                    <td class="text-right discount">- ₹<%= (orderData.couponDiscount ? orderData.couponDiscount : 0).toFixed(2) %></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3">
+                                        <hr class="line-separator thick-line">
+                                    </td>
+                                </tr>
+                                <tr class="summary-items net-amount">
+                                    <td><strong>Net Amount</strong></td>
+                                    <td>:</td>
+                                    <td class="text-right"><strong>₹<%= orderData.netAmount.toFixed(2) %></strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            <div class="product-info-details">
+                <p><strong>Sold by :</strong> Glitz Boutique Manufacturers</p>
+                <p><strong>Payment Mode :</strong> <%= orderData.paymentMethod %> </p>
+            </div>
+        </div>
+        <div class="invoice-footer">
+            <p style="font-size: small;">Contact Us On</p>
+            <ul class="footer-contact">
+                <li><i class="fas fa-globe mr-1"></i> www.glitzboutiqueonline.com</li>
+                <li><i class="fas fa-envelope mr-1"></i> customersupport@glitzboutique.com</li>
+                <!-- <li><i class="fas fa-phone-alt mr-1"></i> +919 633 699 766</li> -->
+                <li><i class="fab fa-whatsapp mr-1"></i> +919 633 699 766</li>
+            </ul>
+        </div>
+    </main>
+</body>
+
+
+</html>
+
+
+
+
+<!-- script for date & time format -->
+<% function formatDate(dateString) {
+    const date = new Date(dateString);
+    const options = {
+
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    };
+    return date.toLocaleDateString('en-GB', options);
+} %>
+
+
+
+<!-- ======================================================= -->
+
+
+
+<style>
+    /* General styling for the invoice page */
+body, html {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    font-size: 14px; /* Increase base font size from 12px to 14px */
+}
+/* body {
+    background-image: url('/assets/images/logos/Glitz-Logo7.png');
+    background-repeat: no-repeat;
+    z-index: -1;
+    position: absolute;
+    
+} */
+
+.page-content {
+    /* border: 1px solid #9a0056; */
+    width: 100%;
+}
+
+.invoice-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Full height of the page */
+    padding: 0.4cm;
+    box-sizing: border-box;
+    width: 100%;
+    position: relative;
+    background: rgba(255, 255, 255, 0.929); /* Optional: Add a semi-transparent white background to the invoice for better readability */
+    margin: 0 auto;
+    z-index: 2;
+}
+
+.invoice-container::before {
+    content: '';
+    background: url('/assets/images/logos/Glitz-Logo7.png') no-repeat center center;
+    background-size: 45%;
+    /* background-position: center; */
+    position: absolute;
+    top: 62%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    transform: translate(-50%, -50%);
+    opacity: 0.1; /* Adjust opacity for a subtle effect */
+    z-index: -1; /* Place it behind the content */
+}
+
+.invoice-header, .invoice-content, .invoice-footer {
+    width: 100%; /* Ensure these elements take up full width */
+    box-sizing: border-box; /* Include padding in width calculations */
+}
+
+.invoice-header {
+    border-bottom: 2px solid #9a0056;
+    padding-bottom: 0.2cm;
+    align-items: center; /* Center items vertically */
+}
+
+.invoice-logo {
+    height: 70px; /* Adjust as needed */
+    width: auto; /* Maintain aspect ratio */
+    margin-bottom: 35px;
+    margin-top: 20px;
+}
+
+.invoice-header h1 {
+    margin: 0;
+    font-size: 26px; /* Slightly larger header font size */
+}
+
+.summary-table {
+    display: flex;
+    justify-content: end;
+    margin-right: 10px;
+    font-size: 22px;
+}
+
+.invoice-info {
+    display: flex;
+    align-items: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.order-summary {
+    padding-bottom: 1cm;
+}
+
+.product-info-details {
+    margin-bottom: 2cm;
+}
+
+.invoice-details,
+.shipping-info {
+    flex: 1; /* Ensures equal width for both divs */
+    box-sizing: border-box;
+}
+
+.invoice-details {
+    margin-bottom: 1cm;
+    margin-left: 10cm;
+    width: 100%;
+    font-size: 21px;
+}
+
+.invoice-details table {
+    margin-top: 20px;
+    width: 100%; /* Full width of the container */
+    border-collapse: collapse; /* Remove space between cells */
+}
+
+.invoice-row {
+    padding: 10px 0; /* Padding for rows */
+}
+
+.invoice-label {
+    font-weight: bold; /* Make labels bold */
+    text-align: left; /* Align text to the left */
+}
+
+.invoice-value {
+    text-align: left; /* Align values to the left */
+    padding-left: 10px; /* Space between colon and value */
+}
+
+td:nth-child(2) {
+    width: 20px; /* Adjust width for the colon column */
+    text-align: center; /* Center align the colon */
+}
+
+.shipping-info h2, .payment-info h2 {
+    margin: 0 0 0.5cm 0;
+    font-size: 18px; /* Adjust heading font size */
+}
+
+.shipping-info p {
+    line-height: 1.2; /* Adjusts line height to be more compact */
+    margin: 0.1cm 0;  /* Reduces the margin between paragraphs */
+    font-size: 21px;
+}
+
+.product-details {
+    margin-bottom: 1cm;
+}
+
+.product-info {
+    display: flex;
+    align-items: center;
+}
+
+.product-image {
+    width: 60px; /* Adjusted to fit better within A4 */
+    height: 60px;
+    margin-right: 0.5cm;
+}
+
+.product-specs {
+    margin-top: 0.5cm;
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed; /* Use fixed layout to maintain column width */
+}
+
+.product-specs th, .product-specs td {
+    border: 1px solid #ddd;
+    padding: 0.1cm; /* Adjust padding */
+    text-align: center;
+    vertical-align: middle; /* Ensure vertical alignment */
+    overflow: hidden; /* Hide overflow text */
+    text-overflow: ellipsis; /* Show ellipsis for overflow text */
+}
+
+.product-specs th {
+    font-size: medium;
+}
+.product-specs td {
+    font-size: large;
+}
+
+.product-specs th {
+    background-color: #f2f2f2;
+    padding: 4px;
+}
+
+.text-danger {
+    color: red;
+}
+
+.line-separator {
+    border-top: 1px solid #ddd;
+    margin: 0.3cm 0;
+}
+
+.line-separator.thick-line {
+    border-top: 2px solid #9a0056; /* Thick line color */
+}
+
+.summary table {
+    align-content: end;
+}
+.net-amount {
+    font-size: x-large;
+}
+
+.discount {
+    color: red;
+}
+
+.invoice-footer {
+    background-color: #9a0056;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 10px 0;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    font-size: 14px; /* Ensure footer font is readable */
+}
+
+.invoice-footer p {
+    padding-top: 5px;
+}
+
+.footer-contact {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1cm;
+    font-size: 12px; /* Adjust font size for contact info */
+}
+
+.footer-contact li {
+    position: relative;
+    margin-bottom: 5px;
+    padding: 1 15cm;
+    font-size: 12px; /* Ensure contact items are legible */
+}
+
+.footer-contact li:not(:last-child)::after {
+    content: '|';
+    position: absolute;
+    right: -0.3cm;
+}
+
+/* Print-specific styles */
+@media print {
+    body, html {
+        width: 210mm; /* A4 size in width */
+        height: 297mm; /* A4 size in height */
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-size: 14px; /* Consistent font size for print */
+    }
+
+    .invoice-container {
+        min-height: 297mm;
+        padding: 0.3cm;
+        width: 100%;
+        position: fixed;
+    }
+
+    .invoice-header, .invoice-content, .invoice-footer {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .invoice-footer {
+        position: fixed;
+        bottom: 0;
+    }
+}
+
+</style>

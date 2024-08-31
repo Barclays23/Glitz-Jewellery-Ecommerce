@@ -36,13 +36,12 @@ const loadProductList = async(req, res)=>{
         let productQuery = {};
 
         // searching
-        if(searchQuery){
+        if (searchQuery){
             productQuery.$or = [
                 {name: {$regex: '.*' + searchQuery + '.*', $options: 'i'}},
                 {code: {$regex: '.*' + searchQuery + '.*', $options: 'i'}},
             ];
         }
-
 
 
         // filtering category

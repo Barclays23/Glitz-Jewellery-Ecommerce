@@ -77,59 +77,65 @@ userRoute.get('/shopping', userController.loadShopping);
 userRoute.get('/product-details', userController.productDetals);
 
 // USER PROFILE ROUTES
-userRoute.get('/my-account', userAuth.isLogin, userController.loadUserAccount);
-userRoute.get('/profile', userAuth.isLogin, userController.loadUserProfile);
-userRoute.get('/edit-profile', userAuth.isLogin, userController.loadEditUserProfile);
-userRoute.post('/update-profile', userAuth.isLogin, multer.uploadUserImages, userController.updateUserProfile);
-userRoute.post('/change-password', userAuth.isLogin, userController.updateUserPassword);
+userRoute.get('/my-account', userAuth.isLogin, userAuth.isBlocked, userController.loadUserAccount);
+userRoute.get('/profile', userAuth.isLogin, userAuth.isBlocked, userController.loadUserProfile);
+userRoute.get('/edit-profile', userAuth.isLogin, userAuth.isBlocked, userController.loadEditUserProfile);
+userRoute.post('/update-profile', userAuth.isLogin, userAuth.isBlocked, multer.uploadUserImages, userController.updateUserProfile);
+userRoute.post('/change-password', userAuth.isLogin, userAuth.isBlocked, userController.updateUserPassword);
 
 
 // ADDRESS ROUTES
-userRoute.get('/address', userAuth.isLogin, addressController.loadUserAddress);
-userRoute.post('/add-address', userAuth.isLogin, addressController.addNewAddress);
-userRoute.patch('/edit-address', userAuth.isLogin, addressController.editAddress);
-userRoute.delete('/delete-address', userAuth.isLogin, addressController.deleteAddress);
+userRoute.get('/address', userAuth.isLogin, userAuth.isBlocked, addressController.loadUserAddress);
+userRoute.post('/add-address', userAuth.isLogin, userAuth.isBlocked, addressController.addNewAddress);
+userRoute.patch('/edit-address', userAuth.isLogin, userAuth.isBlocked, addressController.editAddress);
+userRoute.delete('/delete-address', userAuth.isLogin, userAuth.isBlocked, addressController.deleteAddress);
 
 
 // WISHLIST ROUTES
-userRoute.get('/wishlist', userAuth.isLogin, wishlistController.loadUserWishlist);
-userRoute.post('/add-to-wishlist', wishlistController.addToWishlist); // also same function for remove to wishlist
-userRoute.delete('/save-for-later', userAuth.isLogin, wishlistController.saveForLater);
+userRoute.get('/wishlist', userAuth.isLogin, userAuth.isBlocked, wishlistController.loadUserWishlist);
+userRoute.post('/add-to-wishlist', wishlistController.addToWishlist); // also same route for remove from wishlist
+userRoute.delete('/save-for-later', userAuth.isLogin, userAuth.isBlocked, wishlistController.saveForLater);
 
 
 // CART ROUTES
-userRoute.get('/cart', userAuth.isLogin, cartController.loadUserCart);
-userRoute.post('/add-to-cart', cartController.addToCart);
-userRoute.post('/update-cart-quantity', userAuth.isLogin, cartController.updateCartQuantity);
-userRoute.delete('/remove-from-cart', userAuth.isLogin, cartController.removeFromCart);
-userRoute.post('/proceed-to-checkout', userAuth.isLogin, cartController.proceedToCheckout);
+userRoute.get('/cart', userAuth.isLogin, userAuth.isBlocked, cartController.loadUserCart);
+userRoute.post('/add-to-cart', userAuth.isBlocked, cartController.addToCart);
+userRoute.post('/update-cart-quantity', userAuth.isLogin, userAuth.isBlocked, cartController.updateCartQuantity);
+userRoute.delete('/remove-from-cart', userAuth.isLogin, userAuth.isBlocked, cartController.removeFromCart);
+userRoute.post('/proceed-to-checkout', userAuth.isLogin, userAuth.isBlocked, cartController.proceedToCheckout);
 
 
 // ORDER ROUTES FOR USER
-userRoute.get('/checkout', userAuth.isLogin, cartController.loadCheckout);
+userRoute.get('/checkout', userAuth.isLogin, userAuth.isBlocked, cartController.loadCheckout);
 
-userRoute.post('/make-payment', userAuth.isLogin, cartController.makePayment);
-userRoute.post('/place-order', userAuth.isLogin, cartController.placeOrder);
-userRoute.post('/verify-payment', userAuth.isLogin, cartController.verifyPayment);
-userRoute.get('/order-success', userAuth.isLogin, cartController.loadOrderSuccess);
-userRoute.get('/orders', userAuth.isLogin, cartController.loadUserOrders);  // orderController
-userRoute.get('/order-details', userAuth.isLogin, cartController.loadOrderDetails);  // orderController
+userRoute.post('/make-payment', userAuth.isLogin, userAuth.isBlocked, cartController.makePayment);
+userRoute.post('/place-order', userAuth.isLogin, userAuth.isBlocked, cartController.placeOrder);
+userRoute.post('/verify-payment', userAuth.isLogin, userAuth.isBlocked, cartController.verifyPayment);
+userRoute.get('/order-success', userAuth.isLogin, userAuth.isBlocked, cartController.loadOrderSuccess);
+userRoute.get('/orders', userAuth.isLogin, userAuth.isBlocked, cartController.loadUserOrders);  // orderController
+userRoute.get('/order-details', userAuth.isLogin, userAuth.isBlocked, cartController.loadOrderDetails);  // orderController
 
-userRoute.post('/cancel-order', userAuth.isLogin, orderController.cancelOrder);
-userRoute.post('/return-order', userAuth.isLogin, orderController.returnOrder);
-userRoute.get('/retry-payment', userAuth.isLogin, orderController.loadRetryPayment);
-userRoute.post('/retry-payment', userAuth.isLogin, orderController.retryPayment);
-userRoute.patch('/update-order', userAuth.isLogin, orderController.updateRetryOrder);
+userRoute.post('/cancel-order', userAuth.isLogin, userAuth.isBlocked, orderController.cancelOrder);
+userRoute.post('/return-order', userAuth.isLogin, userAuth.isBlocked, orderController.returnOrder);
+userRoute.get('/retry-payment', userAuth.isLogin, userAuth.isBlocked, orderController.loadRetryPayment);
+userRoute.post('/retry-payment', userAuth.isLogin, userAuth.isBlocked, orderController.retryPayment);
+userRoute.patch('/update-order', userAuth.isLogin, userAuth.isBlocked, orderController.updateRetryOrder);
 
 
 // WALLET ROUTES
-userRoute.get('/wallet', userAuth.isLogin, userController.loadWallet);
+userRoute.get('/wallet', userAuth.isLogin, userAuth.isBlocked, userController.loadWallet);
 
 
 //COUPON ROUTES FOR USER
-userRoute.get('/coupons', userAuth.isLogin, userController.loadCoupons);
-userRoute.post('/apply-coupon', userAuth.isLogin, couponController.applyCoupon);
-userRoute.patch('/cancel-coupon', userAuth.isLogin, couponController.cancelCoupon);
+userRoute.get('/coupons', userAuth.isLogin, userAuth.isBlocked, userController.loadCoupons);
+userRoute.post('/apply-coupon', userAuth.isLogin, userAuth.isBlocked, couponController.applyCoupon);
+userRoute.patch('/cancel-coupon', userAuth.isLogin, userAuth.isBlocked, couponController.cancelCoupon);
+
+
+
+// ROUTES FOR INVOICE
+userRoute.get('/invoice', orderController.loadInvoice); // // removed userAuth.isLogin, userAuth.isBlocked,
+userRoute.get('/download-invoice', orderController.downloadInvoice);  // removed userAuth.isLogin, userAuth.isBlocked,
 
 
 

@@ -13,9 +13,10 @@ const razorPayInstance = new RazorPay ({
     key_secret : process.env.razorPayKeySecret
 });
 
-
 const cron = require('node-cron');  // cron job for pendingOrdersManaging & cancelPendingOrders
 
+const puppeteer = require ('puppeteer');
+const zlib = require('zlib');
 
 
 
@@ -710,7 +711,6 @@ const cancelOrder = async(req, res)=>{
 
 
 
-
 // return order item ----------------------------------------
 const returnOrder = async (req, res)=>{
     try {
@@ -1216,7 +1216,6 @@ const updateRetryOrder = async(req, res)=>{
 
 
 
-
 // to cancel pending orders after 10 minutes
 const cancelPendingOrders = async (req, res) => {
     try {
@@ -1282,6 +1281,128 @@ const pendingOrdersManaging = async (req, res)=>{
 
 
 
+// to get the data for the invoice page.
+const getInvoiceData = async(req, res)=>{
+    try {
+        // const sessionId = req.session.userId;
+        const orderId = req.query.id;
+        console.log('order id for getting invoice data :', orderId);
+        
+        // const userData = await User.findById(sessionId);
+        const orderData = await Order.findOne({_id : orderId}).populate('userRef');
+
+        console.log('Invoice data found :', orderData.orderNo);
+
+        let totalOfferDiscount = 0;
+        let totalGST = 0;
+
+        orderData.orderedItems.forEach((item)=>{
+            offerDiscount = item.offerDiscount ? item.offerDiscount : 0;
+            totalOfferDiscount += offerDiscount;
+
+            let itemGST = item.GST * item.quantity;
+            totalGST += itemGST;
+        });
+
+
+        return { orderData, totalOfferDiscount, totalGST };
+
+        
+    } catch (error) {
+        console.log('error in getInvoiceData :', error.message);
+    }
+}
+
+
+
+
+// load invoice for user -------------------------------------
+const loadInvoice = async(req, res)=>{
+    try {
+
+        const invoiceData = await getInvoiceData (req, res);
+
+        const { 
+            // userData, 
+            orderData, 
+            totalOfferDiscount, 
+            totalGST 
+        } = invoiceData;
+
+        // to load the invoice page.
+        res.render('orderInvoice1', { orderData, totalOfferDiscount, totalGST });
+
+    } catch (error) {
+        console.log('Error in loading the invoice page.', error.message);
+    }
+}
+
+
+
+
+// for downloading the order invoice for user -----------------
+const downloadInvoice = async (req, res) => {
+    try {
+        const orderId = req.query.id;
+        console.log('order id for downloading invoice :', orderId);
+
+        // Fetch order invoice details
+        const invoiceData = await getInvoiceData(req, res); // Set forPdf to true
+
+        const { 
+            orderData, 
+        } = invoiceData;
+
+        // Launch a headless browser instance
+        const browser = await puppeteer.launch();
+        const page = await browser.newPage();
+
+
+        // Replace `localhost:3000` with the actual URL if necessary
+        const invoiceUrl = `http://localhost:3000/invoice?id=${orderId}`;
+
+        console.log('Navigating to URL :', invoiceUrl);
+
+        // Navigate to the invoice page
+        await page.goto(invoiceUrl, { waitUntil: 'networkidle0' });
+
+        // Log page title and URL to check what is being loaded
+        const pageTitle = await page.title();
+        const pageUrl = page.url();
+        console.log('Download Page title :', pageTitle);
+        console.log('Download Page URL :', pageUrl);
+        
+        // Generate PDF from the page content
+        const pdfBuffer = await page.pdf({
+            format: 'A4',
+            printBackground: true,
+        });
+
+
+        // Compress the PDF
+        const compressedBuffer = await new Promise((resolve, reject) => {
+            zlib.gzip(pdfBuffer, (err, result) => {
+                if (err) return reject(err);
+                resolve(result);
+            });
+        });
+
+        // Close the browser
+        await browser.close();
+
+        // Set response headers to trigger a download in the browser
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Encoding', 'gzip');
+        res.setHeader('Content-Disposition', `attachment; filename=Invoice_${orderData.orderNo}.pdf`);
+
+        // Send the generated PDF as a response
+        res.send(compressedBuffer);
+
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        res.status(500).send('An error occurred while generating the PDF.');
+    }
+};
 
 
 
@@ -1297,5 +1418,7 @@ module.exports = {
     loadRetryPayment,
     retryPayment,
     updateRetryOrder,
-    pendingOrdersManaging
+    pendingOrdersManaging,
+    loadInvoice,
+    downloadInvoice
 }

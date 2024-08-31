@@ -249,15 +249,50 @@
                     <br>
                 </div>
 
-                <div class="list-pagination" style="text-align: center">
-                    <% for(let j=1; j <= totalPages; j++){ %>
-                        <% if (currentPage == j) { %>
-                            <a href="?page=<%= j %>&sort=<%= sortQuery %>&search=<%= searchQuery %>&filter-category=<%= categoryQuery %>&filter-status=<%= statusQuery %>" class="text-white"><%= j %></a>
-                        <% } else{ %>
-                            <a href="?page=<%= j %>&sort=<%= sortQuery %>&search=<%= searchQuery %>&filter-category=<%= categoryQuery %>&filter-status=<%= statusQuery %>" class="text-success"><%= j %></a>
-                        <% } %>
-                    <% } %>
-                </div>
+                <div class="list-pagination mt-4">
+                    <nav>
+                        <ul class="pagination rounded-flat pagination-success">
+                            <!-- Previous Page Link -->
+                            <% if (currentPage > 1) { %>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=<%= currentPage - 1 %>&sort=<%= sortQuery %>&search=<%= searchQuery %>&filter-category=<%= categoryQuery %>&filter-status=<%= statusQuery %>">
+                                        <i class="mdi mdi-chevron-left"></i>
+                                    </a>
+                                </li>
+                            <% } else { %>
+                                <li class="page-item disabled">
+                                    <a class="page-link"><i class="mdi mdi-chevron-left"></i></a>
+                                </li>
+                            <% } %>
+                
+                            <!-- Dynamic Page Links -->
+                            <% for(let j = 1; j <= totalPages; j++) { %>
+                                <% if (j === currentPage) { %>
+                                    <li class="page-item active">
+                                        <a class="page-link" href="#"> <%= j %> </a>
+                                    </li>
+                                <% } else { %>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=<%= j %>&sort=<%= sortQuery %>&search=<%= searchQuery %>&filter-category=<%= categoryQuery %>&filter-status=<%= statusQuery %>"> <%= j %> </a>
+                                    </li>
+                                <% } %>
+                            <% } %>
+                
+                            <!-- Next Page Link -->
+                            <% if (currentPage < totalPages) { %>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=<%= currentPage + 1 %>&sort=<%= sortQuery %>&search=<%= searchQuery %>&filter-category=<%= categoryQuery %>&filter-status=<%= statusQuery %>">
+                                        <i class="mdi mdi-chevron-right"></i>
+                                    </a>
+                                </li>
+                            <% } else { %>
+                                <li class="page-item disabled"> 
+                                    <a class="page-link"><i class="mdi mdi-chevron-right"></i></a>
+                                </li>
+                            <% } %>
+                        </ul>
+                    </nav>
+                </div>                
 
             </div>
         </div>
