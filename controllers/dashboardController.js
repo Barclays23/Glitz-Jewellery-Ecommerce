@@ -320,15 +320,16 @@ const getOrderSummary = async (req, res)=>{
 
 
 
+
 // fetch category wise sales report -----------------------------------------
 const getCategoryWiseSaleReport = async (req, res)=>{
     const filter = req.query.filter || 'yearly'; // Default to 'yearly' if no filter is provided
     const year = parseInt(req.query.year) || new Date().getFullYear();
-    const month = req.query.month ? parseInt(req.query.month) - 1 : null; // Months in JavaScript are 0-based
+    const month = req.query.month ? parseInt(req.query.month) - 1 : null; // Months in JavaScript are 0 index based
 
-    console.log('filter by query : ', filter);
-    console.log('filter by year : ', year);
-    console.log('filter by month : ', month);
+    console.log('category sale filter by query : ', filter);
+    console.log('category sale filter by year : ', year);
+    console.log('category sale filter by month : ', month);
 
     // Set the start and end dates based on the filter type
     let startDate, endDate;
@@ -340,8 +341,8 @@ const getCategoryWiseSaleReport = async (req, res)=>{
         startDate = new Date(year, 0, 1); // January 1st of the year
         endDate = new Date(year, 11, 31, 23, 59, 59, 999); // December 31st of the year
     }
-    console.log('filter startDate : ', startDate);
-    console.log('filter endDate : ', endDate);
+    console.log('category sale filter startDate : ', startDate);
+    console.log('category sale filter endDate : ', endDate);
 
     try {
         const aggregationPipeline = [
@@ -434,11 +435,206 @@ const filterCategorySale = async (req, res) => {
 // fetch product wise sale report --------------------------------
 const getMostSoldProducts = async (req, res)=>{
     try {
-        
+        const limit = 10;
+
+        const filter = req.query.filter || 'yearly'; // Default to 'yearly' if no filter is provided
+        const filterYear = parseInt(req.query.year) || new Date().getFullYear();
+        const filterMonth = req.query.month ? parseInt(req.query.month) - 1 : null; // -1 bcoz, Months in JavaScript are 0 index based.
+    
+        console.log('product sale filter by query : ', filter);
+        console.log('product sale filter by year : ', filterYear);
+        console.log('product sale filter by month : ', filterMonth);
+
+        // Set the start and end dates based on the filter type
+        let startDate, endDate;
+
+        if (filterMonth) {
+            startDate = new Date(Date.UTC(filterYear, filterMonth, 1, 0, 0, 0));
+            endDate = new Date(filterYear, filterMonth + 1, 0, 23, 59, 59, 999); // End of the selected month
+
+        } else { // 'yearly' or month == null
+            startDate = new Date(filterYear, 0, 1, 0, 0, 0); // January 1st of the year
+            endDate = new Date(filterYear, 11, 31, 23, 59, 59, 999); // December 31st of the year
+        }
+
+        console.log('product sale filter startDate : ', startDate);
+        console.log('product sale filter endDate : ', endDate);
+
+        const topSellingProducts = await Order.aggregate([
+            // Match orders with specific statuses
+            {
+                $match: {
+                    orderStatus: { $in: ['Processing', 'Process Completed'] },
+                    orderDate: { $gte: startDate, $lte: endDate } // Filter by date range
+                }
+            },
+            // Unwind the orderedItems array to get individual items
+            {
+                $unwind: '$orderedItems'
+            },
+            // Filter products by productStatus
+            {
+                $match: {
+                    'orderedItems.productStatus': { $nin: ['Cancelled', 'Returned'] }
+                }
+            },
+            // Group by productRef and calculate the total quantity sold
+            {
+                $group: {
+                    _id: '$orderedItems.code',
+                    image: { $first: '$orderedItems.image' }, // Use $first to get the image from the first document in each group
+                    totalQuantity: { $sum: '$orderedItems.quantity' },
+                    totalSales: { $sum: '$orderedItems.totalPrice' } // Optional: sum the sales
+                }
+            },
+            // Sort by totalQuantity in descending order
+            {
+                $sort: { totalQuantity: -1 }
+            },
+            // Limit to top N products
+            {
+                $limit: limit
+            }
+        ]);
+
+        return topSellingProducts;
+
     } catch (error) {
-        console.log('error in getMostSold Products :', error.message);
+        console.error('Error in getMostSoldProducts :', error.message);
     }
 }
+
+
+
+
+// for filtered most sold products-sale-report.
+const filterProductSale = async (req, res) => {
+    try {
+        console.log('query for filtering product sale :', req.query);
+
+        // Fetch the filtered top-selling products
+        const filteredTopSellingProducts = await getMostSoldProducts(req, res);
+        
+        console.log('filteredTopSellingProducts :', filteredTopSellingProducts);
+
+        return res.json({ filteredTopSellingProducts });
+
+        
+    } catch (error) {
+        console.error('Error fetching filtered top selling products:', error.message);
+        res.status(500).json({ errorMessage : 'Internal Server Error :'+ error.message });
+    }
+};
+
+
+
+
+// payment method wise transaction report
+const getPaymentModeReport = async (req, res)=> {
+    try {
+        const filter = req.query.filter || 'yearly'; // Default to 'yearly' if no filter is provided
+        const filterYear = parseInt(req.query.year) || new Date().getFullYear();
+        const filterMonth = req.query.month ? parseInt(req.query.month) - 1 : null; // -1 bcoz, Months in JavaScript are 0 index based.
+    
+        console.log('payment method filter by query : ', filter);
+        console.log('payment method filter by year : ', filterYear);
+        console.log('payment method filter by month : ', filterMonth);
+
+        // Set the start and end dates based on the filter type
+        let startDate, endDate;
+
+        if (filterMonth !== null) {
+            startDate = new Date(Date.UTC(filterYear, filterMonth, 1, 0, 0, 0));
+            endDate = new Date(filterYear, filterMonth + 1, 0, 23, 59, 59, 999); // End of the selected month
+
+        } else { // 'yearly' or month == null
+            startDate = new Date(filterYear, 0, 1, 0, 0, 0); // January 1st of the year
+            endDate = new Date(filterYear, 11, 31, 23, 59, 59, 999); // December 31st of the year
+        }
+
+        console.log('product sale filter startDate : ', startDate);
+        console.log('product sale filter endDate : ', endDate);
+
+
+        const paymentModeReport = await Order.aggregate([
+            {
+                $match: {
+                    orderStatus: { $nin: ['Pending', 'Failed'] }, //  orderStatus is not 'Pending' nor 'Failed'
+                    orderDate: { $gte: startDate, $lte: endDate } // Filter by date range
+                }
+            },
+            {
+                $group: {
+                    _id: '$paymentMethod',
+                    netAmount: { $sum: '$netAmount' },
+                    orderCount: { $sum: 1 }
+                }
+            },
+            {
+                // Sorting the results in descending order
+                $sort: { netAmount: -1 }
+            },
+            {
+                // Optionally, rename _id to paymentMethod for clarity in the output
+                $project: {
+                    _id: 0,
+                    paymentMethod: '$_id',
+                    netAmount: 1,
+                    orderCount: 1
+                }
+            }
+        ]);
+
+        let totalPaymentCount = 0;
+        let totalPaymentAmount = 0;
+
+        paymentModeReport.forEach((txn)=>{
+            totalPaymentCount += txn.orderCount;
+            totalPaymentAmount += txn.netAmount;
+        });
+
+        return {
+            paymentModeReport,
+            totalPaymentCount,
+            totalPaymentAmount
+        };
+
+
+    } catch (error) {
+        console.error('Error fetching payment report :', error.message);
+    }
+}
+
+
+
+
+const filterPaymentModeReport = async (req, res) => {
+    try {
+        console.log('query for filtering payment method report :', req.query);
+
+        // Fetch the filtered payment method report
+        const filteredPaymentModeReport = await getPaymentModeReport(req, res);
+        const {
+            paymentModeReport,
+            totalPaymentCount,
+            totalPaymentAmount
+        } = filteredPaymentModeReport;
+
+        console.log('filteredPaymentModeReport :', filteredPaymentModeReport);
+
+        return res.json(
+            {
+                paymentModeReport, totalPaymentCount, totalPaymentAmount 
+            }
+        );
+
+
+    } catch (error) {
+        console.error('Error fetching payment data :', error.message);
+        res.status(500).json({ errorMessage : 'Internal Server Error :'+ error.message });
+    }
+};
+
 
 
 
@@ -919,10 +1115,19 @@ const loadAdminDashboard = async (req, res)=>{
             totalSaleAmount = 0,          // Default to 0 if undefined
             totalSaleQuantity = 0         // Default to 0 if undefined
         } = categorySaleReport || {}; // Default to empty object if undefined
+        
+        
+        const topSellingProducts = await getMostSoldProducts(req, res);
 
-        console.log('totalSaleAmount result in : ', categoryWiseSalesReport);
-        console.log('totalSaleAmount result in : ', totalSaleAmount);
-        console.log('totalSaleQuantity result in : ', totalSaleQuantity);
+
+        const paymentModeWiseReport = await getPaymentModeReport(req, res);
+        const {
+            paymentModeReport,
+            totalPaymentCount,
+            totalPaymentAmount
+        } = paymentModeWiseReport;
+
+        console.log('paymentModeReport for dashboard :', paymentModeReport);
 
 
         res.render("adminDashboard", {
@@ -960,7 +1165,15 @@ const loadAdminDashboard = async (req, res)=>{
             // from categorySaleReport
             categoryWiseSalesReport,
             totalSaleAmount,
-            totalSaleQuantity
+            totalSaleQuantity,
+
+            // from topSellingProducts
+            topSellingProducts,
+
+            // from paymentModeWiseReport
+            paymentModeReport,
+            totalPaymentCount,
+            totalPaymentAmount
 
         });
         
@@ -979,9 +1192,13 @@ const loadAdminDashboard = async (req, res)=>{
 
 
 
+
+
 module.exports = {
     loadAdminDashboard,
     filterCategorySale,
+    filterProductSale,
+    filterPaymentModeReport,
 
     loadSalesReport,
     salesReportPdf,

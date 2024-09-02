@@ -110,7 +110,8 @@ adminRoute.get('/sales-report',  adminAuth.isLogin, dashboardController.loadSale
 adminRoute.get('/sales-report-pdf',  adminAuth.isLogin, dashboardController.salesReportPdf);
 adminRoute.get('/sales-report-excel',  adminAuth.isLogin, dashboardController.salesReportExcel);
 adminRoute.get('/categorywise-sale-report',  adminAuth.isLogin, dashboardController.filterCategorySale);
-// adminRoute.get('/productwise-sale-report',  adminAuth.isLogin, dashboardController.filterProductSale);
+adminRoute.get('/top-selling-products',  adminAuth.isLogin, dashboardController.filterProductSale);
+adminRoute.get('/payment-mode-wise-report',  adminAuth.isLogin, dashboardController.filterPaymentModeReport);
 
 
 

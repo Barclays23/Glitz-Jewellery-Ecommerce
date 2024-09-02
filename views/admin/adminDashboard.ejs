@@ -157,22 +157,22 @@
                 <div class="card-body">
                     <h5 class="card-title text-success"> SALES BY CATEGORIES </h5>
                     <!-- Filter Form -->
-                    <form id="filterForm">
+                    <form id="categoryFilterForm">
                         <div class="row mb-4">
                             <div class="col-md-3">
-                                <label for="filter">Filter By:</label>
-                                <select id="filter" name="filter" class="form-control">
+                                <label for="category-filter">Filter By:</label>
+                                <select id="category-filter" name="filter" class="form-control">
                                     <option value="yearly">Yearly</option>
                                     <option value="monthly">Monthly</option>
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <label for="year">Year:</label>
-                                <input type="number" id="year" name="year" class="form-control" value="<%= new Date().getFullYear() %>">
+                                <label for="category-year">Year:</label>
+                                <input type="number" id="category-year" name="year" class="form-control" value="<%= new Date().getFullYear() %>">
                             </div>
                             <div class="col-md-3">
-                                <label for="month">Month:</label>
-                                <select id="month" name="month" class="form-control">
+                                <label for="category-month">Month:</label>
+                                <select id="category-month" name="month" class="form-control">
                                     <option value="">Select Month</option>
                                     <option value="1">January</option>
                                     <option value="2">February</option>
@@ -239,7 +239,97 @@
 
 
 
-    <!-- row 3 -->
+        <!-- row 3 -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title text-success"> TRANSACTION SUMMARY </h5>
+                        <!-- Filter Form -->
+                        <form id="paymentFilterForm">
+                            <div class="row mb-4">
+                                <div class="col-md-3">
+                                    <label for="payment-filter">Filter By:</label>
+                                    <select id="payment-filter" name="filter" class="form-control">
+                                        <option value="yearly">Yearly</option>
+                                        <option value="monthly">Monthly</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="payment-year">Year:</label>
+                                    <input type="number" id="payment-year" name="year" class="form-control" value="<%= new Date().getFullYear() %>">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="payment-month">Month:</label>
+                                    <select id="payment-month" name="month" class="form-control">
+                                        <option value="">Select Month</option>
+                                        <option value="1">January</option>
+                                        <option value="2">February</option>
+                                        <option value="3">March</option>
+                                        <option value="4">April</option>
+                                        <option value="5">May</option>
+                                        <option value="6">June</option>
+                                        <option value="7">July</option>
+                                        <option value="8">August</option>
+                                        <option value="9">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <button type="submit" class="btn btn-primary mt-4">Apply Filter</button>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="table-responsive">
+                                    <table class="table" id="transationModeTable">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-primary">TRANSACTION MODE</th>
+                                                <th class="text-primary text-center">QUANTITY</th>
+                                                <th class="text-primary text-end">AMOUNT</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% if (paymentModeReport.length >0){ %>
+                                                <% for (let i=0; i< paymentModeReport.length; i++ ){ %>
+                                                    <tr>
+                                                        <td> <%= paymentModeReport[i].paymentMethod %></td> <!-- category name -->
+                                                        <td class="text-center"> <%= paymentModeReport[i].orderCount %> </td>
+                                                        <td class="text-end font-weight-medium"> <%= (paymentModeReport[i].netAmount).toFixed(2) %> </td>
+                                                    </tr>
+                                                <% } %>
+                                                <tr>
+                                                    <td class="text-warning"> TOTAL </td>
+                                                    <td class="text-warning text-center"> <%= totalPaymentCount %> </td>
+                                                    <td class="text-warning text-end font-weight-medium"> <%= (totalPaymentAmount).toFixed(2) %> </td>
+                                                </tr>
+                                            <% } %>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 grid-margin stretch-card">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <!-- <h4 class="card-title">Donut chart</h4> -->
+                                        <div id="transaction-donut-chart"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr style="height: 1px; color: rgb(17, 255, 0);">
+
+
+
+    <!-- row 4 -->
     <div class="row">
 
         <div class="col-sm-4 grid-margin">
@@ -373,136 +463,83 @@
 
 
 
-    <!-- row 4 -->    
+    <!-- row 5 -->
     <div class="row">
-        <div class="col-md-4 grid-margin stretch-card">
+        <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Transaction History</h4>
-                    <div class="position-relative">
-                        <div class="daoughnutchart-wrapper">
-                            <canvas id="transaction-history" class="transaction-chart"></canvas>
+                    <h5 class="card-title text-success"> TOP SELLING PRODUCTS </h5>
+                    <!-- Filter Form -->
+                    <form id="productFilterForm">
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <label for="product-filter">Filter By:</label>
+                                <select id="product-filter" name="filter" class="form-control">
+                                    <option value="yearly">Yearly</option>
+                                    <option value="monthly">Monthly</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="product-year">Year:</label>
+                                <input type="number" id="product-year" name="year" class="form-control" value="<%= new Date().getFullYear() %>">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="product-month">Month:</label>
+                                <select id="product-month" name="month" class="form-control">
+                                    <option value="">Select Month</option>
+                                    <option value="1">January</option>
+                                    <option value="2">February</option>
+                                    <option value="3">March</option>
+                                    <option value="4">April</option>
+                                    <option value="5">May</option>
+                                    <option value="6">June</option>
+                                    <option value="7">July</option>
+                                    <option value="8">August</option>
+                                    <option value="9">September</option>
+                                    <option value="10">October</option>
+                                    <option value="11">November</option>
+                                    <option value="12">December</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <button type="submit" class="btn btn-primary mt-4">Apply Filter</button>
+                            </div>
                         </div>
-                        <div class="custom-value"> ₹ 12000 <span>Total</span>
-                        </div>
-                    </div>
-                    <div
-                        class="bg-gray-dark d-flex d-md-block d-xl-flex flex-row py-3 px-4 px-md-3 px-xl-4 rounded mt-3">
-                        <div class="text-md-center text-xl-left">
-                            <h6 class="mb-1">Transfer to Paypal</h6>
-                            <p class="text-muted mb-0">07 Jan 2019, 09:12AM</p>
-                        </div>
-                        <div class="align-self-center flex-grow text-end text-md-center text-xl-right py-md-2 py-xl-0">
-                            <h6 class="font-weight-bold mb-0"> ₹ 236</h6>
-                        </div>
-                    </div>
-                    <div
-                        class="bg-gray-dark d-flex d-md-block d-xl-flex flex-row py-3 px-4 px-md-3 px-xl-4 rounded mt-3">
-                        <div class="text-md-center text-xl-left">
-                            <h6 class="mb-1">Tranfer to Stripe</h6>
-                            <p class="text-muted mb-0">07 Jan 2019, 09:12AM</p>
-                        </div>
-                        <div class="align-self-center flex-grow text-end text-md-center text-xl-right py-md-2 py-xl-0">
-                            <h6 class="font-weight-bold mb-0"> ₹ 593</h6>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-8 grid-margin stretch-card">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex flex-row justify-content-between">
-                        <h4 class="card-title mb-1">Open Projects</h4>
-                        <p class="text-muted mb-1">Your data status</p>
-                    </div>
+                    </form>
                     <div class="row">
-                        <div class="col-12">
-                            <div class="preview-list">
-                                <div class="preview-item border-bottom">
-                                    <div class="preview-thumbnail">
-                                        <div class="preview-icon bg-primary">
-                                            <i class="mdi mdi-file-document"></i>
-                                        </div>
-                                    </div>
-                                    <div class="preview-item-content d-sm-flex flex-grow">
-                                        <div class="flex-grow">
-                                            <h6 class="preview-subject">Admin dashboard design</h6>
-                                            <p class="text-muted mb-0">Broadcast web app mockup</p>
-                                        </div>
-                                        <div class="mr-auto text-sm-right pt-2 pt-sm-0">
-                                            <p class="text-muted">15 minutes ago</p>
-                                            <p class="text-muted mb-0">30 tasks, 5 issues </p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="preview-item border-bottom">
-                                    <div class="preview-thumbnail">
-                                        <div class="preview-icon bg-success">
-                                            <i class="mdi mdi-cloud-download"></i>
-                                        </div>
-                                    </div>
-                                    <div class="preview-item-content d-sm-flex flex-grow">
-                                        <div class="flex-grow">
-                                            <h6 class="preview-subject">Wordpress Development</h6>
-                                            <p class="text-muted mb-0">Upload new design</p>
-                                        </div>
-                                        <div class="mr-auto text-sm-right pt-2 pt-sm-0">
-                                            <p class="text-muted">1 hour ago</p>
-                                            <p class="text-muted mb-0">23 tasks, 5 issues </p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="preview-item border-bottom">
-                                    <div class="preview-thumbnail">
-                                        <div class="preview-icon bg-info">
-                                            <i class="mdi mdi-clock"></i>
-                                        </div>
-                                    </div>
-                                    <div class="preview-item-content d-sm-flex flex-grow">
-                                        <div class="flex-grow">
-                                            <h6 class="preview-subject">Project meeting</h6>
-                                            <p class="text-muted mb-0">New project discussion</p>
-                                        </div>
-                                        <div class="mr-auto text-sm-right pt-2 pt-sm-0">
-                                            <p class="text-muted">35 minutes ago</p>
-                                            <p class="text-muted mb-0">15 tasks, 2 issues</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="preview-item border-bottom">
-                                    <div class="preview-thumbnail">
-                                        <div class="preview-icon bg-danger">
-                                            <i class="mdi mdi-email-open"></i>
-                                        </div>
-                                    </div>
-                                    <div class="preview-item-content d-sm-flex flex-grow">
-                                        <div class="flex-grow">
-                                            <h6 class="preview-subject">Broadcast Mail</h6>
-                                            <p class="text-muted mb-0">Sent release details to team</p>
-                                        </div>
-                                        <div class="mr-auto text-sm-right pt-2 pt-sm-0">
-                                            <p class="text-muted">55 minutes ago</p>
-                                            <p class="text-muted mb-0">35 tasks, 7 issues </p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="preview-item">
-                                    <div class="preview-thumbnail">
-                                        <div class="preview-icon bg-warning">
-                                            <i class="mdi mdi-chart-pie"></i>
-                                        </div>
-                                    </div>
-                                    <div class="preview-item-content d-sm-flex flex-grow">
-                                        <div class="flex-grow">
-                                            <h6 class="preview-subject">UI Design</h6>
-                                            <p class="text-muted mb-0">New application planning</p>
-                                        </div>
-                                        <div class="mr-auto text-sm-right pt-2 pt-sm-0">
-                                            <p class="text-muted">50 minutes ago</p>
-                                            <p class="text-muted mb-0">27 tasks, 4 issues </p>
-                                        </div>
-                                    </div>
+                        <div class="col-md-6">
+                            <div class="table-responsive">
+                                <table class="table" id="productSalesTable">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-primary">NO</th>
+                                            <th class="text-primary">PRODUCT NAME</th>
+                                            <th class="text-primary text-center">QUANTITY</th>
+                                            <th class="text-primary text-end">AMOUNT</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if (topSellingProducts.length >0){ %>
+                                            <% for (let i=0; i< topSellingProducts.length; i++ ){ %>
+                                                <tr>
+                                                    <td> <%= i+1 %> </td>
+                                                    <td>
+                                                        <img src="/assets/images/productImages/<%= topSellingProducts[i].image %>" alt="photo" style="width: 50px !important; height: 50px !important;"> 
+                                                        <%= topSellingProducts[i]._id %>  <!-- product code -->
+                                                    </td>
+                                                    <td class="text-center"> <%= topSellingProducts[i].totalQuantity %> </td>
+                                                    <td class="text-end font-weight-medium"> <%= (topSellingProducts[i].totalSales).toFixed(2) %> </td>
+                                                </tr>
+                                            <% } %>
+                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-md-6 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <!-- <div id="category-sale-pie-chart"></div> -->
                                 </div>
                             </div>
                         </div>
@@ -515,7 +552,7 @@
 
 
 
-    <!-- row 5 -->
+    <!-- row 6 -->
     <div class="row">
         <div class="col-md-6 col-xl-4 grid-margin stretch-card">
             <div class="card">
@@ -683,7 +720,145 @@
 
 
 
-    <!-- row 6 -->
+    <!-- row 7 -->
+    <div class="row">
+        <div class="col-md-4 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Payment Method Report</h4>
+                    <div class="position-relative">
+                        <div class="daoughnutchart-wrapper">
+                            <canvas id="payment-method-chart" class="payment-method-chart"></canvas>
+                        </div>
+                        <div class="custom-value"> ₹ 12000 <span>Total</span>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-gray-dark d-flex d-md-block d-xl-flex flex-row py-3 px-4 px-md-3 px-xl-4 rounded mt-3">
+                        <div class="text-md-center text-xl-left">
+                            <h6 class="mb-1">Transfer to Paypal</h6>
+                            <p class="text-muted mb-0">07 Jan 2019, 09:12AM</p>
+                        </div>
+                        <div class="align-self-center flex-grow text-end text-md-center text-xl-right py-md-2 py-xl-0">
+                            <h6 class="font-weight-bold mb-0"> ₹ 236</h6>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-gray-dark d-flex d-md-block d-xl-flex flex-row py-3 px-4 px-md-3 px-xl-4 rounded mt-3">
+                        <div class="text-md-center text-xl-left">
+                            <h6 class="mb-1">Tranfer to Stripe</h6>
+                            <p class="text-muted mb-0">07 Jan 2019, 09:12AM</p>
+                        </div>
+                        <div class="align-self-center flex-grow text-end text-md-center text-xl-right py-md-2 py-xl-0">
+                            <h6 class="font-weight-bold mb-0"> ₹ 593</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex flex-row justify-content-between">
+                        <h4 class="card-title mb-1">Open Projects</h4>
+                        <p class="text-muted mb-1">Your data status</p>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="preview-list">
+                                <div class="preview-item border-bottom">
+                                    <div class="preview-thumbnail">
+                                        <div class="preview-icon bg-primary">
+                                            <i class="mdi mdi-file-document"></i>
+                                        </div>
+                                    </div>
+                                    <div class="preview-item-content d-sm-flex flex-grow">
+                                        <div class="flex-grow">
+                                            <h6 class="preview-subject">Admin dashboard design</h6>
+                                            <p class="text-muted mb-0">Broadcast web app mockup</p>
+                                        </div>
+                                        <div class="mr-auto text-sm-right pt-2 pt-sm-0">
+                                            <p class="text-muted">15 minutes ago</p>
+                                            <p class="text-muted mb-0">30 tasks, 5 issues </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="preview-item border-bottom">
+                                    <div class="preview-thumbnail">
+                                        <div class="preview-icon bg-success">
+                                            <i class="mdi mdi-cloud-download"></i>
+                                        </div>
+                                    </div>
+                                    <div class="preview-item-content d-sm-flex flex-grow">
+                                        <div class="flex-grow">
+                                            <h6 class="preview-subject">Wordpress Development</h6>
+                                            <p class="text-muted mb-0">Upload new design</p>
+                                        </div>
+                                        <div class="mr-auto text-sm-right pt-2 pt-sm-0">
+                                            <p class="text-muted">1 hour ago</p>
+                                            <p class="text-muted mb-0">23 tasks, 5 issues </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="preview-item border-bottom">
+                                    <div class="preview-thumbnail">
+                                        <div class="preview-icon bg-info">
+                                            <i class="mdi mdi-clock"></i>
+                                        </div>
+                                    </div>
+                                    <div class="preview-item-content d-sm-flex flex-grow">
+                                        <div class="flex-grow">
+                                            <h6 class="preview-subject">Project meeting</h6>
+                                            <p class="text-muted mb-0">New project discussion</p>
+                                        </div>
+                                        <div class="mr-auto text-sm-right pt-2 pt-sm-0">
+                                            <p class="text-muted">35 minutes ago</p>
+                                            <p class="text-muted mb-0">15 tasks, 2 issues</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="preview-item border-bottom">
+                                    <div class="preview-thumbnail">
+                                        <div class="preview-icon bg-danger">
+                                            <i class="mdi mdi-email-open"></i>
+                                        </div>
+                                    </div>
+                                    <div class="preview-item-content d-sm-flex flex-grow">
+                                        <div class="flex-grow">
+                                            <h6 class="preview-subject">Broadcast Mail</h6>
+                                            <p class="text-muted mb-0">Sent release details to team</p>
+                                        </div>
+                                        <div class="mr-auto text-sm-right pt-2 pt-sm-0">
+                                            <p class="text-muted">55 minutes ago</p>
+                                            <p class="text-muted mb-0">35 tasks, 7 issues </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="preview-item">
+                                    <div class="preview-thumbnail">
+                                        <div class="preview-icon bg-warning">
+                                            <i class="mdi mdi-chart-pie"></i>
+                                        </div>
+                                    </div>
+                                    <div class="preview-item-content d-sm-flex flex-grow">
+                                        <div class="flex-grow">
+                                            <h6 class="preview-subject">UI Design</h6>
+                                            <p class="text-muted mb-0">New application planning</p>
+                                        </div>
+                                        <div class="mr-auto text-sm-right pt-2 pt-sm-0">
+                                            <p class="text-muted">50 minutes ago</p>
+                                            <p class="text-muted mb-0">27 tasks, 4 issues </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr style="height: 1px; color: rgb(17, 255, 0);">
 
 
     <!-- from CS chart -->
@@ -744,152 +919,355 @@
 <script src="https://cdn.jsdelivr.net/npm/c3@0.7.20/c3.min.js"></script>
 
 
+<!-- for filtering and updating the category wise sale report -->
 <script>
+    // for filter form and submiting data to backend
+    document.getElementById('categoryFilterForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        
+        const filter = document.getElementById('category-filter').value;
+        const year = document.getElementById('category-year').value;
+        const month = document.getElementById('category-month').value;
+        
+        const response = await fetch(`/admin/categorywise-sale-report?filter=${filter}&year=${year}&month=${month}`);
 
-document.getElementById('filterForm').addEventListener('submit', async function(event) {
-    event.preventDefault();
-    
-    const filter = document.getElementById('filter').value;
-    const year = document.getElementById('year').value;
-    const month = document.getElementById('month').value;
-    
-    const response = await fetch(`/admin/categorywise-sale-report?filter=${filter}&year=${year}&month=${month}`);
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Fetched Data :', data);
 
-    if (response.ok) {
-        const data = await response.json();
-        console.log('Fetched Data :', data);
-
-        updateCategoryWiseSalesReport(data);  // Update the page with new data (update table & chart)
-    } else {
-        console.error('Failed to fetch data:', response.statusText);
-    }
-    
-    // Update the page with new data (update table & chart)
-    // updateCategoryWiseSalesReport(data);
-});
+            updateCategoryWiseSalesReport(data);  // Update the page with new data (update table & chart)
+        } else {
+            console.error('Failed to fetch data :', response.statusText);
+        }
+        
+    });
 
 
-function updateCategoryWiseSalesReport(data) {
-    console.log('Updating with data :', data);
+    // for updating the category wise table
+    function updateCategoryWiseSalesReport(data) {
+        console.log('Updating with data :', data);
 
-    const { categoryWiseSalesReport, totalSaleAmount, totalSaleQuantity } = data;
-    
-    // Update table
-    const tableBody = document.querySelector('#categorySalesTable tbody');
-    console.log('Table Body :', tableBody);
-    tableBody.innerHTML = ''; // Clear existing data
+        const { categoryWiseSalesReport, totalSaleAmount, totalSaleQuantity } = data;
+        
+        // Update table
+        const tableBody = document.querySelector('#categorySalesTable tbody');
+        console.log('Table Body :', tableBody);
+        tableBody.innerHTML = ''; // Clear existing data
+        
+        
+        if (categoryWiseSalesReport.length > 0) {
 
-    // Add table headers
-    // const headerRow = document.createElement('tr');
-    // headerRow.innerHTML = `
-    //     <th class="text-primary">CATEGORY NAME</th>
-    //     <th class="text-primary text-center">QUANTITY</th>
-    //     <th class="text-primary text-end">AMOUNT</th>
-    // `;
-    // tableBody.appendChild(headerRow);
-    
-    if (categoryWiseSalesReport.length > 0) {
+            // Add table data rows
+            categoryWiseSalesReport.forEach(report => {
+                console.log('report in updateCategoryWiseSalesReport : ', report);
 
-        // Add table data rows
-        categoryWiseSalesReport.forEach(report => {
-            console.log('report in updateCategoryWiseSalesReport : ', report);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${report._id}</td>
+                    <td class="text-center">${report.totalQuantity}</td>
+                    <td class="text-end font-weight-medium">${(report.totalSales).toFixed(2)}</td>
+                `;
+                tableBody.appendChild(row);
+            });
 
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${report._id}</td>
-                <td class="text-center">${report.totalQuantity}</td>
-                <td class="text-end font-weight-medium">${(report.totalSales).toFixed(2)}</td>
+            // Add totals row after listing all category-wise sales
+            const totalRow = document.createElement('tr');
+            totalRow.innerHTML = `
+                <td class="text-warning">TOTAL</td>
+                <td class="text-warning text-center">${totalSaleQuantity}</td>
+                <td class="text-warning text-end font-weight-medium">${totalSaleAmount.toFixed(2)}</td>
             `;
-            tableBody.appendChild(row);
-        });
+            tableBody.appendChild(totalRow);
 
-        // Add totals row after listing all category-wise sales
-        const totalRow = document.createElement('tr');
-        totalRow.innerHTML = `
-            <td class="text-warning">TOTAL</td>
-            <td class="text-warning text-center">${totalSaleQuantity}</td>
-            <td class="text-warning text-end font-weight-medium">${totalSaleAmount.toFixed(2)}</td>
-        `;
-        tableBody.appendChild(totalRow);
+        } else {
+            // Display a message or handle empty state if necessary
+            const noDataRow = document.createElement('tr');
+            noDataRow.innerHTML = `<td colspan="3" class="text-center">No data available</td>`;
+            tableBody.appendChild(noDataRow);
+        }
 
-    } else {
-        // Display a message or handle empty state if necessary
-        const noDataRow = document.createElement('tr');
-        noDataRow.innerHTML = `<td colspan="3" class="text-center">No data available</td>`;
-        tableBody.appendChild(noDataRow);
+
+        // Update pie chart (assuming you use a chart library like Chart.js)
+        updateCategoryReportPieChart(categoryWiseSalesReport);
     }
 
 
-    // Update pie chart (assuming you use a chart library like Chart.js)
-    updatePieChart(categoryWiseSalesReport);
-}
+    // for updating the category wise pie chart
+    function updateCategoryReportPieChart(categoryWiseSalesReport) {
+        const pieData = categoryWiseSalesReport.map(item => [item._id, item.totalSales]);
 
-
-
-function updatePieChart(categoryWiseSalesReport) {
-    const pieData = categoryWiseSalesReport.map(item => [item._id, item.totalSales]);
-
-    // Generate or update the pie chart
-    c3.generate({
-        bindto: '#category-sale-pie-chart',
-        data: {
-            columns: pieData,
-            type: 'pie',
-            labels: true
-        },
-        color: {
-            pattern: [
-                '#FF5733', '#33FF57', '#FF33A8', '#FFD700', '#33A1FF',
-                '#FF8C00', '#8A2BE2', '#FF6347', '#3CB371', '#D2691E',
-                '#FF4500', '#2E8B57'
-            ]
-        },
-        pie: {
-            label: {
-                show: true,
-                format: function(value, ratio, id) {
-                    return `${id}: ${(ratio * 100).toFixed(2)} %`;
+        // Generate or update the pie chart
+        c3.generate({
+            bindto: '#category-sale-pie-chart',
+            data: {
+                columns: pieData,
+                type: 'pie',
+                labels: true
+            },
+            color: {
+                pattern: [
+                    '#fa1300', // Red
+                    '#10d5db', // Sky Blue
+                    '#ff0092', // Deep Pink or Magenta
+                    '#FFD700', // Gold
+                    '#8A2BE2', // Blue Violet or Violet
+                    '#FF6347', // Tomato or Reddish-Orange
+                    '#3CB371', // Medium Sea Green
+                    '#D2691E', // Chocolate
+                    '#FF4500', // Orange Red
+                    '#2E8B57',  // Sea Green
+                    '#FF8C00', // Dark Orange
+                ]
+            },
+            pie: {
+                label: {
+                    show: true,
+                    format: function(value, ratio, id) {
+                        return `${id}: ${(ratio * 100).toFixed(2)} %`;
+                    }
                 }
+            },
+            padding: {
+                top: 0,
+                right: 0,
+                bottom: 30,
+                left: 0
             }
-        },
-        padding: {
-            top: 0,
-            right: 0,
-            bottom: 30,
-            left: 0
+        });
+    }
+
+
+    // update pie chart when the web page loaded (without any filtering)
+    document.addEventListener('DOMContentLoaded', function() {
+        // Retrieve and safely parse the EJS data
+        var rawCategoryWiseSalesReport = `<%- JSON.stringify(categoryWiseSalesReport).replace(/</g, '\\u003c') %>`;
+
+        var categoryWiseSalesReport;
+
+        try {
+            categoryWiseSalesReport = JSON.parse(rawCategoryWiseSalesReport);
+        } catch (e) {
+            console.error("Error parsing JSON data:", e);
+            return;
+        }
+
+        if (categoryWiseSalesReport && categoryWiseSalesReport.length > 0) {
+            // Initialize the pie chart with existing data on page load
+            updateCategoryReportPieChart(categoryWiseSalesReport);
+
+        } else {
+            console.log("No data available for the pie chart.");
         }
     });
-}
-
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Retrieve and safely parse the EJS data
-    var rawCategoryWiseSalesReport = `<%- JSON.stringify(categoryWiseSalesReport).replace(/</g, '\\u003c') %>`;
-
-    var categoryWiseSalesReport;
-
-    try {
-        categoryWiseSalesReport = JSON.parse(rawCategoryWiseSalesReport);
-    } catch (e) {
-        console.error("Error parsing JSON data:", e);
-        return;
-    }
-
-    if (categoryWiseSalesReport && categoryWiseSalesReport.length > 0) {
-        // Initialize the pie chart with existing data on page load
-        updatePieChart(categoryWiseSalesReport);
-        // updateCategoryWiseSalesReport(categoryWiseSalesReport);
-
-    } else {
-        console.log("No data available for the pie chart.");
-    }
-});
-
 
 </script>
 
 
 
+
+
+
+<!-- for filtering and updating the top selling products sale report -->
+<script>
+    document.getElementById('productFilterForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const filterType = document.getElementById('product-filter').value;
+        const year = document.getElementById('product-year').value;
+        const month = document.getElementById('product-month').value;
+
+        console.log('filterType for product sale query :', filterType);
+        console.log('year for product sale query :', year);
+        console.log('month for product sale query :', month);
+
+        const queryString = `filter=${filterType}&year=${year}&month=${month}`;
+
+        fetch(`/admin/top-selling-products?${queryString}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Clear existing table data
+            const tableBody = document.querySelector('#productSalesTable tbody');
+            tableBody.innerHTML = '';
+
+            // Populate table with new data
+            if (data.filteredTopSellingProducts.length > 0) {
+                data.filteredTopSellingProducts.forEach((product, index) => {
+                    const row = `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${product._id} 
+                                <img src="/assets/images/productImages/${product.image}" alt="photo" style="width: 50px !important; height: 50px !important;"> 
+                            </td>
+                            <td class="text-center">${product.totalQuantity}</td>
+                            <td class="text-end font-weight-medium">${product.totalSales.toFixed(2)}</td>
+                        </tr>
+                    `;
+                    tableBody.insertAdjacentHTML('beforeend', row);
+                });
+            } else {
+                const noDataRow = `
+                    <tr>
+                        <td colspan="4" class="text-center">No data found</td>
+                    </tr>
+                `;
+                tableBody.insertAdjacentHTML('beforeend', noDataRow);
+            }
+        })
+        .catch(error => console.error('Error fetching filtered products:', error));
+    });
+</script>
+
+
+
+
+
+
+<!-- for filtering payment method wise report & chart -->
+<script>
+
+// for applying the filter data and send query to backend
+document.getElementById('paymentFilterForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    var filterType = document.getElementById('payment-filter').value;
+    var year = document.getElementById('payment-year').value;
+    var month = document.getElementById('payment-month').value;
+
+    // Construct the query string with filter values
+    const queryString = `filter=${filterType}&year=${year}&month=${month}`;
+
+    // Make a GET request to fetch filtered data
+    fetch(`/admin/payment-mode-wise-report?${queryString}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('data as response :', data)
+        // Update the table and chart with new data
+        updateTransactionTable(data);
+        
+        updateTransactionDonutChart(data.paymentModeReport);
+    })
+    .catch(error => console.error('Error fetching payment data:', error));
+});
+
+
+// update transaction table
+function updateTransactionTable(responseData) {
+    const paymentModeReport = responseData.paymentModeReport;
+    const totalPaymentCount = responseData.totalPaymentCount;
+    const totalPaymentAmount = responseData.totalPaymentAmount;
+
+    var tbody = document.querySelector('#transationModeTable tbody');
+    tbody.innerHTML = ''; // Clear existing table rows
+
+    if (paymentModeReport.length > 0) {
+        paymentModeReport.forEach(function (report) {
+            var row = `<tr>
+                <td>${report.paymentMethod}</td>
+                <td class="text-center">${report.orderCount}</td>
+                <td class="text-end font-weight-medium">${report.netAmount.toFixed(2)}</td>
+            </tr>`;
+            tbody.insertAdjacentHTML('beforeend', row);
+        });
+
+        var totalRow = `<tr>
+            <td class="text-warning"> TOTAL </td>
+            <td class="text-warning text-center">${totalPaymentCount}</td>
+            <td class="text-warning text-end font-weight-medium">${totalPaymentAmount.toFixed(2)}</td>
+        </tr>`;
+        tbody.insertAdjacentHTML('beforeend', totalRow);
+
+    } else {
+        var noDataRow = `<tr>
+            <td colspan="3" class="text-center text-warning">No transaction data available</td>
+        </tr>`;
+        tbody.insertAdjacentHTML('beforeend', noDataRow);
+    }
+
+
+}
+
+
+// update transaction donut chart
+function updateTransactionDonutChart(paymentModeReport) {
+    console.log('paymentModeReport in updateTransactionDonutChart :', paymentModeReport);
+
+    const donutChartData = paymentModeReport.map(item => [item.paymentMethod, item.orderCount, item.netAmount]);
+    console.log('donutChartData :', donutChartData);
+
+    var c3DonutChart = c3.generate({
+        bindto: '#transaction-donut-chart',
+        data: {
+            columns: donutChartData,
+            type: 'donut',
+            labels: true
+        },
+        donut: {
+            // title: "Transaction Chart",
+            label: {
+                show: true,
+                format: function(value, ratio, id) {
+                    console.log(value);
+                    console.log(ratio);
+                    console.log(id);
+                    
+                    return `${id}: ${(ratio * 100).toFixed(2)} %`;
+                }
+            }
+        },
+        color: {
+            pattern: [
+                '#02A301', // green
+                '#ff2300', // orange
+                '#597efe'  // dark blue
+            ]
+        },
+        padding: {
+            top: 0,
+            right: 0,
+            bottom: 30,
+            left: 0,
+        },
+    });
+
+}
+
+
+// update donut chart when the web page loaded (without any filtering)
+document.addEventListener('DOMContentLoaded', function() {
+    // Retrieve and parse the EJS data
+    var rawPaymentMethodReport = `<%- JSON.stringify(paymentModeReport).replace(/</g, '\\u003c') %>`;
+
+    var paymentMethodReport;
+
+    try {
+        paymentMethodReport = JSON.parse(rawPaymentMethodReport);
+    } catch (e) {
+        console.error("Error parsing JSON data:", e);
+        return;
+    }
+
+
+    if (paymentMethodReport && paymentMethodReport.length > 0) {
+        // Initialize the pie chart with existing data on page load
+        updateTransactionDonutChart(paymentMethodReport);
+
+    } else {
+        console.log("No data available for the donut chart.");
+    }
+});
+
+
+</script>
 
 
 
