@@ -1,4 +1,4 @@
-
+<%- include('../layouts/userLayouts/user-header.ejs') %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -12,26 +12,23 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f5f5f5;
-            color: #333;
-        }
-        .main {
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border: 4px solid #AA0056;
-            background-color: #ffffff;
+            background-color: #1a1a1a; /* Dark background */
+            color: #f5f5f5; /* Light text color */
         }
         .container {
-            max-width: 600px;
-            margin-bottom: 120px;
-            padding: 10px;
-            text-align: center;
+            border: 4px solid #AA0056;
+            background-color: #333333; /* Dark gray for content background */
+            color: #ffffff; /* Light text color */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 40px auto;
         }
         .header {
             background-color: #AA0056;
             text-align: center;
             border-top-left-radius: 10px;
             border-top-right-radius: 10px;
-            margin-top: -4px;
             color: #fff; /* White text */
         }
         .header h2 {
@@ -41,29 +38,42 @@
         }
         h1 {
             text-align: center;
-            color: #AA0056;
+            color: #f5f5f5;
             font-size: 80px;
         }
         h3 {
             text-align: center;
-            color: #AA0056;
+            color: #f5f5f5;
             font-size: 40px;
         }
         p {
             line-height: 1.6;
             margin-bottom: 20px;
+            color: #cccccc; /* Lighter gray for paragraph text */
         }
         .oops {
             padding-bottom: 130px;
         }
-        .response-message {
+        .response-area {
             margin-bottom: 40px;
+        }
+        .response-message {
+            color: #858484;
+        }
+        .home-link {
+            color: #ff4d94;
         }
         .footer {
             text-align: center;
             margin-top: 20px;
-            color: #666;
+            color: #aaaaaa; /* Slightly lighter gray for footer text */
             font-size: 12px;
+        }
+        a {
+            color: #ff4d94; /* Light pink color for links */
+        }
+        a:hover {
+            color: #ffffff; /* Change link color on hover */
         }
     </style>
 
@@ -71,20 +81,20 @@
 
 
 <body>
-    <div class="main text-center">
+    <div class="container text-center">
         <div class="header">
-            <!-- <h2>Internal Server Error - Glitz Jewellery Boutique</h2> -->
             <h2> Internal Server Error | 500 </h2>
         </div>
         <br>
-        <div class="container">
+        <div class="">
             <h1> Oops! </h1>
             <h3> Something went wrong... </h3>
         </div>
-        <div class="response-message">
-            <h5 class=""> We're sorry, but there was an internal server error while processing your request. </h5>
-            <h5 class=""> Please try again later or contact our support team for assistance. </h5>
-            <h5> <%= errorMessage %> </h5>
+        <div class="response-area">
+            <h5 class="response-message"> We're sorry, but there was an internal server error while processing your request. </h5>
+            <h5 class="response-message"> Please try again later or contact our support team for assistance. </h5>
+            <h5 class="response-message"> <%= errorMessage ? errorMessage : '' %> </h5>
+            <h5 class="mt-4 home-link"> <a href="/">Home</a></h5>
         </div>
     </div>
     <div class="footer">

@@ -1035,7 +1035,7 @@
         const baseUrl = window.location.origin; // Gets the current base URL like http://localhost:3000
 
         const options = {
-            "key": "rzp_test_Z16lJwrcSEZFzf", // Enter the Key ID generated from the Dashboard
+            "key": orderResponse.razorPayKeyId, // Enter the Key ID generated from the Dashboard
             "amount": orderResponse.order.amount, // Amount is in currency subunits (paise). Default currency is INR. Hence, amount * 100 paise.
             "currency": orderResponse.order.currency, // INR
             "name": "Glitz Jewellery Boutique",

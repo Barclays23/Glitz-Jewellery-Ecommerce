@@ -284,7 +284,8 @@
                             <h4 class="small-title">Similar Products</h4>
                             <div class="row tm-products-slider3">
                                 <% if (similarProducts && similarProducts.length > 0) { %>
-                                    <% for (let i=0; i < 4; i++) { %>
+                                    <% const similarLength = similarProducts.length < 4 ? similarProducts.length : 4 %>
+                                    <% for (let i=0; i < similarLength; i++) { %>
                                         <div class="col-12">
                                             <div class="tm-product tm-scrollanim">
                                                 <div class="tm-product-topside">

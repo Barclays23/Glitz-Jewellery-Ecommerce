@@ -24,14 +24,16 @@ pendingOrdersManaging();
 
 
 
+// for admin routes
+const adminRoute = require('./routes/adminRoutes');
+app.use('/admin', adminRoute);
+
+
 // for user routes
 const userRoute = require('./routes/userRoutes');
 app.use('/', userRoute);
 
 
-// for admin routes
-const adminRoute = require('./routes/adminRoutes');
-app.use('/admin', adminRoute);
 
 
 

@@ -14,8 +14,8 @@ const Crypto = require ('crypto');  // for online/razorPay verifyPayment
 const RazorPay = require('razorpay');
 
 const razorPayInstance = new RazorPay ({
-    key_id: process.env.razorPayKeyId,
-    key_secret : process.env.razorPayKeySecret
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret : process.env.RAZORPAY_KEY_SECRET
 })
 
 const cron = require('node-cron');
@@ -741,7 +741,8 @@ const makePayment = async(req, res)=>{
                 } else {
                     console.log('razorPay order instance created successfully :', order);
                     paymentStatus = 'Pending'; // but verification not completed.
-                    return res.json({proceedToRazorPay: true, order, selectedAddressId, selectedPaymentMethod, paymentStatus, userData});
+                    const razorPayKeyId = razorPayInstance.key_id;
+                    return res.json({proceedToRazorPay: true, order, razorPayKeyId, selectedAddressId, selectedPaymentMethod, paymentStatus, userData});
                 }
 
             });

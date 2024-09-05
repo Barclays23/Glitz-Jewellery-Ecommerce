@@ -6,11 +6,13 @@ const Wishlist = require('../models/wishlistModel');
 const GoldPrice = require('../models/goldPriceModel');
 
 const Crypto = require ('crypto');  // for online/razorPay verifyPayment
+
+require('dotenv').config();
 const RazorPay = require('razorpay');
 
 const razorPayInstance = new RazorPay ({
-    key_id: process.env.razorPayKeyId,
-    key_secret : process.env.razorPayKeySecret
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret : process.env.RAZORPAY_KEY_SECRET
 });
 
 const cron = require('node-cron');  // cron job for pendingOrdersManaging & cancelPendingOrders

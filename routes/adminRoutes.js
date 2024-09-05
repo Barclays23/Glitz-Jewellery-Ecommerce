@@ -2,12 +2,16 @@ const express = require('express');
 const adminRoute = express();
 
 const session = require('express-session');
+
+
+
 adminRoute.use(session({
+    name: 'admin.sid',
     secret: process.env.sessionSecret,
     saveUninitialized: true,
-    resave: false
+    resave: false,
+    cookie: { secure: false } // Set secure: true in production when using HTTPS
 }));
-
 
 adminRoute.set('view engine', 'ejs');
 adminRoute.set('views', './views/admin');
@@ -115,6 +119,8 @@ adminRoute.get('/payment-mode-wise-report',  adminAuth.isLogin, dashboardControl
 
 
 
+// FOR 404 PAGE
+adminRoute.get('*', adminController.load404);
 
 
 

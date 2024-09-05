@@ -9,6 +9,20 @@ const nodemailer = require('nodemailer');
 
 
 
+const load404 = async (req, res)=>{
+    try {
+        console.log('loading admin error page')
+        res.render('404');
+
+    } catch (error) {
+        console.log('error in loading 404 page :', error.message);
+        res.render('500');
+    }
+}
+
+
+
+
 // load admin login page --------------------------------------------------
 const loadLogin = async(req, res)=>{
     try {
@@ -57,7 +71,6 @@ const verifyLogin = async(req, res)=>{
 
 
 
-
 // for verifying the forget password email entered --------------------------
 const verifyForgetMail = async(req, res)=>{
     try {
@@ -98,7 +111,6 @@ const verifyForgetMail = async(req, res)=>{
         console.log('failed verifying the forget password user/mail', error);
     }
 }
-
 
 
 
@@ -278,7 +290,6 @@ const sendforgetPasswordMail = async(userData, randomString, res)=>{
 
 
 
-
 // load reset password page -------------------------------------------------
 const loadResetPassword = async (req, res) => {
     try {
@@ -318,10 +329,6 @@ const resetPassword = async(req, res)=>{
         console.log('error occurred while reseting the password.');
     }
 }
-
-
-
-
 
 
 
@@ -642,6 +649,7 @@ const adminLogout = async(req, res)=>{
 
 
 module.exports = {
+    load404,
     loadLogin,
     verifyLogin,
     verifyForgetMail,

@@ -5,11 +5,13 @@ const passport = require('passport');
 
 
 
+
 userRoute.use(session({
-    secret: process.env.sessionSecret,
-    saveUninitialized: true,
-    resave: false,
-    cookie: { secure: false } // Note: In production (google Auth), set secure: true if using HTTPS
+  name: 'user.sid',
+  secret: process.env.sessionSecret,
+  saveUninitialized: true,
+  resave: false,
+  cookie: { secure: false } // Note: In production (google Auth), set secure: true if using HTTPS
 }));
 
 
@@ -42,6 +44,7 @@ const userAuth = require('../middlewares/userAuth');
 const googleAuth = require('../middlewares/googleAuth');
 const multer = require('../middlewares/multer');
 // console.log('googleAuth require : ', googleAuth);
+
 
 
 
@@ -138,6 +141,8 @@ userRoute.get('/invoice', orderController.loadInvoice); // // removed userAuth.i
 userRoute.get('/download-invoice', orderController.downloadInvoice);  // removed userAuth.isLogin, userAuth.isBlocked,
 
 
+// FOR 404 PAGE
+userRoute.get('*', userController.load404);
 
 
 module.exports = userRoute;

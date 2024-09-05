@@ -19,12 +19,55 @@ const ExcelJS = require('exceljs');
 
 
 
-// fetch orders list (for dashboard & downloading) --------------------------
+// fetch sales report (for dashboard & downloading) --------------------------
 const getOrderList = async(req, res)=>{
     try {
-        // const adminData = await User.findOne({_id: req.session.adminId});
-        // const goldPriceData = await GoldPrice.findOne({});
+        console.log('Query received for sales report :', req.query);
 
+        const filterType = req.query.filter ? req.query.filter : null;
+        const filterYear = req.query.year ? parseInt(req.query.year) : null;
+        const filterMonth = req.query.month ? parseInt(req.query.month) - 1 : null; // -1 bcoz, Months in JavaScript are 0 index based.
+        const filterWeek = req.query.week ? req.query.week : null;  // Last 7 Days
+
+        const startDate = req.query.startDate ? req.query.startDate : null;
+        const endDate = req.query.endDate ? req.query.endDate : null;
+
+        console.log('sales report filter type : ', filterType);
+        console.log('sales report filter by year : ', filterYear);
+        console.log('sales report filter by month (-1) : ', filterMonth);
+        console.log('sales report filter by week : ', filterWeek);
+        console.log('sales report filter by custom startDate : ', startDate);
+        console.log('sales report filter by custom endDate : ', endDate);
+
+        let start;
+        let end;
+
+        if (filterType === 'yearly') {
+            start = new Date(filterYear, 0, 1, 0, 0, 0); // January 1st of the year
+            end = new Date(filterYear, 11, 31, 23, 59, 59, 999); // December 31st of the year
+
+        } else if (filterType === 'monthly'){
+            start = new Date(Date.UTC(filterYear, filterMonth, 1, 0, 0, 0));  // start of the selected month
+            end = new Date(filterYear, filterMonth + 1, 0, 23, 59, 59, 999); // End of the selected month
+
+        } else if (filterType === 'weekly'){
+            end = new Date();
+            start = new Date();
+            start.setDate(end.getDate() - 6); // Subtract 6 days to include the last 7 days
+            start.setHours(0, 0, 0, 0); // Start of the day for start date
+            end.setHours(23, 59, 59, 999); // End of the day for end date
+
+        } else if (filterType === 'custom' && startDate && endDate){
+            start = new Date(startDate);
+            start.setHours(0, 0, 0, 0); // start of the day (of startDate)
+
+            end = new Date(endDate);
+            end.setHours(23, 59, 59, 999); // end of the day (of endDate)
+        
+        }
+
+        
+        
         const searchQuery = req.query.search || '';
         console.log('searchQuery : ', searchQuery);
 
@@ -37,16 +80,23 @@ const getOrderList = async(req, res)=>{
         const sortQuery = req.query.sort || 'none';
         console.log('sortQuery : ', sortQuery);
 
-        // date range parameters
-        const startDate = req.query.startDate;
-        const endDate = req.query.endDate;
 
         let pageNo = parseInt(req.query.page) || 1;
 
         const limit = 10;
         
+
         
-        let matchQuery = {};
+        let matchQuery = {};  // initially empty query.
+
+
+        if (filterType){
+            matchQuery.orderDate = {
+                $gte: start,
+                $lte: end
+            };
+        }
+
 
         if (searchQuery) {
             matchQuery.$or = [
@@ -56,8 +106,6 @@ const getOrderList = async(req, res)=>{
             ];
         }
 
-        // Log the query
-        console.log('matchQuery :', matchQuery);
 
         if (statusQuery != 'all') {
             matchQuery.orderStatus = statusQuery;
@@ -68,20 +116,9 @@ const getOrderList = async(req, res)=>{
         }
 
 
-        // Adding date range filtering
-        if (startDate && endDate) {
-            // Parse the start and end dates to ensure proper formatting
-            const start = new Date(startDate);
-            start.setHours(0, 0, 0, 0); // Set start time to the beginning of the day
-        
-            const end = new Date(endDate);
-            end.setHours(23, 59, 59, 999); // Set end time to the end of the day
-        
-            matchQuery.orderDate = {
-                $gte: start,
-                $lte: end
-            };
-        }
+
+        // Log the query
+        console.log('matchQuery :', matchQuery);
 
 
         // sorting
@@ -166,7 +203,7 @@ const getOrderList = async(req, res)=>{
 
         const countResult = await countAggregate.exec();
         const count = countResult.length > 0 ? countResult[0].count : 0;
-        console.log('count of order result :', count);
+        console.log('count of sales result :', count);
 
         let totalPages = Math.ceil(count / limit);
 
@@ -176,13 +213,20 @@ const getOrderList = async(req, res)=>{
         return {
             // adminData,
             // goldPriceData,
-            orderData,
+            filterType,
+            filterYear,
+            filterMonth,
+            filterWeek,
+            startDate,
+            endDate,
+            
             searchQuery,
             statusQuery,
             methodQuery,
             sortQuery,
-            startDate,
-            endDate,
+            
+            orderData,
+
             count,
             limit,
             totalPages,
@@ -192,7 +236,7 @@ const getOrderList = async(req, res)=>{
         };
 
     } catch (error) {
-        console.log('failed get order list : ', error);
+        console.log('failed get order list : ', error.message);
     }
 }
 
@@ -327,9 +371,9 @@ const getCategoryWiseSaleReport = async (req, res)=>{
     const year = parseInt(req.query.year) || new Date().getFullYear();
     const month = req.query.month ? parseInt(req.query.month) - 1 : null; // Months in JavaScript are 0 index based
 
-    console.log('category sale filter by query : ', filter);
-    console.log('category sale filter by year : ', year);
-    console.log('category sale filter by month : ', month);
+    // console.log('category sale filter by query : ', filter);
+    // console.log('category sale filter by year : ', year);
+    // console.log('category sale filter by month : ', month);
 
     // Set the start and end dates based on the filter type
     let startDate, endDate;
@@ -341,8 +385,8 @@ const getCategoryWiseSaleReport = async (req, res)=>{
         startDate = new Date(year, 0, 1); // January 1st of the year
         endDate = new Date(year, 11, 31, 23, 59, 59, 999); // December 31st of the year
     }
-    console.log('category sale filter startDate : ', startDate);
-    console.log('category sale filter endDate : ', endDate);
+    // console.log('category sale filter startDate : ', startDate);
+    // console.log('category sale filter endDate : ', endDate);
 
     try {
         const aggregationPipeline = [
@@ -418,7 +462,7 @@ const filterCategorySale = async (req, res) => {
     try {
         const filteredCategorySaleReport = await getCategoryWiseSaleReport(req, res);
         
-        console.log('filteredCategorySaleReport : ', filteredCategorySaleReport);
+        // console.log('filteredCategorySaleReport : ', filteredCategorySaleReport);
 
         // passing the data as json (NOT RENDERING OR RETURNING DIRECTLY. Both dashboard & categorywise report are showing in same page);
         return res.json (filteredCategorySaleReport);
@@ -441,9 +485,9 @@ const getMostSoldProducts = async (req, res)=>{
         const filterYear = parseInt(req.query.year) || new Date().getFullYear();
         const filterMonth = req.query.month ? parseInt(req.query.month) - 1 : null; // -1 bcoz, Months in JavaScript are 0 index based.
     
-        console.log('product sale filter by query : ', filter);
-        console.log('product sale filter by year : ', filterYear);
-        console.log('product sale filter by month : ', filterMonth);
+        // console.log('product sale filter by query : ', filter);
+        // console.log('product sale filter by year : ', filterYear);
+        // console.log('product sale filter by month : ', filterMonth);
 
         // Set the start and end dates based on the filter type
         let startDate, endDate;
@@ -457,8 +501,8 @@ const getMostSoldProducts = async (req, res)=>{
             endDate = new Date(filterYear, 11, 31, 23, 59, 59, 999); // December 31st of the year
         }
 
-        console.log('product sale filter startDate : ', startDate);
-        console.log('product sale filter endDate : ', endDate);
+        // console.log('product sale filter startDate : ', startDate);
+        // console.log('product sale filter endDate : ', endDate);
 
         const topSellingProducts = await Order.aggregate([
             // Match orders with specific statuses
@@ -515,7 +559,7 @@ const filterProductSale = async (req, res) => {
         // Fetch the filtered top-selling products
         const filteredTopSellingProducts = await getMostSoldProducts(req, res);
         
-        console.log('filteredTopSellingProducts :', filteredTopSellingProducts);
+        // console.log('filteredTopSellingProducts :', filteredTopSellingProducts);
 
         return res.json({ filteredTopSellingProducts });
 
@@ -536,9 +580,9 @@ const getPaymentModeReport = async (req, res)=> {
         const filterYear = parseInt(req.query.year) || new Date().getFullYear();
         const filterMonth = req.query.month ? parseInt(req.query.month) - 1 : null; // -1 bcoz, Months in JavaScript are 0 index based.
     
-        console.log('payment method filter by query : ', filter);
-        console.log('payment method filter by year : ', filterYear);
-        console.log('payment method filter by month : ', filterMonth);
+        // console.log('payment method filter by query : ', filter);
+        // console.log('payment method filter by year : ', filterYear);
+        // console.log('payment method filter by month : ', filterMonth);
 
         // Set the start and end dates based on the filter type
         let startDate, endDate;
@@ -552,8 +596,8 @@ const getPaymentModeReport = async (req, res)=> {
             endDate = new Date(filterYear, 11, 31, 23, 59, 59, 999); // December 31st of the year
         }
 
-        console.log('product sale filter startDate : ', startDate);
-        console.log('product sale filter endDate : ', endDate);
+        // console.log('product sale filter startDate : ', startDate);
+        // console.log('product sale filter endDate : ', endDate);
 
 
         const paymentModeReport = await Order.aggregate([
@@ -620,7 +664,7 @@ const filterPaymentModeReport = async (req, res) => {
             totalPaymentAmount
         } = filteredPaymentModeReport;
 
-        console.log('filteredPaymentModeReport :', filteredPaymentModeReport);
+        // console.log('filteredPaymentModeReport :', filteredPaymentModeReport);
 
         return res.json(
             {
@@ -638,8 +682,6 @@ const filterPaymentModeReport = async (req, res) => {
 
 
 
-
-
 // show / render (if needed) the sales report & summary (from getOrderList & getOrderSummary)
 const loadSalesReport = async (req, res)=>{
     try {
@@ -650,14 +692,22 @@ const loadSalesReport = async (req, res)=>{
 
         // fetch orderlist and result from getOrderList
         const orderList = await getOrderList(req, res);
+
         const {
-            orderData,
+            filterType,
+            filterYear,
+            filterMonth,
+            filterWeek,
+            startDate,
+            endDate,
+            
             searchQuery,
             statusQuery,
             methodQuery,
             sortQuery,
-            startDate,
-            endDate,
+            
+            orderData,
+
             count,
             limit,
             totalPages,
@@ -691,13 +741,17 @@ const loadSalesReport = async (req, res)=>{
             goldPriceData,
 
             // from oderLlst
-            orderData,
+            filterType,
+            filterYear,
+            filterMonth,
+            filterWeek,
+            startDate,
+            endDate,
             searchQuery,
             statusQuery,
             methodQuery,
             sortQuery,
-            startDate,
-            endDate,
+            orderData,
             count,
             limit,
             totalPages,
@@ -728,19 +782,24 @@ const loadSalesReport = async (req, res)=>{
 
 
 
+
 // download sales report in PDF
 const salesReportPdf = async(req, res)=>{
     try {
         // fetch orderlist and result from getOrderList
         const orderList = await getOrderList(req, res);
         const {
+            filterType,
+            filterYear,
+            filterMonth,
+            filterWeek,
+            startDate,
+            endDate,
             orderData,
             searchQuery,
             statusQuery,
             methodQuery,
             sortQuery,
-            startDate,
-            endDate,
             count,
             limit,
             totalPages,
@@ -771,18 +830,23 @@ const salesReportPdf = async(req, res)=>{
 
     
         // Path to the EJS template
-        const ejsFilePath = path.join(__dirname, '../views/admin/salesReport.ejs');
+        // const ejsFilePath = path.join(__dirname, '../views/admin/salesReport.ejs');
+        const ejsFilePath = path.join(__dirname, '../views/admin/salesReportForDownload.ejs');
         const htmlString = fs.readFileSync(ejsFilePath, 'utf8');
 
         // Render the EJS template with data
         const htmlPageContent = ejs.render(htmlString, {
-            orderData,
+            filterType,
+            filterYear,
+            filterMonth,
+            filterWeek,
+            startDate,
+            endDate,
             searchQuery,
             statusQuery,
             methodQuery,
             sortQuery,
-            startDate,
-            endDate,
+            orderData,
             count,
             limit,
             totalPages,
@@ -821,7 +885,7 @@ const salesReportPdf = async(req, res)=>{
             width: '1200px', // Increase the width to fit all columns
             height: '842px', // Use height similar to A4
             landscape: true, // Set landscape mode for horizontal layout
-            scale: 0.6, // Adjust scale to reduce size
+            scale: 0.5, // Adjust scale to reduce size
             // printBackground: true, // Include background graphics
             margin: {
             // top: '20px',
@@ -860,7 +924,7 @@ const salesReportPdf = async(req, res)=>{
     } catch (error) {
         console.log('error in salesReportPdf :', error.message);
         // res.status(500).render('500');
-        res.status(500).send('Error generating PDF');
+        res.status(500).render('500', {errorMessage: error.message});
     }
 }
 
@@ -928,7 +992,7 @@ const salesReportExcel = async(req, res)=>{
             { header: 'ORDER STATUS', key: 'orderStatus', width: 20 }
         ];
 
-        // add columns for the orderListWorksheet.
+        // add rows for the orderListWorksheet.
         orderData.forEach((order, index) => {
             let orderOfferDiscount = 0;
             for (item of order.orderedItems) {
@@ -1062,7 +1126,6 @@ const applyCellStyle = (worksheet) => {
 
 
 
-
 // load admin dashboard ------------------------------------------
 const loadAdminDashboard = async (req, res)=>{
     try {
@@ -1070,24 +1133,6 @@ const loadAdminDashboard = async (req, res)=>{
 
         const adminData = await User.findOne({_id: sessionId});
         const goldPriceData = await GoldPrice.findOne({});
-
-        // fetch orderlist and result from getOrderList
-        const orderList = await getOrderList(req, res);
-        const {
-            orderData,
-            searchQuery,
-            statusQuery,
-            methodQuery,
-            sortQuery,
-            // startDate,
-            // endDate,
-            count,
-            limit,
-            totalPages,
-            currentPage,
-            startIndex,
-            endIndex,
-        } = orderList;
 
         
         // fetch different types of orderSummary from getorderSummary
@@ -1127,25 +1172,11 @@ const loadAdminDashboard = async (req, res)=>{
             totalPaymentAmount
         } = paymentModeWiseReport;
 
-        console.log('paymentModeReport for dashboard :', paymentModeReport);
 
 
         res.render("adminDashboard", {
             adminData,
             goldPriceData,
-
-            // from oderLlst
-            orderData,
-            searchQuery,
-            statusQuery,
-            methodQuery,
-            sortQuery,
-            count,
-            limit,
-            totalPages,
-            currentPage,
-            startIndex,
-            endIndex,
 
             // from orderSummary
             totalAmount,

@@ -39,7 +39,7 @@
                             <p><strong>Billing Rate</strong><br> ₹ <%= orderData.billingRate %> / Gram</p>
                         </div>
                         <div>
-                            <p class="text-right"><strong>Invoice</strong><br> 402-6505499-6104359</p>
+                            <p class="text-right"><strong>Invoice</strong><br> <a href="/download-invoice?id=<%= orderData._id %>" class="download-link"> Download </a></p>
                         </div>
                     </div>
                     <div class="order-info">
@@ -791,6 +791,12 @@
 }
 .order-details p {
     margin-bottom: 0.15rem;
+}
+.download-link {
+    font-weight: 500;
+}
+.download-link:hover {
+    color: #ff4400;
 }
 .order-header {
     font-size: 24px;

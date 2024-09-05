@@ -16,6 +16,18 @@ const { session } = require('passport');
 
 
 
+const load404 = async (req, res)=>{
+    try {
+        res.render('404');
+
+    } catch (error) {
+        console.log('error in loading 404 page :', error.message);
+        res.render('500');
+    }
+}
+
+
+
 
 
 // load user home page----------------------------------------------
@@ -837,7 +849,7 @@ const productDetals = async(req, res)=>{
 
         const wishlistItems = userWishlist ? userWishlist.product.map((item) => item.productRef) : [];
 
-        
+
         let cartCount = 0;
         let wishlistCount = 0;
 
@@ -902,6 +914,7 @@ const productDetals = async(req, res)=>{
 
     } catch (error) {
         console.log('failed to load product details page :', error.message);
+        return res.render('500', {errorMessage : ''});
     }
 }
 
@@ -1433,6 +1446,7 @@ const loadWallet = async (req, res)=>{
 
 
 module.exports = {
+    load404,
     loadHome,
     loadLogin,
     verifyLogin,
