@@ -1,6 +1,7 @@
 
 <title>Wishlist - Glitz Jewellery</title>
 
+
 <%- include('../layouts/userLayouts/user-header.ejs') %>
 
 <%- include('../layouts/userLayouts/user-preloader.ejs') %>
@@ -95,14 +96,11 @@
                         <div class="tm-wishlist-table table-responsive" id="wishlist-table">
                             <table class="table table-bordered mb-0">
                                 <thead>
-                                    <tr>
+                                    <tr class="text-center">
                                         <th class="tm-wishlist-col-slno bg-light">No</th>
                                         <th class="tm-wishlist-col-image bg-light" scope="col">Image</th>
                                         <th class="tm-wishlist-col-productname bg-light" scope="col">Product</th>
                                         <th class="tm-wishlist-col-price bg-light" scope="col">Price</th>
-                                        <!-- <th class="tm-wishlist-col-quantity" scope="col">Quantity</th> -->
-                                        <!-- <th class="tm-wishlist-col-addcart" scope="col">Add to Cart</th>
-                                        <th class="tm-wishlist-col-remove" scope="col">Remove</th> -->
                                         <th class="tm-wishlist-col-actions bg-light" scope="col">Actions</th>
                                     </tr>
                                 </thead>
@@ -111,7 +109,7 @@
                                         <% console.log('wishlist length :', userWishlist.product.length) %>
                                         <% userWishlist.product.forEach((items, index)=>{ %>
                                             <% console.log('items are :', items.productRef.name) %>
-                                            <tr>
+                                            <tr class="text-center">
                                                 <td class="bg-light"> <%= index + 1 %> </td>
                                                 <td class="bg-light">
                                                     <a href="/product-details?id=<%= items.productRef._id %>" class="tm-wishlist-productimage">
@@ -185,3 +183,11 @@
 
 <!-- script for add to wishlist and remove from wishlist -->
 <script src="/assets/scripts/userScripts/wishlist-scripts.js"></script>
+
+
+<style>
+.tm-wishlist-table .tm-wishlist-col-image {
+    width: 180px;
+    min-width: 180px;
+}
+</style>

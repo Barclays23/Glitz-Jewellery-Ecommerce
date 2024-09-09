@@ -322,7 +322,7 @@ const updateOrderStatus = async(req, res)=>{
 
 
         if (newStatus === 'Delivered') {
-            console.log('order item ', orderProduct.code, ' is delivered.');
+            console.log('order item ', orderProduct?.code, ' is delivered.');
             orderProduct.deliveryDate = Date.now();
 
             // if COD order, collect the money from the customer and update the paymentStatus
@@ -333,7 +333,7 @@ const updateOrderStatus = async(req, res)=>{
         
         
         if (newStatus === 'Returned'){
-            console.log('order item ', orderProduct.code, ' is returned.');
+            console.log('order item ', orderProduct?.code, ' is returned.');
             orderProduct.returnDate = Date.now();
 
             // calculating the refund amount to user wallet
@@ -973,7 +973,7 @@ const retryPayment = async (req, res)=>{
                 // return the product inventory stock quantity after order failed.
                 for (const item of failedOrderData.orderedItems) {
                     let productId = item.productRef;
-                    let productCode = item.code;
+                    let productCode = item?.code;
                     let orderQuantity = item.quantity;
 
                     console.log('Product code of failed order:', productCode);
@@ -985,7 +985,7 @@ const retryPayment = async (req, res)=>{
                             { $inc: { quantity: orderQuantity } },
                             { new: true }
                         );
-                        console.log('Updated product inventory of :', updatedProductInventory.code);
+                        console.log('Updated product inventory of :', updatedProductInventory?.code);
 
                     } catch (err) {
                         console.error('Error updating product inventory:', err);
@@ -1248,7 +1248,7 @@ const cancelPendingOrders = async (req, res) => {
                         { _id: item.productRef },
                         { $inc: { quantity: item.quantity } }
                     );
-                    console.log(`updated the inventory stock count of : ${inventoryProduct.code}.`);
+                    console.log(`updated the inventory stock count of : ${inventoryProduct?.code}.`);
 
                 }
 

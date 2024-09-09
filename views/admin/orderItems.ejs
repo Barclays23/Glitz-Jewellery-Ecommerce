@@ -43,24 +43,36 @@
                                 <th class="text-success">Order Information</th>
                             </tr>
                             <tr>
-                                <td> Billing Rate :</td>
+                                <td> Order Date</td>
                                 <td></td>
-                                <td><%= orderData.billingRate %></td>
+
+                                <td><% 
+                                    const orderDate = new Date(orderData.orderDate);
+                                    const options = { day: '2-digit', month: 'long', year: 'numeric' };
+                                    const formattedDate = orderDate.toLocaleDateString('en-GB', options);
+                                    %>
+                                    : <%= formattedDate %>
+                                </td>
                             </tr>
                             <tr>
-                                <td>Total Amount :</td>
+                                <td> Billing Rate</td>
                                 <td></td>
-                                <td><%= (orderData.netAmount).toFixed(2) %></td>
+                                <td>: <%= orderData.billingRate %></td>
                             </tr>
                             <tr>
-                                <td>No of Items :</td>
+                                <td>Total Amount</td>
                                 <td></td>
-                                <td><%= orderData.orderedItems.length %></td>
+                                <td>: <%= (orderData.netAmount).toFixed(2) %></td>
                             </tr>
                             <tr>
-                                <td>Payment Mode :</td>
+                                <td>No of Items</td>
                                 <td></td>
-                                <td><%= orderData.paymentMethod %></td>
+                                <td>: <%= orderData.orderedItems.length %></td>
+                            </tr>
+                            <tr>
+                                <td>Payment Mode</td>
+                                <td></td>
+                                <td>: <%= orderData.paymentMethod %></td>
                             </tr>
                         </table>
                     </div>
