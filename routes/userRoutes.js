@@ -58,8 +58,8 @@ userRoute.get('/auth/google/callback', googleAuth.authenticate('google', { failu
   function(req, res) {
     console.log('Successful authentication');
     req.session.userId = req.user.id;
-    console.log('Session ID after google login:', req.session.id);
-    console.log('User ID after google login:', req.session.userId);
+    console.log('Session ID after google login :', req.session.id);
+    console.log('User ID after google login :', req.session.userId);
     res.redirect('/shopping');
   }
 );
@@ -96,7 +96,7 @@ userRoute.delete('/delete-address', userAuth.isLogin, userAuth.isBlocked, addres
 
 // WISHLIST ROUTES
 userRoute.get('/wishlist', userAuth.isLogin, userAuth.isBlocked, wishlistController.loadUserWishlist);
-userRoute.post('/add-to-wishlist', wishlistController.addToWishlist); // also same route for remove from wishlist
+userRoute.post('/add-to-wishlist', wishlistController.addToWishlist); // same route for remove from wishlist
 userRoute.delete('/save-for-later', userAuth.isLogin, userAuth.isBlocked, wishlistController.saveForLater);
 
 
@@ -137,7 +137,7 @@ userRoute.patch('/cancel-coupon', userAuth.isLogin, userAuth.isBlocked, couponCo
 
 
 // ROUTES FOR INVOICE
-userRoute.get('/invoice', orderController.loadInvoice); // // removed userAuth.isLogin, userAuth.isBlocked,
+userRoute.get('/invoice', orderController.loadInvoice); // removed userAuth.isLogin, userAuth.isBlocked,
 userRoute.get('/download-invoice', orderController.downloadInvoice);  // removed userAuth.isLogin, userAuth.isBlocked,
 
 
