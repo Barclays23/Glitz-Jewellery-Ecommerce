@@ -762,7 +762,7 @@ const loadShopping = async (req, res)=>{
         // console.log('Sort options:', sortOptions);
 
         // Fetch all matching products
-        const limit = 3;
+        const limit = 9;
         const skip = (pageNo - 1) * limit;
 
         const productData = await Product.find(query)

@@ -227,7 +227,6 @@ const sendforgetPasswordMail = async(userData, randomString, res)=>{
                             <p>Dear <strong>${userData.firstname} ${userData.lastname}</strong>,</p>
                             <p>We received a request to reset your password for your account at <strong>Glitz Jewellery Boutique</strong>. If you initiated this request, please follow the instructions below to reset your password:</p>
                             <p>Please click the following link to reset your password:</p>
-                            // <div class="reset-link"> <a href="http://localhost:${process.env.port}/admin/reset-password?id=${userData._id}&token=${randomString}"><strong>Reset Password</strong></a>
                             <div class="reset-link"> <a href="https://glitzjwellery.in/admin/reset-password?id=${userData._id}&token=${randomString}"><strong>Reset Password</strong></a>
                             </div>
                             <p>If you did not request this password reset or if you have any questions, please contact our support team immediately.</p>

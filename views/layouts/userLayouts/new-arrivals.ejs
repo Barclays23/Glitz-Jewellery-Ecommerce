@@ -28,7 +28,7 @@
                                         onerror="this.onerror=null;pagespeed.lazyLoadImages.loadIfVisibleAndMaybeBeacon(this);">
                                     </div>
                                     <ul class="tm-product-actions">
-                                        <li><a href="#"><i class="ion-android-cart"></i> Add to cart</a></li>
+                                        <li><a href="#tm-product-actions" onclick="addToCart('<%= newProducts[i]._id %>')"><i class="ion-android-cart"></i> Add to cart</a></li>
                                         <li><button data-fancybox data-src="assets/images/productImages/<%= newProducts[i].images.image1 %>"><i class="ion-eye"></i></button>
                                     </li>
                                     <li><a href="#"><i class="ion-heart"></i></a></li>
@@ -64,7 +64,7 @@
                                         leap into electronic typesetting.
                                     </p>
                                     <ul class="tm-product-actions">
-                                        <li><a href="#"><i class="ion-android-cart"></i> Add to cart</a></li>
+                                        <li><a href="#tm-product-actions" onclick="addToCart('<%= newProducts[i]._id %>')"><i class="ion-android-cart"></i> Add to cart</a></li>
                                         <li><button data-fancybox data-src=""> <i class="ion-eye"></i></button></li>
                                         <li><a href="#"><i class="ion-heart"></i></a></li>
                                     </ul>
