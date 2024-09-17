@@ -1071,7 +1071,7 @@ const sendforgetPasswordMail = async(userData, randomToken, res)=>{
                             <p>Dear <strong>${userData.firstname} ${userData.lastname}</strong>,</p>
                             <p>We received a request to reset your password for your account at <strong>Glitz Jewellery Boutique</strong>. If you initiated this request, please follow the instructions below to reset your password:</p>
                             <p>Please click the following link to reset your password:</p>
-                            <div class="reset-link"> <a href="http://localhost:${process.env.port}/reset-password?id=${userData._id}&token=${randomToken}"><strong>Reset Password</strong></a>
+                            <div class="reset-link"> <a href="https://glitzjwellery.in/reset-password?id=${userData._id}&token=${randomToken}"><strong>Reset Password</strong></a>
                             </div>
                             <p>If you did not request this password reset or if you have any questions, please contact our support team immediately.</p>
                             <p>Thank you,</p><br>
@@ -1120,7 +1120,7 @@ const sendforgetPasswordMail = async(userData, randomToken, res)=>{
 const loadResetPassword = async (req, res)=>{
     try {
         const tokenUserData = await User.findOne({token: req.query.token});
-        console.log('find the user with token: ', tokenUserData.firstname);
+        console.log('find the user with token : ', tokenUserData.firstname);
 
         if(!tokenUserData){
             res.render('404', {invalidToken: 'Token is expired or not valid anymore to reset the password !'});
