@@ -137,8 +137,8 @@ userRoute.patch('/cancel-coupon', userAuth.isLogin, userAuth.isBlocked, couponCo
 
 
 // ROUTES FOR INVOICE
-userRoute.get('/invoice', orderController.loadInvoice); // removed userAuth.isLogin, userAuth.isBlocked,
-userRoute.get('/download-invoice', orderController.downloadInvoice);  // removed userAuth.isLogin, userAuth.isBlocked,
+userRoute.get('/invoice', userAuth.isLogin, userAuth.isBlocked, orderController.loadInvoice); // removed userAuth.isLogin, userAuth.isBlocked,
+userRoute.get('/download-invoice', userAuth.isLogin, userAuth.isBlocked, orderController.downloadInvoice);  // removed userAuth.isLogin, userAuth.isBlocked,
 
 
 // FOR 404 PAGE
