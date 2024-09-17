@@ -1403,7 +1403,7 @@ const downloadInvoice = async (req, res) => {
 
     } catch (error) {
         console.error('Error generating PDF:', error);
-        res.status(500).send('An error occurred while generating the PDF.');
+        res.status(500).send(`An error occurred while generating the PDF. ${error}`);
     }
 };
 
