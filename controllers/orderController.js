@@ -1361,7 +1361,8 @@ const downloadInvoice = async (req, res) => {
 
 
         // Replace `localhost:3000` with the actual URL if necessary
-        const invoiceUrl = `http://localhost:3000/invoice?id=${orderId}`;
+        // const invoiceUrl = `http://localhost:3000/invoice?id=${orderId}`;
+        const invoiceUrl = `http://glitzjwellery.in/invoice?id=${orderId}`;
 
         console.log('Navigating to URL :', invoiceUrl);
 

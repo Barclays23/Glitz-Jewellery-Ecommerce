@@ -39,7 +39,7 @@
                             <p><strong>Billing Rate</strong><br> ₹ <%= orderData.billingRate %> / Gram</p>
                         </div>
                         <div>
-                            <p class="text-right"><strong>Invoice</strong><br> <a href="/download-invoice?id=<%= orderData._id %>" class="download-link"> Download </a></p>
+                            <p class="text-right"><strong>Invoice</strong><br> <a href="/-invodownloadice?id=<%= orderData._id %>" class="download-link"> Download </a></p>
                         </div>
                     </div>
                     <div class="order-info">
@@ -169,7 +169,7 @@
                                     <%
                                         let deadlineDays = 0;
 
-                                        if (orderData.orderedItems[i].orderStatus === 'Delivered'){
+                                        if (orderData.orderedItems[i].productStatus === 'Delivered'){
 
                                             const orderItem = (orderData.orderedItems[i].code);
                                             console.log('delivered orderItem :', orderItem)
@@ -253,6 +253,7 @@
 
                                         
                                         <% if (orderData.orderedItems[i].productStatus === 'Delivered' && deadlineDays <= 5 ){ %>
+                                            <% console.log('deadlineDays is : ', deadlineDays) %>
                                             <a class="return-item-link" data-toggle="modal" data-target="#returnItemModal" 
                                                 data-order-id="<%= encodeURIComponent(JSON.stringify(orderData._id)) %>"
                                                 data-order-item="<%= encodeURIComponent(JSON.stringify(orderData.orderedItems[i])) %>">
