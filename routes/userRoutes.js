@@ -79,6 +79,7 @@ userRoute.get('/resend-otp', userController.resendOtp);
 userRoute.get('/shopping', userController.loadShopping);
 userRoute.get('/product-details', userController.productDetals);
 
+
 // USER PROFILE ROUTES
 userRoute.get('/my-account', userAuth.isLogin, userAuth.isBlocked, userController.loadUserAccount);
 userRoute.get('/profile', userAuth.isLogin, userAuth.isBlocked, userController.loadUserProfile);

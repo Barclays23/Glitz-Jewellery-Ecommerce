@@ -73,16 +73,17 @@
                                 <button data-view="grid" class="active"><i class="ion-android-apps"></i></button>
                                 <button data-view="list"><i class="ion-android-menu"></i></button>
                             </div>
-
+                        
                             <% const startProductIndex = (currentPage - 1) * limit + 1 %>
                             <% const endProductIndex = Math.min(currentPage * limit, productCount) %>
-
+                        
                             <p class="tm-shop-countview">Showing <%= startProductIndex %> to <%= endProductIndex %> of <%= productCount %> </p>
                             <div class="tm-product-search d-flex" style="align-items: center;">
-                                <input type="text" class="form-control" name="search" placeholder="Search product...">
+                                <input type="text" class="form-control" name="search" placeholder="Search product..." value="<%= searchQuery || '' %>">
                                 <input type="submit" class="text-white bg-success m-1 w-50" style="height: 40px;" value="Search">
+                                <button type="button" class="text-white bg-secondary m-1 w-50" style="height: 40px;" onclick="window.location.href='?sort=<%= sortQuery %>&categoryId=<%= categoryQuery %>'">Clear</button>
                             </div>
-                               
+                        
                             <select name="sort" onchange="location.href='?sort=' + this.value + '&categoryId=<%= categoryQuery %>'">
                                 <option value="none" <%= sortQuery === 'none' ? 'selected' : '' %>>Default Sorting</option>
                                 <option value="a-z" <%= sortQuery === 'a-z' ? 'selected' : '' %>>Name : A-Z</option>
@@ -90,7 +91,7 @@
                                 <option value="low-to-high" <%= sortQuery === 'low-to-high' ? 'selected' : '' %>>Price : Lowest first</option>
                                 <option value="high-to-low" <%= sortQuery === 'high-to-low' ? 'selected' : '' %>>Price : Highest first</option>
                             </select>
-                        </form>
+                        </form>                        
 
                         <div class="tm-shop-products" id="shop-products">
                             <div class="row mt-30-reverse">

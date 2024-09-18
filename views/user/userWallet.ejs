@@ -108,8 +108,9 @@
                             </thead>
                             <tbody>
                                 <% if (userData && userData.walletHistory.length > 0) { %>
-                                    <% let bal = 0 %>
-                                    <% userData.walletHistory.forEach((transaction)=> { %>
+                                    <% let currentBalance = userData.walletBalance; %>
+                                    <% let transactions = userData.walletHistory.sort((a, b) => new Date(b.date) - new Date(a.date)); %>
+                                    <% transactions.forEach((transaction) => { %>
                                         <tr>
                                             <td><%= new Date(transaction.date).toLocaleDateString('en-GB') %></td>
                                             <td><%= transaction.description %></td>
@@ -117,11 +118,11 @@
                                                 <td></td>
                                                 <td class="text-right text-success"><%= transaction.amount.toFixed(2) %></td>
                                             <% } else { %>
-                                                <td class="text-right text-danger"> <%= transaction.amount.toFixed(2) %></td>
+                                                <td class="text-right text-danger"> <%= Math.abs(transaction.amount).toFixed(2) %></td>
                                                 <td></td>
                                             <% } %>
-                                            <% bal += transaction.amount %>
-                                            <td class="text-right"><%= (bal).toFixed(2) %></td>
+                                            <td class="text-right"><%= currentBalance.toFixed(2) %></td>
+                                            <% currentBalance -= transaction.amount %>
                                         </tr>
                                     <% }); %>
                                 <% } else { %>
@@ -129,8 +130,8 @@
                                         <td colspan="5" class="text-center">No transactions found</td>
                                     </tr>
                                 <% } %>
-                            </tbody>
-                        </table>
+                            </tbody>                            
+                        </table>                        
                     </div>
                 </div>
                     <!-- account tab-content ends -->
