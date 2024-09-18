@@ -32,7 +32,6 @@ userRoute.use(express.urlencoded({extended:true}));
 userRoute.use(express.static('public'));
 
 
-
 const userController = require ('../controllers/userController');
 const cartController = require ('../controllers/cartController');
 const wishlistController = require ('../controllers/wishlistController');
