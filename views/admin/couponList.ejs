@@ -34,13 +34,11 @@
                             <% if (couponData.length > 0){
                                 for(let i=0; i< couponData.length; i++){ %>
                                     <tr>
-                                        <td class="text-center"> <%= i+1 %> </td>
+                                        <td class="text-center"> <%= (currentPage-1) * limit + i+1 %> </td>
 
-                                        <% console.log('coupon image in the list :', couponData[i].image) %>
-
-                                        <% if(couponData[i].image){ %>
+                                        <% if (couponData[i].image){ %>
                                             <td> <img src="/assets/images/couponImages/<%= couponData[i].image %>" alt="<%= couponData[i].name %>" style="width: 150px; height: auto; border-radius: 0%;"> </td>
-                                        <% } else{ %>
+                                        <% } else { %>
                                             <td>(NO IMAGE)</td>
                                         <% } %>
 
@@ -119,6 +117,51 @@
 
                         </tbody>
                     </table>
+                    <!-- Pagination Controls -->
+                    <div class="list-pagination mt-4">
+                        <nav>
+                            <ul class="pagination rounded-flat pagination-success">
+                                <!-- Previous Page Link -->
+                                <% if (currentPage > 1) { %>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=<%= currentPage-1 %>&search=<%= searchQuery %>">
+                                            <i class="mdi mdi-chevron-left"></i>
+                                        </a>
+                                    </li>
+                                <% } else { %>
+                                    <li class="page-item disabled">
+                                        <a class="page-link"><i class="mdi mdi-chevron-left"></i></a>
+                                    </li>
+                                <% } %>
+                    
+                                <!-- Dynamic Page Links -->
+                                <% for (let j = 1; j <= totalPages; j++) { %>
+                                    <% if (j === currentPage) { %>
+                                        <li class="page-item active">
+                                            <a class="page-link" href="#"> <%= j %> </a>
+                                        </li>
+                                    <% } else { %>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page=<%= j %>&search=<%= searchQuery %>"> <%= j %> </a>
+                                        </li>
+                                    <% } %>
+                                <% } %>
+                    
+                                <!-- Next Page Link -->
+                                <% if (currentPage < totalPages) { %>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= searchQuery %>">
+                                            <i class="mdi mdi-chevron-right"></i>
+                                        </a>
+                                    </li>
+                                <% } else { %>
+                                    <li class="page-item disabled">
+                                        <a class="page-link"><i class="mdi mdi-chevron-right"></i></a>
+                                    </li>
+                                <% } %>
+                            </ul>
+                        </nav>
+                    </div>
                 </div>
             </div>
         </div>

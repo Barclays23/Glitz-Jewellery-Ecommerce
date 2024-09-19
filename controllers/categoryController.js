@@ -13,9 +13,31 @@ const loadCategoryList = async(req, res)=>{
         const adminData = await User.findOne({_id: req.session.adminId});
         const goldPriceData = await GoldPrice.findOne({_id: {$exists: true}});
 
-        const categoryData = await Category.find({});
-        // console.log('category data is : ', categoryData);
+        const page = parseInt(req.query.page, 10) || 1;
+        const limit = parseInt(req.query.limit, 10) || 5;
+        const skip = (page - 1) * limit;
 
+        let searchQuery = '';
+        if (req.query.search){
+            searchQuery = req.query.search;
+        }
+
+        let matchQuery = {};
+
+        if (searchQuery){
+            matchQuery.$or = [
+                {name: {$regex:'.*'+ searchQuery +'.*', $options: 'i'}},
+            ];
+        }
+
+        const categoryData = await Category.find(matchQuery).skip(skip).limit(limit);
+
+        // Fetch total count of categories
+        const totalCategories = await Category.find(matchQuery).countDocuments();
+        const totalPages = Math.ceil(totalCategories / limit);
+
+
+        // finding active offers for applying to category.``
         const currentDate = new Date();
         const offerData = await Offer.find(
             {
@@ -26,7 +48,17 @@ const loadCategoryList = async(req, res)=>{
         );
         console.log('Number of active running offers :', offerData.length);
 
-        res.render('categoryList', {adminData, categoryData, offerData, goldPriceData});
+        res.render('categoryList', {
+            adminData, 
+            categoryData, 
+            totalCategories, 
+            limit, 
+            totalPages, 
+            currentPage: page,
+            searchQuery,
+            offerData, 
+            goldPriceData
+        });
 
     } catch (error) {
         console.log('failed to load category page', error.message);

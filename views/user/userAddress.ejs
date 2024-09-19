@@ -93,7 +93,7 @@
                     <div class="tab-content" id="account-ontent">
                         <div class="tab-pane fade show active" id="account-address" role="tabpanel" aria-labelledby="account-address-tab">
                             <div class="tm-myaccount-address">
-                                <% if(userAddress && userAddress.address){ %>
+                                <% if (userAddress && userAddress.address){ %>
                                     <p><b>The following addresses will be used on the checkout page by default.</b></p>
                                 <% } else{ %>
                                     <p><b>"Hello! <br>
@@ -105,8 +105,8 @@
                                 <div class="col-lg-6 col-md-6 mb-3">
                                     <a href="#" class="btn add-button btn-success text-white" data-toggle="modal" data-target="#addAddressModal"> Add Address </a>
                                 </div>
-                                <% if(userAddress && userAddress.address){ %>
-                                    <% for(i=0; i< userAddress.address.length; i++){ %>
+                                <% if (userAddress && userAddress.address){ %>
+                                    <% for (i=0; i< userAddress.address.length; i++){ %>
                                         <div class="row mb-3">
                                             <div class="col-lg-6 col-md-6">
                                                 <div class="tm-myaccount-address-billing bg-grey">
@@ -140,6 +140,27 @@
                                             </div>
                                         </div>
                                     <% } %>
+                                <% } %>
+                            </div>
+                            <!-- Pagination Controls -->
+                            <div class="pagination">
+                                <% const totalPages = Math.ceil (totalItems / limit); %>
+                                
+                                <% if (page > 1) { %>
+                                    <a href="?page=<%= page - 1 %>&limit=<%= limit %>">Previous</a>
+                                <% } %>
+
+                                <!-- Page Number Links -->
+                                <% for (let p = 1; p <= totalPages; p++) { %>
+                                    <% if (p === page) { %>
+                                        <span><%= p %></span> <!-- Current Page -->
+                                    <% } else { %>
+                                        <a href="?page=<%= p %>&limit=<%= limit %>"><%= p %></a>
+                                    <% } %>
+                                <% } %>
+
+                                <% if (page < totalPages) { %>
+                                    <a href="?page=<%= page + 1 %>&limit=<%= limit %>">Next</a>
                                 <% } %>
                             </div>
                         </div>
@@ -391,7 +412,7 @@
 
 
 <!-- importing the script for removing address -->
-<script src="/assets/scripts/userScripts/remove-address-modal-script.js"></script>
+<script src="/assets/scripts/userScripts/remove-address-script.js"></script>
 
 
 <!-- style for address modal -->
@@ -438,6 +459,49 @@
 
 .dropdown-list li:hover {
     background-color: #f0f0f0;
+}
+
+</style>
+
+
+
+<!-- style pagination -->
+<style>
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.pagination a, 
+.pagination span {
+    margin: 0 5px;
+    padding: 8px 12px;
+    text-decoration: none;
+    color: #9a0056;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.pagination a:hover {
+    background-color: #9a0056;
+    color: white;
+}
+
+.pagination span {
+    background-color: #9a0056;
+    color: white;
+    border-color: #9a0056;
+    font-weight: bold;
+    pointer-events: none;
+}
+
+.pagination a:disabled {
+    color: #ccc;
+    pointer-events: none;
+    cursor: default;
 }
 
 </style>

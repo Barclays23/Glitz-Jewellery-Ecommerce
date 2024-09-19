@@ -64,6 +64,10 @@ const loadUserWishlist = async (req, res)=>{
         
 
 
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 5;
+        const skip = (page - 1) * limit;
+
         const userWishlist = await Wishlist.findOne({ userRef: sessionId })
         .populate({
             path: 'product.productRef',
@@ -71,7 +75,8 @@ const loadUserWishlist = async (req, res)=>{
                 path: 'offerRef',
                 model: 'Offer'
             }
-        });
+        })
+        .lean();
 
         let cartCount = 0;
         let wishlistCount = 0;
@@ -88,8 +93,19 @@ const loadUserWishlist = async (req, res)=>{
                 wishlistCount += product.quantity;
             });
         }
+
+        // Get the total number of products in the wishlist
+        const totalItems = userWishlist ? userWishlist.product.length : 0;
+        const totalPages = Math.ceil(totalItems / limit);
+
+        // Paginate the products array
+        const paginatedProducts = userWishlist ? userWishlist.product.slice(skip, skip + limit) : [];
+
+        // Update the wishlist with paginated products
+        userWishlist.product = paginatedProducts;
+
         
-        res.render('userWishlist', { userData, cartCount, wishlistCount, userWishlist, goldPriceData });
+        res.render('userWishlist', { userWishlist, page, limit, totalItems, totalPages, userData, cartCount, wishlistCount, goldPriceData });
 
     } catch (error) {
         console.log('error in loading wishlist', error.message);

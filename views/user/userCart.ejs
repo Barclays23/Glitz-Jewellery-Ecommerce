@@ -104,7 +104,6 @@
                                 </thead>
                                 <tbody>
                                     <% if (userCart && userCart.product.length > 0){ %>
-                                        <% console.log('length of user cart : ', userCart.product.length) %>
                                         <% for(let i=0; i< userCart.product.length; i++){ %>
                                             <tr style="border: 2px solid black">
                                                 <td class="bg-light">
@@ -158,7 +157,7 @@
                                                             <hr style="border: 1px solid black;">
 
                                                             <!-- total amount -->
-                                                            <li class="tm-cart-total-price"> <b><%= (userCart.product[i].productRef.totalPrice).toFixed(2) %></b></li>
+                                                            <li class="tm-cart-total-price text-dark"> <b><%= (userCart.product[i].productRef.totalPrice).toFixed(2) %></b></li>
 
                                                             <!-- discount amount -->
                                                             <% if (userCart.product[i].productRef.offerRef != null){ %>
@@ -169,9 +168,9 @@
 
                                                             <!-- net amount -->
                                                             <% if (userCart.product[i].productRef.offerRef != null){ %>
-                                                                <li class="tm-cart-net-amount"> <b class="text-success">₹<%= ((userCart.product[i].productRef.totalPrice) - (userCart.product[i].productRef.makingCharge * userCart.product[i].productRef.offerRef.offerPercentage / 100)).toFixed(2) %> </b></li>
+                                                                <li class="tm-cart-net-amount"> <b>₹<%= ((userCart.product[i].productRef.totalPrice) - (userCart.product[i].productRef.makingCharge * userCart.product[i].productRef.offerRef.offerPercentage / 100)).toFixed(2) %> </b></li>
                                                             <% } else { %>
-                                                                <li class="tm-cart-net-amount"> <b class="text-success"><%= (userCart.product[i].productRef.totalPrice - 0.00).toFixed(2) %></b></li>
+                                                                <li class="tm-cart-net-amount"> <b><%= (userCart.product[i].productRef.totalPrice - 0.00).toFixed(2) %></b></li>
                                                             <% } %>
                                                         </ul>
                                                     </div>
@@ -203,9 +202,28 @@
                                             <td colspan="6" class="p-5 text-dark bg-light"> YOUR SHOPPING CART IS EMPTY </td>
                                         </tr>
                                     <% } %>
-
                                 </tbody>
                             </table>
+
+                            <!-- Pagination controls -->
+                            <div class="pagination">
+                                <% if (page > 1) { %>
+                                    <a href="?page=<%= page - 1 %>&limit=<%= limit %>">Previous</a>
+                                <% } %>
+                            
+                                <!-- Page Number Links -->
+                                <% for(let i = 1; i <= totalPages; i++) { %>
+                                    <% if(i === page) { %>
+                                        <span><%= i %></span> <!-- Current Page -->
+                                    <% } else { %>
+                                        <a href="?page=<%= i %>&limit=<%= limit %>"><%= i %></a>
+                                    <% } %>
+                                <% } %>
+                            
+                                <% if (page < totalPages) { %>
+                                    <a href="?page=<%= page + 1 %>&limit=<%= limit %>">Next</a>
+                                <% } %>
+                            </div>
                         </div>
     
                         <div class="tm-cart-bottomarea mt-5">
@@ -317,3 +335,43 @@
 <script src="/assets/scripts/userScripts/wishlist-scripts.js"></script>
 
 
+
+<style>
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.pagination a, 
+.pagination span {
+    margin: 0 5px;
+    padding: 8px 12px;
+    text-decoration: none;
+    color: #9a0056;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.pagination a:hover {
+    background-color: #9a0056;
+    color: white;
+}
+
+.pagination span {
+    background-color: #9a0056;
+    color: white;
+    border-color: #9a0056;
+    font-weight: bold;
+    pointer-events: none;
+}
+
+.pagination a:disabled {
+    color: #ccc;
+    pointer-events: none;
+    cursor: default;
+}
+
+</style>

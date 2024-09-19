@@ -75,7 +75,9 @@ const loadUserCart = async (req, res)=>{
         console.log('Number of cancelled offer products in cart :', updatedProductOffer.modifiedCount);
 
 
-
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 5;
+        const skip = (page - 1) * limit;
 
         const userCart = await Cart.findOne({ userRef: sessionId })
         .populate({
@@ -85,8 +87,9 @@ const loadUserCart = async (req, res)=>{
                 model: 'Offer'
             }
         })
-        .populate('couponRef');
-        
+        .populate('couponRef')
+        .lean();
+
         
         let cartCount = 0;
         let wishlistCount = 0;
@@ -181,12 +184,23 @@ const loadUserCart = async (req, res)=>{
         console.log("roundOffAmount :", roundOffAmount)
 
 
+        // Get the total number of products in the wishlist
+        const totalItems = userCart ? userCart.product.length : 0;
+        const totalPages = Math.ceil(totalItems / limit);
+
+        // Paginate the products array
+        const paginatedProducts = userCart ? userCart.product.slice(skip, skip + limit) : [];
+
+        // Update the wishlist with paginated products
+        userCart.product = paginatedProducts;
+
+
         res.render('userCart', { 
             userData, 
             goldPriceData, 
             cartCount, 
             wishlistCount, 
-            userCart, 
+            userCart, page, totalItems, totalPages, limit,
             subTotal, 
             shippingCharge, 
             couponDiscount, 
@@ -1139,7 +1153,18 @@ const loadUserOrders = async (req, res)=>{
         const userCart = await Cart.findOne({ userRef: sessionId });
         const userWishlist = await Wishlist.findOne({ userRef: sessionId});
 
-        const userOrders = await Order.find({userRef: sessionId}).sort({ orderDate: -1 });
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 5;
+        const skip = (page - 1) * limit;
+
+        const userOrders = await Order.find({userRef: sessionId})
+        .sort({ orderDate: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean();
+
+        // Get the total number of orders for the user
+        const totalItems = await Order.countDocuments({ userRef: sessionId });
 
         let cartCount = 0;
         let wishlistCount = 0;
@@ -1157,7 +1182,7 @@ const loadUserOrders = async (req, res)=>{
         }
 
 
-        res.render('userOrders', { userData, cartCount, wishlistCount, goldPriceData, userOrders });
+        res.render('userOrders', { userData, cartCount, wishlistCount, goldPriceData, userOrders, page, totalItems, limit });
 
     } catch (error) {
         console.log('error in loading user order page', error.message);

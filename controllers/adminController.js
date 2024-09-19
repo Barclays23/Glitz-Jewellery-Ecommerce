@@ -372,8 +372,6 @@ const loadUsersList = async(req, res)=>{
         let totalPages = Math.ceil(count /limit);
 
         console.log('count of users : ', count);
-        console.log('logged admin : ', adminData);
-
 
         res.render('usersList', {
             adminData,
@@ -381,6 +379,7 @@ const loadUsersList = async(req, res)=>{
             searchQuery,
             totalPages,
             currentPage: pageNo,
+            limit,
             goldPriceData
         });
 

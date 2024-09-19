@@ -15,9 +15,6 @@
                             <tr>
                                 <th> No </th>
                                 <th> User Name </th>
-                                <!-- <th> Photo </th> -->
-                                <!-- <th> First Name </th> -->
-                                <!-- <th> Last Name </th> -->
                                 <th> Email Address </th>
                                 <th> Mobile No </th>
                                 <th> isVerified </th>
@@ -28,23 +25,22 @@
                             <% if (userData.length > 0){
                                 for(let i=0; i<userData.length; i++){ %>
                                     <tr>
-                                        <td> <%= i+1 %></td>
+                                        <td><%= (currentPage-1) * limit + i + 1 %></td>
                                     
                                         <td>
                                             <% if (userData[i].photo){ %>
+                                                <% console.log(`${(currentPage-1) * limit + i + 1}. ${userData[i].firstname} ${userData[i].lastname} - ${userData[i].photo}`) %>
                                                 <img src="<%= userData[i].photo %>" alt="image"/>
                                             <% } else if (userData[i].googleAccount.googlePhoto){ %>
+                                                <% console.log(`${(currentPage-1) * limit + i + 1}. ${userData[i].firstname} ${userData[i].lastname} - ${userData[i].googleAccount.googlePhoto}`) %>
                                                 <img src="<%= userData[i].googleAccount.googlePhoto %>" alt="image" />
                                             <% } else { %>
+                                                <% console.log(`${(currentPage-1) * limit + i + 1}. ${userData[i].firstname} ${userData[i].lastname} - photo`) %>
                                                 <img src="/assets/images/userImages/faces/face<%= (i+1) %>.jpg" alt="image"/>
                                             <% } %>
+
+                                            <%= userData[i].firstname %> <%= userData[i].lastname %>
                                         </td>
-
-                                        <!-- <td> <%= userData[i].photo %> </td> -->
-
-                                        <!-- <td> <%= userData[i].firstname %> </td> -->
-
-                                        <!-- <td> <%= userData[i].lastname %> </td> -->
 
                                         <td> <%= userData[i].email %> </td>
 

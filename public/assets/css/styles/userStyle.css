@@ -6762,7 +6762,8 @@ button.tm-videobutton img {
 .tm-wishlist-table .tm-cart-totalprice,
 .tm-wishlist-table .tm-wishlist-totalprice {
     font-weight: 700;
-    color: #707070
+    color: #707070;
+    font-size: larger;
 }
 
 .tm-cart-table .tm-cart-removeproduct,

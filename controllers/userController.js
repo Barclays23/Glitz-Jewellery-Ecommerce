@@ -1386,14 +1386,37 @@ const loadCoupons = async (req, res)=>{
             });
         }
 
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 5;
+        const skip = (page - 1) * limit;
+
         const couponData = await Coupon.find({
+            isActive: true,
+            expiryDate: { $gte: new Date() },
+        })
+        .skip(skip).limit(limit);
+
+        const totalCoupons = await Coupon.countDocuments({
             isActive: true,
             expiryDate: { $gte: new Date() },
         });
 
-        console.log('coupon data for users :', couponData);
+        console.log('coupon data :', couponData);
+        console.log('total coupons :', totalCoupons);
 
-        res.render('userCoupons', { userData, couponData, cartCount, wishlistCount, goldPriceData });
+
+        const totalPages = Math.ceil(totalCoupons / limit);
+
+        res.render('userCoupons', { userData, 
+            couponData, 
+            totalCoupons,
+            totalPages,
+            limit,
+            page,
+
+            cartCount, wishlistCount, 
+            goldPriceData 
+        });
 
     } catch (error) {
         console.log('failed to load the user coupons page :', error.message);
@@ -1405,38 +1428,75 @@ const loadCoupons = async (req, res)=>{
 
 
 // load user wallet ---------------------------------------------
-const loadWallet = async (req, res)=>{
+const loadWallet = async (req, res) => {
     try {
         const sessionId = req.session.userId;
         const goldPriceData = await GoldPrice.findOne({});
         const userCart = await Cart.findOne({ userRef: sessionId });
-        const userWishlist = await Wishlist.findOne({ userRef: sessionId});
-
+        const userWishlist = await Wishlist.findOne({ userRef: sessionId });
         const userData = await User.findById(sessionId);
+
+        const page = parseInt(req.query.page, 10) || 1;
+        const limit = parseInt(req.query.limit, 10) || 5;
+        const skip = (page - 1) * limit;
+
+        // Fetch all transactions for pagination
+        const allTransactions = userData.walletHistory || [];
+        const totalItems = allTransactions.length;
+
+        // Sort transactions in ascending order by date for correct balance calculation
+        allTransactions.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        // Calculate balance and paginate transactions
+        let runningBalance = 0;
+        const transactionsWithBalance = allTransactions.map(transaction => {
+            runningBalance += transaction.amount;
+            return {
+                ...transaction,
+                description: transaction.description,
+                date: transaction.date,
+                debit: transaction.amount < 0 ? Math.abs(transaction.amount).toFixed(2) : '',
+                credit: transaction.amount > 0 ? transaction.amount.toFixed(2) : '',
+                balance: runningBalance.toFixed(2)
+            };
+        });
+
+        // Reverse transactions for display (most recent first)
+        const paginatedTransactions = transactionsWithBalance.reverse().slice(skip, skip + limit);
 
 
         let cartCount = 0;
         let wishlistCount = 0;
 
-
-        if (userCart){
+        if (userCart) {
             userCart.product.forEach((product) => {
                 cartCount += product.quantity;
             });
         }
 
-        if (userWishlist){
+        if (userWishlist) {
             userWishlist.product.forEach((product) => {
                 wishlistCount += product.quantity;
             });
         }
-        res.render('userWallet', { userData, cartCount, wishlistCount, goldPriceData });
 
+        res.render('userWallet', {
+            userData,
+            cartCount,
+            wishlistCount,
+            goldPriceData,
+            transactions: paginatedTransactions,
+            totalItems,
+            limit,
+            page,
+            totalPages: Math.ceil(totalItems / limit)
+        });
     } catch (error) {
-        console.log('failed to load the user wallet :', error.message);
-
+        console.log('Failed to load the user wallet:', error.message);
     }
-}
+};
+
+
 
 
 

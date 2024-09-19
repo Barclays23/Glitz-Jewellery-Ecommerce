@@ -107,31 +107,47 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <% if (userData && userData.walletHistory.length > 0) { %>
-                                    <% let currentBalance = userData.walletBalance; %>
-                                    <% let transactions = userData.walletHistory.sort((a, b) => new Date(b.date) - new Date(a.date)); %>
+                                <% if (transactions.length > 0) { %>
                                     <% transactions.forEach((transaction) => { %>
                                         <tr>
                                             <td><%= new Date(transaction.date).toLocaleDateString('en-GB') %></td>
                                             <td><%= transaction.description %></td>
-                                            <% if (transaction.amount > 0){ %>
+                                            <% if (transaction.credit) { %>
                                                 <td></td>
-                                                <td class="text-right text-success"><%= transaction.amount.toFixed(2) %></td>
+                                                <td class="text-right text-success"><%= transaction.credit %></td>
                                             <% } else { %>
-                                                <td class="text-right text-danger"> <%= Math.abs(transaction.amount).toFixed(2) %></td>
+                                                <td class="text-right text-danger"><%= transaction.debit %></td>
                                                 <td></td>
                                             <% } %>
-                                            <td class="text-right"><%= currentBalance.toFixed(2) %></td>
-                                            <% currentBalance -= transaction.amount %>
+                                            <td class="text-right"><%= transaction.balance %></td>
                                         </tr>
-                                    <% }); %>
+                                    <% }) %>
                                 <% } else { %>
                                     <tr>
                                         <td colspan="5" class="text-center">No transactions found</td>
                                     </tr>
                                 <% } %>
-                            </tbody>                            
-                        </table>                        
+                            </tbody>
+                        </table>  
+                        
+                        <!-- Pagination Controls -->
+                        <div class="pagination">
+                            <% if (page > 1) { %>
+                                <a href="?page=<%= page - 1 %>&limit=<%= limit %>">Previous</a>
+                            <% } %>
+
+                            <% for(let i = 1; i <= totalPages; i++) { %>
+                                <% if(i === page) { %>
+                                    <span><%= i %></span> <!-- Current Page -->
+                                <% } else { %>
+                                    <a href="?page=<%= i %>&limit=<%= limit %>"><%= i %></a>
+                                <% } %>
+                            <% } %>
+
+                            <% if (page < totalPages) { %>
+                                <a href="?page=<%= page + 1 %>&limit=<%= limit %>">Next</a>
+                            <% } %>
+                        </div>
                     </div>
                 </div>
                     <!-- account tab-content ends -->
@@ -145,3 +161,48 @@
 </div>
 
 <%- include('../layouts/userLayouts/user-footer.ejs') %>
+
+
+
+
+
+
+<style>
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.pagination a, 
+.pagination span {
+    margin: 0 5px;
+    padding: 8px 12px;
+    text-decoration: none;
+    color: #9a0056;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.pagination a:hover {
+    background-color: #9a0056;
+    color: white;
+}
+
+.pagination span {
+    background-color: #9a0056;
+    color: white;
+    border-color: #9a0056;
+    font-weight: bold;
+    pointer-events: none;
+}
+
+.pagination a:disabled {
+    color: #ccc;
+    pointer-events: none;
+    cursor: default;
+}
+
+</style>

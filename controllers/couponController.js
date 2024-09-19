@@ -15,10 +15,42 @@ const loadCouponList = async(req, res)=>{
 
         const goldPriceData = await GoldPrice.findOne({});
 
-        const couponData = await Coupon.find({});  // find all coupons for admin
+        const page = parseInt(req.query.page, 10) || 1;
+        const limit = parseInt(req.query.limit, 10) || 5;
+        const skip = (page - 1) * limit;
+
+        let searchQuery = '';
+        if (req.query.search){
+            searchQuery = req.query.search;
+        }
+
+        let matchQuery = {};
+
+        if (searchQuery){
+            matchQuery.$or = [
+                {name: {$regex:'.*'+ searchQuery +'.*', $options: 'i'}},
+                {code: {$regex:'.*'+ searchQuery +'.*', $options: 'i'}},
+            ];
+        }
+
+        const couponData = await Coupon.find(matchQuery)
+        .skip(skip)
+        .limit(limit);
+
+        const totalCoupons = await Coupon.find(matchQuery).countDocuments();
+        const totalPages = Math.ceil(totalCoupons / limit);
 
 
-        res.render('couponList', {adminData, goldPriceData, couponData });
+        res.render('couponList', {
+            adminData, 
+            goldPriceData, 
+            couponData,
+            totalCoupons, 
+            limit, 
+            totalPages, 
+            currentPage: page,
+            searchQuery,
+        });
 
     } catch (error) {
         console.log('error in loading coupon list :', error);

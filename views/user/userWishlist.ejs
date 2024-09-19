@@ -106,9 +106,7 @@
                                 </thead>
                                 <tbody>
                                     <% if (userWishlist && userWishlist.product.length > 0){ %>
-                                        <% console.log('wishlist length :', userWishlist.product.length) %>
                                         <% userWishlist.product.forEach((items, index)=>{ %>
-                                            <% console.log('items are :', items.productRef.name) %>
                                             <tr class="text-center">
                                                 <td class="bg-light"> <%= index + 1 %> </td>
                                                 <td class="bg-light">
@@ -148,6 +146,24 @@
                                     <% } %>
                                 </tbody>
                             </table>
+                            <!-- Pagination Controls -->
+                            <div class="pagination">
+                                <% if (page > 1) { %>
+                                    <a href="?page=<%= page - 1 %>&limit=<%= limit %>">Previous</a>
+                                <% } %>
+
+                                <% for(let i = 1; i <= totalPages; i++) { %>
+                                    <% if(i === page) { %>
+                                        <span><%= i %></span> <!-- Current Page -->
+                                    <% } else { %>
+                                        <a href="?page=<%= i %>&limit=<%= limit %>"><%= i %></a>
+                                    <% } %>
+                                <% } %>
+
+                                <% if (page < totalPages) { %>
+                                    <a href="?page=<%= page + 1 %>&limit=<%= limit %>">Next</a>
+                                <% } %>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -190,4 +206,42 @@
     width: 180px;
     min-width: 180px;
 }
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.pagination a, 
+.pagination span {
+    margin: 0 5px;
+    padding: 8px 12px;
+    text-decoration: none;
+    color: #9a0056;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.pagination a:hover {
+    background-color: #9a0056;
+    color: white;
+}
+
+.pagination span {
+    background-color: #9a0056;
+    color: white;
+    border-color: #9a0056;
+    font-weight: bold;
+    pointer-events: none;
+}
+
+.pagination a:disabled {
+    color: #ccc;
+    pointer-events: none;
+    cursor: default;
+}
+
 </style>

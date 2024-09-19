@@ -15,9 +15,40 @@ const loadOfferList = async (req, res)=>{
 
         const goldPriceData = await GoldPrice.findOne({});
 
-        const offerData = await Offer.find({}).sort({ activationDate: -1 });
+        const page = parseInt(req.query.page, 10) || 1;
+        const limit = parseInt(req.query.limit, 10) || 5;
+        const skip = (page - 1) * limit;
 
-        res.render('offerList', {adminData, goldPriceData, offerData});
+        let searchQuery = '';
+        if (req.query.search){
+            searchQuery = req.query.search;
+        }
+
+        let matchQuery = {};
+
+        if (searchQuery){
+            matchQuery.$or = [
+                {offerName: {$regex:'.*'+ searchQuery +'.*', $options: 'i'}},
+            ];
+        }
+
+        const offerData = await Offer.find(matchQuery)
+        .sort({ activationDate: -1 })
+        .skip(skip)
+        .limit(limit);
+
+        const totalOffers = await Offer.find(matchQuery).countDocuments();
+        const totalPages = Math.ceil(totalOffers / limit);
+
+        res.render('offerList', {adminData, 
+            goldPriceData, 
+            offerData,
+            totalOffers, 
+            limit, 
+            totalPages, 
+            currentPage: page,
+            searchQuery,
+        });
 
     } catch (error) {
         console.log('error while loading the offer list :', error);

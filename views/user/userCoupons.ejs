@@ -89,7 +89,7 @@
                     <!-- account tabs ends -->
 
                     <!-- coupons tab-content starts -->
-                    <h4>Available Coupons (<%= couponData.length %>)</h4>
+                    <h4>Available Coupons (<%= totalCoupons %>)</h4>
                     <div class="tab-content col" id="coupons-content">
                         <div class="tab-pane fade show active" id="account-coupons" role="tabpanel" aria-labelledby="account-coupons-tab">
                             <div class="tm-myaccount-coupons">
@@ -119,7 +119,24 @@
                         </div>
                     </div>                    
                     <!-- coupons tab-content ends -->
+                </div>
+                <!-- Pagination Controls -->
+                <div class="pagination">
+                    <% if (page > 1) { %>
+                        <a href="?page=<%= page - 1 %>&limit=<%= limit %>">Previous</a>
+                    <% } %>
 
+                    <% for(let i = 1; i <= totalPages; i++) { %>
+                        <% if(i === page) { %>
+                            <span><%= i %></span> <!-- Current Page -->
+                        <% } else { %>
+                            <a href="?page=<%= i %>&limit=<%= limit %>"><%= i %></a>
+                        <% } %>
+                    <% } %>
+
+                    <% if (page < totalPages) { %>
+                        <a href="?page=<%= page + 1 %>&limit=<%= limit %>">Next</a>
+                    <% } %>
                 </div>
             </div>
         </div>
@@ -194,115 +211,158 @@ function formatDate(dateString) {
 <!-- stlyles for user coupons -->
 
 <style>
-    h4 {
-        font-size: 24px;
-        color: #333;
-        margin-bottom: 20px;
-    }
+h4 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+}
 
-    .tm-myaccount-coupons {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-    }
+.tm-myaccount-coupons {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
 
-    .coupon-item {
-        background-color: #fff;
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        width: 100%;
-    }
+.coupon-item {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
 
+.coupon-details {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    flex-wrap: wrap;
+}
+
+.coupon-image img {
+    width: 100%;
+    max-width: 350px;
+    height: auto;
+    border-bottom: 1px solid #ddd;
+    margin: 7px;
+}
+
+.coupon-text {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 35px;
+    text-align: center;
+    border-radius: 5px;
+    margin: 7px;
+    flex: 1;
+}
+
+.coupon-text b {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.coupon-action {
+    background-color: #fff3cd;
+    color: #9a0056;
+    padding: 30px;
+    margin: 7px;
+    text-align: center;
+    border-radius: 5px;
+    flex: 1;
+}
+
+.coupon-code {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.copy-code {
+    margin-top: 10px;
+    cursor: pointer;
+    padding: 10px 20px;
+    background-color: #636363;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    transition: background-color 0.3s;
+}
+
+.copy-code:hover {
+    background-color: #9a0056;
+}
+
+
+
+/* for pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.pagination a, 
+.pagination span {
+    margin: 0 5px;
+    padding: 8px 12px;
+    text-decoration: none;
+    color: #9a0056;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.pagination a:hover {
+    background-color: #9a0056;
+    color: white;
+}
+
+.pagination span {
+    background-color: #9a0056;
+    color: white;
+    border-color: #9a0056;
+    font-weight: bold;
+    pointer-events: none;
+}
+
+.pagination a:disabled {
+    color: #ccc;
+    pointer-events: none;
+    cursor: default;
+}
+
+
+
+
+@media (max-width: 768px) {
     .coupon-details {
-        display: flex;
-        align-items: center;
-        padding: 20px;
-        flex-wrap: wrap;
+        flex-direction: column;
     }
 
     .coupon-image img {
+        max-width: 100%;
+    }
+
+    .coupon-text, .coupon-action {
         width: 100%;
-        max-width: 350px;
-        height: auto;
-        border-bottom: 1px solid #ddd;
-        margin: 7px;
+        padding: 20px;
+        margin: 10px 0;
     }
+}
 
-    .coupon-text {
-        background-color: #f8d7da;
-        color: #721c24;
-        padding: 35px;
-        text-align: center;
-        border-radius: 5px;
-        margin: 7px;
-        flex: 1;
-    }
-
-    .coupon-text b {
-        display: block;
-        margin-bottom: 5px;
-    }
-
-    .coupon-action {
-        background-color: #fff3cd;
-        color: #9a0056;
-        padding: 30px;
-        margin: 7px;
-        text-align: center;
-        border-radius: 5px;
-        flex: 1;
+@media (max-width: 480px) {
+    .coupon-text, .coupon-action {
+        padding: 15px;
     }
 
     .coupon-code {
-        font-size: 16px;
-        font-weight: bold;
+        font-size: 14px;
     }
 
     .copy-code {
-        margin-top: 10px;
-        cursor: pointer;
-        padding: 10px 20px;
-        background-color: #636363;
-        border: none;
-        border-radius: 5px;
-        color: #fff;
-        transition: background-color 0.3s;
+        padding: 8px 16px;
     }
-
-    .copy-code:hover {
-        background-color: #9a0056;
-    }
-
-    @media (max-width: 768px) {
-        .coupon-details {
-            flex-direction: column;
-        }
-
-        .coupon-image img {
-            max-width: 100%;
-        }
-
-        .coupon-text, .coupon-action {
-            width: 100%;
-            padding: 20px;
-            margin: 10px 0;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .coupon-text, .coupon-action {
-            padding: 15px;
-        }
-
-        .coupon-code {
-            font-size: 14px;
-        }
-
-        .copy-code {
-            padding: 8px 16px;
-        }
-    }
+}
 </style>
 

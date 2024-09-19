@@ -15,6 +15,10 @@ const loadUserAddress = async (req, res)=>{
         const sessionId = req.session.userId
         const userData = await User.findById(sessionId);
 
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 5;
+        const skip = (page - 1) * limit;
+
         const goldPriceData = await GoldPrice.findOne({});
         const userCart = await Cart.findOne({ userRef: sessionId });
         const userWishlist = await Wishlist.findOne({userRef : sessionId});
@@ -34,9 +38,23 @@ const loadUserAddress = async (req, res)=>{
             });
         }
 
-        const userAddress = await Address.findOne({userRef: sessionId});
 
-        res.render('userAddress', { userData, userAddress, cartCount, wishlistCount, goldPriceData });
+        const userAddress = await Address.findOne({ userRef: sessionId })
+        .skip(skip)
+        .limit(limit)
+        .lean();
+
+        // Get the total number of addresses for the user
+        const totalItems = await Address.countDocuments({ userRef: sessionId });
+        console.log('total address length :', totalItems);
+        
+
+        res.render('userAddress', { 
+            userData, 
+            userAddress, page, totalItems,  limit,  
+            cartCount, wishlistCount, 
+            goldPriceData 
+        });
 
     } catch (error) {
         console.log('error in loading user address page', error.message);

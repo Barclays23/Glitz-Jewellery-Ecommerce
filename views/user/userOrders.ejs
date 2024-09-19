@@ -91,11 +91,11 @@
 
                     
                     <!-- account tab-content starts -->
-                    <h4>My Orders (<%= userOrders.length %>)</h4>
+                    <h4>My Orders (<%= totalItems %>)</h4>
                     <div class="tab-content col" id="account-content">
                         <div class="tab-pane fade show active" id="account-orders" role="tabpanel" aria-labelledby="account-orders-tab">
                             <div class="tm-myaccount-orders">
-                                <% for(i=0; i< userOrders.length; i++){ %>
+                                <% for (i=0; i< userOrders.length; i++){ %>
                                     <div class="order-item">
                                         <div class="order-header">
                                             <div>
@@ -251,6 +251,28 @@
                                             <% } %>
                                         </div>
                                     </div>
+                                <% } %>
+                            </div>
+
+                            <!-- Pagination controls -->
+                            <div class="pagination">
+                                <% const totalPages = Math.ceil(totalItems / limit); %>
+                            
+                                <% if (page > 1) { %>
+                                    <a href="?page=<%= page - 1 %>&limit=<%= limit %>">Previous</a>
+                                <% } %>
+                            
+                                <!-- Page Number Links -->
+                                <% for (let p = 1; p <= totalPages; p++) { %>
+                                    <% if (p === page) { %>
+                                        <span class="current-page"><%= p %></span> <!-- Current Page -->
+                                    <% } else { %>
+                                        <a href="?page=<%= p %>&limit=<%= limit %>"><%= p %></a>
+                                    <% } %>
+                                <% } %>
+                            
+                                <% if (page < totalPages) { %>
+                                    <a href="?page=<%= page + 1 %>&limit=<%= limit %>">Next</a>
                                 <% } %>
                             </div>
                         </div>
@@ -421,6 +443,45 @@
 }
 .retry-options a:hover {
     background-color: #9a0056;
+}
+
+
+/* for pagination controlls */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.pagination a, 
+.pagination span {
+    margin: 0 5px;
+    padding: 8px 12px;
+    text-decoration: none;
+    color: #9a0056;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.pagination a:hover {
+    background-color: #9a0056;
+    color: white;
+}
+
+.pagination span {
+    background-color: #9a0056;
+    color: white;
+    border-color: #9a0056;
+    font-weight: bold;
+    pointer-events: none;
+}
+
+.pagination a:disabled {
+    color: #ccc;
+    pointer-events: none;
+    cursor: default;
 }
 
 
