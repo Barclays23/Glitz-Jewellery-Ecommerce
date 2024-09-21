@@ -39,7 +39,13 @@
                             <p><strong>Billing Rate</strong><br> ₹ <%= orderData.billingRate %> / Gram</p>
                         </div>
                         <div>
-                            <p class="text-right"><strong>Invoice</strong><br> <a href="/download-invoice?id=<%= orderData._id %>" class="download-link"> Download </a></p>
+                            <% if (orderData.orderStatus !== "Failed" && orderData.orderStatus !== "Pending" ) { %>
+                                <p class="text-right">
+                                    <a href="/invoice?id=<%= orderData._id %>" class="invoice-link"><strong> View Invoice</strong></a> 
+                                    <br>
+                                    <a href="/download-invoice?id=<%= orderData._id %>" class="download-link"> Download </a>
+                                </p>
+                            <% } %>
                         </div>
                     </div>
                     <div class="order-info">
@@ -793,10 +799,10 @@
 .order-details p {
     margin-bottom: 0.15rem;
 }
-.download-link {
+.download-link, .invoice-link {
     font-weight: 500;
 }
-.download-link:hover {
+.download-link:hover, .invoice-link:hover {
     color: #ff4400;
 }
 .order-header {

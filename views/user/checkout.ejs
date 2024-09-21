@@ -8,6 +8,21 @@
 
 
 <main class="page-content">
+    <!-- Breadcrumbs area starts -->
+    <div id="tm-breadcrumb" class="tm-breadcrumb-area tm-padding-section bg-grey" data-bgimage="assets/images/breadcrumbImages/breadcrumb-bg3.jpg">
+        <div class="container">
+            <div class="tm-breadcrumb" id="tm-breadcrumb">
+                <h2 style="color: black;">Checkout</h2>
+                <ul>
+                    <li><a href="/" style="color: black;">Home</a></li>
+                    <li><a href="/shopping" style="color: black;">Shopping</a></li>
+                    <li><a href="/cart" style="color: black;">Cart</a></li>
+                    <li style="color: black;"> Checkout </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- Breadcrumbs area starts -->
     <div class="tm-section tm-checkout-area bg-white tm-padding-section">
         <div class="container">
             <!-- can give here or bottom side.  -->
@@ -173,13 +188,16 @@
                 <div class="tm-checkout-coupon" id="coupon-area">
                     <% if (userCart && userCart.couponRef == null) { %>
                         <a href="#checkout-couponform" data-toggle="collapse">
-                            <span>Have a coupon code?</span> Click here and enter your code.
+                            <span>Have a coupon code?</span> Click here to see available coupons and to apply.
                         </a>
                         <div id="checkout-couponform" class="collapse">
                             <form action="#" class="tm-checkout-couponform">
-                                <input type="text" id="coupon-field" placeholder="Enter coupon code" required="required" />
-                                <button type="button" class="tm-button" onclick="applyCoupon()">Apply Coupon</button>
+                                <input type="text" id="coupon-field" placeholder="Enter coupon code" required="required"/>
+                                <button type="button" class="tm-button ml-2" onclick="applyCoupon()">Apply Coupon</button>
                             </form>
+                            <div>
+                                <a href="#" class="see-coupons-btn ml-2" data-toggle="modal" data-target="#couponsModal"> See Available Coupons </a>
+                            </div>
                         </div>
                     <% } else { %>
                         <a href="#remove-couponform" data-toggle="collapse">
@@ -662,6 +680,43 @@
 
 
 
+<!-- Choose Available Coupons Modal -->
+<div class="modal fade" id="couponsModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="coupon-modal-content">
+                <span class="close" onclick="closeCouponsModal()">&times;</span>
+                <h4 class="coupon-category-name text-white mt-2 mb-4 p-2">Available Coupons</h4>
+                <h5 class="select-coupon-title mb-3">SELECT A COUPON</h5>
+                <% if (availableCoupons.length > 0) { %>
+                    <div id="couponsList" class="coupons-list">
+                        <% availableCoupons.forEach(coupon => { %>
+                            <div class="coupon-card">
+                                <img src="/assets/images/couponImages/<%= coupon.image %>" alt="<%= coupon.name %> Image" class="coupon-image">
+                                <h3 class="coupon-name"><%= coupon.name %></h3>
+                                <h5 class="coupon-value">Value: ₹<%= coupon.couponValue %> OFF</h5>
+                                <h6 class="coupon-criteria">for purchases worth ₹<%= coupon.criteriaAmount %></h6>
+                                <h6 class="coupon-expiry">Expires on : <%= coupon.expiryDate.toLocaleDateString('en-GB') %></h6>
+                                <h5 class="coupon-code">Code: <%= coupon.code %></h5>
+                                <button class="copy-coupon-btn p-1" onclick="copyToClipboard('<%= coupon.code %>')">Copy Code</button>
+                            </div>
+                        <% }) %>
+                    </div>
+                <% } else { %>
+                    <div>
+                        <h4>NO ACTIVE COUPONS AVAILABLE</h4>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
 <!-- Payment Failed Modal -->
 <div id="paymentFailedModal" class="payment-failed-modal">
     <div class="failed-modal-content">
@@ -673,28 +728,6 @@
 </div>
 
 
-<!-- Styles for payment failed modal -->
-<style>
-    .payment-failed-modal {
-        display: none; /* Hidden by default */
-        position: fixed; /* Stay in place */
-        z-index: 1000; /* Sit on top */
-        left: 0;
-        top: 0;
-        width: 100%; /* Full width */
-        height: 100%; /* Full height */
-        overflow: auto; /* Enable scroll if needed */
-        background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
-    }
-
-    .failed-modal-content {
-        background-color: #fefefe;
-        margin: 15% auto; /* 15% from the top and centered */
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%; /* Could be more or less, depending on screen size */
-    }
-</style>
 
 
 
@@ -712,6 +745,7 @@
 
 <!-- SweetAlert2 JavaScript -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
 
 
 <!-- importing the script for add address modal form -->
@@ -738,6 +772,39 @@
 <!-- importing the razorpay library link -->
 <script src="https://checkout.razorpay.com/v1/checkout.js"> </script>
  
+
+
+
+<!--  script for the available coupons modal -->
+<script>
+    // Show the offers modal
+    function showCouponsModal() {
+        document.getElementById('couponsModal').style.display = 'block';
+    }
+
+    // Hide the offers modal
+    function closeCouponsModal() {
+        document.getElementById('couponsModal').style.display = 'none';
+    }
+
+    // to copy the coupon code
+    function copyToClipboard(code) {
+    navigator.clipboard.writeText(code).then(() => {
+        Swal.fire({
+            title: code,
+            text: 'Coupon code copied to clipboard',
+            showConfirmButton: false,
+            timer: 1500
+        });
+    }).catch(err => {
+        console.error('Could not copy text: ', err);
+    });
+}
+
+
+</script>
+
+
 
 
 
@@ -1209,13 +1276,17 @@
 
 
 
-<!-- styles for checkout page -->
+
+
+<!-- styles for checkout page product image -->
  <style>
 .tm-cart-table .tm-cart-col-image {
     width: 150px;
     min-width: 150px;
 }
  </style>
+
+
 
 
 
@@ -1263,5 +1334,181 @@
     
     .dropdown-list li:hover {
         background-color: #f0f0f0;
+    }
+</style>
+
+
+
+
+<!-- style for Available Coupons Modal -->
+<style>
+.see-coupons-btn {
+    margin-top: 10px;
+    display: inline-block;
+    height: 25px;
+    min-width: 150px;
+    background: #f2ba59;
+    color: #fff;
+    text-align: center;
+    /* line-height: 50px; */
+    font-weight: 600;
+    border-radius: 4px;
+    z-index: 1;
+    position: relative;
+    overflow: hidden;
+    padding: 0 40px;
+    vertical-align: middle;
+    font-size: 16px;
+}
+
+.see-coupons-btn:hover {
+    background: #9a0056;
+    color: white;
+}
+
+.coupon-modal-content {
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.coupon-modal-content .close {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.coupon-category-name {
+    color: #f0f0f0;
+    background-color: #9a0056;
+}
+
+.coupon-name {
+    font-size: 18px;
+    text-align: center;
+    margin-bottom: 10px;
+    color: #9a0056;
+}
+
+.coupon-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: #009a12;
+}
+
+.coupon-code {
+    margin-top: 15px;
+    font-size: 16px;
+}
+
+.coupon-modal-content h4 {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.select-coupon-title {
+    text-align: center;
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: #666;
+}
+
+.coupons-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    max-height: 400px; /* Set a maximum height for scrolling */
+    overflow-y: auto;  /* Enable scrolling if needed */
+}
+
+.coupon-card {
+    width: 200px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.coupon-card:hover {
+    transform: translateY(-5px);
+    background-color: #fdd5ec;
+}
+
+.coupon-image {
+    width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+.coupon-criteria, .coupon-discount, .coupon-expiry {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.copy-coupon-btn {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 8px 16px;
+    background-color: #959695;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.copy-coupon-btn:hover {
+    background-color: #9a0056;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .coupons-list {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .coupon-card {
+        width: 80%;
+    }
+}
+
+</style>
+
+
+
+
+<!-- Styles for payment failed modal -->
+<style>
+    .payment-failed-modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1000; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+    }
+
+    .failed-modal-content {
+        background-color: #fefefe;
+        margin: 15% auto; /* 15% from the top and centered */
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%; /* Could be more or less, depending on screen size */
     }
 </style>

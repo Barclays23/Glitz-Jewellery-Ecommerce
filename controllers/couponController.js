@@ -237,13 +237,12 @@ const applyCoupon = async(req, res)=>{
         const couponData = await Coupon.findOne({code: couponCode});
         console.log('coupon data for applying coupon discount :', couponData);
 
-        // const usedCustomer = couponData.usedCustomers.find(userRef => userRef.toString() === sessionId);
-        const usedCustomer = couponData.usedCustomers.some(user => user.userRef.toString() === sessionId);
-
         if (!couponData) {
             console.log(`coupon code ${couponCode} not found in database.`);
-            return res.json({notfound: true, message: 'Invalid coupon code!'})
+            return res.json({notfound: true, message: 'Invalid coupon code!'});
+
         } else {
+            const usedCustomer = couponData.usedCustomers.some(user => user.userRef.toString() === sessionId);
             const currentDate = new Date();
             console.log('currentDate is :', currentDate);
     

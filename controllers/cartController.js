@@ -495,6 +495,17 @@ const loadCheckout = async (req, res)=>{
         console.log('Number of cancelled offer products in checkout :', updatedProductOffer.modifiedCount);
 
 
+        // finding active & available coupons for applying to checkout.`
+        const currentDate = new Date();
+        const availableCoupons = await Coupon.find(
+            {
+                isActive: true, 
+                activationDate: {$lte: currentDate},  // activation date is on running
+                expiryDate: {$gte: currentDate}  // not expired
+            }
+        );
+
+        console.log('available Coupons :', availableCoupons);
 
         const userCart = await Cart.findOne({ userRef: sessionId })
         .populate({
@@ -610,6 +621,8 @@ const loadCheckout = async (req, res)=>{
                 userCart, 
                 cartCount, 
                 wishlistCount, 
+
+                availableCoupons,
                 subTotal, 
                 shippingCharge, 
                 offerDiscount, 
@@ -626,6 +639,7 @@ const loadCheckout = async (req, res)=>{
 
     } catch (error) {
         console.log('error in loadCheckout :', error.message);
+        return res.render('500', {errorMessage: error.message});
     }
 }
 

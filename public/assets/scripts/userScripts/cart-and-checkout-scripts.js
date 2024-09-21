@@ -457,6 +457,8 @@ function cancelCoupon() {
         // data: JSON.stringify({ couponCode }),
         success: function(response) {
             if (response.cancelled) {
+                console.log('response after cancelling the coupon :', response);
+                
                 Swal.fire({
                     icon: 'success',
                     text: 'Coupon cancelled !',

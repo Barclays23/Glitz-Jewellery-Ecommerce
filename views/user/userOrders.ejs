@@ -142,8 +142,12 @@
                                             <div class="order-options">
                                                 <div class="text-success text-right"><b><%= userOrders[i].orderNo %></b></div>
                                                 <!-- <div class="text-success text-right"><b><%= userOrders[i].orderNo %></b></div> -->
-                                                <a href="/order-details?id=<%= userOrders[i]._id %>">View Order Details</a> | <a href="/invoice?id=<%= userOrders[i]._id %>">Invoice</a>
-                                                <a href="/download-invoice?id=<%= userOrders[i]._id %>">Download</a>
+                                                <a href="/order-details?id=<%= userOrders[i]._id %>">View Order Details</a>
+                                                <% if (userOrders[i].orderStatus !== "Failed" && userOrders[i].orderStatus !== "Pending" ) { %>
+                                                    | 
+                                                    <a href="/invoice?id=<%= userOrders[i]._id %>">Invoice</a>
+                                                    <a href="/download-invoice?id=<%= userOrders[i]._id %>">Download</a>
+                                                <% } %>
                                             </div>
                                         </div>
                                         <!-- ordered items list -->

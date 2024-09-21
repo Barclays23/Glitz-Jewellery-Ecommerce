@@ -231,11 +231,10 @@
                                 <div class="col-lg-5 col-md-6">
                                     <div class="tm-buttongroup">
                                         <a href="/shopping" class="tm-button">Continue Shopping</a>
-                                        <!-- <a href="#" class="tm-button">Update Cart</a> -->
                                     </div>
                                     <% if (userCart && userCart.product.length > 0){ %>
                                         <form action="#" class="tm-cart-coupon" id="coupon-area">
-                                            <% if (userCart.couponRef === null) { %>
+                                            <% if (!userCart.couponRef) { %>
                                                 <label for="coupon-field">Have a coupon code?</label>
                                                 <input type="text" id="coupon-field" placeholder="Enter coupon code">
                                                 <button type="button" class="tm-button" onclick="applyCoupon()">Apply Coupon</button>
